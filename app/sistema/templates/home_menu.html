@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-success">Menu Rápido</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+        
+            <div class="col-sm-4">
+            <a href="/gerenciar-pessoas" style="font-size: 25px; padding: 25px;" class="btn btn-dark"><i class="fa fa-user align-center"></i> GERENCIAR PESSOAS</a>
+            </div>
+
+            <div class="col-sm-4">
+                <a href="/cadastrar-pessoas" style="font-size: 25px; padding: 25px;" class="btn btn-dark"><i class="fa fa-plus"></i> CADASTRAR PESSOAS</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

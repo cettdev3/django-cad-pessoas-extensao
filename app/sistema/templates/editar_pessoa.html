@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-success">Alterar Cadastro</h6>
+    </div>
+    <div class="card-body">
+        <form action="/edicaoPessoa" method="POST">{% csrf_token %}
+            <div class="form-group row">
+                <div class="col-sm-4">
+                    <label><b>Nome Completo:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" id="nome" name="nome" placeholder="" value="{{user.nome}}" required>
+                    <input type="text" hidden class="form-control" id="codigo" name="codigo" placeholder="" value="{{user.id}}" required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>Email:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="email" class="form-control" id="email" name="email" value="{{user.email}}" placeholder=""required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>Data de Nascimento:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control"  value="{{user.data_nascimento}}" id="data_nascimento" name="data_nascimento" placeholder=""required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-4">
+                    <label><b>Telefone:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.telefone}}" id="telefone" name="telefone" placeholder=""required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>CPF:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.cpf}}" id="cpf" name="cpf" placeholder=""required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>RG:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.rg}}" id="rg" name="rg" placeholder=""required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-4">
+                    <label><b>Orgão Emissor:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.orgao_emissor}}" id="orgao_emissor" name="orgao_emissor" placeholder=""required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>Endereço:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.endereco}}" id="endereco" name="endereco" placeholder=""required>
+                </div>
+                <div class="col-sm-4">
+                    <label><b>CEP:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.cep}}" id="cep" name="cep" placeholder=""required>
+                </div>
+              
+            </div>
+            <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>CARGO:</b></label>
+                <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.cargo}}" id="cargo" name="cargo" placeholder=""required>
+            </div>
+            <div class="col-sm-4">
+                <label><b>Tipo:</b></label>
+                <select required style="background-color: rgb(12, 80, 75); color:#fff;" class="form-control" id="tipo" name="tipo">
+                    {% if user.tipo == 'RPA' %}
+                    <option selected>RPA</option>
+                    <option>CLT</option> 
+                    {% else %}
+                    <option>RPA</option> 
+                    <option selected>CLT</option> 
+                    {% endif %}
+                  </select>
+            </div>
+
+            <div class="col-sm-4">
+                <label><b>Qtd de Contratações:</b></label>
+                <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" class="form-control" value="{{user.qtd_contratacoes}}" id="qtd_contratacoes" name="qtd_contratacoes" placeholder=""required>
+            </div>
+            </div>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações Financeiras</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <div class="col-sm-3">
+                            <label><b>Banco:</b></label>
+                            <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" value="{{user.banco}}" class="form-control" id="banco" name="banco" placeholder=""required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label><b>Agência:</b></label>
+                            <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" value="{{user.agencia}}" class="form-control" id="agencia" name="agencia" placeholder=""required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label><b>Conta:</b></label>
+                            <input style="background-color: rgb(12, 80, 75); color:#fff;" type="text" value="{{user.conta}}" class="form-control" id="conta" name="conta" placeholder=""required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label><b>Pix:</b></label>
+                            <input style="background-color: rgb(12, 80, 75); color:#fff;"  type="text" value="{{user.pix}}" class="form-control" id="pix" name="pix" placeholder=""required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <a href="/gerenciar-pessoas" type="submit" class="btn btn-primary btn-user btn-block" >VOLTAR</a>
+                </div>
+
+                <div class="col-sm-6">
+                    <button type="submit" class="btn btn-warning btn-user btn-block" style="color:#000000">ALTERAR CADASTRO</button>
+                </div>
+            </div>
+            
+ 
+        </form>
+
+    
+    </div>
+</div>
+
+{% endblock content %}
