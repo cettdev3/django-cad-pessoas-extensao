@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  cett_index:
-    image: cett_index
+  cad-pessoas-extensao:
+    image: cad-pessoas-extensao
     restart: always
     build:
       context: .
