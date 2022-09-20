@@ -95,7 +95,7 @@ def registrar(request):
     agencia = request.POST['agencia']
     conta = request.POST['conta']
     pix = request.POST['pix']
-    qtd_contratacoes  = request.POST['qtd_contratacoes ']
+    qtd_contratacoes  = request.POST['qtd_contratacoes']
     user_camunda = request.POST['user_camunda']
     
 
