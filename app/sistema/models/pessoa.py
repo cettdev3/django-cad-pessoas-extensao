@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Pessoas(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     email = models.CharField(max_length=50)
     nome = models.CharField(max_length=50)
     data_nascimento = models.CharField(max_length=50)
