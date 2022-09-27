@@ -1,14 +1,53 @@
 version: '3.4'
 
 services:
+  dbextensao:
+    image: mariadb:latest
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${EXT_MYSQL_USER}
+      - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
+      - MYSQL_HOST=${EXT_MYSQL_HOST}
+      - MYSQL_DATABASE=${EXT_MYSQL_USER}
+    volumes:
+      - ./logs:/var/log/mysql:rw
+      - ./data:/var/lib/mysql:rw
+
   cad-pessoas-extensao:
     image: cad-pessoas-extensao
     restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
+    depends_on:
+      - dbextensao
+    environment:
+      - NODE_ENV=production
+      - TOPIC=putProtocolo
+      - ENG_REST_URL=${CAMUNDA_URL}
+      - ENG_REST_USERNAME=${CAMUNDA_USERNAME}
+      - ENG_REST_PASSWORD=${CAMUNDA_PASSWORD}
+      - MAX_TASK_DURATION=30000
+      - DEV_SSH_HOST_NAME=${DEV_SSH_HOST_NAME}
+      - DEV_SSH_HOST_USER=${DEV_SSH_HOST_USER}
+      - DEV_SSH_HOST_PASS=${DEV_SSH_HOST_PASS}
+      - SITES_SSH_HOST_NAME=${SITES_SSH_HOST_NAME}
+      - SITES_SSH_HOST_USER=${SITES_SSH_HOST_USER}
+      - SITES_SSH_HOST_PASS=${SITES_SSH_HOST_PASS}
+      - SIGA-SER_SSH_HOST_NAME=${SIGA-SER_SSH_HOST_NAME}
+      - SIGA-SER_SSH_HOST_USER=${SIGA-SER_SSH_HOST_USER}
+      - SIGA-SER_SSH_HOST_PASS=${SIGA-SER_SSH_HOST_PASS}
+      - PROTO_API_KEY=${PROTO_API_KEY}
+      - PROTO_API_SECRET=${PROTO_API_SECRET}
+      - PROTO_API_URL=${PROTO_API_URL}
+      - MYSQL_ROOT_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${EXT_MYSQL_USER}
+      - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
+      - MYSQL_HOST=${EXT_MYSQL_HOST}
+      - MYSQL_DATABASE=${EXT_MYSQL_USER}
     ports:
-     - 8000:8000
+      - 8081:8000
     volumes:
       - ./app:/home/appuser
     

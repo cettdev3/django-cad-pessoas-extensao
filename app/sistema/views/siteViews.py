@@ -1,7 +1,7 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from sistema.models import Pessoas
+from sistema.models.pessoa import Pessoas
 from django.contrib import messages
 # Create your views here. teste
 
