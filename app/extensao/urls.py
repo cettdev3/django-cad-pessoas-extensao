@@ -17,6 +17,7 @@ from xml.etree.ElementInclude import include
 from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path
+from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView
 from sistema.views.siteViews import home, gerencia_pessoas, cadastrar_pessoas, eliminarPessoa, visualizarPessoa, editarPessoa, edicaoPessoa, registrar,menu_rapido
 
@@ -33,4 +34,7 @@ urlpatterns = [
 
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path("pessoas", PessoaApiView.as_view()),
+    path("avaliacoes", AvaliacaoApiView.as_view()),
+    path('avaliacoes/<int:avaliacao_id>/', AvaliacaoDetailApiView.as_view()),
+
 ]
