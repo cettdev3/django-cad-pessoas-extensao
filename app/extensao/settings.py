@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import envconfiguration as config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sistema',
+    'rest_framework',
+    "rest_framework.authtoken"
 ]
 
 MIDDLEWARE = [
@@ -80,17 +83,16 @@ WSGI_APPLICATION = 'extensao.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'c3selecao3bd',
-        'USER': 'c3selecao3bd',
-        'PASSWORD': 'q#b3FgZ3A',
-        'HOST': 'isp.cett.org.br',
+        'NAME': config.MYSQL_USER,
+        'USER': config.MYSQL_USER,
+        'PASSWORD': config.MYSQL_ROOT_PASSWORD,
+        'HOST': config.MYSQL_HOST,
         'PORT': '3306',
         'OPTION': {'init_command':"SET sql_mode='STRICT_TRANS_TABLE',"},
-    }
+    },
 }
 
 
@@ -135,3 +137,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
