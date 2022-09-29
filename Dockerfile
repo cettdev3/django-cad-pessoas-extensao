@@ -38,7 +38,7 @@ RUN python -m pip install -r requirements.txt -U
 RUN adduser -u 1000 --disabled-password --gecos "" appuser && chown -R appuser /home/appuser
 
 WORKDIR /home/appuser
-# COPY ./app /home/appuser
+COPY ./app /home/appuser
 
 # RUN chown -R appuser:appuser /home/appuser
 USER appuser
