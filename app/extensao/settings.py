@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sistema',
     'rest_framework',
-    "rest_framework.authtoken"
+    "rest_framework.authtoken",
+    "authentication"
 ]
 
 MIDDLEWARE = [
@@ -83,13 +84,31 @@ WSGI_APPLICATION = 'extensao.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
+username = ""
+password = ""
+host = ""
+
+try:
+    username = config.MYSQL_USER
+except:
+    pass
+try:
+    password = config.MYSQL_ROOT_PASSWORD
+except:
+    pass
+try:
+    host = config.MYSQL_HOST
+except:
+    pass
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config.MYSQL_USER,
-        'USER': config.MYSQL_USER,
-        'PASSWORD': config.MYSQL_ROOT_PASSWORD,
-        'HOST': config.MYSQL_HOST,
+        'NAME': username,
+        'USER': username,
+        'PASSWORD': password,
+        'HOST': host,
         'PORT': '3306',
         'OPTION': {'init_command':"SET sql_mode='STRICT_TRANS_TABLE',"},
     },

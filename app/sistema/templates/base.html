@@ -47,11 +47,13 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
+            {% if user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link" href="/">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
+            {% endif %}
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -61,6 +63,7 @@
                 Menu de Acesso
             </div>
 
+            {% if user.is_authenticated %}
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -76,7 +79,21 @@
                     </div>
                 </div>
             </li>
-
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="/auth-user/logout-user">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Logout</span></a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="/auth-user/login-user">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Login</span></a>
+            </li>
+            {% endif %}
             
 
         </ul>

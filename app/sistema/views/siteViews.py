@@ -3,14 +3,18 @@ from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from sistema.models.pessoa import Pessoas
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 # Create your views here. teste
 
+@login_required(login_url='/auth-user/login-user')
 def menu_rapido(request):
     return render(request, 'home_menu.html')
 
+@login_required(login_url='/auth-user/login-user')
 def home(request):
     return render(request, 'base.html')
 
+@login_required(login_url='/auth-user/login-user')
 def gerencia_pessoas(request):
     count = 0
     pessoa = Pessoas.objects.all()
@@ -20,23 +24,28 @@ def gerencia_pessoas(request):
 
     return render(request,'gerencia_pessoas.html',{'pessoas':pessoa,'contagem':count})
 
+@login_required(login_url='/auth-user/login-user')
 def cadastrar_pessoas(request):
     return render(request,'cadastrar_pessoas.html')
 
+@login_required(login_url='/auth-user/login-user')
 def eliminarPessoa(request,codigo):
     user = Pessoas.objects.get(id=codigo)
     user.delete()
     return redirect('/gerenciar-pessoas')
 
+@login_required(login_url='/auth-user/login-user')
 def visualizarPessoa(request,codigo):
     user = Pessoas.objects.get(id=codigo)
 
     return render(request,'visualizar_pessoas.html',{'user':user})
 
+@login_required(login_url='/auth-user/login-user')
 def editarPessoa(request,codigo):
     user = Pessoas.objects.get(id=codigo)
     return render(request,'editar_pessoa.html',{'user':user})
 
+@login_required(login_url='/auth-user/login-user')
 def edicaoPessoa(request):
     id_ = request.POST['codigo']
     nome = request.POST['nome']
@@ -79,6 +88,7 @@ def edicaoPessoa(request):
 
     return redirect('/gerenciar-pessoas')
 
+@login_required(login_url='/auth-user/login-user')
 def registrar(request):
     nome = request.POST['nome']
     email = request.POST['email']
