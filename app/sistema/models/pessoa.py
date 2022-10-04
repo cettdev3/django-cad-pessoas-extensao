@@ -23,4 +23,3 @@ class Pessoas(models.Model):
     
     class Meta:
         db_table = 'processo_gps_professor'
-        
