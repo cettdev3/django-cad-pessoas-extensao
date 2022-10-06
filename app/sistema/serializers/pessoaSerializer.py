@@ -23,5 +23,7 @@ class PessoaSerializer(serializers.ModelSerializer):
             "pix",
             "tipo",
             "qtd_contratacoes",
-            "user_camunda"
+            "user_camunda",
+            "cursos"
         ]
+        depth = 1

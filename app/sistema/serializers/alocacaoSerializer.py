@@ -14,3 +14,4 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "status",
             "observacao",
         ]
+        depth = 2

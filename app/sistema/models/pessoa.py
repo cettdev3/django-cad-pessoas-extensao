@@ -1,5 +1,5 @@
 from django.db import models
-
+from ..models.curso import Curso
 # Create your models here.
 class Pessoas(models.Model):
     id = models.AutoField(primary_key=True)
@@ -20,6 +20,7 @@ class Pessoas(models.Model):
     tipo = models.CharField(max_length=50)
     qtd_contratacoes = models.CharField(max_length=11)
     user_camunda = models.CharField(max_length=50)
-    
+    cursos = models.ManyToManyField(Curso, blank=True)
+
     class Meta:
         db_table = 'processo_gps_professor'

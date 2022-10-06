@@ -1,7 +1,7 @@
 from django.db import models
 
-from app.sistema.models.evento import Evento
-from app.sistema.models.pessoa import Pessoas
+from ..models.evento import Evento
+from ..models.pessoa import Pessoas
 
 class Alocacao(models.Model):
     id = models.AutoField(primary_key=True)
