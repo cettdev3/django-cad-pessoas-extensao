@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="d-flex">
+        {% block messages %}
+            {% if messages %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {% for message in messages %}
+                    <span{% if message.tags %} class="h5"{% endif %}> {{message.tags}} {{ message|capfirst }}</span>
+                    {% endfor %}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endblock messages %}
+    </div>
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-success">Cadastro de Pessoa</h6>
+    </div>
+    <div class="card-body">
+        <form action="/auth-user/login-user" method="POST">{% csrf_token %}
+            <div class="form-group row">
+                <div class="col-12">
+                    <label><b>Usuario:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" 
+                    type="text" 
+                    class="form-control" 
+                    id="username" 
+                    name="username" 
+                    placeholder="" 
+                    required>
+                </div>
+                <div class="col-12">
+                    <label><b>Senha:</b></label>
+                    <input style="background-color: rgb(12, 80, 75); color:#fff;" 
+                    type="password" 
+                    class="form-control" 
+                    id="password" 
+                    name="password" 
+                    placeholder="" 
+                    required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-user btn-block">Logar</button>
+ 
+        </form>
+
+    
+    </div>
+</div>
+
+{% endblock content %}

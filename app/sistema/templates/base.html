@@ -24,7 +24,10 @@
     <link href="{% static 'css/gestao-cursos.css' %}" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     
-   
+   <!-- FONT AWESOME -->
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
 </head>
 
 <body id="page-top">
@@ -36,7 +39,7 @@
         <ul class="navbar-nav sidebar sidebar-dark accordion" style="background-color: #0c504b;" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -47,36 +50,61 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
+            <!-- {% if user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link" href="/">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
+                    <span>Principal</span></a>
             </li>
+            {% endif %} -->
 
             <!-- Divider -->
-            <hr class="sidebar-divider">
+            <!-- <hr class="sidebar-divider"> -->
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <!-- <div class="sidebar-heading">
                 Menu de Acesso
-            </div>
+            </div> -->
 
-            <!-- Nav Item - Pages Collapse Menu -->
+            {% if user.is_authenticated %}
             <li class="nav-item">
+                <a class="nav-link" href="/gerenciar-pessoas">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Pessoas</span></a>
+            </li>
+            {% endif %}
+
+            <!-- {% if user.is_authenticated %} -->
+            <!-- Nav Item - Pages Collapse Menu -->
+            <!-- <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-check-square"></i>
-                    <span>Gerenciamento</span>
+                    <span>Pessoas</span>
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
+                    <div class="bg-white collapse-inner rounded">
                         <h6 class="collapse-header">Escolha sua opção:</h6>
-                        <a class="collapse-item" href="/gerenciar-pessoas">Gerenciar Pessoas kaike</a>
+                        <a class="collapse-item" href="/gerenciar-pessoas">Gerenciar Pessoas</a>
                         <a class="collapse-item" href="/cadastrar-pessoas">Cadastrar Pessoas</a>
                     </div>
                 </div>
+            </li> -->
+            <!-- {% endif %} -->
+            
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="/auth-user/logout-user">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Logout</span></a>
             </li>
-
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="/auth-user/login-user">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Login</span></a>
+            </li>
+            {% endif %}
             
 
         </ul>
@@ -89,15 +117,23 @@
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-
-
+                <nav class=" navbar 
+                navbar-expand navbar-light 
+                bg-white topbar
+                static-top shadow">
+                    <div class="w-100 d-flex justify-content-between align-items-center">
+                        {% if page_title %}
+                        <span class="h4">{{ page_title }}</span>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <span >Bem vindo {{ user.get_username }}</span>
+                        {% endif %}
+                    </div>
                 </nav>
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div class="w-100">
 
                     {% block content %}
 
@@ -108,16 +144,6 @@
             </div>
             <!-- End of Main Content -->
 
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>CETT 2022</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
-
         </div>
         <!-- End of Content Wrapper -->
 
@@ -125,7 +151,7 @@
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
+    <a class="scroll-to-top rounded " style="margin-right: 40px;" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
@@ -152,11 +178,12 @@
 
      
     <script type="text/javascript">
-        $(document).ready(function(){
+        function maskValues() {
+            $('#rg').mask("00000.00");
             $('#telefone').mask("(00)0 0000-0000");
             $('#cpf').mask("000.000.000-00");
             $('#cep').mask("00.000-000");
-        });
+        }
     </script>
 </body>
 

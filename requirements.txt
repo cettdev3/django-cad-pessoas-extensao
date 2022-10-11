@@ -3,3 +3,4 @@ Django
 mysqlclient
 djangorestframework
 envconfiguration
+fontawesomefree
