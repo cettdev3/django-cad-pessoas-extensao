@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'sistema',
     'rest_framework',
     "rest_framework.authtoken",
-    "authentication"
+    "authentication",
+    'fontawesomefree',
 ]
 
 MIDDLEWARE = [

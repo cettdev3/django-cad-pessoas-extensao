@@ -1,0 +1,619 @@
+<div class="modal fade" id="cadastrarPessoaModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarPessoaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarPessoaModalLabel">
+                    {% if pessoa is None %}
+                        Cadastrar Pessoa
+                        <span id="modelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{pessoa.nome}}
+                        <span id="modelId" hidden>{{pessoa.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" id="dismissCadastrarPessoa" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="pessoasList1" class="col py-2 active-form-tab">
+                            <a id="pessoaMenuLink1" style="display: none;" href="#home">1</a>
+                            <span>Dados Pessoais</span>
+                        </li>
+                        <li id="pessoasList2" class="col py-2">
+                            <a id="pessoaMenuLink2" style="display: none;" href="#menu1">2</a>
+                            <span>Endereco</span>
+                        </li>
+                        <li id="pessoasList3" class="col py-2">
+                            <a id="pessoaMenuLink3" style="display: none;" href="#menu2">3</a>
+                            <span>Dasos Bancários</span>
+                        </li>
+                        <li id="pessoasList4" class="col py-2">
+                            <a id="pessoaMenuLink4" style="display: none;" href="#menu3">4</a>
+                            <span>Dados Gerenciais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarPessoaForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Nome Completo:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.nome}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome" 
+                                        name="nome" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Email:</b></label>
+                                        <input 
+                                        type="email" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.email}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="email"
+                                        name="email"
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Data de Nascimento:</b></label>
+                                        <input 
+                                        type="date" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.data_nascimento_formatted|date:'Y-m-d'}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="data_nascimento"
+                                        name="data_nascimento"
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
+                                        <label><b>Telefone:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.telefone}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="telefone" 
+                                        name="telefone"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>CPF:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.cpf}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="cpf" 
+                                        name="cpf" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>RG:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.rg}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="rg" 
+                                        name="rg" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label><b>Orgão Emissor:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.orgao_emissor}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="orgao_emissor" 
+                                        name="orgao_emissor"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="menu1" class="tab-pane py-3 fade">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Cidade:</b></label>
+                                        <input type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.cidade}}" 
+                                        {% endif %}
+                                        id="cidade" 
+                                        name="cidade" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Bairro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.bairro}}" 
+                                        {% endif %}
+                                        id="bairro" 
+                                        name="bairro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Rua:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.rua}}" 
+                                        {% endif %}
+                                        id="rua" 
+                                        name="rua" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>CEP:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.cep}}" 
+                                        {% endif %}
+                                        id="cep" 
+                                        name="cep" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label><b>Complemento:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.complemento}}" 
+                                        {% endif %}
+                                        id="complemento" 
+                                        name="complemento"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="menu2" class="tab-pane py-3 fade">
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
+                                        <label><b>Banco:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.banco}}" 
+                                        {% endif %}
+                                        id="banco" 
+                                        name="banco" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Agência:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.agencia}}" 
+                                        {% endif %}
+                                        id="agencia" 
+                                        name="agencia"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Conta:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.conta}}" 
+                                        {% endif %}
+                                        id="conta" 
+                                        name="conta" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Pix:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.pix}}" 
+                                        {% endif %}
+                                        id="pix" 
+                                        name="pix" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="menu3" class="tab-pane py-3 fade">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Cargo:</b></label>
+                                        <select required class="form-control" id="cargo" name="cargo">
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'estoquista' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="estoquista">Estoquista</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'professor' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="professor">Professor</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'auxiliar' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="auxiliar">auxiliar</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'assistente' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="assistente">Assistente</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'coordenador' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="coordenador">Coordenador</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'gerente' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="gerente">Gerente</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.cargo == 'outro' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="outro">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Tipo de Contratação:</b></label>
+                                        <select required class="form-control" id="tipo" name="tipo">
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo == 'rpa' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="rpa">RPA</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo == 'clt' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="clt">CLT</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Qtd de Contratações:</b></label>
+                                        <input 
+                                        min="0" 
+                                        type="number" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.qtd_contratacoes}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        value="0"
+                                        id="qtd_contratacoes" 
+                                        name="qtd_contratacoes" 
+                                        placeholder="" 
+                                        required>
+                                    </div>
+
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
+                                        <label><b>Usuário do Camunda:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.user_camunda}}" 
+                                        {% endif %}
+                                        class="form-control" id="user_camunda" name="user_camunda"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div id="selectCursosCadastrarPessoa" class="col-sm-4">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="formPessoaPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevPessoaLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formPessoaNext" type="button" class="btn btn-primary">
+                    <span id="nextPessoaLink" class="pessoaMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button style="display: none;" 
+                {% if pessoa %}
+                    onclick="editarPessoa({{pessoa.id}})" 
+                {% else %}
+                    onclick="cadastrarPessoa()" 
+                {% endif %}
+                id="finishCadastroPessoa" 
+                type="button"
+                class="btn btn-primary">
+                    </span>
+                    <span>Cadastrar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ cursos|json_script:"cursos" }}
+<script>
+    formId = "cadastrarPessoaForm"
+    function updateSelectedCursos(cursos) {
+        setTimeout(() => {  
+            $("input[name='cursos']").each(function (i, elem) {
+                for (let index = 0; index < cursos.length; index++) {
+                    const selectedId = cursos[index]["id"];
+                    if ($(elem).val() == selectedId) $(elem).trigger("click");
+                }
+            })
+        }, 200);
+    }
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById('cadastrarPessoaForm').reset();
+        console.log($('#cadastrarPessoaForm').serializeArray())
+        $("div[id^='dropdownInputedItem']").each(function () {
+            $(this).remove()
+        })
+
+        if (changedResource) pessoaModificadaEventProxy.modificado = changedResource
+        else console.log("pessoa nao modificada")
+        if (changedResource) $("#dismissCadastrarPessoa").click()
+        
+        nextLinkElement = $('#nextPessoaLink')
+        nextPessoaLink = nextLinkElement.attr('class')
+        currentLinkNumber = parseInt(nextPessoaLink.slice(-1)) - 1
+        let clickcount = 4 - (currentLinkNumber -1)
+
+        let reloadButtons = setInterval(function () {
+            if ( clickcount <= 3 ) $("#formPessoaPrev").click()
+            else clearInterval(reloadButtons)
+            clickcount++
+        },200);
+    }
+
+    function cadastrarPessoa() {
+        $.ajax({
+            url: "pessoas",
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarPessoa(id) {
+        $.ajax({
+            url: "pessoas/"+id,
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function buscarCursos(selectedCursos = null) {
+        $.ajax({
+            url: "cursosSelect",
+            data: {},
+            success: function (data) {
+                $("#selectCursosCadastrarPessoa").html(data);
+                if (selectedCursos) updateSelectedCursos(selectedCursos)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#cadastrarPessoaForm')
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        let cursosId = []
+        cursosCheckbox.each(function (i, el) {
+            if ($(this).is(":checked")) { cursosId.push($(this).val()) }
+        })
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        values['cursos'] = cursosId;
+        return values
+    }
+
+    $(document).ready(function () {
+        let cursos = JSON.parse(document.getElementById('cursos').textContent)
+        nextBtnControl = ["pessoaMenuLink1", "pessoaMenuLink2", "pessoaMenuLink3", "pessoaMenuLink4"]
+        tabsQuantity = 4
+        item = 1
+        $(".nav-tabs a").click(function () {
+            $(this).tab('show');
+        });
+
+        $("#formPessoaNext").click(function () {
+            // buscar os botoes de proximo e anterior
+            prevLinkElement = $("#formPessoaPrev").children('#prevPessoaLink')
+            nextLinkElement = $(this).children('#nextPessoaLink')
+
+            // buscar nome do proximo link
+            nextPessoaLink = nextLinkElement.attr('class')
+            $("#" + nextPessoaLink).trigger("click")
+            nextLinkElement.removeClass(nextPessoaLink)
+            currentLinkNumber = parseInt(nextPessoaLink.slice(-1))
+            proximoLink = currentLinkNumber % 4 + 1
+            proximoLink = nextPessoaLink.slice(0, -1) + proximoLink
+            nextLinkElement.addClass(proximoLink)
+
+            // mudar a cor da aba
+            if (currentLinkNumber <= 0) currentLinkNumber = 1
+            $("li[id^='pessoasList']").each(function (i, el) {
+                currentId = "pessoasList" + currentLinkNumber
+                if ($(this).attr('id') == currentId) $(this).addClass("active-form-tab")
+                else $(this).removeClass("active-form-tab")
+            })
+
+            // salvar o link anterior
+            classes = prevLinkElement.attr('class')
+            if (classes) {
+                prevLinkElement.removeClass(classes)
+                currentClassNumber = parseInt(nextPessoaLink.slice(-1))
+                prevLink = currentClassNumber % 4 == 0 ? 3 : currentClassNumber % 4 - 1
+                prevLink = nextPessoaLink.slice(0, -1) + prevLink
+                prevLinkElement.addClass(prevLink)
+            } else {
+                currentClassNumber = parseInt(nextPessoaLink.slice(-1))
+                prevLink = currentClassNumber % 4 - 1
+                prevLink = nextPessoaLink.slice(0, -1) + prevLink
+                prevLinkElement.addClass(prevLink)
+            }
+
+            // mostrar o botao de cadastrar
+            if (proximoLink == "pessoaMenuLink1") {
+                $("#formPessoaNext").hide()
+                $("#finishCadastroPessoa").show()
+            }
+
+            // mostrar o botao de anterior
+            if (
+                proximoLink == "pessoaMenuLink3" ||
+                proximoLink == "pessoaMenuLink1" ||
+                proximoLink == "pessoaMenuLink4"
+            ) {
+                $("#formPessoaPrev").show()
+            } else $("#formPessoaPrev").hide()
+        });
+
+        $("#formPessoaPrev").click(function () {
+            // buscar os botoes de proximo e anterior
+            prevLinkElement = $("#formPessoaPrev").children('#prevPessoaLink')
+            nextLinkElement = $("#formPessoaNext").children('#nextPessoaLink')
+
+            // buscar nome do link anterior
+            prevPessoaLink = prevLinkElement.attr('class')
+            $("#" + prevPessoaLink).trigger("click")
+            currentLinkNumber = parseInt(prevPessoaLink.slice(-1))
+            prevLinkElement.removeClass(prevPessoaLink)
+            prevLinkAtualizado = currentLinkNumber % 4 - 1
+            prevLinkAtualizado = prevPessoaLink.slice(0, -1) + prevLinkAtualizado
+            prevLinkElement.addClass(prevLinkAtualizado)
+
+            // mudar a cor da aba
+            if (currentLinkNumber <= 0) currentLinkNumber = 1
+            if (currentLinkNumber > 4) currentLinkNumber = 4
+            $("li[id^='pessoasList']").each(function (i, el) {
+                currentId = "pessoasList" + currentLinkNumber
+                if ($(this).attr('id') == currentId) $(this).addClass("active-form-tab")
+                else $(this).removeClass("active-form-tab")
+            })
+
+            // salvar o proximo link
+            classes = nextLinkElement.attr('class')
+            if (classes == "pessoaMenuLink1") {
+                nextLinkElement.removeClass(classes)
+                nextink = classes.slice(0, -1) + 4
+                nextLinkElement.addClass(nextink)
+            } else {
+                nextLinkElement.removeClass(classes)
+                currentClassNumber = parseInt(classes.slice(-1))
+                nextink = currentClassNumber - 1
+                nextink = classes.slice(0, -1) + nextink
+                nextLinkElement.addClass(nextink)
+            }
+
+            // mostrar o botao de cadastrar
+            if (prevLinkAtualizado != "pessoaMenuLink3") {
+                $("#formPessoaNext").show()
+                $("#finishCadastroPessoa").hide()
+            }
+            // esconder o botao de anterior
+            if (
+                prevLinkAtualizado == "pessoaMenuLink0"
+            ) {
+                $("#formPessoaPrev").hide()
+            } else $("#formPessoaPrev").show()
+        });
+        
+        $("#cadastrarPessoaModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#modelId").text()
+            if (pessoaId) {
+                console.log("O id da pessoa é: ", pessoaId)
+                clearModalForm()
+            } else {
+                console.log("Pessoa sendo cadastrada")
+            }
+        });
+        buscarCursos(cursos)
+        maskValues()
+    });
+</script>

@@ -23,13 +23,17 @@ from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
-from sistema.views.siteViews import home, gerencia_pessoas, cadastrar_pessoas, eliminarPessoa, visualizarPessoa, editarPessoa, edicaoPessoa, registrar,menu_rapido
+from sistema.views.siteViews import home, pessoasModalCadastrar, pessoasTable, cursosSelect, visualizar, gerencia_pessoas, cadastrar_pessoas, eliminarPessoa, visualizarPessoa, editarPessoa, edicaoPessoa, registrar,menu_rapido
 
 urlpatterns = [
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
     path("",menu_rapido),
     path("home",menu_rapido),
+    path("pessoasTable",pessoasTable),
+    path("pessoasModalCadastrar",pessoasModalCadastrar),
+    path("cursosSelect", cursosSelect),
+    path("visualizar/<codigo>",visualizar),
     path("gerenciar-pessoas",gerencia_pessoas),
     path("cadastrar-pessoas",cadastrar_pessoas),
     path("eliminarPessoa/<codigo>", eliminarPessoa),

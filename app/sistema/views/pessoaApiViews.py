@@ -20,13 +20,51 @@ class PessoaApiView(APIView):
 
     # 2. Create
     def post(self, request, *args, **kwargs):
+        print(request.data)
         cursos =  request.data.get('cursos')
         nome = request.data.get('nome')
         email = request.data.get('email')
+        data_nascimento = request.data.get("data_nascimento")
+        telefone = request.data.get("telefone")
+        cpf = request.data.get("cpf")
+        rg = request.data.get("rg")
+        orgao_emissor = request.data.get("orgao_emissor")
+        cidade = request.data.get("cidade")
+        bairro = request.data.get("bairro")
+        rua = request.data.get("rua")
+        cep = request.data.get("cep")
+        complemento = request.data.get("complemento")
+        cargo = request.data.get("cargo")
+        banco = request.data.get("banco")
+        agencia = request.data.get("agencia")
+        conta = request.data.get("conta")
+        pix = request.data.get("pix")
+        tipo = request.data.get("tipo")
+        qtd_contratacoes = request.data.get("qtd_contratacoes")
+        user_camunda = request.data.get("user_camunda")
+
 
         pessoa = Pessoas.objects.create(
             nome = nome,
-            email = email
+            email = email,
+            data_nascimento = data_nascimento,
+            telefone = telefone,
+            cpf = cpf,
+            rg = rg,
+            orgao_emissor = orgao_emissor,
+            cidade = cidade,
+            bairro = bairro,
+            rua = rua,
+            complemento = complemento,
+            cep = cep,
+            cargo = cargo,
+            banco = banco,
+            agencia = agencia,
+            conta = conta,
+            pix = pix,
+            tipo = tipo,
+            qtd_contratacoes = qtd_contratacoes,
+            user_camunda = user_camunda,
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
@@ -76,7 +114,7 @@ class PessoaDetailApiView(APIView):
             pessoa.cursos.set([])
 
         if request.data.get("nome"):
-            pessoa.evento = request.data.get("nome")
+            pessoa.nome = request.data.get("nome")
         if request.data.get("email"):
             pessoa.email = request.data.get("email")
         if request.data.get("data_nascimento"):
@@ -89,8 +127,16 @@ class PessoaDetailApiView(APIView):
             pessoa.rg = request.data.get("rg")
         if request.data.get("orgao_emissor"):
             pessoa.orgao_emissor = request.data.get("orgao_emissor")
-        if request.data.get("endereco"):
-            pessoa.endereco = request.data.get("endereco")
+        if request.data.get("cidade"):
+            pessoa.cidade = request.data.get("cidade")
+        if request.data.get("bairro"):
+            pessoa.bairro = request.data.get("bairro")
+        if request.data.get("rua"):
+            pessoa.rua = request.data.get("rua")
+        if request.data.get("cep"):
+            pessoa.cep = request.data.get("cep")
+        if request.data.get("complemento"):
+            pessoa.complemento = request.data.get("complemento")
         if request.data.get("cep"):
             pessoa.cep = request.data.get("cep")
         if request.data.get("cargo"):

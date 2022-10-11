@@ -1,4 +1,5 @@
 # todo/todo_api/serializers.py
+from datetime import datetime
 from rest_framework import serializers
 from ..models.pessoa import Pessoas
 
@@ -9,12 +10,16 @@ class PessoaSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "nome",
-            "data_nascimento",
+            "data_nascimento_formatted",
             "telefone",
             "cpf",
             "rg",
             "orgao_emissor",
-            "endereco",
+            "cidade",
+            "bairro",
+            "rua",
+            "cep",
+            "complemento",
             "cep",
             "cargo",
             "banco",
