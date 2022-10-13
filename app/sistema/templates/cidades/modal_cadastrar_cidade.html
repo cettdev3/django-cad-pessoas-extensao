@@ -1,0 +1,137 @@
+<div class="modal fade" id="cadastrarCidadeModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarCidadeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarCidadeModalLabel">
+                    {% if cidade is None %}
+                        Cadastrar Cidade
+                        <span id="cidadeModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{cidade.nome}}
+                        <span id="cidadeModelId" hidden>{{cidade.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarCidade" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="cidadeList1" class="col py-2 active-form-tab">
+                            <a id="cidadeMenuLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarCidadeForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Nome da Cidade:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if cidade %}
+                                        value="{{cidade.nome}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome" 
+                                        name="nome" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                {% if cidade %}
+                    onclick="editarCidade({{cidade.id}})" 
+                {% else %}
+                    onclick="cadastrarCidade()" 
+                {% endif %}
+                id="finishCadastroCidade" 
+                type="button"
+                class="btn btn-primary">
+                {% if cidade %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarCidadeForm"
+    cidadeModelId = "cidadeModelId"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        console.log($('#'+formId).serializeArray())
+
+        if (changedResource) cidadeModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarCidadeId).click()
+    }
+
+    function cadastrarCidade() {
+        $.ajax({
+            url: "cidades",
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarCidade(id) {
+        $.ajax({
+            url: "cidades/"+id,
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarCidadeModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+cidadeModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+        
+        buscarCidades(cidades)
+    });
+</script>

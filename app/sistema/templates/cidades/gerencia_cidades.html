@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .br {
+        border: 2px solid red;
+    }
+
+    .w-10 {
+        width: 10%;
+    }
+
+    .w-15 {
+        width: 15%;
+    }
+
+    .w-2 {
+        width: 2%;
+    }
+
+    .justify-start {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-group-custom button {
+        background-color: #fff;
+        /* Green background */
+        border: 1px solid #e3e6f0;
+        /* Green border */
+        color: #343a40;
+        /* White text */
+        padding: 10px 24px;
+        /* Some padding */
+        cursor: pointer;
+        /* Pointer/hand icon */
+        float: left;
+        /* Float the buttons side by side */
+    }
+
+    /* Clear floats (clearfix hack) */
+    .btn-group-custom {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .btn-group-custom button:not(:last-child) {
+        border-bottom: none;
+        /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    .btn-group-custom button:hover {
+        background-color: #e3e6f0;
+    }
+
+    .btn-circle {
+        border: none;
+        outline: inherit;
+        background-color: #fff;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar {
+        border: none;
+        outline: inherit;
+        color: white;
+        background-color: #1cc88a;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar:hover {
+        background-color: #15865d;
+        transition: background-color 0.1s;
+    }
+
+    .btn-circle:active {
+        background-color: #ececec;
+        transition: background-color 0.1s;
+    }
+
+    .active-form-tab {
+        background-color: #15865d;
+        color: white;
+    }
+</style>
+<div id="loadingPessoas" 
+style="
+background-color: rgba(125,125,125,0.3); 
+display: none; 
+justify-content: center; 
+align-items: center; 
+width: 100vw; 
+height: 100vh;
+position: absolute;
+overflow: hidden;
+top: 0;
+left: 0;
+z-index: 4
+;">
+    <div class="spinner-border" style="z-index: 5;" role="status">
+        <span class="sr-only">Carregando...</span>
+    </div>
+</div>
+<div style="width: 100%;" class="">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible alert-success" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong class="text-dark">{{message}}</strong>
+        </div>
+        {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div>
+            <input id="nomeCidadeFilter" 
+            placeholder="Digite um nome" 
+            class="form-control-sm border-secondary"
+            name="nome" 
+            onchange="buscarCidades('nomeCidadeFilter')" type="text">
+        </div>
+        <div>
+            <button id="adicionarPessoas" 
+            onclick="carregarCidadesModalCadastrar()"
+            class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+                <span> cadastrar cidade</span>
+            </button>
+        </div>
+    </div>
+    <div id="receberTabelaCidades" class="shadow bg-white w-100">
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="modalCadastrarCidadeContainer">
+</div>
+<script>
+    let buttonMenuCidadesId = "buttonMenuCidades"
+    let hiddenMenuCidadesId = "hiddenMenuCidades"
+    let cadastrarCidadeModalId = "cadastrarCidadeModal"
+    let cadastrarCidadeFormId = "cadastrarCidadeForm"
+    let dismissCadastrarCidadeId = "dismissCadastrarCidade"
+</script>
+
+<script>
+    var cidadeModificadaEvent = {};
+    var cidadeModificadaEventProxy = null
+    let modalCadastrarCidadeContainerId = "modalCadastrarCidadeContainer"
+    let idTabelaCidades = "receberTabelaCidades"
+    let rotaTabelaCidades = "cidadesTable"
+    let rotaDeletarCidade = "eliminarCidade"
+    let rotaModalCidade = "cidadesModalCadastrar"
+    let rotaVisualizarCidade = "visualizarCidade"
+
+    function deleteCidade(id) {
+        deletar_url = rotaDeletarCidade+"/" + id
+
+        $.ajax({
+            url: deletar_url,
+            data: {},
+            success: function (data) {
+                let menuId = "#" + hiddenMenuCidadesId + id
+                $(menuId).toggle()
+                carregarCidades()
+            }
+        });
+    }
+
+    function carregarCidades(filter = null) {
+        let recarregarTabela = rotaTabelaCidades
+        $.ajax({
+            url: recarregarTabela,
+            data: filter ? filter : {},
+            success: function (data) {
+                $("#"+idTabelaCidades).html(data);
+            }
+        });
+    }
+
+    function carregarCidadesModalCadastrar(id = null) {
+        let recarregarTabela = rotaModalCidade
+        $.ajax({
+            url: recarregarTabela,
+            data: id ? {id: id} : {},
+            success: function (data) {
+                $("#"+modalCadastrarCidadeContainerId).html(data);
+                $('#'+cadastrarCidadeModalId).modal('toggle');
+            }
+        });
+    }
+        
+    function visualizarCidade(id) {
+        location.href = rotaVisualizarCidade+"/" + id
+    }
+
+    function buscarCidades(filter) {
+        let value = $("#" + filter).val()
+        carregarCidades({ nome: value })
+    }
+
+    $(document).ready(function () {
+        cidadeModificadaEventProxy = new Proxy(cidadeModificadaEvent, {
+            set: function (target, key, value) {
+                console.log("cidade modificada: ", value)
+                target[key] = value;
+                if (value) {
+                    carregarCidades()
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        function editarCidade(id) {
+            $.ajax({
+                url: "cidades",
+                data: JSON.stringify(getFormData()),
+                dataType: "json",
+                contentType: 'application/json',
+                method: "POST",
+                success: function (data) {
+                    $('#'+cadastrarCidadeFormId)[0].reset();
+                    $("#"+dismissCadastrarCidadeId).click()
+                    carregarCidades()
+                }
+            });
+        }
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuCidadesId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        carregarCidades()
+    });
+
+</script>
+
+{% endblock content %}

@@ -6,6 +6,7 @@ class Evento(models.Model):
     data_inicio = models.DateTimeField(null = True)
     data_fim = models.DateTimeField(null = True)
     observacao = models.CharField(null = True, max_length=500)
+    status = models.CharField(null = True, max_length=100)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True)
 
     class Meta:

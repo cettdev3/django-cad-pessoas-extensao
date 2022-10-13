@@ -32,6 +32,8 @@ class Pessoas(models.Model):
     
     @property
     def data_nascimento_formatted(self):
+        if not self.data_nascimento:
+            return ""
         dateFormt = datetime.strptime(self.data_nascimento, "%Y-%m-%d")
         dateStr = dateFormt.strftime("%d-%m-%Y")
         dateFormatted = datetime.strptime(dateStr, "%d-%m-%Y")
