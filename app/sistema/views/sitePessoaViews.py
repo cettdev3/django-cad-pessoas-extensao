@@ -1,9 +1,14 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
+from django.db import connection, reset_queries
 from django.shortcuts import render, redirect
 from sistema.serializers.cursoSerializer import CursoSerializer
+from sistema.serializers.pessoaSerializer import PessoaSerializer
+from sistema.serializers.eventoSerializer import EventoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.curso import Curso
+from sistema.models.evento import Evento
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -24,9 +29,18 @@ def gerencia_pessoas(request):
 @login_required(login_url='/auth-user/login-user')
 def pessoasTable(request):
     nome = request.GET.get('nome')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
     pessoas = Pessoas.objects
     if nome:
         pessoas = pessoas.filter(nome__contains = nome)
+    if data_fim and data_inicio:
+        pessoas = pessoas.filter(
+            Q(alocacao__data_inicio__lt=data_inicio,
+            alocacao__data_fim__lt=data_inicio) | 
+            Q(alocacao__data_inicio__gt=data_fim,
+            alocacao__data_fim__gt=data_fim) | 
+            Q(alocacao__evento__status__in=["finalizado", "adiado"]))
     pessoas = pessoas.all()
     return render(request,'pessoas/pessoas_table.html',{'pessoas':pessoas})
 
@@ -49,6 +63,20 @@ def pessoasModalCadastrar(request):
             data['pessoa'] = pessoa
             data['cursos'] = cursos.data
     return render(request,'pessoas/modal_cadastrar_pessoa.html',data)
+
+@login_required(login_url='/auth-user/login-user')
+def pessoasModalAlocar(request):
+    pessoaIds = request.GET.getlist('checked_values[]')
+    data = {}
+    print("ids da requisicao",pessoaIds)
+    if pessoaIds:
+        pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
+        pessoas = PessoaSerializer(pessoas, many = True)
+        data['pessoas'] = pessoas.data
+        eventos = Evento.objects.filter(~Q(status="finalizado"))
+        eventos = EventoSerializer(eventos, many=True)
+        data['eventos'] = eventos.data
+    return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')
 def cursosSelect(request):

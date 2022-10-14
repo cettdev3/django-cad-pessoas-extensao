@@ -24,7 +24,7 @@ from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
-from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa
+from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade
 from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento
@@ -44,6 +44,7 @@ urlpatterns = [
     path("gerenciar-pessoas",gerencia_pessoas),
     path("pessoasTable",pessoasTable),
     path("pessoasModalCadastrar",pessoasModalCadastrar),
+    path("pessoasModalAlocar",pessoasModalAlocar),
     path("cursosSelect", cursosSelect),
     path("cadastrar-pessoas",cadastrar_pessoas),
     

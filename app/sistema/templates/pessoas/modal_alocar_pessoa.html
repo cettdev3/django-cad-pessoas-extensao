@@ -1,0 +1,123 @@
+<div class="modal fade" id="alocarPessoaModal" tabindex="-1" role="dialog"
+    aria-labelledby="alocarPessoaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alocarPessoaModalLabel">
+                    Alocar Pessoa(s)
+                </h5>
+                <button type="button" id="dismissAlocarPessoa" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    {% for pessoa in pessoas %}
+                    <form id="alocarPessoaForm-{{pessoa.id}}" action="/" method="POST">
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <div class="d-flex flex-column justify-content-start align-items-start">
+                                    <span>{{ pessoa.nome }}</span>
+                                    <span><strong>{{ pessoa.cargo }}</strong></span>
+                                    <input hidden type="text" 
+                                    id="pessoa_id-{{pessoa.id}}" 
+                                    name="professor_id" 
+                                    value="{{pessoa.id}}">
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Curso:</b></label>
+                                <select required 
+                                class="form-control" 
+                                id="curso-{{pessoa.id}}" 
+                                name="curso_id">
+                                    {% for curso in pessoa.cursos %}
+                                    <option value="{{curso.id}}">
+                                        {{curso.nome}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Evento:</b></label>
+                                <select required 
+                                class="form-control" 
+                                id="evento-{{pessoa.id}}" 
+                                name="evento_id">
+                                    {% for evento in eventos %}
+                                    <option value="{{evento.id}}">
+                                        {{evento.observacao}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>Data de Inicio:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_inicio-{{pessoa.id}}"
+                                name="data_inicio">
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>Data de Fim:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_fim-{{pessoa.id}}"
+                                name="data_fim">
+                            </div>
+                        </div>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                onclick="criarAlocacoes()"
+                type="button"
+                class="btn btn-primary">
+                    </span>
+                    <span>Alocar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let alocarPessoaModalId = "alocarPessoaModal"
+    let dismissAlocarPessoaId = "dismissAlocarPessoa"
+    let alocarPessoaFormId = "alocarPessoaForm"
+
+    function getAlocacoesFormData() {
+        let alocacoes = []
+        $("form[id^='"+alocarPessoaFormId+"'").each(function() {
+            let values = {}
+            let unindexed_array = $(this).serializeArray();
+            $.map(unindexed_array, function (n, i) {
+                values[n['name']] = n['value'];
+            });
+            alocacoes.push(values) 
+        })
+        return alocacoes
+    }
+
+    function criarAlocacoes() {
+        let alocacoes = getAlocacoesFormData()
+        $.ajax({
+            url: "alocacoes",
+            data: JSON.stringify(alocacoes),
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                $('#'+dismissAlocarPessoaId).modal('toggle');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        console.log("dentro de alocar pessoas",
+        alocarPessoaModalId, dismissAlocarPessoaId,alocarPessoaFormId)
+    });
+</script>

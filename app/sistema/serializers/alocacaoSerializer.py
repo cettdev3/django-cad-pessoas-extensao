@@ -9,6 +9,7 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "id",
             "evento",
             "professor",
+            "curso",
             "data_inicio",
             "data_fim",
             "status",
