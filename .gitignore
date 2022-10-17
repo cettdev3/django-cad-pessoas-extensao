@@ -3,3 +3,8 @@
 /data
 /logs
 __pycache__
+__pycache__
+/data
+/logs
+anotacoes
+**.bash_history
