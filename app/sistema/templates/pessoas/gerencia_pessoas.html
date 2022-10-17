@@ -129,13 +129,28 @@ z-index: 4
     px-3 py-3 my-3
     bg-white">
         <div>
-            <input id="nomePessoaFilter" placeholder="Digite um nome" class="form-control-sm border-secondary"
-                name="nome" onchange="buscarPessoas('nomePessoaFilter')" type="text">
+            <input id="filterPessoaNomePessoa" 
+            placeholder="Digite um nome" 
+            class="form-control-sm border-secondary"
+            name="nome" type="text">
+            <input id="filterPessoaDataInicio" 
+            type="date"
+            class="form-control-sm border-secondary"
+            name="data_inicio" type="text">
+            <input id="filterPessoaDataFim" 
+            type="date"
+            class="form-control-sm border-secondary"
+            name="data_fim" type="text">
         </div>
-        <div>
+        <div class="d-flex">
+            <button id="alocarPessoasBtn" 
+            onclick="alocarPessoas()"
+            class="btn-cadastrar rounded d-none justify-content-between align-items-center">
+                <span> alocar pessoas</span>
+            </button>
             <button id="adicionarPessoas" 
             onclick="carregarPessoasModalCadastrar()"
-            class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+            class="btn-cadastrar rounded d-flex justify-content-between align-items-center ml-1">
                 <span> cadastrar pessoa</span>
             </button>
         </div>
@@ -148,10 +163,45 @@ z-index: 4
 <div id="modalCadastrarContainer">
 </div>
 
+<div id="modalAlocarPessoas">
+</div>
+
 
 <script>
-    var pessoaModificadaEvent = {};
-    var pessoaModificadaEventProxy = null
+    let pessoaModificadaEvent = {};
+    let pessoaModificadaEventProxy = null
+    let alocarPessoasBtnId = "alocarPessoasBtn"
+    let modalAlocarPessoasId = "modalAlocarPessoas"
+    let alocarUrl = "pessoasModalAlocar"
+    let pessoaTableCheckboxRowId = "pessoaTableCheckboxRow-" 
+    let rowPessoaId = "rowPessoa-" 
+    let pessoaTableCheckboxAllId = "pessoaTableCheckboxAll"
+    let filterPrefix = "filterPessoa"
+
+    function getCheckedIds() {
+        let checkedValues = []
+        $("input[id^='"+pessoaTableCheckboxRowId+"']").filter(function () {
+            if ($(this).is(":checked")) {
+                checkedValues.push($(this).attr("id").split("-")[1])
+            }
+        })
+        return checkedValues
+    }
+
+    function alocarPessoas () {
+        let checkedValues = getCheckedIds()
+        $.ajax({
+            url: alocarUrl,
+            data: {checked_values: checkedValues},
+            type: "GET",
+            success: function (data) {
+                $("#"+modalAlocarPessoasId).html(data)
+                $('#'+alocarPessoaModalId).modal('toggle');
+            }
+        });
+
+        console.log(checkedValues)
+    }
 
     function deletePessoa(id) {
         deletar_url = "eliminarPessoa/" + id
@@ -168,10 +218,11 @@ z-index: 4
     }
 
     function carregarPessoas(filter = null) {
+        console.log(filter)
         let recarregarTabela = "pessoasTable"
         $.ajax({
             url: recarregarTabela,
-            data: filter ? filter : {},
+            data: filter,
             success: function (data) {
                 $("#receberTabela").html(data);
             }
@@ -194,9 +245,22 @@ z-index: 4
         location.href = "visualizarPessoa/" + id
     }
 
-    function buscarPessoas(filter) {
-        let value = $("#" + filter).val()
-        carregarPessoas({ nome: value })
+    function filtrarPessoas() {
+        let filtros = {}
+        $("input[id^='"+filterPrefix+"']").each(function() {
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        carregarPessoas(filtros)
+    }
+
+    function debounce(func, timeout = 300){
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
     }
 
     $(document).ready(function () {
@@ -349,6 +413,14 @@ z-index: 4
                 }
             })
         });
+        
+        $("input[id^='"+filterPrefix+"']").each(function () {
+            let input = $(this)
+            $(this)
+            .change(debounce(function() {
+                filtrarPessoas()
+            }, 500))
+        })
 
         carregarPessoas()
     });

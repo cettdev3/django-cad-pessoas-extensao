@@ -7,8 +7,8 @@ from ..models.endereco import Endereco
 from ..models.evento import Evento
 
 class EventoSerializer(serializers.ModelSerializer):
-    data_inicio = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S")
-    data_fim = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S")
+    data_inicio = serializers.DateTimeField(format='%Y-%m-%dT%H:%M')
+    data_fim = serializers.DateTimeField(format='%Y-%m-%dT%H:%M')
 
     class Meta:
         model = Evento
@@ -17,7 +17,9 @@ class EventoSerializer(serializers.ModelSerializer):
             "data_inicio",
             "data_fim",
             "observacao",
+            "status",
             "endereco",
+            "status_class"
         ]
         depth = 2
         

@@ -23,24 +23,56 @@ from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
-from sistema.views.siteViews import home, pessoasModalCadastrar, pessoasTable, cursosSelect, visualizar, gerencia_pessoas, cadastrar_pessoas, eliminarPessoa, visualizarPessoa, editarPessoa, edicaoPessoa, registrar,menu_rapido
+from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
+from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar
+from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso
+from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade
+from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento, visualizarEvento
+from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar
 
 urlpatterns = [
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
-    path("",menu_rapido),
-    path("home",menu_rapido),
-    path("pessoasTable",pessoasTable),
-    path("pessoasModalCadastrar",pessoasModalCadastrar),
-    path("cursosSelect", cursosSelect),
-    path("visualizar/<codigo>",visualizar),
-    path("gerenciar-pessoas",gerencia_pessoas),
-    path("cadastrar-pessoas",cadastrar_pessoas),
     path("eliminarPessoa/<codigo>", eliminarPessoa),
     path("visualizarPessoa/<codigo>", visualizarPessoa),
     path("editarPessoa/<codigo>", editarPessoa),
     path("edicaoPessoa",edicaoPessoa),
     path("registrar",registrar),
+
+    # ROTAS PARA PESSOAS
+    path("",gerencia_pessoas),
+    path("home",gerencia_pessoas),
+    path("gerenciar-pessoas",gerencia_pessoas),
+    path("pessoasTable",pessoasTable),
+    path("pessoasModalCadastrar",pessoasModalCadastrar),
+    path("pessoasModalAlocar",pessoasModalAlocar),
+    path("cursosSelect", cursosSelect),
+    path("cadastrar-pessoas",cadastrar_pessoas),
+    
+    # ROTAS PARA CURSOS
+    path("gerenciar-cursos",gerencia_cursos),
+    path("cursosTable",cursosTable),
+    path("cursosModalCadastrar",cursosModalCadastrar),
+    path("eliminarCurso/<codigo>",eliminarCurso),
+    
+    # ROTAS PARA CIDADES
+    path("gerenciar-cidades",gerencia_cidades),
+    path("cidadesTable",cidadesTable),
+    path("cidadesModalCadastrar",cidadesModalCadastrar),
+    path("eliminarCidade/<codigo>",eliminarCidade),
+    
+    # ROTAS PARA ALOCAÇÔES
+    path("alocacoesTable",alocacoesTable),
+    path("alocacaoModalCadastrar",alocacaoModalCadastrar),
+    
+    # ROTAS PARA EVENTOS
+    path("gerenciar-eventos",gerencia_eventos),
+    path("eventosTable",eventosTable),
+    path("eventosModalCadastrar",eventosModalCadastrar),
+    path("eliminarEvento/<codigo>",eliminarEvento),
+    path("cidadesSelect",cidadesSelect),
+    path("enderecosSelect",enderecosSelect),
+    path("visualizarEvento/<codigo>",visualizarEvento),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),

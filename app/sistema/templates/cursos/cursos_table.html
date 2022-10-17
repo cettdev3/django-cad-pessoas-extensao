@@ -1,0 +1,88 @@
+<style>
+    .cursos-w-90 {
+        width: 90%;
+    }
+</style>
+<table class="table table-borderless" 
+width="100%" 
+cellspacing="0">
+    <thead class="border">
+        <tr class="">
+            <th class="cursos-w-90 text-left">Nome</th>
+            <th class="w-2 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for curso in cursos %}
+        <tr>
+            <td class="w-10 text-left">{{curso.nome}}</td>
+            <td class="w-2 text-left" style="position: relative;">
+                <button id="buttonMenuCursos{{curso.id}}" 
+                class="btn-circle">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>                        
+                </button>
+                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
+                id="hiddenMenuCursos{{curso.id}}" 
+                class="btn-group-custom">
+                    <a id="linkVisualizarcurso{{curso.id}}" href="/visualizarCurso/({{curso.id}})"></a>
+                    <!-- <button onclick="visualizarCurso({{curso.id}})">Visualizar</button>  -->
+                    <button onclick="carregarCursosModalCadastrar({{curso.id}})">Editar</button> 
+                    <button onclick="deleteCurso({{curso.id}})" >Excluir</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        function isvisibleOnViewport(element) {
+            var rect = element.getBoundingClientRect();
+            var html = document.documentElement;
+            return (
+                (rect.top) >= 0 &&
+                rect.left >= 0 &&
+                (rect.bottom + 100) <= (window.innerHeight || html.clientHeight) &&
+                rect.right <= (window.innerWidth || html.clientWidth)
+            );
+        }
+
+        function bindButtons() {
+            $("button[id^='"+buttonMenuCursosId+"']").each(function (i, el) {
+                $(this).on("click", function () {
+                    let id = $(this).attr('id').split("Cursos")[1];
+                    let menuId = "#"+hiddenMenuCursosId + id
+                    $("div[id^='"+hiddenMenuCursosId+"']").each(function (i, el) {
+                        
+                        if (menuId != "#" + $(this).attr("id")) {
+                            if ($(this).css('display') != 'none') {
+                                $(this).toggle()
+                            }
+                        }
+                    })
+                    console.log(menuId)
+                    let hiddenMenu = $(menuId).parent()
+                    console.log(hiddenMenu)
+                    let isVisible = isvisibleOnViewport(hiddenMenu[0])
+                    console.log(isVisible)
+                    if (!isVisible) {
+                        $(menuId).css("bottom", "40px")
+                    } 
+                    $(menuId).toggle()
+                });
+            });
+        }
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuCursosId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        bindButtons()
+     })
+</script>

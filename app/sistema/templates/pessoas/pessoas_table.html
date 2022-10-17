@@ -1,0 +1,148 @@
+{% load static %}
+<table id="tablePessoa" class="table table-borderless border-cst" 
+width="100%" 
+cellspacing="0">
+    <thead class="border">
+        <tr class="">
+            <th class="select-row">
+                <input id="pessoaTableCheckboxAll" type="checkbox">
+            </th>
+            <th class="w-10 text-left">Nome</th>
+            <th class="w-10 text-left">Email</th>
+            <th class="w-10 text-left">Telefone</th>
+            <th class="w-10 text-left">Cargo</th>
+            <th class="w-10 text-left">Tipo</th>
+            <th class="w-10 text-left">Contratações</th>
+            <th class="w-2 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pessoa in pessoas %}
+        <tr id="rowPessoa-{{pessoa.id}}">
+            <td class="select-row">
+                <input id="pessoaTableCheckboxRow-{{pessoa.id}}" type="checkbox">
+            </td>
+            <td class="w-10 text-left">{{pessoa.nome}}</td>
+            <td class="w-10 text-left">{{pessoa.email}}</td>
+            <td class="w-10 text-left">{{pessoa.telefone}}</td>
+            <td class="w-10 text-left">{{pessoa.cargo}}</td>
+            <td class="w-10 text-left">{{pessoa.tipo}}</td>
+            <td class="w-10 text-left">{{pessoa.qtd_contratacoes}}</td>
+            <td class="w-2 text-left" style="position: relative;">
+                <button id="buttonMenuPessoas{{pessoa.id}}" 
+                class="btn-circle">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>                        
+                </button>
+                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
+                id="hiddenMenuPessoas{{pessoa.id}}" 
+                class="btn-group-custom">
+                    <!-- <a id="linkVisualizarPessoa{{pessoa.id}}" href="/visualizarPessoa/({{pessoa.id}})"></a> -->
+                    <button onclick="visualizarPessoa({{pessoa.id}})">Visualizar</button> 
+                    <button onclick="carregarPessoasModalCadastrar({{pessoa.id}})">Editar</button> 
+                    <button onclick="deletePessoa({{pessoa.id}})" >Excluir</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<input hidden type="number" value="0" id="pessoasTableActiveCheckBoxes">
+<script>
+    $(document).ready(function () {
+        function isvisibleOnViewport(element) {
+            var rect = element.getBoundingClientRect();
+            var html = document.documentElement;
+            return (
+                (rect.top) >= 0 &&
+                rect.left >= 0 &&
+                (rect.bottom + 100) <= (window.innerHeight || html.clientHeight) &&
+                rect.right <= (window.innerWidth || html.clientWidth)
+            );
+        }
+
+        function hideControlAlocacaoButton(value) {
+            if (value > 0) {
+                $("#"+alocarPessoasBtnId).removeClass("d-none")
+                $("#"+alocarPessoasBtnId).addClass("d-flex")
+            } else {
+                $("#"+alocarPessoasBtnId).addClass("d-none")
+                $("#"+alocarPessoasBtnId).removeClass("d-flex")
+            }
+        }
+
+        function bindButtons() {
+            $("button[id^='buttonMenuPessoas']").each(function (i, el) {
+                $(this).on("click", function () {
+                    let id = $(this).attr('id').split("Pessoas")[1];
+                    let menuId = "#hiddenMenuPessoas" + id
+                    $("div[id^='hiddenMenuPessoas']").each(function (i, el) {
+                        
+                        if (menuId != "#" + $(this).attr("id")) {
+                            if ($(this).css('display') != 'none') {
+                                $(this).toggle()
+                            }
+                        }
+                    })
+                    let hiddenMenu = $(menuId).parent()
+                    let isVisible = isvisibleOnViewport(hiddenMenu[0])
+                    console.log(isVisible)
+                    if (!isVisible) {
+                        $(menuId).css("bottom", "40px")
+                    } 
+                    $(menuId).toggle()
+                });
+            });
+        }
+
+        $(document).mouseup(function (e) {
+            $("div[id^='hiddenMenuPessoas']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        $("input[id^='"+pessoaTableCheckboxRowId+"']").each(function() {
+            $(this).change(function() {
+                let rowIdNumber = $(this).attr("id").split("-")[1]
+                let rowId = rowPessoaId+rowIdNumber
+                let currentValue =  parseInt( $("#pessoasTableActiveCheckBoxes").val())
+                if ($(this).is(":checked")) {
+                    $("#"+rowId).addClass("selected-row")
+                    currentValue += 1
+                    $("#pessoasTableActiveCheckBoxes").val(currentValue)
+                    console.log($("#pessoasTableActiveCheckBoxes").val())
+                } else {
+                    $("#"+rowId).removeClass("selected-row")
+                    currentValue -= 1
+                    $("#pessoasTableActiveCheckBoxes").val(currentValue)
+                    console.log($("#pessoasTableActiveCheckBoxes").val())
+                }
+
+                hideControlAlocacaoButton(currentValue)
+            })
+        })
+
+        $("#"+pessoaTableCheckboxAllId).change(function() {
+            let checkedValue = $(this).is(":checked")
+            console.log("valor checado")
+            let currentValue = 0
+            $("input[id^='"+pessoaTableCheckboxRowId+"']").each(function(elem, value) {
+                let rowCheckedValue = $(this).is(":checked")
+                $(this).prop('checked', checkedValue);
+                $(this).trigger("change");
+                if (rowCheckedValue == checkedValue) {
+                    if (checkedValue ) currentValue--
+                    else currentValue++
+                } 
+            })
+            let rowsActive = parseInt($("#pessoasTableActiveCheckBoxes").val()) + currentValue
+            $("#pessoasTableActiveCheckBoxes").val(rowsActive)
+            hideControlAlocacaoButton(rowsActive)
+        })
+
+        bindButtons()
+     })
+</script>

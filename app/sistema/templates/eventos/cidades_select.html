@@ -1,0 +1,9 @@
+<label><b>Cidade:</b></label>
+<select class="form-control" 
+id="cidade_id" 
+name="cidade_id">
+    <option value="">Selecione uma Cidade</option>
+    {% for cidade in cidades %}
+        <option value="{{cidade.id}}">{{cidade.nome}}</option>
+    {% endfor %}
+</select>

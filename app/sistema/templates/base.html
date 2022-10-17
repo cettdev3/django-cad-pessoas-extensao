@@ -22,6 +22,10 @@
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/gestao-cursos.css' %}" rel="stylesheet">
+    <link href="{% static 'css/pessoa_table.css' %}" rel="stylesheet">
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link href="{% static 'css/general.css' %}" rel="stylesheet">
+    <link href="{% static 'css/visualizar_evento.css' %}" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     
    <!-- FONT AWESOME -->
@@ -71,6 +75,21 @@
                 <a class="nav-link" href="/gerenciar-pessoas">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Pessoas</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/gerenciar-cursos">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Cursos</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/gerenciar-cidades">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Cidades</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/gerenciar-eventos">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Eventos</span></a>
             </li>
             {% endif %}
 
@@ -123,7 +142,14 @@
                 static-top shadow">
                     <div class="w-100 d-flex justify-content-between align-items-center">
                         {% if page_title %}
-                        <span class="h4">{{ page_title }}</span>
+                        <div class="align-items-center">
+                            {% if path_back %}
+                                <a class="link-back" href="/{{path_back}}">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </a>
+                            {% endif %}
+                            <span class="h4 ml-2">{{ page_title }}</span>
+                        </div>
                         {% endif %}
                         {% if user.is_authenticated %}
                             <span >Bem vindo {{ user.get_username }}</span>

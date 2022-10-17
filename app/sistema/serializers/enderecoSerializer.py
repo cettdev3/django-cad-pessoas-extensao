@@ -10,6 +10,10 @@ class EnderecoSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "endereco_completo",
-            "cidade"
+            "cidade",
+            "bairro",
+            "logradouro",
+            "cep",
+            "complemento"
         ]
         depth = 1

@@ -18,11 +18,17 @@ class EnderecoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        endereco_completo = request.data.get("endereco_completo")
+        bairro = request.data.get("bairro") 
+        logradouro = request.data.get("logradouro") 
+        cep = request.data.get("cep") 
+        complemento = request.data.get("complemento") 
         cidade = Cidade.objects.get(id = request.data.get("cidade_id"))
         endereco = Endereco.objects.create(
-            endereco_completo = endereco_completo,
-            cidade = cidade
+            cidade = cidade,
+            bairro = bairro,
+            logradouro = logradouro,
+            cep = cep,
+            complemento = complemento,
         )
 
         endereco.save()
@@ -55,8 +61,14 @@ class EnderecoDetailApiView(APIView):
                 {"res": "Não existe endereco com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if request.data.get("endereco_completo"):
-            endereco.endereco_completo = request.data.get("endereco_completo")
+        if request.data.get("bairro"):
+            endereco.bairro = request.data.get("bairro")
+        if request.data.get("logradouro"):
+            endereco.logradouro = request.data.get("logradouro")
+        if request.data.get("cep"):
+            endereco.cep = request.data.get("cep")
+        if request.data.get("complemento"):
+            endereco.complemento = request.data.get("complemento")
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:

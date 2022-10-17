@@ -1,0 +1,138 @@
+<div class="modal fade" id="cadastrarCursoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarCursoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarCursoModalLabel">
+                    {% if curso is None %}
+                        Cadastrar Curso
+                        <span id="cursoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{curso.nome}}
+                        <span id="cursoModelId" hidden>{{curso.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarCurso" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="cursoList1" class="col py-2 active-form-tab">
+                            <a id="pessoaMenuLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarCursoForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Nome do Curso:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if curso %}
+                                        value="{{curso.nome}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome" 
+                                        name="nome" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                {% if curso %}
+                    onclick="editarCurso({{curso.id}})" 
+                {% else %}
+                    onclick="cadastrarCurso()" 
+                {% endif %}
+                id="finishCadastroCurso" 
+                type="button"
+                class="btn btn-primary">
+                {% if curso %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarCursoForm"
+    cursoModelId = "cursoModelId"
+    dismissCadastrarCursoId = "dismissCadastrarCurso"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        console.log($('#'+formId).serializeArray())
+
+        if (changedResource) cursoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarCursoId).click()
+    }
+
+    function cadastrarCurso() {
+        $.ajax({
+            url: "cursos",
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarCurso(id) {
+        $.ajax({
+            url: "cursos/"+id,
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarCursoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+cursoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+        
+        buscarCursos(cursos)
+    });
+</script>

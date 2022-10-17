@@ -1,0 +1,129 @@
+<style>
+    .alocacao-w-5 {
+        width: 5%;
+    }
+
+    .alocacao-w-25 {
+        width: 25%;
+    }
+
+    .alocacao-w-15 {
+        width: 15%;
+    }
+    
+    .alocacao-w-30 {
+        width: 30%;
+    }
+</style>
+<table class="table table-borderless" width="100%" cellspacing="0">
+    <thead class="border">
+        <tr class="">
+            <th class="alocacao-w-30 text-left">Professor</th>
+            <th class="alocacao-w-25 text-left">Data de Inicio</th>
+            <th class="alocacao-w-25 text-left">Data de Fim</th>
+            <th class="alocacao-w-20 text-left">Curso</th>
+            <th class="w-5 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alocacao in alocacoes %}
+        <td class="alocacao-w-15 text-left">{{alocacao.professor.nome}}</td>
+        <td class="alocacao-w-15 text-left">{{alocacao.data_inicio|date:"d-m-Y"}}</td>
+        <td class="alocacao-w-15 text-left">{{alocacao.data_fim|date:"d-m-Y"}}</td>
+        <td class="alocacao-w-25 text-left">{{alocacao.curso.nome}}</td>
+        <td class="w-5 text-left" style="position: relative;">
+            <button id="buttonMenuAlocacoes{{alocacao.id}}" class="btn-circle">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuAlocacoes{{alocacao.id}}"
+                class="btn-group-custom">
+                <button onclick="carregarAlocacoesModalCadastrar({{alocacao.id}})">Editar</button>
+                <button onclick="deleteAlocacao({{alocacao.id}})">Excluir</button>
+            </div>
+        </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div id="modalCadastrarAlocacaoContainer">
+</div>
+
+<script>
+    function carregarAlocacoesModalCadastrar(id = null) {
+        let recarregarTabela = rotaModalAlocacao
+        $.ajax({
+            url: "/"+recarregarTabela,
+            data: id ? { id: id } : {},
+            success: function (data) {
+                $("#" + modalCadastrarAlocacaoContainerId).html(data);
+                $('#' + cadastrarAlocacaoModalId).modal('toggle');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $(document).mouseup(function (e) {
+            $("div[id^='" + hiddenMenuAlocacoesId + "']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+    });
+
+</script>
+<script>
+
+    $(document).ready(function () {
+        function isvisibleOnViewport(element) {
+            var rect = element.getBoundingClientRect();
+            var html = document.documentElement;
+            return (
+                (rect.top) >= 0 &&
+                rect.left >= 0 &&
+                (rect.bottom + 100) <= (window.innerHeight || html.clientHeight) &&
+                rect.right <= (window.innerWidth || html.clientWidth)
+            );
+        }
+
+        function bindButtons() {
+            $("button[id^='" + buttonMenuAlocacoesId + "']").each(function (i, el) {
+                $(this).on("click", function () {
+                    let id = $(this).attr('id').split("Alocacoes")[1];
+                    let menuId = "#" + hiddenMenuAlocacoesId + id
+                    $("div[id^='" + hiddenMenuAlocacoesId + "']").each(function (i, el) {
+
+                        if (menuId != "#" + $(this).attr("id")) {
+                            if ($(this).css('display') != 'none') {
+                                $(this).toggle()
+                            }
+                        }
+                    })
+                    console.log(menuId)
+                    let hiddenMenu = $(menuId).parent()
+                    console.log(hiddenMenu)
+                    let isVisible = isvisibleOnViewport(hiddenMenu[0])
+                    console.log(isVisible)
+                    if (!isVisible) {
+                        $(menuId).css("bottom", "40px")
+                    }
+                    $(menuId).toggle()
+                });
+            });
+        }
+
+        $(document).mouseup(function (e) {
+            $("div[id^='" + hiddenMenuAlocacoesId + "']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        bindButtons()
+    })
+</script>

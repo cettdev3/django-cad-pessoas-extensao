@@ -1,0 +1,12 @@
+#tablePessoa .select-row{
+    vertical-align: top!important;
+    width: 2%;
+}
+
+#tablePessoa .select-row input{
+    cursor: pointer;
+}
+
+#tablePessoa .selected-row {
+    background-color: #ececec;
+}

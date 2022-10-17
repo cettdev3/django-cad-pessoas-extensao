@@ -1,0 +1,10 @@
+<label><b>Endereco:</b></label>
+<select class="form-control" 
+id="endereco_id" 
+name="endereco_id">
+    <option value="">Selecione uma opção</option>
+    <option value="novo">Cadastrar Novo Endereco</option>
+    {% for endereco in enderecos %}
+        <option value="{{endereco.id}}">{{endereco.endereco_completo}}</option>
+    {% endfor %}
+</select>

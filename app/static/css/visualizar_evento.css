@@ -1,0 +1,28 @@
+.evt-status-blue {
+    color: white;
+    background-color: #1E88E5;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+.evt-status-yellow {
+    color: black;
+    background-color: #FDD835;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+.evt-status-green {
+    color: white;
+    background-color: #43A047;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+.evt-status-red {
+    color: white;
+    background-color: #F44336;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+}
