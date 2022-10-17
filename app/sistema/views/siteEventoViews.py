@@ -32,9 +32,15 @@ def eventosTable(request):
     return render(request,'eventos/eventos_table.html',{'eventos':eventos})
 
 @login_required(login_url='/auth-user/login-user')
-def visualizarCurso(request,codigo):
-    curso = Curso.objects.get(id=codigo)
-    return render(request,'cursos/visualizar_curso.html',{'curso':curso})
+def visualizarEvento(request,codigo):
+    evento = Evento.objects.get(id=codigo)
+    page_title = evento.observacao
+    path_back = "gerenciar-eventos"
+    return render(request,'eventos/visualizar_evento.html',{
+        'evento':evento, 
+        'page_title': page_title,
+        'path_back': path_back
+    })
 
 @login_required(login_url='/auth-user/login-user')
 def eventosModalCadastrar(request):

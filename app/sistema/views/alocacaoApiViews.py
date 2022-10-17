@@ -40,7 +40,7 @@ class AlocacaoApiView(APIView):
                 professor = None
                 curso = None
                 print("alocação data", alocacaoData)
-                if alocacaoData["curso_id"]:
+                if "curso_id" in alocacaoData:
                     curso = self.get_object(Curso, alocacaoData["curso_id"])
                     if not curso:
                         return Response(

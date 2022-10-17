@@ -1,0 +1,157 @@
+<div class="modal fade" id="cadastrarAlocacaoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarAlocacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alocarPessoaModalLabel">
+                    {% if alocacao %}
+                        Editar Alocação
+                    {% else %}
+                        Cadastrar Alocação
+                    {% endif %}
+                </h5>
+                <button type="button" id="dismissAlocarPessoa" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <form id="cadastrarAlocacaoForm" action="/" method="POST">
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <div class="d-flex flex-column justify-content-start align-items-start">
+                                    <span>{{ alocacao.professor.nome }}</span>
+                                    <span><strong>{{ alocacao.professor.cargo }}</strong></span>
+                                    <input hidden type="text"  
+                                    name="professor_id" 
+                                    value="{{alocacao.professor.id}}">
+                                    <input hidden type="text" 
+                                    name="evento_id" 
+                                    value="{{alocacao.evento.id}}">
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Curso:</b></label>
+                                <select required 
+                                class="form-control" 
+                                id="curso-{{pessoa.id}}" 
+                                name="curso_id">
+                                    {% for curso in alocacao.professor.cursos %}
+                                    <option value="{{curso.id}}" 
+                                    {% if curso.id == alocacao.curso.id %}selected="selected"{% endif %}>
+                                        {{curso.nome}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Data de Inicio:</b></label>
+                                <input 
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_inicio}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="data_inicio-{{pessoa.id}}"
+                                name="data_inicio">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Data de Fim:</b></label>
+                                <input 
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_fim}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="data_fim-{{pessoa.id}}"
+                                name="data_fim">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {% if alocacao %}
+                <button
+                onclick="editarAlocacao({{alocacao.id}})"
+                type="button"
+                class="btn btn-primary">
+                    </span>
+                    <span>Editar</span>
+                </button>
+                {% else %}
+                <button
+                onclick="cadastrarAlocacao()"
+                type="button"
+                class="btn btn-primary">
+                    </span>
+                    <span>Cadastrar</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarAlocacaoForm"
+    alocacaoModelId = "alocacaoModelId"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) alocacaoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarAlocacaoId).click()
+    }
+
+    function cadastrarAlocacao(data) {
+        $.ajax({
+            url: "/alocacoes",
+            data: JSON.stringify(data),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarAlocacao(alocacaoId) {
+        $.ajax({
+            url: "/alocacoes/"+alocacaoId,
+            data: JSON.stringify(getFormData()),
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        enderecoFields = ["logradouro", "bairro", "cep", "complemento", "cidade_id"]
+        var values = {};
+        var endereco = {}
+        $.map(unindexed_array, function (n, i) {
+            if (enderecoFields.includes(n['name'])) {
+                endereco[n['name']] = n['value']
+            } else values[n['name']] = n['value'];
+        });
+        values["endereco"] = endereco
+        console.log("form data: ", values)
+        return values
+    }
+
+    $(document).ready(function () {
+        $("#"+cadastrarAlocacaoModalId).on('hide.bs.modal', function(){
+            let pessoaId = $("#"+alocacaoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+    });
+</script>

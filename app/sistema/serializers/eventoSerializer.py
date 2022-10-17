@@ -19,6 +19,7 @@ class EventoSerializer(serializers.ModelSerializer):
             "observacao",
             "status",
             "endereco",
+            "status_class"
         ]
         depth = 2
         

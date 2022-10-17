@@ -111,7 +111,8 @@
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
-                $('#'+dismissAlocarPessoaId).modal('toggle');
+                console.log("toggle pessoa modal")
+                $('#'+alocarPessoaModalId).modal('toggle');
             }
         });
     }

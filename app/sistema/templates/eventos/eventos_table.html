@@ -41,7 +41,7 @@ cellspacing="0">
                 id="hiddenMenuEventos{{evento.id}}" 
                 class="btn-group-custom">
                     <a id="linkVisualizarevento{{evento.id}}" href="/visualizarEvento/({{evento.id}})"></a>
-                    <!-- <button onclick="visualizarEvento({{evento.id}})">Visualizar</button>  -->
+                    <button onclick="visualizarEvento({{evento.id}})">Visualizar</button> 
                     <button onclick="carregarEventosModalCadastrar({{evento.id}})">Editar</button> 
                     <button onclick="deleteEvento({{evento.id}})" >Excluir</button>
                 </div>
@@ -51,6 +51,10 @@ cellspacing="0">
     </tbody>
 </table>
 <script>
+    function visualizarEvento(id) {
+        location.href = "visualizarEvento/" + id
+    }
+
     $(document).ready(function () {
         function isvisibleOnViewport(element) {
             var rect = element.getBoundingClientRect();

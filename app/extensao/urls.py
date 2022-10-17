@@ -27,7 +27,8 @@ from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edica
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade
-from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento
+from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento, visualizarEvento
+from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -60,6 +61,10 @@ urlpatterns = [
     path("cidadesModalCadastrar",cidadesModalCadastrar),
     path("eliminarCidade/<codigo>",eliminarCidade),
     
+    # ROTAS PARA ALOCAÇÔES
+    path("alocacoesTable",alocacoesTable),
+    path("alocacaoModalCadastrar",alocacaoModalCadastrar),
+    
     # ROTAS PARA EVENTOS
     path("gerenciar-eventos",gerencia_eventos),
     path("eventosTable",eventosTable),
@@ -67,6 +72,7 @@ urlpatterns = [
     path("eliminarEvento/<codigo>",eliminarEvento),
     path("cidadesSelect",cidadesSelect),
     path("enderecosSelect",enderecosSelect),
+    path("visualizarEvento/<codigo>",visualizarEvento),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
