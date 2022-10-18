@@ -1,5 +1,6 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
+from django.http import JsonResponse
 from django.db import connection, reset_queries
 from django.core import serializers
 from django.db.models import Count
@@ -21,31 +22,29 @@ def gerencia_pessoas(request):
     page_title = "Pessoas"
     count = 0
     pessoa = Pessoas.objects.all()
-    print('-------------------------\n\n'+str(pessoa))
     for p in pessoa:
         count += 1
 
     return render(request,'pessoas/gerencia_pessoas.html',
     {'pessoas':pessoa,'contagem':count, "page_title": page_title})
 
-@login_required(login_url='/auth-user/login-user')
+# @login_required(login_url='/auth-user/login-user')
 def pessoasTable(request):
     nome = request.GET.get('nome')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     pessoas = Pessoas.objects
     if nome:
+        print("dentro do filtro de nome: ", nome)
         pessoas = pessoas.filter(nome__contains = nome)
     if data_fim and data_inicio:
-        print("filtrando")
+        print("dentro do filtro de data: ", data_fim, data_inicio)
         pessoas = pessoas.filter(
             Q(alocacao__data_inicio__lt=data_inicio,
             alocacao__data_fim__lt=data_inicio) | 
             Q(alocacao__data_inicio__gt=data_fim,
             alocacao__data_fim__gt=data_fim) | 
-            Q(alocacao__evento__status__in=["finalizado", "adiado"]) |
-            Q(alocacao__isnull=True)
-        )
+            Q(alocacao__evento__status__in=["finalizado", "adiado"])) | pessoas.filter(alocacao=None)
     pessoas = pessoas.all()
     qs_json = serializers.serialize('json', pessoas)
     print(qs_json)
@@ -65,7 +64,6 @@ def pessoasModalCadastrar(request):
     if id:
         pessoa = Pessoas.objects.get(id=id)
         cursos = CursoSerializer(pessoa.cursos, many=True)
-        print(cursos)
         if cursos:
             data['pessoa'] = pessoa
             data['cursos'] = cursos.data
@@ -75,7 +73,6 @@ def pessoasModalCadastrar(request):
 def pessoasModalAlocar(request):
     pessoaIds = request.GET.getlist('checked_values[]')
     data = {}
-    print("ids da requisicao",pessoaIds)
     if pessoaIds:
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
