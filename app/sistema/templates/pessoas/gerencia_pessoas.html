@@ -197,6 +197,8 @@ z-index: 4
             success: function (data) {
                 $("#"+modalAlocarPessoasId).html(data)
                 $('#'+alocarPessoaModalId).modal('toggle');
+                $("#"+pessoaTableCheckboxAllId).prop('checked', false);
+                $("#"+pessoaTableCheckboxAllId).trigger("change");
             }
         });
 
@@ -416,10 +418,18 @@ z-index: 4
         
         $("input[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
-            $(this)
-            .change(debounce(function() {
-                filtrarPessoas()
-            }, 500))
+            console.log($(this).attr("id"))
+            if ($(this).attr("id").includes("NomePessoa")) {
+                $(this)
+                .keyup(debounce(function() {
+                    filtrarPessoas()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    filtrarPessoas()
+                }, 500))
+            }
         })
 
         carregarPessoas()

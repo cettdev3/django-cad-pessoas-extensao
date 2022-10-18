@@ -1,6 +1,8 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.db import connection, reset_queries
+from django.core import serializers
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
@@ -35,13 +37,18 @@ def pessoasTable(request):
     if nome:
         pessoas = pessoas.filter(nome__contains = nome)
     if data_fim and data_inicio:
+        print("filtrando")
         pessoas = pessoas.filter(
             Q(alocacao__data_inicio__lt=data_inicio,
             alocacao__data_fim__lt=data_inicio) | 
             Q(alocacao__data_inicio__gt=data_fim,
             alocacao__data_fim__gt=data_fim) | 
-            Q(alocacao__evento__status__in=["finalizado", "adiado"]))
+            Q(alocacao__evento__status__in=["finalizado", "adiado"]) |
+            Q(alocacao__isnull=True)
+        )
     pessoas = pessoas.all()
+    qs_json = serializers.serialize('json', pessoas)
+    print(qs_json)
     return render(request,'pessoas/pessoas_table.html',{'pessoas':pessoas})
 
 @login_required(login_url='/auth-user/login-user')
@@ -90,3 +97,75 @@ def eliminarPessoa(request,codigo):
     return redirect('/gerenciar-pessoas')
 
 # FIM PESSOAS
+
+
+[
+    {"model": 
+    "sistema.pessoas", "pk": 86, "fields": 
+    {"email": 
+    "jose@email", "nome": 
+    "jose da silva", "data_nascimento": 
+    "2000-03-15", "telefone": 
+    "(62)9 8585-8585", "cpf": 
+    "458.745.874-77", "rg": 
+    "45587.45", "orgao_emissor": 
+    "SSP-GO", "cargo": 
+    "professor", "banco": 
+    "Itau", "agencia": 
+    "4587445", "conta": 
+    "45878546454", "pix": 
+    "454654987789", "tipo": 
+    "clt", 
+"qtd_contratacoes": 
+"0", "user_camunda": 
+"", "cidade": 
+"Goiania", "bairro": 
+"Coiembra", "rua": 
+"Rua 250", "cep": 
+"75.386-222", "complemento": 
+"casa 4", "cursos": [4]}}, 
+{"model": 
+"sistema.pessoas", "pk": 87, "fields": {"email": 
+"maria@email", "nome": 
+"maria da silva", "data_nascimento": 
+"1995-04-15", "telefone": 
+"(62)9 8555-5555", "cpf": 
+"454.478.784-54", "rg": 
+"45646.54", "orgao_emissor": 
+"SSP-GO", "cargo": 
+"professor", "banco": 
+"Brasdesco", "agencia": 
+"44558888", "conta": 
+"554456646", "pix": 
+"4564654694", "tipo": 
+"clt", "qtd_contratacoes": 
+"0", "user_camunda": 
+"", "cidade": 
+"Trindade", "bairro": 
+"Setor Garavelo", 
+"rua": 
+"Rua  10", "cep": 
+"12.545-887", "complemento": 
+"Casa amarela", "cursos": [4, 5]}}, 
+{"model": 
+"sistema.pessoas", "pk": 89, "fields": {"email": 
+"sfas", "nome": 
+"sem alocacao", "data_nascimento": 
+"2022-10-14", "telefone": 
+"(01)3 2645-6464", "cpf": 
+"456.545.646-45", "rg": 
+"46464.65", "orgao_emissor": 
+"SSP-GO", "cargo": 
+"estoquista", "banco": 
+"fsaf", "agencia": 
+"fsdf", "conta": 
+"dfsfas", "pix": 
+"dfdsf", "tipo": 
+"rpa", "qtd_contratacoes": 
+"0", "user_camunda": 
+"sdfsd", "cidade": 
+"safsd", "bairro": 
+"afsdf", "rua": 
+"sfsdf", "cep": 
+"54.646-546", "complemento": 
+"44464", "cursos": [4, 5]}}]
