@@ -5,3 +5,9 @@
 .link-back:hover {
     color: #1cc88a;
 }
+
+.logout-last li:last-child{
+    bottom: 20px;
+    height: 22px;
+    position: fixed;
+}
