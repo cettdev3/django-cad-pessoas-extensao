@@ -46,8 +46,8 @@ services:
       - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
       - MYSQL_HOST=${EXT_MYSQL_HOST}
       - MYSQL_DATABASE=${EXT_MYSQL_USER}
-    ports:
-      - 8081:8000
+    # ports:
+    #   - 8081:8000
     volumes:
       - ./app:/home/appuser
     
