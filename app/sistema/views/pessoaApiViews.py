@@ -1,6 +1,7 @@
 # todo/todo_api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import status as st
 from rest_framework import permissions
 from ..models.pessoa import Pessoas
@@ -13,9 +14,13 @@ class PessoaApiView(APIView):
 
     # 1. List all
     def get(self, request, *args, **kwargs):
-        todos = Pessoas.objects.all()
-        print("dados retornados",todos)
-        serializer = PessoaSerializer(todos, many=True)
+        cpf = request.GET.get('cpf')
+        pessoas = Pessoas.objects
+        if cpf:
+            cpfNaoFormatado = cpf.replace('.', '').replace('-','')
+            pessoas = pessoas.filter(Q(cpf=cpf)|Q(cpf=cpfNaoFormatado))
+        pessoas = pessoas.all()
+        serializer = PessoaSerializer(pessoas, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     # 2. Create
@@ -97,10 +102,14 @@ class PessoaDetailApiView(APIView):
                     {"res": "Não existe pessoa cadastrada com o id informado"}, 
                     status=st.HTTP_400_BAD_REQUEST
                 )
-        if request.data.get("cursos"):
-            cursosIds = request.data.get("cursos")
+
+        requestCursos = request.data.get("cursos")
+        if requestCursos:
+            cursosIds = requestCursos
             cursos = []
             for cursoId in cursosIds:
+                if type(cursoId) == dict:
+                    cursoId = cursoId["id"]    
                 curso = self.get_object(Curso, cursoId)
                 if not curso:
                     return Response(
@@ -110,7 +119,7 @@ class PessoaDetailApiView(APIView):
                 cursos.append(curso)
            
             pessoa.cursos.set(cursos)
-        else:
+        elif type(requestCursos) is list:
             pessoa.cursos.set([])
 
         if request.data.get("nome"):
