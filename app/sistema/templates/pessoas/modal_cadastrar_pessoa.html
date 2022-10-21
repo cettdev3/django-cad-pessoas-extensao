@@ -762,6 +762,20 @@
                                                 {% endif %}
                                             {% endif %}
                                             value="clt">CLT</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo == 'bolsista' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="bolsista">Bolsista</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo == 'outro' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="outro">Outros</option>
                                         </select>
                                     </div>
                                     <div class="col-sm-4">

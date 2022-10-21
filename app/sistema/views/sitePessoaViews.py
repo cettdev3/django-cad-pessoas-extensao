@@ -11,7 +11,7 @@ from sistema.serializers.eventoSerializer import EventoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.curso import Curso
 from sistema.models.evento import Evento
-from django.db.models import Q
+from django.db.models import Q, Exists
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -35,19 +35,18 @@ def pessoasTable(request):
     data_fim = request.GET.get('data_fim')
     pessoas = Pessoas.objects
     if nome:
-        print("dentro do filtro de nome: ", nome)
         pessoas = pessoas.filter(nome__contains = nome)
     if data_fim and data_inicio:
-        print("dentro do filtro de data: ", data_fim, data_inicio)
         pessoas = pessoas.filter(
-            Q(alocacao__data_inicio__lt=data_inicio,
-            alocacao__data_fim__lt=data_inicio) | 
-            Q(alocacao__data_inicio__gt=data_fim,
-            alocacao__data_fim__gt=data_fim) | 
-            Q(alocacao__evento__status__in=["finalizado", "adiado"])) | pessoas.filter(alocacao=None)
+            ~Exists(Pessoas.objects.filter(
+                Q(alocacao__data_inicio__gte=data_inicio,
+                alocacao__data_inicio__lte=data_fim) |
+                Q(alocacao__data_fim__gte=data_inicio,
+                alocacao__data_fim__lte=data_fim) 
+            ))
+        ).union(pessoas.filter(alocacao__isnull=True))
     pessoas = pessoas.all()
     qs_json = serializers.serialize('json', pessoas)
-    print(qs_json)
     return render(request,'pessoas/pessoas_table.html',{'pessoas':pessoas})
 
 @login_required(login_url='/auth-user/login-user')
