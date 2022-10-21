@@ -18,7 +18,6 @@ class PessoaSerializer(serializers.ModelSerializer):
             "cidade",
             "bairro",
             "rua",
-            "cep",
             "complemento",
             "cep",
             "cargo",
@@ -29,6 +28,16 @@ class PessoaSerializer(serializers.ModelSerializer):
             "tipo",
             "qtd_contratacoes",
             "user_camunda",
+            "sexo",
+            "estado_civil",
+            "telefone_recado",
+            "pis_pasep",
+            "data_emissao",
+            "nome_mae",
+            "nome_pai",
+            "tipo_conta",
+            "numero_endereco",
+            "estado",
             "cursos"
         ]
         depth = 1

@@ -25,7 +25,18 @@ class PessoaApiView(APIView):
 
     # 2. Create
     def post(self, request, *args, **kwargs):
-        print(request.data)
+        sexo = request.data.get('sexo')
+        telefone_recado = request.data.get('telefone_recado')
+        pis_pasep = request.data.get('pis_pasep')
+        if request.data.get("data_emissao"):
+            data_emissao = request.data.get("data_emissao")
+        else: data_emissao = None
+        estado_civil = request.data.get("estado_civil")
+        nome_mae = request.data.get('nome_mae')
+        nome_pai = request.data.get('nome_pai')
+        tipo_conta = request.data.get('tipo_conta')
+        numero_endereco = request.data.get('numero_endereco')
+        estado = request.data.get('estado')
         cursos =  request.data.get('cursos')
         nome = request.data.get('nome')
         email = request.data.get('email')
@@ -52,6 +63,7 @@ class PessoaApiView(APIView):
         pessoa = Pessoas.objects.create(
             nome = nome,
             email = email,
+            estado_civil = estado_civil,
             data_nascimento = data_nascimento,
             telefone = telefone,
             cpf = cpf,
@@ -60,6 +72,15 @@ class PessoaApiView(APIView):
             cidade = cidade,
             bairro = bairro,
             rua = rua,
+            sexo = sexo,
+            telefone_recado = telefone_recado,
+            pis_pasep = pis_pasep,
+            data_emissao = data_emissao,
+            nome_mae = nome_mae,
+            nome_pai = nome_pai,
+            tipo_conta = tipo_conta,
+            numero_endereco = numero_endereco,
+            estado = estado,
             complemento = complemento,
             cep = cep,
             cargo = cargo,
@@ -164,6 +185,27 @@ class PessoaDetailApiView(APIView):
             pessoa.qtd_contratacoes = request.data.get("qtd_contratacoes")
         if request.data.get("user_camunda"):
             pessoa.user_camunda = request.data.get("user_camunda")
+        if request.data.get("sexo"):
+            pessoa.sexo = request.data.get("sexo")
+        if request.data.get("estado_civil"):
+            pessoa.estado_civil = request.data.get("estado_civil")
+        if request.data.get("telefone_recado"):
+            pessoa.telefone_recado = request.data.get("telefone_recado")
+        if request.data.get("pis_pasep"):
+            pessoa.pis_pasep = request.data.get("pis_pasep")
+        data_emissao = request.data.get("data_emissao")
+        if data_emissao and len(data_emissao) > 0:
+            pessoa.data_emissao = request.data.get("data_emissao")
+        if request.data.get("nome_mae"):
+            pessoa.nome_mae = request.data.get("nome_mae")
+        if request.data.get("nome_pai"):
+            pessoa.nome_pai = request.data.get("nome_pai")
+        if request.data.get("tipo_conta"):
+            pessoa.tipo_conta = request.data.get("tipo_conta")
+        if request.data.get("numero_endereco"):
+            pessoa.numero_endereco = request.data.get("numero_endereco")
+        if request.data.get("estado"):
+            pessoa.estado = request.data.get("estado")
         
                 
         pessoa.save()

@@ -162,7 +162,7 @@
                 <div id="content">
     
                     <!-- Begin Page Content -->
-                    <div class="w-100">
+                    <div class="w-100" style="min-height: 100vh;">
     
                         {% block content %}
     
@@ -210,6 +210,7 @@
     <script type="text/javascript">
         function maskValues() {
             $('#telefone').mask("(00)0 0000-0000");
+            $('#telefone_recado').mask("(00)0 0000-0000");
             $('#cpf').mask("000.000.000-00");
             $('#cep').mask("00.000-000");
         }

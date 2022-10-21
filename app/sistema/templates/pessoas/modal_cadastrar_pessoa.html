@@ -81,7 +81,68 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
+                                        <label><b>Sexo:</b></label>
+                                        {% if pessoa %}
+                                            <select required
+                                            class="form-control"
+                                            {% if pessoa.sexo == 'masculino' or pessoa.sexo == 'feminino' or not pessoa.sexo %}
+                                            {% else %}
+                                            style="display: none;"
+                                            {% endif %}
+                                            id="sexo_select" 
+                                            name="sexo">
+                                                <option 
+                                                {% if pessoa %}
+                                                    {% if pessoa.sexo == 'masculino' %}
+                                                        selected
+                                                    {% endif %}
+                                                {% endif %}
+                                                value="masculino">Masculino</option>
+                                                <option 
+                                                {% if pessoa %}
+                                                    {% if pessoa.sexo == 'feminino' %}
+                                                        selected
+                                                    {% endif %}
+                                                {% endif %}
+                                                value="feminino">Feminino</option>
+                                                <option 
+                                                value="outro">Outro</option>
+                                            </select>
+                                            <input 
+                                            type="text" 
+                                            {% if pessoa.sexo == 'masculino' or pessoa.sexo == 'feminino' or not pessoa.sexo %}
+                                            style="display: none;"
+                                            {% else %}
+                                            value="{{pessoa.sexo}}" 
+                                            {% endif %}
+                                            class="form-control" 
+                                            id="sexo_input" 
+                                            name="sexo"
+                                            placeholder="" 
+                                            required>
+                                        {% else %}
+                                        <select required class="form-control" 
+                                        id="sexo_select" 
+                                        name="sexo">
+                                            <option 
+                                            value="masculino">Masculino</option>
+                                            <option 
+                                            value="feminino">Feminino</option>
+                                            <option 
+                                            value="outro">Outro</option>
+                                        </select>
+                                        <input 
+                                        type="text" 
+                                        style="display: none;"
+                                        class="form-control" 
+                                        id="sexo_input" 
+                                        name="sexo"
+                                        placeholder="" 
+                                        required>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-sm-4">
                                         <label><b>Telefone:</b></label>
                                         <input 
                                         type="text" 
@@ -95,6 +156,21 @@
                                         required>
                                     </div>
                                     <div class="col-sm-4">
+                                        <label><b>Telefone (Recado):</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.telefone_recado}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="telefone_recado" 
+                                        name="telefone_recado"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
                                         <label><b>CPF:</b></label>
                                         <input 
                                         type="text" 
@@ -120,7 +196,20 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3">
+                                        <label><b>Data de Emissão (RG):</b></label>
+                                        <input 
+                                        type="date" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.data_emissao|date:'Y-m-d'}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="data_emissao"
+                                        name="data_emissao"
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
                                         <label><b>Orgão Emissor:</b></label>
                                         <input 
                                         type="text" 
@@ -134,10 +223,96 @@
                                         required>
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
+                                        <label><b>PIS/PASEP:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.pis_pasep}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="pis_pasep" 
+                                        name="pis_pasep"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Nome da Mãe:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.nome_mae}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome_mae" 
+                                        name="nome_mae"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Nome do Pai:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.nome_pai}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome_pai" 
+                                        name="nome_pai"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Estado Civil:</b></label>
+                                        <select required
+                                        class="form-control" 
+                                        id="estado_civil" 
+                                        name="estado_civil">
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado_civil == 'solteiro(a)' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="solteiro(a)">SOLTEIRO(a)</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado_civil == 'divorciado(a)' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="divorciado(a)">DIVORCIADO(a)</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado_civil == 'casado(a)' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="casado(a)">CASADO(a)</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado_civil == 'viuvo(a)' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="viuvo(a)">VIÚVO(a)</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado_civil == 'uniao_estavel' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="uniao_estavel">UNIÃO ESTÁVEL</option>
+                                            <option 
+                                            value="outro">Outro</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div id="menu1" class="tab-pane py-3 fade">
                                 <div class="form-group row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Cidade:</b></label>
                                         <input type="text" 
                                         class="form-control" 
@@ -149,7 +324,7 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Bairro:</b></label>
                                         <input 
                                         type="text" 
@@ -162,8 +337,8 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Rua:</b></label>
+                                    <div class="col-sm-3">
+                                        <label><b>Logradouro:</b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
@@ -172,6 +347,19 @@
                                         {% endif %}
                                         id="rua" 
                                         name="rua" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label><b>Número:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.numero_endereco}}" 
+                                        {% endif %}
+                                        id="numero_endereco" 
+                                        name="numero_endereco" 
                                         placeholder=""
                                         required>
                                     </div>
@@ -190,7 +378,7 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-4">
                                         <label><b>Complemento:</b></label>
                                         <input 
                                         type="text" 
@@ -203,11 +391,214 @@
                                         placeholder="" 
                                         required>
                                     </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Estado:</b></label>
+                                        <select class="form-control" 
+                                        id="estado" 
+                                        name="estado">
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'AC' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="AC">Acre</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'AL' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="AL">Alagoas</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'AP' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="AP">Amapá</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'AM' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="AM">Amazonas</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'BA' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="BA">Bahia</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'CE' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="CE">Ceará</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'DF' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="DF">Distrito Federal</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'ES' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="ES">Espírito Santo</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'GO' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="GO">Goiás</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'MA' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="MA">Maranhão</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'MT' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="MT">Mato Grosso</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'MS' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="MS">Mato Grosso do Sul</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'MG' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="MG">Minas Gerais</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'PA' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="PA">Pará</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'PB' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="PB">Paraíba</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'PR' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="PR">Paraná</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'PE' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="PE">Pernambuco</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'PI' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="PI">Piauí</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'RJ' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="RJ">Rio de Janeiro</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'RN' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="RN">Rio Grande do Norte</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'RS' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="RS">Rio Grande do Sul</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'RO' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="RO">Rondônia</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'RR' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="RR">Roraima</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'SC' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="SC">Santa Catarina</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'SP' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="SP">São Paulo</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'SE' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="SE">Sergipe</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'TO' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="TO">Tocantins</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.estado == 'EX' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %} 
+                                            value="EX">Estrangeiro</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div id="menu2" class="tab-pane py-3 fade">
                                 <div class="form-group row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <label><b>Banco:</b></label>
                                         <input 
                                         type="text" 
@@ -220,7 +611,7 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <label><b>Agência:</b></label>
                                         <input 
                                         type="text" 
@@ -233,7 +624,7 @@
                                         placeholder="" 
                                         required>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <label><b>Conta:</b></label>
                                         <input 
                                         type="text" 
@@ -246,7 +637,9 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-3">
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
                                         <label><b>Pix:</b></label>
                                         <input 
                                         type="text" 
@@ -258,6 +651,41 @@
                                         name="pix" 
                                         placeholder=""
                                         required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label><b>Tipo de Conta:</b></label>
+                                        <select required class="form-control" 
+                                        id="tipo_conta" 
+                                        name="tipo_conta">
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo_conta == 'corrente' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="corrente">Corrente</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo_conta == 'poupanca' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="poupanca">Poupança</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo_conta == 'salario' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="salario">Salário</option>
+                                            <option 
+                                            {% if pessoa %}
+                                                {% if pessoa.tipo_conta == 'conjunta' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="conjunta">Conjunta</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -416,13 +844,11 @@
 
     function clearModalForm(changedResource = null) {
         document.getElementById('cadastrarPessoaForm').reset();
-        console.log($('#cadastrarPessoaForm').serializeArray())
         $("div[id^='dropdownInputedItem']").each(function () {
             $(this).remove()
         })
 
         if (changedResource) pessoaModificadaEventProxy.modificado = changedResource
-        else console.log("pessoa nao modificada")
         if (changedResource) $("#dismissCadastrarPessoa").click()
         
         nextLinkElement = $('#nextPessoaLink')
@@ -475,10 +901,16 @@
     }
 
     function getFormData() {
+        if ($("#sexo_select").length) {
+            if ($("#sexo_input").val()) {
+                $("#sexo_select").remove()
+            } else $("#sexo_input").remove()
+        }
+
         let form = $('#cadastrarPessoaForm')
         var unindexed_array = form.serializeArray();
         var values = {};
-
+            
         let cursosId = []
         cursosCheckbox.each(function (i, el) {
             if ($(this).is(":checked")) { cursosId.push($(this).val()) }
@@ -489,6 +921,7 @@
         });
 
         values['cursos'] = cursosId;
+        console.log(values)
         return values
     }
 
@@ -607,11 +1040,16 @@
         $("#cadastrarPessoaModal").on('hide.bs.modal', function(){
             let pessoaId = $("#modelId").text()
             if (pessoaId) {
-                console.log("O id da pessoa é: ", pessoaId)
                 clearModalForm()
-            } else {
-                console.log("Pessoa sendo cadastrada")
             }
+        });
+        $("#sexo_select").on('change', function(evt){
+            if ($(this).val() == "outro") {
+                $("#sexo_select").remove()
+                $("#sexo_input").toggle()
+                $("#sexo_input").focus()
+                $("#sexo_input").attr("placeholder", "Digite um valor para o sexo...")
+            } 
         });
         buscarCursos(cursos)
         maskValues()
