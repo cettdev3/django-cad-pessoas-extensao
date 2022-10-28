@@ -47,6 +47,7 @@ class AvaliacaoApiView(APIView):
             "limpeza": request.data.get("limpeza"),
             "link_imagens": request.data.get("link_imagens"),
             "parecer": request.data.get("parecer"),
+            "obs_parecer": request.data.get("obs_parecer"),
             "possui_cozinha": request.data.get("possui_cozinha"),
             "capacidade_cozinha": request.data.get("capacidade_cozinha"),
             "qtd_tomadas_cozinha": request.data.get("qtd_tomadas_cozinha"),
@@ -70,6 +71,17 @@ class AvaliacaoApiView(APIView):
             "cadeiras_de_sb": request.data.get("cadeiras_de_sb"),
             "qtd_cadeiras_sb": request.data.get("qtd_cadeiras_sb"),
             "cidade": request.data.get("cidade"),
+            "obsinfra": request.data.get("obsinfra"),
+            "cidade_realizacao": request.data.get("cidade_realizacao"),
+            "avalLocalEmailAvaliador": request.data.get("avalLocalEmailAvaliador"),
+            "tipoAvaliacao": request.data.get("tipoAvaliacao"),
+            "endereco_realizacao": request.data.get("endereco_realizacao"),
+            "observacao_beleza": request.data.get("observacao_beleza"),
+            "sevicodebeleza": request.data.get("sevicodebeleza"),
+            "confeitaria": request.data.get("confeitaria"),
+            "UsuariolAvaliador": request.data.get("UsuariolAvaliador"),
+            "avalLocalNomeAvaliador": request.data.get("avalLocalNomeAvaliador"),
+            "infomatica": request.data.get("infomatica"),
         }
 
         serializer = AvaliacaoSerializer(data=data)
@@ -150,6 +162,8 @@ class AvaliacaoDetailApiView(APIView):
             data["link_imagens"] = request.data.get("link_imagens")
         if request.data.get("parecer"):
             data["parecer"] = request.data.get("parecer")
+        if request.data.get("obs_parecer"):
+            data["obs_parecer"] = request.data.get("obs_parecer")
         if request.data.get("possui_cozinha"):
             data["possui_cozinha"] = request.data.get("possui_cozinha")
         if request.data.get("capacidade_cozinha"):
@@ -196,13 +210,35 @@ class AvaliacaoDetailApiView(APIView):
             data["qtd_cadeiras_sb"] = request.data.get("qtd_cadeiras_sb")
         if request.data.get("cidade"):
             data["cidade"] = request.data.get("cidade")
+        if request.data.get("obsinfra"):
+            data["obsinfra"] = request.data.get("obsinfra")
+        if request.data.get("cidade_realizacao"):
+            data["cidade_realizacao"] = request.data.get("cidade_realizacao")
+        if request.data.get("avalLocalEmailAvaliador"):
+            data["avalLocalEmailAvaliador"] = request.data.get("avalLocalEmailAvaliador")
+        if request.data.get("tipoAvaliacao"):
+            data["tipoAvaliacao"] = request.data.get("tipoAvaliacao")
+        if request.data.get("endereco_realizacao"):
+            data["endereco_realizacao"] = request.data.get("endereco_realizacao")
+        if request.data.get("observacao_beleza"):
+            data["observacao_beleza"] = request.data.get("observacao_beleza")
+        if request.data.get("sevicodebeleza"):
+            data["sevicodebeleza"] = request.data.get("sevicodebeleza")
+        if request.data.get("confeitaria"):
+            data["confeitaria"] = request.data.get("confeitaria")
+        if request.data.get("UsuariolAvaliador"):
+            data["UsuariolAvaliador"] = request.data.get("UsuariolAvaliador")
+        if request.data.get("avalLocalNomeAvaliador"):
+            data["avalLocalNomeAvaliador"] = request.data.get("avalLocalNomeAvaliador")
+        if request.data.get("infomatica"):
+            data["infomatica"] = request.data.get("infomatica")
 
         serializer = AvaliacaoSerializer(instance = avaliacao, data=data, partial = True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
     # 5. Delete
     def delete(self, request, avaliacao_id, *args, **kwargs):
         
