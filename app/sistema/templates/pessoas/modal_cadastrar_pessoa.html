@@ -807,6 +807,17 @@
                                         placeholder="" 
                                         required>
                                     </div>
+                                    <div class="col-sm-3">
+                                        <label><b>id protocolo:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if pessoa %}
+                                        value="{{pessoa.id_protocolo}}" 
+                                        {% endif %}
+                                        class="form-control" id="id_protocolo" name="id_protocolo"
+                                        placeholder="" 
+                                        required>
+                                    </div>
                                     <div id="selectCursosCadastrarPessoa" class="col-sm-4">
                                     </div>
                                 </div>

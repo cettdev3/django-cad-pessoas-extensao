@@ -36,6 +36,7 @@ class PessoaSerializer(serializers.ModelSerializer):
             "nome_mae",
             "nome_pai",
             "tipo_conta",
+            "id_protocolo",
             "numero_endereco",
             "estado",
             "cursos"

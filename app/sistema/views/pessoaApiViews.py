@@ -15,10 +15,13 @@ class PessoaApiView(APIView):
     # 1. List all
     def get(self, request, *args, **kwargs):
         cpf = request.GET.get('cpf')
+        user_camunda = request.GET.get('user_camunda')
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
             pessoas = pessoas.filter(Q(cpf=cpf)|Q(cpf=cpfNaoFormatado))
+        if user_camunda:
+            pessoas = pessoas.filter(user_camunda=user_camunda)
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
@@ -54,6 +57,7 @@ class PessoaApiView(APIView):
         banco = request.data.get("banco")
         agencia = request.data.get("agencia")
         conta = request.data.get("conta")
+        id_protocolo = request.data.get("id_protocolo")
         pix = request.data.get("pix")
         tipo = request.data.get("tipo")
         qtd_contratacoes = request.data.get("qtd_contratacoes")
@@ -82,6 +86,7 @@ class PessoaApiView(APIView):
             numero_endereco = numero_endereco,
             estado = estado,
             complemento = complemento,
+            id_protocolo = id_protocolo,
             cep = cep,
             cargo = cargo,
             banco = banco,
@@ -159,6 +164,8 @@ class PessoaDetailApiView(APIView):
             pessoa.orgao_emissor = request.data.get("orgao_emissor")
         if request.data.get("cidade"):
             pessoa.cidade = request.data.get("cidade")
+        if request.data.get("id_protocolo"):
+            pessoa.id_protocolo = request.data.get("id_protocolo")
         if request.data.get("bairro"):
             pessoa.bairro = request.data.get("bairro")
         if request.data.get("rua"):

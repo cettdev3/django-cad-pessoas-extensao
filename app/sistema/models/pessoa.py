@@ -35,6 +35,7 @@ class Pessoas(models.Model):
     numero_endereco = models.CharField(null = True, max_length=10) 
     complemento = models.CharField(null = True, max_length=250)
     estado = models.CharField(null = True, max_length=50)
+    id_protocolo = models.CharField(null = True, max_length=50)
     cursos = models.ManyToManyField(Curso, blank=True)
 
     class Meta:
