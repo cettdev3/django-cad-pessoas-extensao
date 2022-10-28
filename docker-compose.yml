@@ -20,6 +20,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.constraint-label-stack=cad-pessoas-extensao"
+      - "traefik.docker.network=backend"
+      - "traefik.http.services.cad-pessoas-extensao.loadbalancer.server.port=8000"
+      #http
+      - "traefik.http.routers.cad-pessoas-extensao_http.entrypoints=http"
+      - "traefik.http.routers.cad-pessoas-extensao_http.rule=Host(`extensao.cett.dev.br`)&&PathPrefix(`/`)"
+      - "traefik.http.routers.cad-pessoas-extensao_http.service=cad-pessoas-extensao"
     depends_on:
       - dbextensao
     environment:
@@ -50,9 +59,8 @@ services:
     #   - 8081:8000
     volumes:
       - ./app:/home/appuser
-    
 
 networks:
-   default:
-     external: true
-     name: backend
+  default:
+    external: true
+    name: backend
