@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
+from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
 from sistema.views.eventoApiViews import EventoApiView, EventoDetailApiView
@@ -97,6 +98,8 @@ urlpatterns = [
     
     path("cursos", CursoApiView.as_view()),
     path('cursos/<int:curso_id>', CursoDetailApiView.as_view()),
+    
+    path("tickets", TicketApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),
