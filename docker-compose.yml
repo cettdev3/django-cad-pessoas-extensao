@@ -26,9 +26,13 @@ services:
       - "traefik.docker.network=backend"
       - "traefik.http.services.cad-pessoas-extensao.loadbalancer.server.port=8000"
       #http
-      - "traefik.http.routers.cad-pessoas-extensao_http.entrypoints=http"
-      - "traefik.http.routers.cad-pessoas-extensao_http.rule=Host(`extensao.cett.dev.br`)&&PathPrefix(`/`)"
-      - "traefik.http.routers.cad-pessoas-extensao_http.service=cad-pessoas-extensao"
+      - "traefik.http.routers.cad-pessoas-extensao_http.rule=Host(`extensao.${PRIMARY_DOMAIN_NAME}`)&&PathPrefix(`/`)"
+      - "traefik.http.routers.cad-pessoas-extensao_http.entrypoints=web"
+      - "traefik.http.routers.cad-pessoas-extensao_http.middlewares=https_redirect"
+      #https
+      - "traefik.http.routers.cad-pessoas-extensao_https.rule=Host(`extensao.${PRIMARY_DOMAIN_NAME}`)&&PathPrefix(`/`)"
+      - "traefik.http.routers.cad-pessoas-extensao_https.entrypoints=websecure"
+      - "traefik.http.routers.cad-pessoas-extensao_https.tls.certresolver=letsencryptresolver"
     depends_on:
       - dbextensao
     environment:
