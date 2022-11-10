@@ -3,14 +3,12 @@ from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as str
-from rest_framework import permissions
-
-from ..models.endereco import Endereco
-from ..models.evento import Evento
-from ..serializers.eventoSerializer import EventoSerializer
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 class TicketApiView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
     def get_object(self, fn, object_id):
         try:
             return fn.objects.get(id=object_id)
