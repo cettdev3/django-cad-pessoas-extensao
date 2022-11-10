@@ -4,3 +4,4 @@ mysqlclient
 djangorestframework
 envconfiguration
 fontawesomefree
+requests

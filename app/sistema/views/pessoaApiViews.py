@@ -1,27 +1,44 @@
 # todo/todo_api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q
+from django.db.models import Q, Exists
 from rest_framework import status as st
 from rest_framework import permissions
 from ..models.pessoa import Pessoas
 from ..models.curso import Curso
 from ..serializers.pessoaSerializer import PessoaSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 class PessoaApiView(APIView):
-    # add permission to check if user is authenticated
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     # 1. List all
     def get(self, request, *args, **kwargs):
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda')
+        nome = request.GET.get('nome')
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
             pessoas = pessoas.filter(Q(cpf=cpf)|Q(cpf=cpfNaoFormatado))
         if user_camunda:
             pessoas = pessoas.filter(user_camunda=user_camunda)
+        if nome:
+            pessoas = pessoas.filter(nome__contains = nome)
+        if data_fim and data_inicio:
+            pessoas = pessoas.filter(
+                ~Exists(Pessoas.objects.filter(
+                    Q(alocacao__data_inicio__gte=data_inicio,
+                    alocacao__data_inicio__lte=data_fim) |
+                    Q(alocacao__data_fim__gte=data_inicio,
+                    alocacao__data_fim__lte=data_fim) 
+                ))
+            ).union(pessoas.filter(alocacao__isnull=True))
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
@@ -103,6 +120,9 @@ class PessoaApiView(APIView):
 
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PessoaDetailApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
     def get_object(self, fn, object_id):
         try:
             return fn.objects.get(id=object_id)

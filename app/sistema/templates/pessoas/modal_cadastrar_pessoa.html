@@ -890,9 +890,10 @@
 
     function cadastrarPessoa() {
         $.ajax({
-            url: "pessoas",
-            data: JSON.stringify(getFormData()),
+            url: "savePessoa",
+            data: JSON.stringify({"data":getFormData()}),
             dataType: "json",
+            headers: { "X-CSRFToken":'{{ csrf_token }}' },
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
@@ -903,12 +904,15 @@
 
     function editarPessoa(id) {
         $.ajax({
-            url: "pessoas/"+id,
-            data: JSON.stringify(getFormData()),
+            url: "editarPessoa/"+id,
+            data: JSON.stringify({"data":getFormData()}),
             dataType: "json",
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             contentType: 'application/json',
-            method: "PUT",
+            method: "POST",
+            type: "POST",
             success: function (data) {
+                console.log("data", data)
                 clearModalForm(data)
             }
         });
