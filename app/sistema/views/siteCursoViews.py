@@ -6,6 +6,10 @@ from sistema.models.pessoa import Pessoas
 from sistema.models.curso import Curso
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import requests
+import json
+from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
 
 # Create your views here. teste
 
@@ -56,4 +60,19 @@ def eliminarCurso(request,codigo):
     curso.delete()
     return redirect('/gerenciar-cursos')
 
-# FIM PESSOAS
+@login_required(login_url='/auth-user/login-user')
+def saveCurso(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)['data']
+    response = requests.post('http://localhost:8000/cursos', json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def editarCurso(request, codigo):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    print(request.body)
+    body = json.loads(request.body)['data']
+    response = requests.put('http://localhost:8000/cursos/'+str(codigo), json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)

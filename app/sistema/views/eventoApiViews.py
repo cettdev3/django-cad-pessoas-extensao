@@ -8,9 +8,13 @@ from rest_framework import permissions
 from ..models.endereco import Endereco
 from ..models.evento import Evento
 from ..serializers.eventoSerializer import EventoSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class EventoApiView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
     def get_object(self, fn, object_id):
         try:
             return fn.objects.get(id=object_id)
@@ -51,6 +55,9 @@ class EventoApiView(APIView):
         return Response(eventoSerializer.data, status=str.HTTP_201_CREATED)
 
 class EventoDetailApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
     def get_object(self, fn, object_id):
         try:
             return fn.objects.get(id=object_id)

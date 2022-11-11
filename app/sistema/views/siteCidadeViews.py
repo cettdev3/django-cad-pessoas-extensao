@@ -7,7 +7,10 @@ from sistema.models.cidade import Cidade
 from sistema.models.curso import Curso
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
+import requests
+import json
+from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
 # Create your views here. teste
 
 @login_required(login_url='/auth-user/login-user')
@@ -52,4 +55,19 @@ def eliminarCidade(request,codigo):
     cidade.delete()
     return redirect('/gerenciar-cidades')
 
-# FIM PESSOAS
+@login_required(login_url='/auth-user/login-user')
+def saveCidade(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)['data']
+    response = requests.post('http://localhost:8000/cidades', json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def editarCidade(request, codigo):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    print(request.body)
+    body = json.loads(request.body)['data']
+    response = requests.put('http://localhost:8000/cidades/'+str(codigo), json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)

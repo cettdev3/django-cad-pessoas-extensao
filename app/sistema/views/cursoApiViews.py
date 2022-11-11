@@ -6,9 +6,11 @@ from rest_framework import permissions
 
 from ..models.curso import Curso
 from ..serializers.cursoSerializer import CursoSerializer
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 class CursoApiView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
         cursos = Curso.objects.all()
@@ -28,6 +30,8 @@ class CursoApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CursoDetailApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     
     def get_object(self, fn, object_id):
         try:

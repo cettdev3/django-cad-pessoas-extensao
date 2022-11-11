@@ -8,8 +8,10 @@ from sistema.models.cidade import Cidade
 from sistema.models.evento import Evento
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
-# Create your views here. teste
+import requests
+import json
+from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_eventos(request):
@@ -72,4 +74,19 @@ def eliminarEvento(request,codigo):
     evento.delete()
     return redirect('/gerenciar-eventos')
 
-# FIM PESSOAS
+@login_required(login_url='/auth-user/login-user')
+def saveEvento(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)['data']
+    response = requests.post('http://localhost:8000/eventos', json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def editarEvento(request, codigo):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    print(request.body)
+    body = json.loads(request.body)['data']
+    response = requests.put('http://localhost:8000/eventos/'+str(codigo), json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)

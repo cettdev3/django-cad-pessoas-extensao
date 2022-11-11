@@ -106,8 +106,9 @@
 
     function cadastrarAlocacao(data) {
         $.ajax({
-            url: "/alocacoes",
-            data: JSON.stringify(data),
+            url: "/saveAlocacao",
+            data: JSON.stringify({"data":data}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "POST",
@@ -119,8 +120,9 @@
     
     function editarAlocacao(alocacaoId) {
         $.ajax({
-            url: "/alocacoes/"+alocacaoId,
-            data: JSON.stringify(getFormData()),
+            url: "/editarAlocacao/"+alocacaoId,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "PUT",

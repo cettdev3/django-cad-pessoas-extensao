@@ -88,8 +88,9 @@
 
     function cadastrarCidade() {
         $.ajax({
-            url: "cidades",
-            data: JSON.stringify(getFormData()),
+            url: "saveCidade",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "POST",
@@ -101,8 +102,9 @@
 
     function editarCidade(id) {
         $.ajax({
-            url: "cidades/"+id,
-            data: JSON.stringify(getFormData()),
+            url: "editarCidade/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "PUT",

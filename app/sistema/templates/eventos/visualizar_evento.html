@@ -73,13 +73,15 @@
     let eventoId = {{evento.id}} 
 
     function deleteAlocacao(id) {
-        deletar_url = "/alocacoes/" + id
+        deletar_url = "/eliminarAlocacao/" + id
 
         $.ajax({
             url: deletar_url,
             method: "DELETE",
             data: {},
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             success: function (data) {
+                console.log("sucesso")
                 let menuId = "#"+hiddenMenuAlocacoesId+ id
                 $(menuId).toggle()
                 carregarAlocacoes()

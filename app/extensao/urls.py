@@ -26,11 +26,11 @@ from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiVie
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
-from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso
-from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade
-from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento, visualizarEvento
-from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar
-
+from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
+from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade
+from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento, visualizarEvento, saveEvento, editarEvento
+from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao
+from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco
 urlpatterns = [
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
@@ -57,16 +57,27 @@ urlpatterns = [
     path("cursosTable",cursosTable),
     path("cursosModalCadastrar",cursosModalCadastrar),
     path("eliminarCurso/<codigo>",eliminarCurso),
+    path("saveCurso",saveCurso),
+    path("editarCurso/<codigo>",editarCurso),
     
+    # ROTAS PARA ENDERECOS
+    path("saveEndereco",saveEndereco),
+    path("editarEndereco/<codigo>",editarEndereco),
+   
     # ROTAS PARA CIDADES
     path("gerenciar-cidades",gerencia_cidades),
     path("cidadesTable",cidadesTable),
     path("cidadesModalCadastrar",cidadesModalCadastrar),
     path("eliminarCidade/<codigo>",eliminarCidade),
+    path("saveCidade",saveCidade),
+    path("editarCidade/<codigo>",editarCidade),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
     path("alocacaoModalCadastrar",alocacaoModalCadastrar),
+    path("saveAlocacao",saveAlocacao),
+    path("editarAlocacao/<codigo>",editarAlocacao),
+    path("eliminarAlocacao/<codigo>",eliminarAlocacao),
     
     # ROTAS PARA EVENTOS
     path("gerenciar-eventos",gerencia_eventos),
@@ -76,6 +87,8 @@ urlpatterns = [
     path("cidadesSelect",cidadesSelect),
     path("enderecosSelect",enderecosSelect),
     path("visualizarEvento/<codigo>",visualizarEvento),
+    path("saveEvento",saveEvento),
+    path("editarEvento/<codigo>",editarEvento),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),

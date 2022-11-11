@@ -216,9 +216,10 @@
 
     function cadastrarEvento(data) {
         $.ajax({
-            url: "eventos",
-            data: JSON.stringify(data),
+            url: "saveEvento",
+            data: JSON.stringify({"data":data}),
             dataType: "json",
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
@@ -231,9 +232,10 @@
         let formData = getFormData()
         if (formData["endereco_id"] == "novo") {
             $.ajax({
-                url: "enderecos",
-                data: JSON.stringify(formData["endereco"]),
+                url: "saveEndereco",
+                data: JSON.stringify({"data":formData["endereco"]}),
                 dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
                 contentType: 'application/json',
                 method: "POST",
                 success: function (data) {
@@ -248,8 +250,9 @@
 
     function editarEvento(eventoId, formData) {
         $.ajax({
-            url: "eventos/"+eventoId,
-            data: JSON.stringify(formData),
+            url: "editarEvento/"+eventoId,
+            data: JSON.stringify({"data":formData}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "PUT",
@@ -325,12 +328,13 @@
     function processarEditarEvento(eventoId) {
         let formData = getFormData()
         if (formData["endereco_id"] == "novo") {
-            url = selectedEnderecoId ? "enderecos/"+selectedEnderecoId : "enderecos"
+            url = selectedEnderecoId ? "editarEndereco/"+selectedEnderecoId : "saveEndereco"
             method = selectedEnderecoId ? "PUT" : "POST"
             $.ajax({
                 url: url,
-                data: JSON.stringify(formData["endereco"]),
+                data: JSON.stringify({"data":formData["endereco"]}),
                 dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
                 contentType: 'application/json',
                 method: method,
                 success: function (data) {

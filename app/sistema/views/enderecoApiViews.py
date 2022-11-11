@@ -7,9 +7,11 @@ from rest_framework import permissions
 from ..models.endereco import Endereco
 from ..models.cidade import Cidade
 from ..serializers.enderecoSerializer import EnderecoSerializer
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 class EnderecoApiView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
         eventos = Endereco.objects.all()
@@ -36,6 +38,9 @@ class EnderecoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class EnderecoDetailApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
     def get_object(self, fn, object_id):
         try:
             return fn.objects.get(id=object_id)

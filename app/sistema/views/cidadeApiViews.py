@@ -6,9 +6,11 @@ from rest_framework import permissions
 
 from ..models.cidade import Cidade
 from ..serializers.cidadeSerializer import CidadeSerializer
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 class CidadeApiView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
         cidades = Cidade.objects.all()
@@ -28,6 +30,8 @@ class CidadeApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CidadeDetailApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     
     def get_object(self, cidade_id):
         try:
