@@ -22,15 +22,18 @@ from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiVie
 from sistema.views.eventoApiViews import EventoApiView, EventoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
+from sistema.views.escolaApiViews import EscolaApiView, EscolaDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
-from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade
-from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, cidadesSelect, enderecosSelect, eliminarEvento, visualizarEvento, saveEvento, editarEvento
+from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
+from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEvento, visualizarEvento, saveEvento, editarEvento
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao
-from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco
+from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
+from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola
+
 urlpatterns = [
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
@@ -63,6 +66,7 @@ urlpatterns = [
     # ROTAS PARA ENDERECOS
     path("saveEndereco",saveEndereco),
     path("editarEndereco/<codigo>",editarEndereco),
+    path("enderecosSelect",enderecosSelect),
    
     # ROTAS PARA CIDADES
     path("gerenciar-cidades",gerencia_cidades),
@@ -71,6 +75,15 @@ urlpatterns = [
     path("eliminarCidade/<codigo>",eliminarCidade),
     path("saveCidade",saveCidade),
     path("editarCidade/<codigo>",editarCidade),
+    path("cidadesSelect",cidadesSelect),
+    
+    # ROTAS PARA ESCOLAS
+    path("gerenciar-escolas",gerencia_escolas),
+    path("escolasTable",escolasTable),
+    path("escolasModalCadastrar",escolasModalCadastrar),
+    path("eliminarEscola/<codigo>",eliminarEscola),
+    path("saveEscola",saveEscola),
+    path("editarEscola/<escola_id>",editarEscola),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
@@ -84,8 +97,6 @@ urlpatterns = [
     path("eventosTable",eventosTable),
     path("eventosModalCadastrar",eventosModalCadastrar),
     path("eliminarEvento/<codigo>",eliminarEvento),
-    path("cidadesSelect",cidadesSelect),
-    path("enderecosSelect",enderecosSelect),
     path("visualizarEvento/<codigo>",visualizarEvento),
     path("saveEvento",saveEvento),
     path("editarEvento/<codigo>",editarEvento),
@@ -113,6 +124,9 @@ urlpatterns = [
     
     path("cursos", CursoApiView.as_view()),
     path('cursos/<int:curso_id>', CursoDetailApiView.as_view()),
+    
+    path("escolas", EscolaApiView.as_view()),
+    path('escolas/<int:escola_id>', EscolaDetailApiView.as_view()),
     
     path("tickets", TicketApiView.as_view()),
 

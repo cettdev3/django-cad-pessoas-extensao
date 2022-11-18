@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .br {
+        border: 2px solid red;
+    }
+
+    .w-10 {
+        width: 10%;
+    }
+
+    .w-15 {
+        width: 15%;
+    }
+
+    .w-2 {
+        width: 2%;
+    }
+
+    .justify-start {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-group-custom button {
+        background-color: #fff;
+        /* Green background */
+        border: 1px solid #e3e6f0;
+        /* Green border */
+        color: #343a40;
+        /* White text */
+        padding: 10px 24px;
+        /* Some padding */
+        cursor: pointer;
+        /* Pointer/hand icon */
+        float: left;
+        /* Float the buttons side by side */
+    }
+
+    /* Clear floats (clearfix hack) */
+    .btn-group-custom {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .btn-group-custom button:not(:last-child) {
+        border-bottom: none;
+        /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    .btn-group-custom button:hover {
+        background-color: #e3e6f0;
+    }
+
+    .btn-circle {
+        border: none;
+        outline: inherit;
+        background-color: #fff;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar {
+        border: none;
+        outline: inherit;
+        color: white;
+        background-color: #1cc88a;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar:hover {
+        background-color: #15865d;
+        transition: background-color 0.1s;
+    }
+
+    .btn-circle:active {
+        background-color: #ececec;
+        transition: background-color 0.1s;
+    }
+
+    .active-form-tab {
+        background-color: #15865d;
+        color: white;
+    }
+</style>
+<div id="loadingEscolas" 
+style="
+background-color: rgba(125,125,125,0.3); 
+display: none; 
+justify-content: center; 
+align-items: center; 
+width: 100vw; 
+height: 100vh;
+position: absolute;
+overflow: hidden;
+top: 0;
+left: 0;
+z-index: 4
+;">
+    <div class="spinner-border" style="z-index: 5;" role="status">
+        <span class="sr-only">Carregando...</span>
+    </div>
+</div>
+<div style="width: 100%;" class="">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible alert-success" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong class="text-dark">{{message}}</strong>
+        </div>
+        {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div>
+            <input id="filterEscolaNome" 
+            placeholder="Digite um nome" 
+            class="form-control-sm border-secondary"
+            name="nome" 
+            type="text">
+        </div>
+        <div>
+            <button id="adicionarEscolas" 
+            onclick="carregarEscolasModalCadastrar()"
+            class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+                <span> cadastrar escola</span>
+            </button>
+        </div>
+    </div>
+    <div id="receberTabelaEscolas" class="shadow bg-white w-100">
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="modalCadastrarEscolaContainer">
+</div>
+<script>
+    let buttonMenuEscolasId = "buttonMenuEscolas"
+    let hiddenMenuEscolasId = "hiddenMenuEscolas"
+    let cadastrarEscolaModalId = "cadastrarEscolaModal"
+    let cadastrarEscolaFormId = "cadastrarEscolaForm"
+    let dismissCadastrarEscolaId = "dismissCadastrarEscola"
+</script>
+
+<script>
+    var escolaModificadaEvent = {};
+    var escolaModificadaEventProxy = null
+    let modalCadastrarEscolaContainerId = "modalCadastrarEscolaContainer"
+    let idTabelaEscolas = "receberTabelaEscolas"
+    let rotaTabelaEscolas = "escolasTable"
+    let rotaDeletarEscola = "eliminarEscola"
+    let rotaModalEscola = "escolasModalCadastrar"
+    let rotaVisualizarEscola = "visualizarEscola"
+    let filterPrefix = "filterEscola"
+
+    function deleteEscola(id) {
+        deletar_url = rotaDeletarEscola+"/" + id
+
+        $.ajax({
+            url: deletar_url,
+            data: {},
+            success: function (data) {
+                let menuId = "#" + hiddenMenuEscolasId + id
+                $(menuId).toggle()
+                carregarEscolas()
+            }
+        });
+    }
+
+    function carregarEscolas(filter = null) {
+        let recarregarTabela = rotaTabelaEscolas
+        $.ajax({
+            url: recarregarTabela,
+            data: filter ? filter : {},
+            success: function (data) {
+                $("#"+idTabelaEscolas).html(data);
+            }
+        });
+    }
+
+    function carregarEscolasModalCadastrar(id = null) {
+        let recarregarTabela = rotaModalEscola
+        $.ajax({
+            url: recarregarTabela,
+            data: id ? {id: id} : {},
+            success: function (data) {
+                $("#"+modalCadastrarEscolaContainerId).html(data);
+                $('#'+cadastrarEscolaModalId).modal('toggle');
+            }
+        });
+    }
+        
+    function visualizarEscola(id) {
+        location.href = rotaVisualizarEscola+"/" + id
+    }
+
+    function buscarEscolas(filter) {
+        let value = $("#" + filter).val()
+        carregarEscolas({ nome: value })
+    }
+
+    function filtrarEscolas() {
+        let filtros = {}
+        $("input[id^='"+filterPrefix+"']").each(function() {
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        carregarEscolas(filtros)
+    }
+
+    function debounce(func, timeout = 300){
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
+    $(document).ready(function () {
+        escolaModificadaEventProxy = new Proxy(escolaModificadaEvent, {
+            set: function (target, key, value) {
+                console.log("escola modificada: ", value)
+                target[key] = value;
+                if (value) {
+                    carregarEscolas()
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuEscolasId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        $("input[id^='"+filterPrefix+"']").each(function () {
+            let input = $(this)
+            console.log($(this).attr("id"))
+            if ($(this).attr("id").includes("Nome")) {
+                $(this)
+                .keyup(debounce(function() {
+                    console.log("key up")
+                    filtrarEscolas()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    console.log("change")
+                    filtrarEscolas()
+                }, 500))
+            }
+        })
+        
+        carregarEscolas()
+    });
+
+</script>
+
+{% endblock content %}

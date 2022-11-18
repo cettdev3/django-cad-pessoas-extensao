@@ -29,3 +29,13 @@ def editarEndereco(request, codigo):
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/enderecos/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def enderecosSelect(request):
+    enderecos = Endereco.objects
+    if request.GET.get('cidade_id'):
+        cidade_id = request.GET.get('cidade_id')
+        enderecos = enderecos.filter(cidade_id=cidade_id)
+
+    enderecos = enderecos.all()
+    return render(request,'enderecos/enderecos_select.html',{'enderecos':enderecos})

@@ -71,3 +71,8 @@ def editarCidade(request, codigo):
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/cidades/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def cidadesSelect(request):
+    cidades = Cidade.objects.all()
+    return render(request,'cidades/cidades_select.html',{'cidades':cidades})

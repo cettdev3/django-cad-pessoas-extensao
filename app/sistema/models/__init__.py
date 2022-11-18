@@ -5,3 +5,4 @@ from .alocacao import Alocacao
 from .avaliacao import Avaliacao
 from .pessoa import Pessoas
 from .curso import Curso
+from .escola import Escola

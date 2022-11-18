@@ -1,0 +1,306 @@
+<div class="modal fade" id="cadastrarEscolaModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarEscolaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarEscolaModalLabel">
+                    {% if escola is None %}
+                        Cadastrar Escola
+                        <span id="escolaModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{escola.nome}}
+                        <span id="escolaModelId" hidden>{{escola.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarEscola" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="escolasTab1" class="col py-2 active-form-tab">
+                            <a id="escolaTabLink1" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                        <li id="escolasTab2" class="col py-2">
+                            <a id="escolaTabLink2" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#endereco">2</a>
+                            <span>Endereco</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarEscolaForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Nome da escola:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if escola %}
+                                        value="{{escola.nome}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome" 
+                                        name="nome" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="endereco" class="tab-pane py-3">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Logradouro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if escola %}
+                                        value="{{escola.logradouro}}" 
+                                        {% endif %}
+                                        id="logradouro" 
+                                        name="logradouro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Bairro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if escola %}
+                                        value="{{escola.bairro}}" 
+                                        {% endif %}
+                                        id="bairro" 
+                                        name="bairro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>CEP:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if escola.endereco %}
+                                        value="{{escola.cep}}" 
+                                        {% endif %}
+                                        id="cep" 
+                                        name="cep" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div id="escolaFormSelectCidade" class="col-sm-4">
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label><b>Complemento:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if escola %}
+                                        value="{{escola.complemento}}" 
+                                        {% endif %}
+                                        id="complemento" 
+                                        name="complemento"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="formEscolaPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevEscolaLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formEscolaNext" type="button" class="btn btn-primary">
+                    <span id="nextEscolaLink" class="EscolaMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if escola %}
+                    onclick="editarEscola({{escola.id}})" 
+                {% else %}
+                    onclick="cadastrarEscola()" 
+                {% endif %}
+                id="finishCadastroEscola" 
+                type="button"
+                class="btn btn-primary">
+                {% if escola %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarEscolaForm"
+    escolaModelId = "escolaModelId"
+    tabsId = "escolasTab"
+    escolaFormSelectCidadeId = "escolaFormSelectCidade"
+    selectedCidadeId = "{{escola.cidade.id}}"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        console.log($('#'+formId).serializeArray())
+
+        if (changedResource) escolaModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarEscolaId).click()
+    }
+
+    function cadastrarEscola() {
+        $.ajax({
+            url: "saveEscola",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarEscola(id) {
+        $.ajax({
+            url: "editarEscola/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+        id = $(activeTab[0]).attr("id")
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        console.log(instructions)
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function updateSelectedCidade() {
+        console.log("cidade",selectedCidadeId)
+        if (selectedCidadeId) {
+            $("#cidade_id").val(selectedCidadeId).change();
+        }
+    }
+
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+escolaFormSelectCidadeId).html(data)
+                updateSelectedCidade()
+            }
+        });
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#escolaTabLink"+nextTab).trigger("click")
+        $("#escolasTab"+nextTab).addClass("active-form-tab")
+        $("#escolasTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formEscolaNext"],
+                hide: ["formEscolaPrev", "finishCadastroEscola"]
+            },
+            last: {
+                show: ["formEscolaPrev", "finishCadastroEscola"],
+                hide: ["formEscolaNext"]
+            },
+            middle: {
+                show: ["formEscolaPrev", "formEscolaNext"],
+                hide: ["finishCadastroEscola"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        console.log(activTabFn)
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarEscolaModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+escolaModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formEscolaNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formEscolaPrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        carregarSelectCidades()
+        maskValues()
+    });
+</script>

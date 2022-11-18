@@ -278,24 +278,6 @@ z-index: 4
             }
         });
 
-        function editarPessoa(id) {
-            $.ajax({
-                url: "pessoas",
-                data: JSON.stringify(getFormData()),
-                dataType: "json",
-                contentType: 'application/json',
-                method: "POST",
-                success: function (data) {
-                    $('#cadastrarPessoaForm')[0].reset();
-                    $("div[id^='dropdownInputedItem']").each(function () {
-                        $(this).remove()
-                    })
-                    $("#dismissCadastrarPessoa").click()
-                    carregarPessoas()
-                }
-            });
-        }
-
         nextBtnControl = ["pessoaMenuLink1", "pessoaMenuLink2", "pessoaMenuLink3", "pessoaMenuLink4"]
         tabsQuantity = 4
         item = 1

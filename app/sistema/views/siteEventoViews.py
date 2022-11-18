@@ -56,18 +56,6 @@ def eventosModalCadastrar(request):
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
 @login_required(login_url='/auth-user/login-user')
-def cidadesSelect(request):
-    cidades = Cidade.objects.all()
-    return render(request,'eventos/cidades_select.html',{'cidades':cidades})
-
-@login_required(login_url='/auth-user/login-user')
-def enderecosSelect(request):
-    cidade_id = request.GET.get('cidade_id')
-    print("cidade id: ",cidade_id)
-    enderecos = Endereco.objects.filter(cidade_id=cidade_id).all()
-    return render(request,'eventos/enderecos_select.html',{'enderecos':enderecos})
-
-@login_required(login_url='/auth-user/login-user')
 def eliminarEvento(request,codigo):
     print("dentro da rota")
     evento = Evento.objects.get(id=codigo)
