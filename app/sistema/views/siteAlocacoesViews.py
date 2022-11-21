@@ -27,6 +27,20 @@ def alocacoesTable(request):
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 
 @login_required(login_url='/auth-user/login-user')
+def alocacaoForm(request):
+    id = request.GET.get('alocacao_id')
+    alocacao = None
+    data = {}
+    if id:
+        alocacao = Alocacao.objects.get(id=id)
+        data['alocacao'] = AlocacaoSerializer(alocacao).data
+    if request.GET.get('formId'):
+        data['formId'] = request.GET.get('formId')
+    else :
+        data['formId'] = 'alocacaoForm'
+    return render(request,'alocacoes/form_alocacoes.html',data)
+
+@login_required(login_url='/auth-user/login-user')
 def alocacaoModalCadastrar(request):
     id = request.GET.get('id')
     alocacao = None

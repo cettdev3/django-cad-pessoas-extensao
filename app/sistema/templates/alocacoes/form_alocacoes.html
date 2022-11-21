@@ -1,0 +1,110 @@
+<form id="{{formId}}">
+    <div class="row">
+        <div class="col">
+            <span >{{ pessoa.nome }}:</span>
+            <span ><strong>{{ pessoa.cargo }}</strong></span>
+            <input hidden type="text" 
+            id="pessoa_id-{{pessoa.id}}" 
+            name="professor_id" 
+            value="{{pessoa.id}}">
+        </div>
+    </div>
+    <hr>
+    <div class="form-group row">
+        <div class="col-sm-3">
+            <label><b>Evento:</b></label>
+            <select required 
+            class="form-control" 
+            id="evento-{{pessoa.id}}" 
+            name="evento_id">
+                {% for evento in eventos %}
+                <option value="{{evento.id}}">
+                    {{evento.observacao}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="alocarPessoasFormSelectCidade" class="col-sm-3">
+        </div>
+        <div class="col-sm-3">
+            <label><b>Logradouro:</b></label>
+            <input 
+            type="text" 
+            class="form-control" 
+            id="logradouro" 
+            name="logradouro" 
+            placeholder=""
+            required>
+        </div>
+        <div class="col-sm-3">
+            <label><b>Bairro:</b></label>
+            <input 
+            type="text" 
+            class="form-control" 
+            id="bairro" 
+            name="bairro" 
+            placeholder=""
+            required>
+        </div>
+    </div>
+    <div class="dadosNovoEndereco form-group row">
+        <div class="col-sm-4">
+            <label><b>CEP: </b></label>
+            <input 
+            type="text" 
+            class="form-control" 
+            id="cep" 
+            name="cep" 
+            placeholder=""
+            required>
+        </div>
+        <div class="col-sm-8">
+            <label><b>Complemento:</b></label>
+            <input 
+            type="text" 
+            class="form-control" 
+            id="complemento" 
+            name="complemento"
+            placeholder="" 
+            required>
+        </div>
+    </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4">
+            <label><b>Curso:</b></label>
+            <select required 
+            class="form-control" 
+            id="curso-{{pessoa.id}}" 
+            name="curso_id">
+                {% for curso in pessoa.cursos %}
+                <option value="{{curso.id}}">
+                    {{curso.nome}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label><b>Data de Inicio:</b></label>
+            <input 
+            type="date" 
+            class="form-control" 
+            id="data_inicio-{{pessoa.id}}"
+            name="data_inicio">
+        </div>
+        <div class="col-sm-4">
+            <label><b>Data de Fim:</b></label>
+            <input 
+            type="date" 
+            class="form-control" 
+            id="data_fim-{{pessoa.id}}"
+            name="data_fim">
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        
+    })
+</script>

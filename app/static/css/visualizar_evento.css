@@ -26,3 +26,10 @@
     font-weight: bold;
     border-radius: 4px;
 }
+.evt-status-orange {
+    color: black;
+    background-color: #FFBF00;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+}

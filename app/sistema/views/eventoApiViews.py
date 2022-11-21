@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status as str
 from rest_framework import permissions
 
+from ..models.cidade import Cidade
 from ..models.endereco import Endereco
 from ..models.evento import Evento
 from ..serializers.eventoSerializer import EventoSerializer
@@ -35,20 +36,26 @@ class EventoApiView(APIView):
             data_fim = datetime.strptime(request.data.get("data_fim"), '%Y-%m-%dT%H:%M')
         observacao = request.data.get("observacao")
         status = request.data.get("status")
-        endereco = self.get_object(Endereco, request.data.get("endereco_id"))
+        endereco = None
+        if request.data.get("endereco_id"):
+            endereco = self.get_object(Endereco, request.data.get("endereco_id"))
 
-        if not endereco:
-            return Response(
-                {"res": "Não existe endereco com o id informado"},
-                status=str.HTTP_400_BAD_REQUEST
-            )
+            if not endereco:
+                return Response(
+                    {"res": "Não existe endereco com o id informado"},
+                    status=str.HTTP_400_BAD_REQUEST
+                )
 
         evento = Evento.objects.create(
             data_inicio = data_inicio,
             data_fim = data_fim,
             observacao = observacao,
-            endereco = endereco,
             status = status,
+            logradouro = endereco.logradouro if endereco else None,
+            complemento = endereco.complemento if endereco else None,
+            bairro = endereco.bairro if endereco else None,
+            cidade = endereco.cidade if endereco else None,
+            cep = endereco.cep if endereco else None,
         )
 
         eventoSerializer = EventoSerializer(evento)
@@ -84,6 +91,11 @@ class EventoDetailApiView(APIView):
                 {"res": "Não existe evento com o id informado"}, 
                 status=str.HTTP_400_BAD_REQUEST
             )
+        print("valor do cep: ", request.data.get("cep"))
+        print("valor do logradouro", request.data.get("logradouro"))
+        print("valor do complemento", request.data.get("complemento"))
+        print("valor do bairro", request.data.get("bairro"))
+        print("valor do cidade", request.data.get("cidade"))
 
         if request.data.get("data_inicio"):
             evento.data_inicio = datetime.strptime(request.data.get("data_inicio"), '%Y-%m-%dT%H:%M')
@@ -93,14 +105,23 @@ class EventoDetailApiView(APIView):
             evento.observacao = request.data.get("observacao")
         if request.data.get("status"):
             evento.status = request.data.get("status")
-        if request.data.get("endereco_id"):
-            endereco = self.get_object(Endereco, request.data.get("endereco_id"))
-            if not endereco:
+        if request.data.get("logradouro"):
+            evento.logradouro = request.data.get("logradouro")
+        if request.data.get("complemento"):
+            evento.complemento = request.data.get("complemento")
+        if request.data.get("bairro"):
+            evento.bairro = request.data.get("bairro")
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
                 return Response(
-                    {"res": "Não existe endereco com o id informado"}, 
+                    {"res": "Não existe evento com o id informado"}, 
                     status=str.HTTP_400_BAD_REQUEST
                 )
-            evento.endereco = endereco
+            evento.cidade = cidade
+        if request.data.get("cep"):
+            evento.cep = request.data.get("cep")
+
         evento.save()
         serializer = EventoSerializer(evento)
         

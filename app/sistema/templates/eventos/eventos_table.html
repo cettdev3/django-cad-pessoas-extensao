@@ -30,8 +30,12 @@ cellspacing="0">
             <td class="eventos-w-15 text-left">{{evento.status}}</td>
             <td class="eventos-w-15 text-left">{{evento.data_inicio|date:"d-m-Y"}}</td>
             <td class="eventos-w-15 text-left">{{evento.data_fim|date:"d-m-Y"}}</td>
-            <td class="eventos-w-25 text-left">{{evento.endereco.endereco_completo}}</td>
-            <td class="eventos-w-15 text-left">{{evento.endereco.cidade.nome}}</td>
+            <td class="eventos-w-25 text-left">{{evento.endereco_completo}}</td>
+            {% if evento.cidade %}
+                <td class="eventos-w-15 text-left">{{evento.cidade.nome}}</td>
+            {% else %}
+                <td class="eventos-w-15 text-left">{{evento.endereco.cidade.nome}}</td>
+            {% endif %}
             <td class="w-5 text-left" style="position: relative;">
                 <button id="buttonMenuEventos{{evento.id}}" 
                 class="btn-circle">

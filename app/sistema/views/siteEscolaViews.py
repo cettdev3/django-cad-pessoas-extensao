@@ -43,7 +43,7 @@ def escolasModalCadastrar(request):
     data = {}
     if id:
         escola = Escola.objects.get(id=id)
-        data['escola'] = escola
+        data['escola'] = EscolaSerializer(escola).data
     return render(request,'escolas/modal_cadastrar_escola.html',data)
 
 @login_required(login_url='/auth-user/login-user')

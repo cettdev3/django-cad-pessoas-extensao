@@ -79,6 +79,13 @@
                                                 {% endif %}
                                             {% endif %}
                                             value="adiado">Adiado</option>
+                                            <option 
+                                            {% if evento %}
+                                                {% if evento.status == 'cancelado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="cancelado">Cancelado</option>
                                         </select>
                                     </div>
                                 </div>
@@ -112,19 +119,29 @@
                                     <div id="eventoFormSelectCidade" class="col-sm-4">
                                     </div>
                                 </div>
-                                
+                                {% if not evento %}
                                 <div class="form-group row">
                                     <div class="col-sm-12" id="eventoFormSelectEnderecos">
                                     </div>
-                                </div>
-                                <div style="display: none;" class="dadosNovoEndereco form-group row">
+                                </div> 
+                                {% endif %}
+                                
+                                <div
+                                {% if not evento %}
+                                style="display: none;" 
+                                {% endif %}
+                                class="dadosNovoEndereco form-group row">
                                     <div class="col-sm-4">
                                         <label><b>Logradouro:</b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
                                         {% if evento %}
-                                        value="{{evento.endereco.logradouro}}" 
+                                            {% if evento.logradouro %}
+                                            value="{{evento.logradouro}}" 
+                                            {% else %}
+                                            value="{{evento.endereco.logradouro}}" 
+                                            {% endif %}
                                         {% endif %}
                                         id="logradouro" 
                                         name="logradouro" 
@@ -137,7 +154,11 @@
                                         type="text" 
                                         class="form-control" 
                                         {% if evento %}
-                                        value="{{evento.endereco.bairro}}" 
+                                            {% if evento.bairro %}
+                                            value="{{evento.bairro}}" 
+                                            {% else %}
+                                            value="{{evento.endereco.bairro}}" 
+                                            {% endif %}
                                         {% endif %}
                                         id="bairro" 
                                         name="bairro" 
@@ -145,12 +166,16 @@
                                         required>
                                     </div>
                                     <div class="col-sm-4">
-                                        <label><b>CEP:</b></label>
+                                        <label><b>CEP: </b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
-                                        {% if evento.endereco %}
-                                        value="{{evento.endereco.cep}}" 
+                                        {% if evento %}
+                                            {% if evento.cep %}
+                                            value="{{evento.cep}}" 
+                                            {% else %}
+                                            value="{{evento.endereco.cep}}" 
+                                            {% endif %}
                                         {% endif %}
                                         id="cep" 
                                         name="cep" 
@@ -158,14 +183,22 @@
                                         required>
                                     </div>
                                 </div>
-                                <div style="display: none;" class="dadosNovoEndereco form-group row">
+                                <div 
+                                {% if not evento %}
+                                style="display: none;" 
+                                {% endif %}
+                                class="dadosNovoEndereco form-group row">
                                     <div class="col-sm-12">
                                         <label><b>Complemento:</b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
                                         {% if evento %}
-                                        value="{{evento.endereco.complemento}}" 
+                                            {% if evento.complemento %}
+                                            value="{{evento.complemento}}" 
+                                            {% else %}
+                                            value="{{evento.endereco.complemento}}" 
+                                            {% endif %}
                                         {% endif %}
                                         id="complemento" 
                                         name="complemento"
@@ -204,8 +237,9 @@
     eventoModelId = "eventoModelId"
     eventoFormSelectCidadeId = "eventoFormSelectCidade"
     eventoFormSelectEnderecosId = "eventoFormSelectEnderecos"
-    selectedCidadeId = "{{evento.endereco.cidade.id}}"
+    selectedCidadeId = "{% if evento.cidade %}{{evento.cidade.id}}{% else %}{{evento.endereco.cidade.id}}{% endif %}"
     selectedEnderecoId = "{{evento.endereco.id}}"
+    isEditing = "{{evento.id}}"
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
@@ -249,6 +283,7 @@
     }
 
     function editarEvento(eventoId, formData) {
+        
         $.ajax({
             url: "editarEvento/"+eventoId,
             data: JSON.stringify({"data":formData}),
@@ -271,20 +306,23 @@
         $.map(unindexed_array, function (n, i) {
             if (enderecoFields.includes(n['name'])) {
                 endereco[n['name']] = n['value']
-            } else values[n['name']] = n['value'];
+            }
+            values[n['name']] = n['value'];
         });
         values["endereco"] = endereco
+        console.log(values)
         return values
     }
 
     function updateSelectedCidade() {
         if (selectedCidadeId) {
-            $("#cidade_id").val(selectedCidadeId).change();
+            let cidade = $("#cidade_id").val(selectedCidadeId);
         }
     }
 
     function updateSelectedEndereco() {
         if (selectedEnderecoId) {
+            console.log("dentro de update select de endereco", selectedEnderecoId)
             $("#endereco_id").val(selectedEnderecoId).change();
         }
     }
@@ -316,9 +354,11 @@
                 $("#"+eventoFormSelectCidadeId).html(data)
                 $("#cidade_id").change(function (val) {
                     carregarSelectEnderecos($(this).val())
-                    $(".dadosNovoEndereco").each(function(elem) {
-                       $(this).hide()
-                    })
+                    if (!isEditing) {
+                        $(".dadosNovoEndereco").each(function(elem) {
+                            $(this).hide()
+                        })
+                    }
                 })
                 updateSelectedCidade()
             }
@@ -327,24 +367,7 @@
     
     function processarEditarEvento(eventoId) {
         let formData = getFormData()
-        if (formData["endereco_id"] == "novo") {
-            url = selectedEnderecoId ? "editarEndereco/"+selectedEnderecoId : "saveEndereco"
-            method = selectedEnderecoId ? "PUT" : "POST"
-            $.ajax({
-                url: url,
-                data: JSON.stringify({"data":formData["endereco"]}),
-                dataType: "json",
-                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
-                contentType: 'application/json',
-                method: method,
-                success: function (data) {
-                    formData["endereco_id"] = data["id"]
-                    editarEvento(eventoId,formData)
-                }
-            });
-        } else {
-            editarEvento(eventoId,formData)
-        }
+        editarEvento(eventoId,formData)
     }
 
     $(document).ready(function () {
