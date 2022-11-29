@@ -52,12 +52,10 @@ def eventosModalCadastrar(request):
     if id:
         evento = Evento.objects.get(id=id)
         data['evento'] = EventoSerializer(evento).data
-        print(data)
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarEvento(request,codigo):
-    print("dentro da rota")
     evento = Evento.objects.get(id=codigo)
     evento.delete()
     return redirect('/gerenciar-eventos')
@@ -74,7 +72,6 @@ def saveEvento(request):
 def editarEvento(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/eventos/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

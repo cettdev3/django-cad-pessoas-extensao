@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 def login_user(request):
-    print("dentro de loginuser")
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -13,7 +12,6 @@ def login_user(request):
             return redirect("/home")
         else:
             messages.error(request, ("Houve um erro verifique suas credenciais e tente novamente"))
-            print("login")
             return render(request, "authenticate/login.html", {})  
     else:
         return render(request, "authenticate/login.html", {})  

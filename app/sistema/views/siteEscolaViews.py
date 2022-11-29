@@ -56,7 +56,6 @@ def eliminarEscola(request,codigo):
 def saveEscola(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.post('http://localhost:8000/escolas', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
@@ -65,7 +64,6 @@ def saveEscola(request):
 def editarEscola(request, escola_id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/escolas/'+str(escola_id), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

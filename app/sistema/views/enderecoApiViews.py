@@ -15,7 +15,6 @@ class EnderecoApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         eventos = Endereco.objects.all()
-        print("dados em eventos",eventos)
         serializer = EnderecoSerializer(eventos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

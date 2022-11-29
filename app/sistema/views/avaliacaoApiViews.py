@@ -20,7 +20,6 @@ class AvaliacaoApiView(APIView):
             todos = Avaliacao.objects.filter(cidade=cidade).all()
         else: 
             todos = Avaliacao.objects.all()
-        print("dados em avaliacoes",todos)
         serializer = AvaliacaoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

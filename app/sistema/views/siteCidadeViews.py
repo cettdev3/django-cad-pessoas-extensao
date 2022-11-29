@@ -50,7 +50,6 @@ def cidadesModalCadastrar(request):
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarCidade(request,codigo):
-    print("dentro da rota")
     cidade = Cidade.objects.get(id=codigo)
     cidade.delete()
     return redirect('/gerenciar-cidades')
@@ -67,7 +66,6 @@ def saveCidade(request):
 def editarCidade(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/cidades/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

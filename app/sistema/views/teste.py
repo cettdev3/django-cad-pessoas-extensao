@@ -171,5 +171,3 @@ mappedJson = []
 for cont in range(len(content)):
     for col in range(len(columns)):
         mappedJson.append({columns[col]['name']: content[cont][col]})
-
-print(mappedJson)

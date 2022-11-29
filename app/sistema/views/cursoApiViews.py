@@ -14,7 +14,6 @@ class CursoApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         cursos = Curso.objects.all()
-        print("dados em cursos",cursos)
         serializer = CursoSerializer(cursos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

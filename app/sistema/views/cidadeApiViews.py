@@ -14,7 +14,6 @@ class CidadeApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         cidades = Cidade.objects.all()
-        print("dados em cidades",cidades)
         serializer = CidadeSerializer(cidades, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

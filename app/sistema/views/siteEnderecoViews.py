@@ -25,7 +25,6 @@ def saveEndereco(request):
 def editarEndereco(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/enderecos/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

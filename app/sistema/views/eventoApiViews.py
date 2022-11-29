@@ -91,11 +91,6 @@ class EventoDetailApiView(APIView):
                 {"res": "Não existe evento com o id informado"}, 
                 status=str.HTTP_400_BAD_REQUEST
             )
-        print("valor do cep: ", request.data.get("cep"))
-        print("valor do logradouro", request.data.get("logradouro"))
-        print("valor do complemento", request.data.get("complemento"))
-        print("valor do bairro", request.data.get("bairro"))
-        print("valor do cidade", request.data.get("cidade"))
 
         if request.data.get("data_inicio"):
             evento.data_inicio = datetime.strptime(request.data.get("data_inicio"), '%Y-%m-%dT%H:%M')
