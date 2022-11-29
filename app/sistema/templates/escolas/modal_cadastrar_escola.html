@@ -160,7 +160,6 @@
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
-        console.log($('#'+formId).serializeArray())
 
         if (changedResource) escolaModificadaEventProxy.modificado = changedResource
         if (changedResource) $("#"+dismissCadastrarEscolaId).click()
@@ -220,7 +219,6 @@
     }
 
     function showHideTabs(instructions) {
-        console.log(instructions)
         instructions.show.forEach(function (elementId) {
                 $("#" + elementId).show()
         })
@@ -230,7 +228,6 @@
     }
 
     function updateSelectedCidade() {
-        console.log("cidade",selectedCidadeId)
         if (selectedCidadeId) {
             $("#cidade_id").val(selectedCidadeId).change();
         }
@@ -274,7 +271,6 @@
 
         activTabFn = getActiveTab()
         tabsQuantity = functionGetTabsQuantity()
-        console.log(activTabFn)
         if (activTabFn == 1) {
             showHideTabs(tabsControl.first)
         } else if (activTabFn == tabsQuantity) {

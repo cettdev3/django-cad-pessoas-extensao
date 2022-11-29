@@ -85,7 +85,6 @@ cellspacing="0">
                     })
                     let hiddenMenu = $(menuId).parent()
                     let isVisible = isvisibleOnViewport(hiddenMenu[0])
-                    console.log(isVisible)
                     if (!isVisible) {
                         $(menuId).css("bottom", "40px")
                     } 
@@ -113,12 +112,10 @@ cellspacing="0">
                     $("#"+rowId).addClass("selected-row")
                     currentValue += 1
                     $("#pessoasTableActiveCheckBoxes").val(currentValue)
-                    console.log($("#pessoasTableActiveCheckBoxes").val())
                 } else {
                     $("#"+rowId).removeClass("selected-row")
                     currentValue -= 1
                     $("#pessoasTableActiveCheckBoxes").val(currentValue)
-                    console.log($("#pessoasTableActiveCheckBoxes").val())
                 }
 
                 hideControlAlocacaoButton(currentValue)
@@ -127,7 +124,6 @@ cellspacing="0">
 
         $("#"+pessoaTableCheckboxAllId).change(function() {
             let checkedValue = $(this).is(":checked")
-            console.log("valor checado")
             let currentValue = 0
             $("input[id^='"+pessoaTableCheckboxRowId+"']").each(function(elem, value) {
                 let rowCheckedValue = $(this).is(":checked")

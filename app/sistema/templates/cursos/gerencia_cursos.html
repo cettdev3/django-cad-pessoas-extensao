@@ -208,7 +208,6 @@ z-index: 4
     $(document).ready(function () {
         cursoModificadaEventProxy = new Proxy(cursoModificadaEvent, {
             set: function (target, key, value) {
-                console.log("pessoa modificada: ", value)
                 target[key] = value;
                 if (value) {
                     carregarCursos()

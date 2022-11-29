@@ -14,5 +14,12 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "data_fim",
             "status",
             "observacao",
+            "bairro",
+            "logradouro",
+            "cep",
+            "complemento",
+            "cidade",
+            "turnos",
+            "aulas_sabado"
         ]
         depth = 2

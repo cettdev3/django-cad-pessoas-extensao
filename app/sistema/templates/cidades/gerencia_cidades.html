@@ -217,7 +217,6 @@ z-index: 4
     $(document).ready(function () {
         cidadeModificadaEventProxy = new Proxy(cidadeModificadaEvent, {
             set: function (target, key, value) {
-                console.log("cidade modificada: ", value)
                 target[key] = value;
                 if (value) {
                     carregarCidades()

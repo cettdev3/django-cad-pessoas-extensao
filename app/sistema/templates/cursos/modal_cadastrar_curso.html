@@ -81,7 +81,6 @@
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
-        console.log($('#'+formId).serializeArray())
 
         if (changedResource) cursoModificadaEventProxy.modificado = changedResource
         if (changedResource) $("#"+dismissCadastrarCursoId).click()

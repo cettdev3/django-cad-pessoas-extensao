@@ -3,12 +3,16 @@ from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from sistema.serializers.alocacaoSerializer import AlocacaoSerializer
 from sistema.serializers.cursoSerializer import CursoSerializer
+from sistema.serializers.pessoaSerializer import PessoaSerializer
+from sistema.serializers.eventoSerializer import EventoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from sistema.models.curso import Curso
+from sistema.models.evento import Evento
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
+from django.db.models import Q, Exists
 import json
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
@@ -16,29 +20,25 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
-    print("dentro de alocacoes table")
     evento_id = request.GET.get('evento_id')
-    print("eventoId: ", evento_id)
     alocacoes = Alocacao.objects
     if evento_id:
         alocacoes = alocacoes.filter(evento_id = evento_id)
     alocacoes = alocacoes.all()
-    print(alocacoes)
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 
 @login_required(login_url='/auth-user/login-user')
-def alocacaoForm(request):
-    id = request.GET.get('alocacao_id')
-    alocacao = None
+def modalAlocar(request):
+    pessoaIds = request.GET.getlist('checked_values[]')
     data = {}
-    if id:
-        alocacao = Alocacao.objects.get(id=id)
-        data['alocacao'] = AlocacaoSerializer(alocacao).data
-    if request.GET.get('formId'):
-        data['formId'] = request.GET.get('formId')
-    else :
-        data['formId'] = 'alocacaoForm'
-    return render(request,'alocacoes/form_alocacoes.html',data)
+    if pessoaIds:
+        pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
+        pessoas = PessoaSerializer(pessoas, many = True)
+        data['pessoas'] = pessoas.data
+        eventos = Evento.objects.filter(~Q(status="finalizado"))
+        eventos = EventoSerializer(eventos, many=True)
+        data['eventos'] = eventos.data
+    return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')
 def alocacaoModalCadastrar(request):
@@ -49,7 +49,6 @@ def alocacaoModalCadastrar(request):
         alocacao = Alocacao.objects.get(id=id)
         alocacao = AlocacaoSerializer(alocacao).data
         data['alocacao'] = alocacao
-        print(data)
     return render(request,'alocacoes/modal_cadastrar_alocacao.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -58,13 +57,12 @@ def saveAlocacao(request):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     response = requests.post('http://localhost:8000/alocacoes', json=body, headers=headers)
-    return JsonResponse(json.loads(response.content),status=response.status_code)
+    return JsonResponse(json.loads(response.content.decode()),status=response.status_code, safe=False)
 
 @login_required(login_url='/auth-user/login-user')
 def editarAlocacao(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print(request.body)
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/alocacoes/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

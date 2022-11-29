@@ -1,3 +1,81 @@
+<style>
+    .dropdown input {
+        outline: none;
+        border: none;
+    }
+    .dropdown input:focus {
+        outline: none;
+        border: none;
+    }
+
+    .dflex {
+        display: flex;
+    }
+
+    .border {
+        border: 1px solid black;
+    }
+
+    /* The container <div> - needed to position the dropdown content */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+        padding: 4px 2px;
+        border: 2px solid #d1d3e2;
+        border-radius: 4px;
+    }
+
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    
+    .dropdown-inputed-item {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2px 8px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+
+    }
+
+    .dropdown-input {
+        border: 2px solid #ccc;
+        border-left: none;
+    }
+
+    .btn-delete-checkbox-selection {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-size: 12px;
+        background-color: transparent;
+        color: transparent;
+        border-radius: 8px;
+    }
+
+    .show-on-viewport {
+        position: fixed;
+        bottom: 0px;
+        right: 20px;
+    }
+
+    .dropdown-inputed-container {
+        height: 25px;
+        display: flex;
+        justify-content: start;
+    }
+</style>
 <div class="modal fade" id="alocarPessoaModal" tabindex="-1" role="dialog"
     aria-labelledby="alocarPessoaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -14,23 +92,25 @@
                 <div class="w-100">
                     {% for pessoa in pessoas %}
                     <form id="alocarPessoaForm-{{pessoa.id}}" action="/" method="POST">
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                <div class="d-flex flex-column justify-content-start align-items-start">
-                                    <span>{{ pessoa.nome }}</span>
-                                    <span><strong>{{ pessoa.cargo }}</strong></span>
-                                    <input hidden type="text" 
-                                    id="pessoa_id-{{pessoa.id}}" 
-                                    name="professor_id" 
-                                    value="{{pessoa.id}}">
-                                </div>
+                        <div class="row d-flex justify-content-start px-2 pb-2">
+                            <div class="d-flex justify-content-start align-items-start">
+                                <span style="font-size: 1.2rem;"> alocacao nº {{forloop.counter}}: {{ pessoa.nome }} <strong> ({{ pessoa.cargo }})</strong></span>
+                                <input hidden type="text" 
+                                id="pessoa_id-{{pessoa.id}}" 
+                                name="professor_id" 
+                                value="{{pessoa.id}}">
                             </div>
-                            <div class="col-sm-3">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-4">
                                 <label><b>Curso:</b></label>
                                 <select required 
                                 class="form-control" 
                                 id="curso-{{pessoa.id}}" 
                                 name="curso_id">
+                                    <option value="">
+                                        Selecione um curso
+                                    </option>
                                     {% for curso in pessoa.cursos %}
                                     <option value="{{curso.id}}">
                                         {{curso.nome}}
@@ -38,12 +118,16 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-4">
                                 <label><b>Evento:</b></label>
                                 <select required 
+                                onchange="setEnderecos(this, {{pessoa.id}})"
                                 class="form-control" 
                                 id="evento-{{pessoa.id}}" 
                                 name="evento_id">
+                                    <option value="">
+                                        Selecione um evento
+                                    </option>
                                     {% for evento in eventos %}
                                     <option value="{{evento.id}}">
                                         {{evento.observacao}}
@@ -51,7 +135,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-4">
                                 <label><b>Data de Inicio:</b></label>
                                 <input 
                                 type="date" 
@@ -59,7 +143,9 @@
                                 id="data_inicio-{{pessoa.id}}"
                                 name="data_inicio">
                             </div>
-                            <div class="col-sm-2">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-4">
                                 <label><b>Data de Fim:</b></label>
                                 <input 
                                 type="date" 
@@ -67,8 +153,81 @@
                                 id="data_fim-{{pessoa.id}}"
                                 name="data_fim">
                             </div>
+                            <div id="alocacaoPessoasTurnosSelect{{pessoa.id}}" class="col-sm-5">
+                                <label><b>Turnos:</b></label>
+                                <div id="dropdown-turnos{{pessoa.id}}">
+                                    <div id="dropdown{{pessoa.id}}" class="dropdown">
+                                        <div class="dflex felx-row">
+                                            <div id="inputedValues{{pessoa.id}}" 
+                                            class="dropdown-inputed-container"></div>
+                                            <input id="dropdowninput{{pessoa.id}}" 
+                                            class="dropdown-input" 
+                                            type="text">
+                                        </div>
+                                        <div id="dropdown-content{{pessoa.id}}" class="dropdown-content">
+                                            {% for turno in turnos %}
+                                            <div id="checkboxTurnoContainer{{pessoa.id}}{{turno.id}}">
+                                                <input id="checkboxTurnoInput{{pessoa.id}}{{turno.id}}" 
+                                                type="checkbox" 
+                                                name="turno{{pessoa.id}}" 
+                                                value="{{turno.id}}">
+                                                <span id="checkboxTurnoText{{pessoa.id}}{{turno.id}}">{{turno.nome}}</span>    
+                                            </div>   
+                                            {% endfor %}     
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 d-flex justify-content-start align-items-end">
+                                <div>
+                                    <input id="aulas_sabado-{{pessoa.id}}" 
+                                    type="checkbox" 
+                                    value="2"
+                                    name="aulas_sabado">
+                                    <label><b>Haverá aulas Sábado</b></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div id="alocacaoFormSelectCidade-{{pessoa.id}}" class="col-sm-3">
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>bairro:</b></label>
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="bairro-{{pessoa.id}}"
+                                name="bairro">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>logradouro:</b></label>
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="logradouro-{{pessoa.id}}"
+                                name="logradouro">
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>cep:</b></label>
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="cep-{{pessoa.id}}"
+                                name="cep">
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>complemento:</b></label>
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="complemento-{{pessoa.id}}"
+                                name="complemento">
+                            </div>
                         </div>
                     </form>
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -84,11 +243,31 @@
         </div>
     </div>
 </div>
-
+{{ pessoas|json_script:"pessoas-script" }}
+{{ eventos|json_script:"eventos-script" }}
 <script>
-    let alocarPessoaModalId = "alocarPessoaModal"
-    let dismissAlocarPessoaId = "dismissAlocarPessoa"
-    let alocarPessoaFormId = "alocarPessoaForm"
+    var alocarPessoaModalId = "alocarPessoaModal"
+    var dismissAlocarPessoaId = "dismissAlocarPessoa"
+    var alocarPessoaFormId = "alocarPessoaForm"
+    var pessoaFormSelectCidadeId = "alocacaoFormSelectCidade"
+    var alocacaoPessoasTurnosSelectId = "alocacaoPessoasTurnosSelect"
+    var pessoas = JSON.parse(document.getElementById('pessoas-script').textContent);
+    var eventos = JSON.parse(document.getElementById('eventos-script').textContent);
+
+    function getTurnosSelectData(id) {
+        let turnosId = [] 
+        let turnosInputs = $("input[name^='turno"+id+"'")
+        turnosInputs.each(function() {
+            if ($(this).is(':checked')) {
+                turnosId.push($(this).val())
+            }
+        })
+        return turnosId
+    }
+
+    function getCheckBoxValue(id) {
+        return $("#aulas_sabado-"+id).is(':checked')
+    }
 
     function getAlocacoesFormData() {
         let alocacoes = []
@@ -98,6 +277,8 @@
             $.map(unindexed_array, function (n, i) {
                 values[n['name']] = n['value'];
             });
+            values['turnos'] = getTurnosSelectData($(this).attr('id').split('-')[1])
+            values['aulas_sabado'] = getCheckBoxValue($(this).attr('id').split('-')[1])
             alocacoes.push(values) 
         })
         return alocacoes
@@ -105,20 +286,136 @@
 
     function criarAlocacoes() {
         let alocacoes = getAlocacoesFormData()
+
         $.ajax({
-            url: "alocacoes",
-            data: JSON.stringify(alocacoes),
+            url: "saveAlocacao",
+            data: JSON.stringify({"data": alocacoes}),
+            dataType: "json",
+            headers: { "X-CSRFToken":'{{ csrf_token }}' },
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
-                console.log("toggle pessoa modal")
                 $('#'+alocarPessoaModalId).modal('toggle');
             }
         });
     }
 
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("div[id^='"+pessoaFormSelectCidadeId+"']").each(function () {
+                    $(this).html(data)
+                })
+            }
+        });
+    }
+
+    function filterElements(id) {
+        let input = $("#dropdowninput"+id);
+        let filter = input.val().toUpperCase();
+        let inputedElements = $("div[id^='checkboxTurnoContainer"+id+"']");
+        inputedElements.each(function() {
+            let textContent = $(this).children("span[id^='checkboxTurnoText"+id+"']").text()
+            let elementContainsFilter = textContent.toUpperCase().indexOf(filter) > -1;
+            if (elementContainsFilter) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    function onclickElementOutside(element, callback) {
+        $(document).on('click', function (e) {
+            if (!$(element).is(e.target) && $(element).has(e.target).length === 0) {
+                callback();
+            }
+        });
+    }
+
+    function initSelectTurnos(id) {
+        turnosCheckbox = $("input[name='turno"+id+"']")
+        turnosCheckbox.each(function(i, el) {
+            $(el).on('click', function() {
+                if ($(el).is(':checked')) {
+                    let valueId = $(el).val()
+                    let div = $('<div />').attr({
+                        'class':'dropdown-inputed-item', 
+                        'id': 'dropdownInputedItem'+ id + valueId});
+                    let span = $('<span />')
+                    let spanTextValueId = "#checkboxTurnoText"+ id + valueId  
+                    let spanTextValue = $(spanTextValueId).text() 
+                    span.css("white-space", "nowrap")
+                    span.text(spanTextValue)
+                    div.append(span)
+                    let btnRemove = $('<button />').attr({
+                        'class':'btn-delete-checkbox-selection', 
+                        'type': 'button',
+                        'id': 'btnRemove'+ id + valueId});
+                    btnRemove.text("x")
+                    btnRemove.hover(function() {
+                        $(this).css("background-color", "rgba(255, 0, 0, 0.3)")
+                        div.css("text-decoration", "line-through")
+                    }, function() {
+                        $(this).css("background-color", "transparent")
+                        div.css("text-decoration", "none")
+                    })
+                    btnRemove.on('click', function() {
+                        $(el).prop('checked', false);
+                        div.remove();
+                    })
+                    div.append(btnRemove)
+                    $("#inputedValues"+id).append(div)
+                    
+                } else {
+                    let valueId = $(el).val()
+                    console.log(valueId)
+                    $("#dropdownInputedItem" + id + valueId).remove()
+                }
+            });
+    
+        })
+        
+        $("#dropdowninput"+id).on('keyup', function() {
+            filterElements(id)
+        });
+    
+        $("#dropdowninput"+id).focus(function() {
+            $("#dropdown-content"+id).show();
+        });
+    
+        onclickElementOutside("#dropdown"+id, function() {
+            $("#dropdown-content"+id).hide();
+        });
+    }
+
+    function setEnderecos(evento, id) {
+        console.log(eventos)
+        let selectedEvento = eventos.find(function(element) {
+            return element.id == $(evento).val()
+        })
+        if (selectedEvento) {
+            let endereco = selectedEvento.endereco
+            let logradouro = endereco ? endereco.logradouro : selectedEvento.logradouro
+            let bairro = endereco ? endereco.bairro : selectedEvento.bairro
+            let cidade = endereco ? endereco.cidade.id : selectedEvento.cidade.id
+            let cep = endereco ? endereco.cep : selectedEvento.cep
+            let complemento = endereco ? endereco.complemento : selectedEvento.complemento
+
+            $("#logradouro-"+id).val(logradouro)
+            $("#bairro-"+id).val(bairro)
+            $("#alocacaoFormSelectCidade-"+id+" #cidade_id").val(cidade)
+            $("#cep-"+id).val(cep)
+            $("#complemento-"+id).val(complemento)
+        }
+    }
+
     $(document).ready(function () {
-        console.log("dentro de alocar pessoas",
-        alocarPessoaModalId, dismissAlocarPessoaId,alocarPessoaFormId)
+        pessoas.forEach(pessoa => {
+            initSelectTurnos(pessoa.id)
+        });
+        carregarSelectCidades()
     });
 </script>

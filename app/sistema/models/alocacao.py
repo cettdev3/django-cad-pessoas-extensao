@@ -4,6 +4,7 @@ from ..models.evento import Evento
 from ..models.cidade import Cidade
 from ..models.pessoa import Pessoas
 from ..models.curso import Curso
+from ..models.turno import Turno
 
 class Alocacao(models.Model):
     id = models.AutoField(primary_key=True)
@@ -19,6 +20,7 @@ class Alocacao(models.Model):
     cep = models.CharField(null = True, max_length=100) 
     complemento = models.CharField(null = True, max_length=250)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True)
-
+    turnos = models.ManyToManyField(Turno, blank=True)
+    aulas_sabado = models.BooleanField(default=False)
     class Meta:
         db_table = 'alocacoes'

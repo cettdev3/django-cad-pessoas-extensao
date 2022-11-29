@@ -217,7 +217,6 @@ z-index: 4
     $(document).ready(function () {
         eventoModificadaEventProxy = new Proxy(eventoModificadaEvent, {
             set: function (target, key, value) {
-                console.log("evento modificada: ", value)
                 target[key] = value;
                 if (value) {
                     carregarEventos()

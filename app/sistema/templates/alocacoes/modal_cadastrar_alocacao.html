@@ -17,19 +17,22 @@
             <div class="modal-body">
                 <div class="w-100">
                     <form id="cadastrarAlocacaoForm" action="/" method="POST">
-                        <div class="form-group row">
-                            <div class="col-sm-3">
-                                <div class="d-flex flex-column justify-content-start align-items-start">
-                                    <span>{{ alocacao.professor.nome }}</span>
-                                    <span><strong>{{ alocacao.professor.cargo }}</strong></span>
-                                    <input hidden type="text"  
-                                    name="professor_id" 
-                                    value="{{alocacao.professor.id}}">
-                                    <input hidden type="text" 
-                                    name="evento_id" 
-                                    value="{{alocacao.evento.id}}">
-                                </div>
+                        <div class="row d-flex justify-content-start px-2 pb-2">
+                            <div class="d-flex justify-content-start align-items-start">
+                                <span style="font-size: 1.2rem;"> {{ alocacao.professor.nome }} <strong> ({{ alocacao.professor.cargo }})</strong></span>
+                                <input hidden type="text" 
+                                id="pessoa_id-{{pessoa.id}}" 
+                                name="professor_id" 
+                                value="{{pessoa.id}}">
                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <input hidden type="text"  
+                            name="professor_id" 
+                            value="{{alocacao.professor.id}}">
+                            <input hidden type="text" 
+                            name="evento_id" 
+                            value="{{alocacao.evento.id}}">
                             <div class="col-sm-3">
                                 <label><b>Curso:</b></label>
                                 <select required 
@@ -66,6 +69,70 @@
                                 id="data_fim-{{pessoa.id}}"
                                 name="data_fim">
                             </div>
+
+                            <div id="alocacaoFormSelectCidade" class="col-sm-3">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label><b>logradouro:</b></label>
+                                <input 
+                                type="text" 
+                                {% if alocacao %}
+                                value="{{ alocacao.logradouro}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="logradouro-{{pessoa.id}}"
+                                name="logradouro">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>bairro:</b></label>
+                                <input 
+                                type="text" 
+                                {% if alocacao %}
+                                value="{{ alocacao.bairro}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="bairro-{{pessoa.id}}"
+                                name="bairro">
+                            </div>
+                            <div class="col-sm-4">
+                                <label><b>complemento:</b></label>
+                                <input 
+                                type="text" 
+                                {% if alocacao %}
+                                value="{{ alocacao.complemento}}" 
+                                {% endif %} 
+                                class="form-control" 
+                                id="complemento-{{pessoa.id}}"
+                                name="complemento">
+                            </div>
+                            <div class="col-sm-2">
+                                <label><b>cep:</b></label>
+                                <input 
+                                type="text"
+                                {% if alocacao %}
+                                value="{{ alocacao.cep}}" 
+                                {% endif %} 
+                                class="form-control" 
+                                id="cep-{{pessoa.id}}"
+                                name="cep">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div id="alocacaoFormSelectTurno" class="col-sm-6">
+                            </div>
+                            <div class="col-sm-6 d-flex justify-content-start align-items-end">
+                                <div>
+                                    <input id="aulas_sabado" 
+                                    type="checkbox" 
+                                    {% if alocacao %}
+                                    {% if alocacao.aulas_sabado %}checked{% endif %}
+                                    {% endif %}
+                                    name="aulas_sabado">
+                                    <label><b>Haverá aulas Sábado</b></label>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -92,10 +159,69 @@
         </div>
     </div>
 </div>
-
+{{ alocacao.turnos|json_script:"turnos_script" }}
 <script>
     formId = "cadastrarAlocacaoForm"
     alocacaoModelId = "alocacaoModelId"
+    var alocacaoFormSelectCidadeId = "alocacaoFormSelectCidade"
+    var alocacaoFormSelectTurnoId = "alocacaoFormSelectTurno"
+    var selectedCidadeId = "{% if alocacao.cidade.id %}{{alocacao.cidade.id}}{% endif %}"
+    var selectedTurnos = JSON.parse($("#turnos_script").text())
+
+    function getTurnosSelectData() {
+        let turnosId = [] 
+        let turnosInputs = $("input[name^='turnos'")
+        turnosInputs.each(function() {
+            if ($(this).is(':checked')) {
+                turnosId.push($(this).val())
+            }
+        })
+        return turnosId
+    }
+
+    function getCheckBoxValue(id) {
+        return $("#aulas_sabado").is(':checked')
+    }
+
+    function updateSelectedCidade() {
+        if (selectedCidadeId) {
+            let cidade = $("#cidade_id").val(selectedCidadeId);
+        }
+    }
+    
+    function updateSelectedTurnos(turnos) {
+        console.log(turnos)
+        setTimeout(() => {  
+            $("input[name='turnos']").each(function (i, elem) {
+                for (let index = 0; index < turnos.length; index++) {
+                    const selectedId = turnos[index]["id"];
+                    if ($(elem).val() == selectedId) $(elem).trigger("click");
+                }
+            })
+        }, 200);
+    }
+
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "/cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+alocacaoFormSelectCidadeId).html(data)
+                updateSelectedCidade()
+            }
+        });
+    }
+    
+    function carregarSelectTurnos() {
+        $.ajax({
+            url: "/turnosSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+alocacaoFormSelectTurnoId).html(data)
+                updateSelectedTurnos(selectedTurnos)
+            }
+        });
+    }
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
@@ -119,9 +245,11 @@
     }
     
     function editarAlocacao(alocacaoId) {
+        let formdata = getFormData()
+        console.log(formdata)
         $.ajax({
             url: "/editarAlocacao/"+alocacaoId,
-            data: JSON.stringify({"data":getFormData()}),
+            data: JSON.stringify({"data":formdata}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
@@ -141,10 +269,12 @@
         $.map(unindexed_array, function (n, i) {
             if (enderecoFields.includes(n['name'])) {
                 endereco[n['name']] = n['value']
-            } else values[n['name']] = n['value'];
+            } 
+            values[n['name']] = n['value'];
         });
         values["endereco"] = endereco
-        console.log("form data: ", values)
+        values["aulas_sabado"] = getCheckBoxValue()
+        values["turnos"] = getTurnosSelectData()
         return values
     }
 
@@ -155,5 +285,7 @@
                 clearModalForm()
             }
         });
+        carregarSelectCidades()
+        carregarSelectTurnos()
     });
 </script>

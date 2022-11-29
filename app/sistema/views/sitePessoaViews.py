@@ -11,10 +11,12 @@ from django.shortcuts import render, redirect
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
 from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.turnoSerializer import TurnoSerializer
 from sistema.models.pessoa import Pessoas
 from rest_framework.authtoken.models import Token
 from sistema.models.curso import Curso
 from sistema.models.evento import Evento
+from sistema.models.turno import Turno
 from django.db.models import Q, Exists
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -70,7 +72,10 @@ def pessoasModalCadastrar(request):
 @login_required(login_url='/auth-user/login-user')
 def pessoasModalAlocar(request):
     pessoaIds = request.GET.getlist('checked_values[]')
+    turnos = Turno.objects.all()
+    turnos = TurnoSerializer(turnos, many=True)
     data = {}
+    data["turnos"]  = turnos.data
     if pessoaIds:
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)

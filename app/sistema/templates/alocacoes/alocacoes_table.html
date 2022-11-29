@@ -101,11 +101,8 @@
                             }
                         }
                     })
-                    console.log(menuId)
                     let hiddenMenu = $(menuId).parent()
-                    console.log(hiddenMenu)
                     let isVisible = isvisibleOnViewport(hiddenMenu[0])
-                    console.log(isVisible)
                     if (!isVisible) {
                         $(menuId).css("bottom", "40px")
                     }

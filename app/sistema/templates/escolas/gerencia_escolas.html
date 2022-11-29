@@ -236,7 +236,6 @@ z-index: 4
     $(document).ready(function () {
         escolaModificadaEventProxy = new Proxy(escolaModificadaEvent, {
             set: function (target, key, value) {
-                console.log("escola modificada: ", value)
                 target[key] = value;
                 if (value) {
                     carregarEscolas()
@@ -258,17 +257,14 @@ z-index: 4
 
         $("input[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
-            console.log($(this).attr("id"))
             if ($(this).attr("id").includes("Nome")) {
                 $(this)
                 .keyup(debounce(function() {
-                    console.log("key up")
                     filtrarEscolas()
                 }, 500))
             } else {
                 $(this)
                 .change(debounce(function() {
-                    console.log("change")
                     filtrarEscolas()
                 }, 500))
             }

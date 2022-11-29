@@ -202,7 +202,6 @@ z-index: 4
             }
         });
 
-        console.log(checkedValues)
     }
 
     function deletePessoa(id) {
@@ -220,7 +219,6 @@ z-index: 4
     }
 
     function carregarPessoas(filter = null) {
-        console.log(filter)
         let recarregarTabela = "pessoasTable"
         $.ajax({
             url: recarregarTabela,
@@ -268,7 +266,6 @@ z-index: 4
     $(document).ready(function () {
         pessoaModificadaEventProxy = new Proxy(pessoaModificadaEvent, {
             set: function (target, key, value) {
-                console.log("pessoa modificada: ", value)
                 target[key] = value;
                 if (value) {
                     carregarPessoas()
@@ -400,7 +397,6 @@ z-index: 4
         
         $("input[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
-            console.log($(this).attr("id"))
             if ($(this).attr("id").includes("NomePessoa")) {
                 $(this)
                 .keyup(debounce(function() {

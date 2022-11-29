@@ -310,7 +310,6 @@
             values[n['name']] = n['value'];
         });
         values["endereco"] = endereco
-        console.log(values)
         return values
     }
 
@@ -322,7 +321,6 @@
 
     function updateSelectedEndereco() {
         if (selectedEnderecoId) {
-            console.log("dentro de update select de endereco", selectedEnderecoId)
             $("#endereco_id").val(selectedEnderecoId).change();
         }
     }
@@ -377,7 +375,6 @@
                 clearModalForm()
             }
         });
-        console.log("selectedCidadeId: ", selectedCidadeId)
         carregarSelectCidades()
         maskValues()
     });
