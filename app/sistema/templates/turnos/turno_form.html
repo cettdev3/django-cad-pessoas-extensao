@@ -1,0 +1,27 @@
+<div class="w-100">
+    <form id="cadastrarTurnoForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <label><b>Nome:</b></label>
+                <input 
+                type="text" 
+                {% if turno %}
+                value="{{ turno.nome}}" 
+                {% endif %}
+                class="form-control" 
+                name="nome">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Carga Horária:</b></label>
+                <input 
+                type="number" 
+                step="0.01"
+                {% if turno %}
+                value="{{ turno.carga_horaria}}" 
+                {% endif %}
+                class="form-control" 
+                name="carga_horaria">
+            </div>
+        </div>
+    </form>
+</div>

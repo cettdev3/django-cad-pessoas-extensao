@@ -1,0 +1,214 @@
+<div class="modal fade" id="cadastrarEscolaModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarEscolaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarEscolaModalLabel">
+                    {% if escola is None %}
+                        Cadastrar Escola
+                        <span id="escolaModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{escola.nome}}
+                        <span id="escolaModelId" hidden>{{escola.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarEscola" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "teste/testeForm.html" with pessoas=pessoas eventos=eventos alocacao=alocacao %}
+            </div>
+            <div class="modal-footer">
+                <button id="formEscolaPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevEscolaLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formEscolaNext" type="button" class="btn btn-primary">
+                    <span id="nextEscolaLink" class="EscolaMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if escola %}
+                    onclick="editarEscola({{escola.id}})" 
+                {% else %}
+                    onclick="criarAlocacoes()" 
+                {% endif %}
+                id="finishCadastroEscola" 
+                type="button"
+                class="btn btn-primary">
+                {% if escola %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarEscolaForm"
+    var escolaModelId = "escolaModelId"
+    var tabsId = "escolasTab"
+    var escolaFormSelectCidadeId = "escolaFormSelectCidade"
+    var selectedCidadeId = "{{escola.cidade.id}}"
+    var cadastrarEscolaModalId = "cadastrarEscolaModal"
+
+    function criarAlocacoes() {
+        let alocacoes = getAlocacoesFormData()
+        $.ajax({
+            url: "alocacoes",
+            data: JSON.stringify(alocacoes),
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                $('#'+alocarPessoaModalId).modal('toggle');
+            }
+        });
+    }
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) escolaModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarEscolaId).click()
+    }
+
+    function cadastrarEscola() {
+        $.ajax({
+            url: "saveEscola",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function updateSelectedCidade() {
+        if (selectedCidadeId) {
+            $("#cidade_id").val(selectedCidadeId).change();
+        }
+    }
+
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+escolaFormSelectCidadeId).html(data)
+                updateSelectedCidade()
+            }
+        });
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#escolaTabLink"+nextTab).trigger("click")
+        $("#escolasTab"+nextTab).addClass("active-form-tab")
+        $("#escolasTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formEscolaNext"],
+                hide: ["formEscolaPrev", "finishCadastroEscola"]
+            },
+            last: {
+                show: ["formEscolaPrev", "finishCadastroEscola"],
+                hide: ["formEscolaNext"]
+            },
+            middle: {
+                show: ["formEscolaPrev", "formEscolaNext"],
+                hide: ["finishCadastroEscola"]
+            },
+            only: {
+                show: ["finishCadastroEscola"],
+                hide: ["formEscolaPrev", "formEscolaNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarEscolaModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+escolaModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formEscolaNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formEscolaPrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        carregarSelectCidades()
+        maskValues()
+    });
+</script>

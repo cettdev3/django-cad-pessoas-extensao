@@ -1,0 +1,9 @@
+<label><b>Turno:</b></label>
+<select class="form-control" 
+id="turno_id" 
+name="turno_id">
+    <option value="">Selecione um Turno</option>
+    {% for turno in turnos %}
+        <option value="{{turno.id}}">{{turno.nome}}</option>
+    {% endfor %}
+</select>

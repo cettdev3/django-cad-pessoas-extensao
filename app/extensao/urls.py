@@ -25,14 +25,17 @@ from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.escolaApiViews import EscolaApiView, EscolaDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
+from sistema.views.turnoApiViews import TurnoApiView, TurnoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
 from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEvento, visualizarEvento, saveEvento, editarEvento
-from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, alocacaoForm
+from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar 
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola
+from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
+from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -87,7 +90,7 @@ urlpatterns = [
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
-    path("alocacaoForm",alocacaoForm),
+    path("modalAlocar",modalAlocar),
     path("alocacaoModalCadastrar",alocacaoModalCadastrar),
     path("saveAlocacao",saveAlocacao),
     path("editarAlocacao/<codigo>",editarAlocacao),
@@ -101,6 +104,25 @@ urlpatterns = [
     path("visualizarEvento/<codigo>",visualizarEvento),
     path("saveEvento",saveEvento),
     path("editarEvento/<codigo>",editarEvento),
+    
+    # ROTAS PARA TESTES
+    path("testeForm",testeForm),
+    path("testeSave",testeSave),
+    path("testeEdit",testeEdit),
+    path("testeForm",testeForm),
+    path("testeModal",testeModal),
+    path("testeGerenciar",testeGerenciar),
+    path("testeTabela",testeTabela),
+   
+    # ROTAS PARA TURNOS
+    path("gerencia_turnos",gerencia_turnos),
+    path("turnoTable",turnoTable),
+    path("turnoModal",turnoModal),
+    path("turnosSelect",turnosSelect),
+    path("saveTurno",saveTurno),
+    path("editarTurno/<codigo>",editarTurno),
+    path("eliminarTurno/<codigo>",eliminarTurno),
+    path("turnosSelect",turnosSelect),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
@@ -128,6 +150,9 @@ urlpatterns = [
     
     path("escolas", EscolaApiView.as_view()),
     path('escolas/<int:escola_id>', EscolaDetailApiView.as_view()),
+    
+    path("turnos", TurnoApiView.as_view()),
+    path('turnos/<int:turno_id>', TurnoDetailApiView.as_view()),
     
     path("tickets", TicketApiView.as_view()),
 

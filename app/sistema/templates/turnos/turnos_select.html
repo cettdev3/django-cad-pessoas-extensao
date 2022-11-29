@@ -1,0 +1,186 @@
+<style>
+    .dropdown input {
+        outline: none;
+        border: none;
+    }
+    .dropdown input:focus {
+        outline: none;
+        border: none;
+    }
+
+    .dflex {
+        display: flex;
+    }
+
+    .border {
+        border: 1px solid black;
+    }
+
+    /* The container <div> - needed to position the dropdown content */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+        padding: 4px 2px;
+        border: 2px solid #d1d3e2;
+        border-radius: 4px;
+    }
+
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    
+    .dropdown-inputed-item {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2px 8px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+
+    }
+
+    .dropdown-input {
+        border: 2px solid #ccc;
+        border-left: none;
+    }
+
+    .btn-delete-checkbox-selection {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-size: 12px;
+        background-color: transparent;
+        color: transparent;
+        border-radius: 8px;
+    }
+
+    .show-on-viewport {
+        position: fixed;
+        bottom: 0px;
+        right: 20px;
+    }
+
+    .dropdown-inputed-container {
+        height: 25px;
+        display: flex;
+        justify-content: start;
+    }
+</style>
+<label><b>Turnos:</b></label>
+<div id="dropdown-turnos">
+    <div class="dropdown">
+        <div class="dflex felx-row">
+            <div id="inputedValues" class="dropdown-inputed-container"></div>
+            <input id="dropdowninput" class="dropdown-input" type="text">
+        </div>
+        <div class="dropdown-content">
+            {% for turno in turnos %}
+            <div id="checkboxTurnoContainer{{turno.id}}">
+                <input id="checkboxTurnoInput{{turno.id}}" type="checkbox" name="turnos" value="{{turno.id}}">
+                <span id="checkboxTurnoText{{turno.id}}">{{turno.nome}}</span>    
+            </div>   
+            {% endfor %}     
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        function filterElements() {
+            let input = $("#dropdowninput");
+            let filter = input.val().toUpperCase();
+            let inputedElements = $("div[id^='checkboxTurnoContainer']");
+            inputedElements.each(function() {
+                let textContent = $(this).children("span[id^='checkboxTurnoText']").text()
+                let elementContainsFilter = textContent.toUpperCase().indexOf(filter) > -1;
+                if (elementContainsFilter) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function onclickElementOutside(element, callback) {
+            $(document).on('click', function (e) {
+                if (!$(element).is(e.target) && $(element).has(e.target).length === 0) {
+                    callback();
+                }
+            });
+        }
+
+        turnosCheckbox = $("input[name='turnos']")
+        turnosCheckbox.each(function(i, el) {
+            $(el).on('click', function() {
+                if ($(el).is(':checked')) {
+                    let valueId = $(el).val()
+                    let div = $('<div />').attr({
+                        'class':'dropdown-inputed-item', 
+                        'id': 'dropdownInputedItem' + valueId});
+                    let span = $('<span />')
+                    let spanTextValueId = "#checkboxTurnoText"+valueId  
+                    let spanTextValue = $(spanTextValueId).text() 
+                    span.css("white-space", "nowrap")
+                    span.text(spanTextValue)
+                    div.append(span)
+                    let btnRemove = $('<button />').attr({
+                        'class':'btn-delete-checkbox-selection', 
+                        'type': 'button',
+                        'id': 'btnRemove' + valueId});
+                    btnRemove.text("x")
+                    btnRemove.hover(function() {
+                        $(this).css("background-color", "rgba(255, 0, 0, 0.3)")
+                        div.css("text-decoration", "line-through")
+                    }, function() {
+                        $(this).css("background-color", "transparent")
+                        div.css("text-decoration", "none")
+                    })
+                    btnRemove.on('click', function() {
+                        $(el).prop('checked', false);
+                        div.remove();
+                    })
+                    div.append(btnRemove)
+                    $("#inputedValues").append(div)
+                    
+                } else {
+                    let valueId = $(el).val()
+                    $("#dropdownInputedItem" + valueId).remove()
+                }
+            });
+
+        })
+        
+        $("#dropdowninput").on('keyup', function() {
+            filterElements()
+        });
+
+        $("#dropdowninput").focus(function() {
+            $(".dropdown-content").show();
+        });
+
+        onclickElementOutside(".dropdown", function() {
+            $(".dropdown-content").hide();
+        });
+
+        // $("#"+formId).submit(function(event) {
+        //     event.preventDefault();
+        //     let values = [] 
+        //     turnosCheckbox.each(function(i, el) {
+        //         if ($(this).is(":checked")) {values.push($(this).val())}
+        //     })
+        //     console.log(values);
+        // });
+
+        
+    });
+</script>

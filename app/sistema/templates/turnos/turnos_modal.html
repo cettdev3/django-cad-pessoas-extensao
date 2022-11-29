@@ -1,0 +1,195 @@
+<div class="modal fade" id="cadastrarTurnoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarTurnoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarTurnoModalLabel">
+                    {% if turno is None %}
+                        Cadastrar Turno
+                        <span id="turnoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{turno.nome}}
+                        <span id="turnoModelId" hidden>{{turno.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarTurno" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "turnos/turno_form.html" with turno=turno %}
+            </div>
+            <div class="modal-footer">
+                <button id="formTurnoPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevTurnoLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formTurnoNext" type="button" class="btn btn-primary">
+                    <span id="nextTurnoLink" class="TurnoMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if turno %}
+                    onclick="editarTurno({{turno.id}})" 
+                {% else %}
+                    onclick="cadastrarTurno()" 
+                {% endif %}
+                id="finishCadastroTurno" 
+                type="button"
+                class="btn btn-primary">
+                {% if turno %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarTurnoForm"
+    var turnoModelId = "turnoModelId"
+    var tabsId = "turnosTab"
+    var cadastrarTurnoModalId = "cadastrarTurnoModal"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) turnoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarTurnoId).click()
+    }
+
+    function cadastrarTurno() {
+        $.ajax({
+            url: "saveTurno",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarTurno(id) {
+        $.ajax({
+            url: "editarTurno/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+        
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#turnoTabLink"+nextTab).trigger("click")
+        $("#turnosTab"+nextTab).addClass("active-form-tab")
+        $("#turnosTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formTurnoNext"],
+                hide: ["formTurnoPrev", "finishCadastroTurno"]
+            },
+            last: {
+                show: ["formTurnoPrev", "finishCadastroTurno"],
+                hide: ["formTurnoNext"]
+            },
+            middle: {
+                show: ["formTurnoPrev", "formTurnoNext"],
+                hide: ["finishCadastroTurno"]
+            },
+            only: {
+                show: ["finishCadastroTurno"],
+                hide: ["formTurnoPrev", "formTurnoNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarTurnoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+turnoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formTurnoNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formTurnoPrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        maskValues()
+    });
+</script>
