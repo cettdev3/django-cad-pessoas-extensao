@@ -19,7 +19,7 @@ cellspacing="0">
             <th class="eventos-w-15 text-left">Inicio</th>
             <th class="eventos-w-15 text-left">Fim</th>
             <th class="eventos-w-15 text-left">Endereco</th>
-            <th class="eventos-w-15 text-left">Cidade</th>
+            <th class="eventos-w-15 text-left">Escola</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
@@ -30,12 +30,16 @@ cellspacing="0">
             <td class="eventos-w-15 text-left">{{evento.status}}</td>
             <td class="eventos-w-15 text-left">{{evento.data_inicio|date:"d-m-Y"}}</td>
             <td class="eventos-w-15 text-left">{{evento.data_fim|date:"d-m-Y"}}</td>
-            <td class="eventos-w-25 text-left">{{evento.endereco_completo}}</td>
-            {% if evento.cidade %}
-                <td class="eventos-w-15 text-left">{{evento.cidade.nome}}</td>
-            {% else %}
-                <td class="eventos-w-15 text-left">{{evento.endereco.cidade.nome}}</td>
-            {% endif %}
+            <td class="eventos-w-25 text-left">
+                {% if evento.cidade %}
+                    <strong>{{evento.cidade.nome}}</strong>
+                {% else %}
+                    <strong>{{evento.endereco.cidade.nome}}</strong>
+                {% endif %}
+                {{evento.endereco_completo}} 
+            </td>
+            <td class="eventos-w-15 text-left">{{evento.escola.nome}}</td>
+
             <td class="w-5 text-left" style="position: relative;">
                 <button id="buttonMenuEventos{{evento.id}}" 
                 class="btn-circle">
