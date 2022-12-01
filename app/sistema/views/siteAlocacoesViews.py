@@ -163,7 +163,8 @@ def horasTrabalhadas(request):
             alocacao['horas_trabalhadas'] = diasTranscorridos * cargaHorariaDia
             total_horas_pessoa += alocacao['horas_trabalhadas']
         pessoa['total_horas'] = total_horas_pessoa
-        tabela_horas_trabalhadas.append({"nome": nome, "cpf": cpf, "total_horas": total_horas_pessoa})
+        if pessoa['cargo'] == 'professor':
+            tabela_horas_trabalhadas.append({"nome": nome, "cpf": cpf, "total_horas": total_horas_pessoa})
     print(tabela_horas_trabalhadas)
 
     response = HttpResponse(
