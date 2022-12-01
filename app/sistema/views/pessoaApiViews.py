@@ -1,27 +1,34 @@
 # todo/todo_api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q, Exists
+from django.db.models import Q, Exists, IntegerField, Subquery
 from rest_framework import status as st
 from rest_framework import permissions
 from ..models.pessoa import Pessoas
+from ..models.alocacao import Alocacao
 from ..models.curso import Curso
 from ..serializers.pessoaSerializer import PessoaSerializer
+from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-
+from datetime import datetime
+from django.db import reset_queries
+from django.db import connection
+from django.db.models import Prefetch, Count
 class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
-
+    
     # 1. List all
     def get(self, request, *args, **kwargs):
         cpf = request.GET.get('cpf')
-        user_camunda = request.GET.get('user_camunda')
-        nome = request.GET.get('nome')
-        data_inicio = request.GET.get('data_inicio')
-        data_fim = request.GET.get('data_fim')
+        user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
+        nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
+        data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
+        data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
+        is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
+
+        print(f"cpf: {cpf}, user_camunda: {user_camunda}, nome: {nome}, data_inicio: {data_inicio}, data_fim: {data_fim}, is_alocated: {is_alocated}")
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
@@ -31,16 +38,23 @@ class PessoaApiView(APIView):
         if nome:
             pessoas = pessoas.filter(nome__contains = nome)
         if data_fim and data_inicio:
-            pessoas = pessoas.filter(
-                ~Exists(Pessoas.objects.filter(
-                    Q(alocacao__data_inicio__gte=data_inicio,
-                    alocacao__data_inicio__lte=data_fim) |
-                    Q(alocacao__data_fim__gte=data_inicio,
-                    alocacao__data_fim__lte=data_fim) 
-                ))
-            ).union(pessoas.filter(alocacao__isnull=True))
+            pessoas = pessoas.annotate(count_alocacao=Count('alocacao', 
+                filter=Q(
+                    Q(alocacao__data_inicio__gte=data_inicio,alocacao__data_inicio__lte=data_fim) |
+                    Q(alocacao__data_fim__gte=data_inicio,alocacao__data_fim__lte=data_fim) |
+                    Q(alocacao__data_inicio__lte=data_inicio,alocacao__data_fim__gte=data_inicio) |
+                    Q(alocacao__data_inicio__lte=data_fim,alocacao__data_fim__gte=data_fim)
+                )
+            ))
+
+            if is_alocated == "True" or is_alocated == "true":
+                pessoas = pessoas.filter(count_alocacao__gt=0)
+            else:
+                pessoas = pessoas.filter(count_alocacao__lte=0)
+
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
+
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     # 2. Create
@@ -253,3 +267,12 @@ class PessoaDetailApiView(APIView):
             {"res": "pessoa deletada!"},
             status=st.HTTP_200_OK
         )
+
+
+    """
+    SELECT 
+    `alocacoes`.`id`, `alocacoes`.`evento_id`, `alocacoes`.`professor_id`, `alocacoes`.`curso_id`, `alocacoes`.`data_inicio`, `alocacoes`.`data_fim`, `alocacoes`.`status`, `alocacoes`.`observacao`, `alocacoes`.`bairro`, `alocacoes`.`logradouro`, `alocacoes`.`cep`, `alocacoes`.`complemento`, `alocacoes`.`cidade_id`, `alocacoes`.`aulas_sabado` 
+    FROM `alocacoes` 
+    WHERE (`alocacoes`.`data_inicio` BETWEEN '2022-12-03' AND '2022-12-06' 
+    OR `alocacoes`.`data_fim` BETWEEN '2022-12-03' AND '2022-12-06')"
+    """

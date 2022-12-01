@@ -5,3 +5,4 @@ djangorestframework
 envconfiguration
 fontawesomefree
 requests
+xlsxwriter

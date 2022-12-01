@@ -4,6 +4,7 @@ from rest_framework import serializers
 from ..models.pessoa import Pessoas
 
 class PessoaSerializer(serializers.ModelSerializer):
+    count_alocacao = serializers.IntegerField(initial=0, allow_null=True)
     class Meta:
         model = Pessoas
         fields = [
@@ -39,6 +40,8 @@ class PessoaSerializer(serializers.ModelSerializer):
             "id_protocolo",
             "numero_endereco",
             "estado",
-            "cursos"
+            "cursos",
+            "alocacao_set",
+            "count_alocacao"
         ]
-        depth = 1
+        depth = 2

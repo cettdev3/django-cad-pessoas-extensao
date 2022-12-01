@@ -31,7 +31,7 @@ from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, c
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
 from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEvento, visualizarEvento, saveEvento, editarEvento
-from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar 
+from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
@@ -90,6 +90,7 @@ urlpatterns = [
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
+    path("horasTrabalhadas",horasTrabalhadas),
     path("modalAlocar",modalAlocar),
     path("alocacaoModalCadastrar",alocacaoModalCadastrar),
     path("saveAlocacao",saveAlocacao),

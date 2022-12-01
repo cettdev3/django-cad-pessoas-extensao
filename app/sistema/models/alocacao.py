@@ -1,5 +1,5 @@
 from django.db import models
-
+import datetime
 from ..models.evento import Evento
 from ..models.cidade import Cidade
 from ..models.pessoa import Pessoas
@@ -24,3 +24,4 @@ class Alocacao(models.Model):
     aulas_sabado = models.BooleanField(default=False)
     class Meta:
         db_table = 'alocacoes'
+    

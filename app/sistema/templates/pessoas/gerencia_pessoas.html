@@ -128,25 +128,39 @@ z-index: 4
     d-flex justify-content-between align-items-center 
     px-3 py-3 my-3
     bg-white">
-        <div>
+        <div class="d-flex justify-content-start align-items-center">
             <input id="filterPessoaNomePessoa" 
             placeholder="Digite um nome" 
-            class="form-control-sm border-secondary"
+            class="mx-2 form-control-sm border-secondary"
             name="nome" type="text">
             <input id="filterPessoaDataInicio" 
             type="date"
-            class="form-control-sm border-secondary"
+            class="mx-2 form-control-sm border-secondary"
             name="data_inicio" type="text">
             <input id="filterPessoaDataFim" 
             type="date"
-            class="form-control-sm border-secondary"
+            class="mx-2 form-control-sm border-secondary"
             name="data_fim" type="text">
+            <div class="d-flex justify-content-start align-items-center">
+                <input id="filterPessoaIsAlocated" 
+                type="checkbox"
+                class="ml-2 mr-1 form-control-sm"
+                id="is_alocated"
+                name="is_alocated" 
+                type="text">
+                <label for="is_alocated" class="m-0">Buscar Alocados</label>
+            </div>
         </div>
         <div class="d-flex">
             <button id="alocarPessoasBtn" 
             onclick="alocarPessoas()"
-            class="btn-cadastrar rounded d-none justify-content-between align-items-center">
+            class="btn-cadastrar rounded d-none justify-content-between align-items-center  ml-1">
                 <span> alocar pessoas</span>
+            </button>
+            <button id="horasTrabalhadasBtn" 
+            onclick="horasTrabalhadas()"
+            class="btn-cadastrar rounded justify-content-between align-items-center  ml-1">
+                <span> Horas Trabalhadas </span>
             </button>
             <button id="adicionarPessoas" 
             onclick="carregarPessoasModalCadastrar()"
@@ -158,6 +172,7 @@ z-index: 4
     <div id="receberTabela" class="shadow bg-white w-100">
     </div>
 </div>
+<a id="download-broshura" name="download-file" download> </a>
 
 <!-- Modal -->
 <div id="modalCadastrarContainer">
@@ -186,6 +201,18 @@ z-index: 4
             }
         })
         return checkedValues
+    }
+
+    function getFiltros() {
+        let filtros = {}
+        $("input[id^='"+filterPrefix+"']").each(function() {
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        filtros["is_alocated"] = $("#"+filterPrefix+"IsAlocated").is(":checked")
+        console.log(filtros)
+        return filtros
     }
 
     function alocarPessoas () {
@@ -217,6 +244,29 @@ z-index: 4
             }
         });
     }
+    
+    function horasTrabalhadas() {
+        var base_url = window.location.origin;
+        filter = getFiltros()
+        if (filter.data_fim && filter.data_inicio) {
+            fetch(base_url+'/horasTrabalhadas?data_fim='+filter["data_fim"]+'&data_inicio='+filter["data_inicio"])
+            .then(resp => resp.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'horas_trabalhadas_I'+filter["data_inicio"]+"F"+filter["data_fim"]+'.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(() => alert('Erro ao baixar arquivo'));
+        } else {
+            console.log("preencha corretamente os camposa")
+        }
+        
+    }
 
     function carregarPessoas(filter = null) {
         let recarregarTabela = "pessoasTable"
@@ -246,13 +296,7 @@ z-index: 4
     }
 
     function filtrarPessoas() {
-        let filtros = {}
-        $("input[id^='"+filterPrefix+"']").each(function() {
-            if ($(this).val()) {
-                filtros[$(this).attr("name")] = $(this).val()
-            }
-        })
-        carregarPessoas(filtros)
+        carregarPessoas(getFiltros())
     }
 
     function debounce(func, timeout = 300){
@@ -261,6 +305,10 @@ z-index: 4
             clearTimeout(timer);
             timer = setTimeout(() => { func.apply(this, args); }, timeout);
         };
+    }
+
+    function getCheckboxValue(id) {
+        return $("#"+id).is(":checked")
     }
 
     $(document).ready(function () {
