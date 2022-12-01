@@ -1,0 +1,28 @@
+<style>
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-space-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+</style>
+<div class="d-flex justify-content-space-between align-items-center">
+    <label><b>Escola:</b></label>
+    <div class="d-flex justify-content-space-between align-items-center">
+        <label class="mr-1" for="use_select_value">Usar endereço da escola</label>
+        <input class="mb-1" type="checkbox" id="use_select_value" name="use_select_value">
+    </div>
+</div>
+<select class="form-control" 
+id="escola_id" 
+name="escola_id">
+    <option value="">Selecione uma Escola</option>
+    {% for escola in escolas %}
+        <option value="{{escola.id}}">{{escola.nome}}</option>
+    {% endfor %}
+</select>

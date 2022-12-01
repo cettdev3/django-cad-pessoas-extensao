@@ -2,8 +2,10 @@ from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.escolaSerializer import EscolaSerializer
 from sistema.models.curso import Curso
 from sistema.models.endereco import Endereco
+from sistema.models.escola import Escola
 from sistema.models.cidade import Cidade
 from sistema.models.evento import Evento
 from django.contrib import messages
@@ -48,10 +50,12 @@ def visualizarEvento(request,codigo):
 def eventosModalCadastrar(request):
     id = request.GET.get('id')
     evento = None
+    escolas = Escola.objects.all()
     data = {}
     if id:
         evento = Evento.objects.get(id=id)
         data['evento'] = EventoSerializer(evento).data
+    data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -65,6 +69,7 @@ def saveEvento(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
+    print(body)
     response = requests.post('http://localhost:8000/eventos', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 

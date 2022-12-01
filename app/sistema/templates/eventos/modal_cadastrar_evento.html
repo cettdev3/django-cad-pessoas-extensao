@@ -34,7 +34,7 @@
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 <div class="form-group row">
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-5">
                                         <label><b>Descrição:</b></label>
                                         <input 
                                         type="text" 
@@ -46,6 +46,8 @@
                                         name="observacao" 
                                         placeholder=""
                                         required>
+                                    </div>
+                                    <div id="eventoFormSelectEscola" class="col-sm-3">
                                     </div>
                                     <div class="col-sm-4">
                                         <label><b>Status:</b></label>
@@ -119,18 +121,8 @@
                                     <div id="eventoFormSelectCidade" class="col-sm-4">
                                     </div>
                                 </div>
-                                {% if not evento %}
-                                <div class="form-group row">
-                                    <div class="col-sm-12" id="eventoFormSelectEnderecos">
-                                    </div>
-                                </div> 
-                                {% endif %}
                                 
-                                <div
-                                {% if not evento %}
-                                style="display: none;" 
-                                {% endif %}
-                                class="dadosNovoEndereco form-group row">
+                                <div class="dadosNovoEndereco form-group row">
                                     <div class="col-sm-4">
                                         <label><b>Logradouro:</b></label>
                                         <input 
@@ -183,11 +175,7 @@
                                         required>
                                     </div>
                                 </div>
-                                <div 
-                                {% if not evento %}
-                                style="display: none;" 
-                                {% endif %}
-                                class="dadosNovoEndereco form-group row">
+                                <div class="dadosNovoEndereco form-group row">
                                     <div class="col-sm-12">
                                         <label><b>Complemento:</b></label>
                                         <input 
@@ -232,14 +220,19 @@
     </div>
 </div>
 
+{{ escolas|json_script:"escolas-script" }}
+
 <script>
     formId = "cadastrarEventoForm"
     eventoModelId = "eventoModelId"
     eventoFormSelectCidadeId = "eventoFormSelectCidade"
     eventoFormSelectEnderecosId = "eventoFormSelectEnderecos"
     selectedCidadeId = "{% if evento.cidade %}{{evento.cidade.id}}{% else %}{{evento.endereco.cidade.id}}{% endif %}"
+    selectedEscolaId = "{{evento.escola.id}}"
     selectedEnderecoId = "{{evento.endereco.id}}"
     isEditing = "{{evento.id}}"
+    var escolas = JSON.parse(document.getElementById('escolas-script').textContent);
+    eventoFormSelectEscolaId = "eventoFormSelectEscola"
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
@@ -318,6 +311,14 @@
             let cidade = $("#cidade_id").val(selectedCidadeId);
         }
     }
+    
+    function updateSelectedEscola() {
+        if (selectedEscolaId.length > 0) {
+            let escola = $("#escola_id").val(selectedEscolaId);
+        } else {
+            let escola = $("#escola_id").val("");
+        }
+    }
 
     function updateSelectedEndereco() {
         if (selectedEnderecoId) {
@@ -325,23 +326,8 @@
         }
     }
 
-    function carregarSelectEnderecos(cidadeId = null) {
-        let url = cidadeId ? "enderecosSelect?cidade_id="+cidadeId : "enderecosSelect" 
-        $.ajax({
-            url: url,
-            method: "GET",
-            success: function (data) {
-                $("#"+eventoFormSelectEnderecosId).html(data)
-                $("#endereco_id").change(function () {
-                    let selectedValue = $(this).val() 
-                    $(".dadosNovoEndereco").each(function(elem) {
-                        if (selectedValue == "novo") $(this).show()
-                        else $(this).hide()
-                    })
-                })
-                updateSelectedEndereco()
-            }
-        });
+    function mostrarEndereco() {
+
     }
 
     function carregarSelectCidades() {
@@ -350,15 +336,42 @@
             method: "GET",
             success: function (data) {
                 $("#"+eventoFormSelectCidadeId).html(data)
-                $("#cidade_id").change(function (val) {
-                    carregarSelectEnderecos($(this).val())
-                    if (!isEditing) {
-                        $(".dadosNovoEndereco").each(function(elem) {
-                            $(this).hide()
-                        })
-                    }
-                })
                 updateSelectedCidade()
+            }
+        });
+    }
+
+    function getCheckBoxValue(checkboxId) {
+        return $("#"+checkboxId).is(":checked")
+    }
+
+    function bindEnderecoFields(escolaId) {
+        let escola = escolas.find(escola => escola.id == escolaId)
+        if (escola && getCheckBoxValue("use_select_value")) {
+            $("#logradouro").val(escola.logradouro)
+            $("#bairro").val(escola.bairro)
+            $("#cep").val(escola.cep)
+            $("#complemento").val(escola.complemento)
+            $("#cidade_id").val(escola.cidade.id)
+        }
+    } 
+    
+    function carregarSelectEscolas() {
+        $.ajax({
+            url: "escolasSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+eventoFormSelectEscolaId).html(data)
+                $("#escola_id").change(function (val) {
+                    let selectedEscola = $(this).val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+
+                $("#use_select_value").change(function (val) {
+                    let selectedEscola = $("#escola_id").val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+                updateSelectedEscola()
             }
         });
     }
@@ -376,6 +389,7 @@
             }
         });
         carregarSelectCidades()
+        carregarSelectEscolas()
         maskValues()
     });
 </script>

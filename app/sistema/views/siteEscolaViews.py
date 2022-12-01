@@ -67,3 +67,8 @@ def editarEscola(request, escola_id):
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/escolas/'+str(escola_id), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def escolasSelect(request):
+    escolas = Escola.objects.all()
+    return render(request,'escolas/escolas_select.html',{'escolas':escolas})

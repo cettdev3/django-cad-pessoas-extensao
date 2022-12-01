@@ -25,6 +25,7 @@ class EventoSerializer(serializers.ModelSerializer):
             "bairro",
             "cidade",
             "cep",
+            "escola"
         ]
         depth = 2
         

@@ -1,7 +1,7 @@
 from django.db import models
 from ..models.endereco import Endereco
 from ..models.cidade import Cidade
-
+from ..models.escola import Escola
 class Evento(models.Model):
     STATUS_PLANNEJADO = "planejamento"
     STATUS_ANDAMENTO = "andamento"
@@ -27,6 +27,7 @@ class Evento(models.Model):
     cep = models.CharField(null = True, max_length=100) 
     complemento = models.CharField(null = True, max_length=250)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True)
+    escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
 
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True)
 
