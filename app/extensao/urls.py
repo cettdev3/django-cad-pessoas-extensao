@@ -36,6 +36,7 @@ from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, endere
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
+from sistema.views.siteComponentsView import calendario
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -125,6 +126,9 @@ urlpatterns = [
     path("editarTurno/<codigo>",editarTurno),
     path("eliminarTurno/<codigo>",eliminarTurno),
     path("turnosSelect",turnosSelect),
+
+    # ROTAS PARA COMPONENTES
+    path("calendario",calendario),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),

@@ -181,6 +181,8 @@ z-index: 4
 <div id="modalAlocarPessoas">
 </div>
 
+<div id="calendario" class="d-flex flex-column">
+</div>
 
 <script>
     let pessoaModificadaEvent = {};
@@ -192,6 +194,8 @@ z-index: 4
     let rowPessoaId = "rowPessoa-" 
     let pessoaTableCheckboxAllId = "pessoaTableCheckboxAll"
     let filterPrefix = "filterPessoa"
+    let calendarioId = "calendario"
+    let calendarioUrl = "calendario"
 
     function getCheckedIds() {
         let checkedValues = []
@@ -230,6 +234,18 @@ z-index: 4
         });
 
     }
+    
+    function getCalendario () {
+        $.ajax({
+            url: calendarioUrl,
+            data: getFiltros(),
+            type: "GET",
+            success: function (data) {
+                $("#"+calendarioId).html(data)
+                $('#'+modalCalendarioId).modal('toggle');
+            }
+        });
+    }
 
     function deletePessoa(id) {
         deletar_url = "eliminarPessoa/" + id
@@ -246,26 +262,7 @@ z-index: 4
     }
     
     function horasTrabalhadas() {
-        var base_url = window.location.origin;
-        filter = getFiltros()
-        if (filter.data_fim && filter.data_inicio) {
-            fetch(base_url+'/horasTrabalhadas?data_fim='+filter["data_fim"]+'&data_inicio='+filter["data_inicio"])
-            .then(resp => resp.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'horas_trabalhadas_I'+filter["data_inicio"]+"F"+filter["data_fim"]+'.xlsx';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(() => alert('Erro ao baixar arquivo'));
-        } else {
-            console.log("preencha corretamente os camposa")
-        }
-        
+        getCalendario()
     }
 
     function carregarPessoas(filter = null) {

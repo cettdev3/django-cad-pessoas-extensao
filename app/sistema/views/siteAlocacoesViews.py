@@ -110,9 +110,10 @@ def intervening_weekdays(start, end, inclusive=True, weekdays=[0, 1, 2, 3, 4, 5,
 
 @login_required(login_url='/auth-user/login-user')
 def horasTrabalhadas(request):
-    print("dentro de horas trabalhadas", request.GET.get('data_inicio'), request.GET.get('data_fim'))
-    data_inicio = request.GET.get('data_inicio')
-    data_fim = request.GET.get('data_fim')
+    body = json.loads(request.body.decode())
+    data_inicio = body['data_inicio']
+    data_fim = body['data_fim']
+    removed_dates = body['removed_dates']
     pessoas = Pessoas.objects
     if data_fim and data_inicio:
         pessoas = pessoas.prefetch_related(
@@ -135,38 +136,44 @@ def horasTrabalhadas(request):
         nome = pessoa['nome']
         cpf = pessoa['cpf']
         total_horas_pessoa = 0
+        carga_horaria_dia = {}
+        queryDataInicio = datetime.datetime.strptime(data_inicio, '%Y-%m-%d')
+        queryDataFim = datetime.datetime.strptime(data_fim, '%Y-%m-%d')
+        
+        while queryDataInicio <= queryDataFim:
+            carga_horaria_dia[queryDataInicio.strftime('%Y-%m-%d')] = {
+                'carga_horaria': 0
+            }
+            queryDataInicio += datetime.timedelta(days=1)
+        
         for alocacao in pessoa['alocacao_set']:
+            alocacao['horas_trabalhadas'] = 0
             cargaHorariaDia = 0
             for turno in alocacao['turnos']:
                 cargaHorariaDia += turno["carga_horaria"]
             
-            alocacaoDataInicio = datetime.datetime.strptime(alocacao['data_inicio'], '%Y-%m-%d')
-            alocacaoDataFim = datetime.datetime.strptime(alocacao['data_fim'], '%Y-%m-%d')
             queryDataInicio = datetime.datetime.strptime(data_inicio, '%Y-%m-%d')
             queryDataFim = datetime.datetime.strptime(data_fim, '%Y-%m-%d')
+            alocacaoDataInicio = datetime.datetime.strptime(alocacao['data_inicio'], '%Y-%m-%d')
+            alocacaoDataFim = datetime.datetime.strptime(alocacao['data_fim'], '%Y-%m-%d')
 
-            inicio = alocacaoDataInicio if alocacaoDataInicio >= queryDataInicio else queryDataInicio
-            fim = alocacaoDataFim if alocacaoDataFim <= queryDataFim else queryDataFim 
+            while queryDataInicio <= queryDataFim:
+                isSatturday = queryDataInicio.weekday() == 5
+                count_sabado = (not isSatturday) or alocacao["aulas_sabado"]
+                is_alocation_date = queryDataInicio >= alocacaoDataInicio and queryDataInicio <= alocacaoDataFim 
+                is_sunday = queryDataInicio.weekday() == 6
+                if queryDataInicio.strftime('%Y-%m-%d') not in removed_dates and count_sabado and is_alocation_date and not is_sunday:
+                    chave = queryDataInicio.strftime('%Y-%m-%d')
+                    carga_horaria_dia[chave]["carga_horaria"] += cargaHorariaDia
+                    total_horas_pessoa += cargaHorariaDia
+                    alocacao['horas_trabalhadas'] += cargaHorariaDia
+                
+                queryDataInicio += datetime.timedelta(days=1)
 
-            week_day =  {
-                'segunda': intervening_weekdays(inicio, fim, True, [0]),
-                'terca': intervening_weekdays(inicio, fim, True, [1]),
-                'quarta': intervening_weekdays(inicio, fim, True, [2]),
-                'quinta': intervening_weekdays(inicio, fim, True, [3]),
-                'sexta': intervening_weekdays(inicio, fim, True, [4]),
-                'sabado': intervening_weekdays(inicio, fim, True, [5]),
-                'domingo': intervening_weekdays(inicio, fim, True, [6])
-            }
-           
-            sabado = week_day["sabado"] if alocacao["aulas_sabado"] else 0
-            diasTranscorridos = week_day["segunda"] + week_day["terca"] + week_day["quarta"] + week_day["quinta"] + week_day["sexta"] + sabado
-            alocacao['horas_trabalhadas'] = diasTranscorridos * cargaHorariaDia
-            total_horas_pessoa += alocacao['horas_trabalhadas']
         pessoa['total_horas'] = total_horas_pessoa
         if pessoa['cargo'] == 'professor':
-            tabela_horas_trabalhadas.append({"nome": nome, "cpf": cpf, "total_horas": total_horas_pessoa})
-    print(tabela_horas_trabalhadas)
-
+            tabela_horas_trabalhadas.append({"nome": nome, "cpf": cpf, "carga_horaria_dia": carga_horaria_dia,"total_horas": total_horas_pessoa})
+    
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
@@ -177,11 +184,20 @@ def horasTrabalhadas(request):
     worksheet = workbook.add_worksheet()
     worksheet.write(0, 0, 'Nome')
     worksheet.write(0, 1, 'CPF')
-    worksheet.write(0, 2, 'Total de Horas')
-    for row_num, columns in enumerate(tabela_horas_trabalhadas):
-        for col_num, cell_data in enumerate(columns):
-            worksheet.write(row_num+1, col_num, columns[cell_data])
-    
+    worksheet.write(0, len(tabela_horas_trabalhadas[0]['carga_horaria_dia'])+2, 'Total de Horas')
+    for i, date in enumerate(tabela_horas_trabalhadas[0]['carga_horaria_dia']):
+        date = date.split('-')
+        date = date[2] + '/' + date[1] + '/' + date[0]
+        worksheet.write(0, i+2, date)
+
+    for pessoa in tabela_horas_trabalhadas:
+        worksheet.write(tabela_horas_trabalhadas.index(pessoa)+1, 0, pessoa['nome'])
+        worksheet.write(tabela_horas_trabalhadas.index(pessoa)+1, 1, pessoa['cpf'])
+        for i, date in enumerate(pessoa['carga_horaria_dia']):
+            worksheet.write(tabela_horas_trabalhadas.index(pessoa)+1, i+2, pessoa['carga_horaria_dia'][date]['carga_horaria'])
+        worksheet.write(tabela_horas_trabalhadas.index(pessoa)+1, len(pessoa['carga_horaria_dia'])+2, pessoa['total_horas'])
+
+
     workbook.close()
     output.seek(0)
 

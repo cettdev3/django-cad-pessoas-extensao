@@ -1,0 +1,578 @@
+<style>
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .month,
+        .days {
+            flex: 0 0 100%;
+            box-sizing: border-box;
+            background: #1abc9c;
+            text-align: center;
+        }
+
+        .week-day-item {
+            display: inline-block;
+            flex: 1 0 14.286%;
+            max-width: 14.286%;
+            min-width: 14.286%;
+            background: #fff;
+            text-align: center;
+            line-height: 2rem;
+            box-sizing: border-box;
+            font-size: 1.2rem;
+            padding: 10px 0px;
+            font-weight: bolder;
+        }
+
+        .hover-select:hover {
+            cursor: pointer;
+            background: #3498db;
+            box-shadow: 0 0 10px #3498db;
+            color: #fff;
+        }
+
+        .hover-remove:hover {
+            cursor: pointer;
+            background: #e74c3c;
+            box-shadow: 0 0 10px #e74c3c;
+            color: #fff;
+        }
+
+        .selected {
+            background: #3da4e8;
+            box-shadow: 0 0 10px #3da4e8;
+            color: #fff;
+        }
+
+        .removed {
+            background: #f35d4d;
+            color: #fff;
+        }
+
+        .week-days {
+            background-color: #f9f9f9;
+        }
+
+        .week-days .week-day-item{
+            font-size: 1.2rem;
+            font-weight: 400;
+            background-color: rgba(0, 0, 0, 0);
+            color: #555;
+        }
+
+        .months .month  {
+            padding: 30px 0px;
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .today {
+            background: #f1c40f;
+            box-shadow: 0 0 10px #f1c40f;
+            color: #fff;
+        }
+
+        .button-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: #fff;
+            padding: 20px 30px;
+            border: none;
+            font-size: 3.5rem;
+            cursor: pointer;
+        }
+
+        .button-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 20px 30px;
+            color: #fff;
+            border: none;
+            font-size: 3.5rem;
+            cursor: pointer;
+        }
+
+        .button-left:hover,
+        .button-right:hover{
+            color: #f1c40f;
+        }
+</style>
+<div class="modal fade" id="modalCalendario" tabindex="-1" role="dialog"
+    aria-labelledby="modalCalendarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCalendarioTitle">
+                    Remover Datas especificas
+                </h5>
+                <button type="button" 
+                id="dismisModalCalendario" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="calendar" class="calendar position-relative">
+                        <div class="button-left br" onclick="slide(['months', 'days'], -1, 1, true)"><span class="btn-chevron">&#8249;</span></div>
+                        <div class="button-right br" onclick="slide(['months', 'days'], 1, 1, true)"><span class="btn-chevron">&#8250;</span></div>
+                        <div id="months" class="months d-flex w-100-p overflow-hidden">
+                        </div>
+                        <div id="week-days" class="week-days d-flex">
+                            <div class="week-day-item">Domingo</div>
+                            <div class="week-day-item">Segunda</div>
+                            <div class="week-day-item">Terça</div>
+                            <div class="week-day-item">Quarta</div>
+                            <div class="week-day-item">Quinta</div>
+                            <div class="week-day-item">Sexta</div>
+                            <div class="week-day-item">Sábado</div>
+                        </div>
+                        <div id="days" class="d-flex w-100-p  overflow-hidden">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                onclick="finalizar()"
+                id="confimarModalCalendario" 
+                type="button"
+                class="btn btn-primary">
+                    <span>Confirmar Datas</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var modalCalendarioId = "modalCalendario"
+    
+    $(document).ready(function () {
+        console.log("calendario pronto")
+    });
+</script>
+
+<script> 
+    var startRangeSelectedDate = null
+    var endRangeSelectedDate = null
+    var removedDates = []
+
+    function calcWidth(elementId, withPadding, withBorder, withMargin) {
+        let container = $(`#${elementId}`);
+        let totalWidth = container.width();
+        let totalPadding = 0;
+        let totalBorder = 0;
+        let totalMargin = 0;
+
+        if (withPadding) {
+            totalPadding += parseInt(container.css("padding-left"), 10) + parseInt(container.css("padding-right"), 10); //Total Padding Width
+        }
+        if (withBorder) {
+            totalBorder += parseInt(container.css("margin-left"), 10) + parseInt(container.css("margin-right"), 10); //Total Margin Width
+        }
+
+        if (withMargin) {
+            totalMargin += parseInt(container.css("margin-left"), 10) + parseInt(container.css("margin-right"), 10); //Total Margin Width
+        }
+        return totalWidth + totalPadding + totalBorder + totalMargin;
+    }
+
+    function getMode() {
+        if (startRangeSelectedDate && endRangeSelectedDate) {
+            return 'removing'
+        } else if (startRangeSelectedDate) {
+            return 'select-end'
+        } else {
+            return 'select-start'
+        }
+    }
+
+    function createSpan(text, id, classes) {
+        let span = $("<span>");
+        span.text(text);
+        if (id) 
+            span.attr("id", id);
+        if (classes) 
+            span.addClass(classes);
+        return span;
+    }
+
+    function createDiv(id, classes, content) {
+        const div = $("<div>")
+        if (id) 
+            div.attr("id", id);
+        if (classes)
+            div.addClass(classes)
+        if (content)
+            div.append(createSpan(content));
+        return div
+    }
+
+    function getDateFromPosition(position) {
+        let months = $("#months");
+        date = null
+        if (position == 1) {
+            let monthId = months.children().last().attr("id")
+            let monthNumber = ("0" + (parseInt(monthId.split("-")[1]) + 1)).slice(-2);
+            let yearNumber = monthId.split("-")[2];
+            date = moment(`${yearNumber}-${monthNumber}-01`, "YYYY-MM-DD").add(1, "month");
+        } else if (position == -1) {
+            let monthId = months.children().first().attr("id")
+            let monthNumber = ("0" + (parseInt(monthId.split("-")[1]) + 1)).slice(-2);
+            let yearNumber = monthId.split("-")[2];
+            date = moment(`${yearNumber}-${monthNumber}-01`, "YYYY-MM-DD").subtract(1, "month");
+        }
+        return date
+    }
+
+    function getDateFromId(id) {
+        return moment(id.replace("day-", ""), "YYYY-MM-DD")
+    }
+
+    function buildMonth(date) {
+        let monthNumber = date.month();
+        let monthName = date.format("MMMM");
+        let year = date.format("YYYY");
+
+        let monthContainer = createDiv(`month-${monthNumber}-${year}`, "month d-flex flex-column justify-content-center", monthName);
+        monthContainer.append(createSpan(year));
+        return monthContainer;
+    } 
+
+    function isDateRemoved(date) {
+        let isRemoved = removedDates.filter(function (removedDate) { 
+            return removedDate.format("YYYY-MM-DD") == date.format("YYYY-MM-DD") 
+        }).length != 0
+
+        return isRemoved
+    }
+
+    function isDateInRange(date, startRange, endRange) {
+        let isInRange = false
+        
+        if (startRange && endRange) {
+            isInRange = date.isBetween(startRange, endRange, null, "[]")
+            isInRange = isInRange || date.isBetween(endRange, startRange, null, "[]")
+            isInRange = isInRange || date.format("YYYY-MM-DD") == startRange.format("YYYY-MM-DD")
+            isInRange = isInRange || date.format("YYYY-MM-DD") == endRange.format("YYYY-MM-DD")
+            if (startRange && endRange) console.log(`date ${date.format("YYYY-MM-DD")}, startRange ${startRange.format("YYYY-MM-DD")}, endRange ${endRange.format("YYYY-MM-DD")}`, isInRange)
+        }
+        return isInRange
+    }
+
+    function setRemovedClasses() {
+        $("div[id^='day-']").each(function () {
+            let date = getDateFromId($(this).attr("id"))
+            $(this).removeClass("hover-select")
+
+            if (isDateInRange(date, startRangeSelectedDate, endRangeSelectedDate)) {
+                $(this).addClass("hover-remove")
+                $(this).removeClass("today")
+            }
+        })
+    }
+
+    function bindDay(dayContainer) {
+        dayContainer.click(function () {
+            let mode = getMode();
+            let dayDate = getDateFromId($(this).attr("id")); 
+            console.log("mode", mode)
+            if(mode == 'select-start') {
+                startRangeSelectedDate = dayDate
+                $(this).addClass("selected")
+                $(this).removeClass("today")
+            } else if (mode == 'select-end') {
+                endRangeSelectedDate = dayDate
+                $(this).addClass("selected")
+                $(this).removeClass("today")
+                setRemovedClasses()
+            } else if (mode == 'removing') {
+                if (isDateRemoved(dayDate)) {
+                    removedDates = removedDates.filter(d => 
+                        d.format("YYYY-MM-DD") != dayDate.format("YYYY-MM-DD")
+                    )
+                    $(this).removeClass("removed")
+                    $(this).removeClass("hover-remove")
+                    $(this).removeClass("today")
+                    $(this).addClass("selected")
+                    $(this).addClass("hover-select")
+                } else if (isDateInRange(dayDate, startRangeSelectedDate, endRangeSelectedDate)) {
+                    removedDates.push(dayDate)
+                    $(this).addClass("removed")
+                    $(this).removeClass("today")
+                    $(this).addClass("hover-remove")
+                    $(this).removeClass("selected")
+                    $(this).removeClass("hover-select")
+                }
+            }
+        })
+    }
+
+    function buildDay(date, classes="") {
+        let day = date.format("DD");
+        let month = date.format("MM");
+        let year = date.format("YYYY");
+        let dayContainer = createDiv(`day-${year}-${month}-${day}`, classes, day);
+        return dayContainer;
+    }
+
+    function getDayContainerClasses(date) {
+        let mode = getMode()
+        let classes = "week-day-item "
+        if (mode == 'select-start') {
+            classes += "hover-select "
+        } else if (mode == 'select-end') {
+            classes += "hover-select "
+        } else if (mode == 'removing') {
+            let isInRange = isDateInRange(date, startRangeSelectedDate, endRangeSelectedDate) 
+            if (isInRange && isDateRemoved(date)) {
+                classes += "removed "
+            } else if (isInRange) {
+                classes += "selected "
+                classes += ("hover-remove ")
+            }
+        }
+
+        if (date.isSame(moment(), "day") && !isDateRemoved(date) && !isDateInRange(date, startRangeSelectedDate, endRangeSelectedDate)) {
+            classes += "today "
+        }
+
+        return classes
+    }
+
+    function getDatesBeforeStartOfMonth(date) {
+        let dates = []
+        let firstDayOfMonth = date.startOf("month")
+        let firstDayOfWeek = firstDayOfMonth.clone().startOf("week")
+        while ( firstDayOfWeek < firstDayOfMonth ) {
+            dates.push(firstDayOfWeek.clone())
+            firstDayOfWeek = firstDayOfWeek.add(1, "day")
+        }
+        return dates
+    }
+
+    function getDatesAfterEndOfMonth(date) {
+        let dates = []
+        let lastDayOfMonth = date.endOf("month")
+        let lastDayOfWeek = lastDayOfMonth.clone().endOf("week")
+        while ( lastDayOfWeek > lastDayOfMonth ) {
+            dates.push(lastDayOfWeek.clone())
+            lastDayOfWeek = lastDayOfWeek.subtract(1, "day")
+        }
+        return dates
+    }
+
+    function buildDays(date) {
+        let initialDate = date.clone().startOf("month");
+        let endDate = date.clone().endOf("month");
+        let daysContainer = createDiv(`days-${date.month()}-${date.format("YYYY")}`, "days d-flex");
+        let datesBeforeStartOfMonth = getDatesBeforeStartOfMonth(date)
+        let datesAfterEndOfMonth = getDatesAfterEndOfMonth(date).reverse()
+
+        datesBeforeStartOfMonth.forEach(function (date) {
+            let dayContainer = buildDay(date, getDayContainerClasses(date))
+            bindDay(dayContainer)
+            daysContainer.append(dayContainer)
+        })
+
+        while (initialDate <= endDate) {
+            let classes = getDayContainerClasses(initialDate)
+            let dayContainer = buildDay(initialDate, classes);
+            bindDay(dayContainer)
+            daysContainer.append(dayContainer);
+            initialDate.add(1, "day");
+        }
+
+        datesAfterEndOfMonth.forEach(function (date) {
+            let dayContainer = buildDay(date, getDayContainerClasses(date))
+            bindDay(dayContainer)
+            daysContainer.append(dayContainer)
+        })
+        return daysContainer;
+    }
+
+    function slide(itemsIds, direction, quantity=1, changeStructure=false) {
+        if (changeStructure) {
+            let date = getDateFromPosition(direction)
+            addMonthContainer(date,direction)
+        }
+
+        itemsIds.forEach(itemId => {
+            let monthsContainer = $("#"+itemId)
+            let currentLeft = monthsContainer.scrollLeft()
+            let monthTotalWidth = calcWidth(monthsContainer.children().first().attr("id"), true, true )
+            let newLeft = (currentLeft + (monthTotalWidth * direction))*quantity
+            $("#"+itemId).animate({
+                scrollLeft: newLeft
+            }, 200);
+        });
+
+        setTimeout(function () {
+            if (changeStructure) {
+                deleteMonthContainer(direction)
+            }
+        }, 230)
+        
+
+        bindDaysMouseOver()
+    }
+
+    function addMonth(date) {
+        let monthContainer = buildMonth(date);
+        let daysContainer = buildDays(date);
+        let months = $("#months");
+        let days = $("#days");
+        
+        months.append(monthContainer);
+        days.append(daysContainer);
+    }
+
+    function deleteMonthContainer(position) {
+        let months = $("#months");
+        let days = $("#days");
+        if (position == -1) {
+            let monthToRemove = months.children().last()
+            let dayToRemove = days.children().last()
+            months.children().last().remove();
+            days.children().last().remove();
+        } else {
+            months.children().first().remove();
+            days.children().first().remove();
+        }
+    }
+
+    function addMonthContainer(date, position) {
+        let months = $("#months");
+        let days = $("#days");
+
+        let monthContainer = buildMonth(date);
+        let daysContainer = buildDays(date);
+
+        if (position == 1) {
+            months.append(monthContainer);
+            days.append(daysContainer);
+        } else {
+            let nextMonthContainer = months.children().first()
+            let nextDaysContainer = days.children().first()
+
+            months.prepend(monthContainer)
+            days.prepend(daysContainer)
+
+            months.animate({
+                scrollLeft: nextMonthContainer.offset().left
+            }, 0);
+            days.animate({
+                scrollLeft: nextDaysContainer.offset().left
+            }, 0);
+        }
+    }
+
+    function bindDaysMouseOver() {
+        $("div[id^='day-']").each(function () {
+            $(this).mouseover(function () {
+                let mode = getMode();
+                let dayDate = getDateFromId($(this).attr("id")); 
+                if(mode == 'select-end') {
+                    $("div[id^='day-']").each(function () {
+                        let date = getDateFromId($(this).attr("id"))
+                        $(this).removeClass("hover-remove")
+                        if (isDateInRange(date, startRangeSelectedDate, dayDate)) {
+                            $(this).addClass("selected")
+                        }
+                        else if (date.format("YYYY-MM-DD") != startRangeSelectedDate.format("YYYY-MM-DD")) {
+                            $(this).removeClass("selected")  
+                        } 
+                    })
+                } else if (mode == 'removing') {
+                    if (isDateRemoved(dayDate)) {
+                        $(this).addClass("hover-select")
+                        $(this).removeClass("hover-remove")
+                    }
+                }
+            })
+        })
+    }
+
+    function clearCalendar() {
+        startRangeSelectedDate = null
+        endRangeSelectedDate = null
+        removedDates = []
+        $("div[id^='day-']").each(function () {
+            $(this).removeClass("selected")
+            $(this).addClass("hover-select")
+            $(this).removeClass("hover-remove")
+            $(this).removeClass("removed")
+            if(getDateFromId($(this).attr("id")).format("YYYY-MM-DD") == moment().format("YYYY-MM-DD")) {
+                $(this).addClass("today")
+            }
+        })
+        bindDaysMouseOver()
+    }
+
+    function bindBackspacePressed() {
+        $(document).keydown(function (e) {
+            if (e.keyCode == 8) {
+                clearCalendar()
+            }
+        })
+    }
+
+    function finalizar() {
+        console.log("startRangeSelectedDate", startRangeSelectedDate)
+        console.log("endRangeSelectedDate", endRangeSelectedDate)
+        console.log("removedDates", removedDates)
+        var base_url = window.location.origin;
+        filter = getFiltros()
+        if (startRangeSelectedDate && endRangeSelectedDate) {
+            fetch(base_url+'/horasTrabalhadas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    data_inicio: startRangeSelectedDate.format("YYYY-MM-DD"),
+                    data_fim: endRangeSelectedDate.format("YYYY-MM-DD"),
+                    removed_dates: removedDates.map(date => date.format("YYYY-MM-DD")),
+                })
+            })
+            .then(resp => resp.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'horas_trabalhadas_I'+filter["data_inicio"]+"F"+filter["data_fim"]+'.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                $("#dismisModalCalendario").click()
+            })
+            .catch(() => alert('Erro ao baixar arquivo'));
+        } else {
+            console.log("preencha corretamente os camposa")
+        }
+    }
+
+    $(document).ready(function() {
+        moment.locale('pt'); 
+        moment.updateLocale('pt', {
+            months : [
+                "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho",
+                "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+            ]
+        });
+
+        addMonth(moment());
+        slide(["months", "days"], 1);
+        bindDaysMouseOver()
+        bindBackspacePressed()
+    })
+</script>
