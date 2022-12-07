@@ -1,0 +1,9 @@
+<label><b>Ação:</b></label>
+<select class="form-control" 
+id="acao_id" 
+name="acao_id">
+    <option value="">Selecione um acao</option>
+    {% for acao in acoes %}
+        <option value="{{acao.id}}">{{acao.nome}}</option>
+    {% endfor %}
+</select>

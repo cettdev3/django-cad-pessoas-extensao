@@ -1,0 +1,293 @@
+<div class="modal fade" id="cadastrarAcoesModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarAcoesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form id="cadastrarAcoesForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cadastrarAcoesModalLabel">
+                        {% if acao is None %}
+                            Cadastrar Ação
+                            <span id="acaoModelId" hidden></span>
+                        {% else %}
+                            Editar Cadastro de: {{acao.nome}}
+                            <span id="acaoModelId" hidden>{{acao.id}}</span>
+                        {% endif %}
+                    </h5>
+                    <button type="button" 
+                    id="dismissCadastrarAcoes" 
+                    class="close" 
+                    data-dismiss="modal" 
+                    aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs row">
+                        <li id="acaoTabs1" class="col py-2 active-form-tab">
+                            <a id="acoesTabLink1" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                        <li id="acaoTabs2" class="col py-2">
+                            <a id="acoesTabLink2" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#pessoas">2</a>
+                            <span>Pessoas</span>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="home" class="tab-pane py-3 active">
+                            {% include "acoes/acao_form.html" with acao=acao %}
+                        </div>
+                        <div id="pessoas" class="tab-pane py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h3">Adicionar pessoas</span>
+                                <button id="btn-add-pessoa-0"
+                                type="button"
+                                class="btn btn-primary"
+                                onclick="addPessoa()">
+                                    Adicionar Pessoa
+                                </button>
+                            </div>
+                            <hr>
+                    
+                            <div id="pessoas_tickets" class="w-100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="formAcoesPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                        <span id="prevAcoesLink" class=""></span>
+                        <span>Anterior</span>
+                    </button>
+                    <button id="formAcoesNext" type="button" class="btn btn-primary">
+                        <span id="nextAcoesLink" class="AcoesMenuLink2">
+                        </span>
+                        <span>Próximo</span>
+                    </button>
+                    <button
+                    {% if acao %}
+                        onclick="editarAcoes({{acao.id}})" 
+                    {% else %}
+                        onclick="cadastrarAcoes()" 
+                    {% endif %}
+                    id="finishCadastroAcoes" 
+                    type="button"
+                    class="btn btn-primary">
+                    {% if acao %}
+                        <span>Salvar Alterações</span>
+                    {% else %}
+                        <span>Cadastrar</span>
+                    {% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarAcoesForm"
+    var acaoModelId = "acaoModelId"
+    var tabsId = "acaoTabs"
+    var cadastrarAcaoModalId = "cadastrarAcoesModal"
+    var pessoasTicketsForm = "pessoaAcaoForm"
+    var dismissCadastrarAcoesId = "dismissCadastrarAcoes"
+
+    function addPessoa() {
+        var forms = $("#pessoas_tickets").children().length
+        addPessoaTicketForm(forms)
+        
+        if (forms >= 1) {
+            $("button[id^=btn-remove-pessoa-").each(function(index) {
+                $(this).show()
+            })
+        }
+    }
+
+    function setHideDelete() {
+        var forms = $("div[id^='pessoas_ticket_form_container']").length
+        console.log("setando hides", forms)
+        if (forms <= 1) {
+            console.log("setando hides if")
+            $("span[id^=btn-remove-pessoa-]").each(function(index) {
+                $(this).hide()
+            })
+        } else {
+            console.log("setando hides else")
+            $("span[id^=btn-remove-pessoa-]").each(function(index) {
+                $(this).show()
+            })
+        }
+    }
+
+    function removePessoa(id) {
+        var forms = $("#pessoas_tickets").children().length
+
+        $("#pessoas_ticket_form_container_" + id).remove()
+        setHideDelete()
+    }
+
+    function addPessoaTicketForm(id) {
+        $.ajax({
+            url: "/pessoaTicketForm",
+            type: "GET",
+            data: {id: id, hide_remove_button: id == 0},
+            success: function (data) {
+                $("#pessoas_tickets").append(data);
+                setHideDelete()
+            }
+        });
+    }
+
+    function clearModalForm(changedResource = null) {
+        if (changedResource) acaoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarAcoesId).click()
+    }
+
+    function cadastrarAcoes() {
+        $.ajax({
+            url: "/saveAcao",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarAcoes(id) {
+        $.ajax({
+            url: "/editarAcoes/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+        var pessoa_tickets = []
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        $("form[id^='pessoaTicketAcaoForm-']").each(function(index) {
+            var pessoa_ticket = {}
+            var pessoa_ticket_unindexed_array = $(this).serializeArray();
+            $.map(pessoa_ticket_unindexed_array, function (n, i) {
+                pessoa_ticket[n['name']] = n['value'];
+            });
+            console.log(pessoa_ticket)
+            pessoa_tickets.push(pessoa_ticket)
+        });
+        values["pessoa_tickets"] = pessoa_tickets
+
+        console.log(values)
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        let tabs = $("*[id^='"+tabsId+"']")
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#acoesTabLink"+nextTab).trigger("click")
+        $("#acaoTabs"+nextTab).addClass("active-form-tab")
+        $("#acaoTabs"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formAcoesNext"],
+                hide: ["formAcoesPrev", "finishCadastroAcoes"]
+            },
+            last: {
+                show: ["formAcoesPrev", "finishCadastroAcoes"],
+                hide: ["formAcoesNext"]
+            },
+            middle: {
+                show: ["formAcoesPrev", "formAcoesNext"],
+                hide: ["finishCadastroAcoes"]
+            },
+            only: {
+                show: ["finishCadastroAcoes"],
+                hide: ["formAcoesPrev", "formAcoesNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarAcoesModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+acaoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formAcoesNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formAcoesPrev").click(function () {
+            processTabBtnClick(-1)
+        })  
+        addPessoaTicketForm(0)
+        maskValues()
+    });
+</script>

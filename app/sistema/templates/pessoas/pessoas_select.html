@@ -1,0 +1,15 @@
+<label><b>Pessoa:</b></label>
+<select class="form-control" 
+id="pessoa_id" 
+name="pessoa_id">
+    <option value="">Selecione Pessoa</option>
+    {% for pessoa in pessoas %}
+        <option value="{{pessoa.id}}">{{pessoa.nome}}</option>
+    {% endfor %}
+</select>
+
+<script>
+    $(document).ready(function() {
+        
+    });
+</script>

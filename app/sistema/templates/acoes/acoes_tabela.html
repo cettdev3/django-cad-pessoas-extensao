@@ -1,0 +1,141 @@
+<style>
+    .acao-w-70 {
+        width: 70%;
+    }
+    .acao-w-25 {
+        width: 25%;
+    }
+</style>
+<table class="table table-borderless" 
+width="100%" 
+cellspacing="0">
+    <thead class="border">
+        <tr class="">
+            <th class="acao-w-25 text-left">Tipo</th>
+            <th class="acao-w-70 text-left">Descrição</th>
+            <th class="w-2 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for acao in acoes %}
+        <tr>
+            <td class="cursos-w-45 text-left">{{acao.tipo}}</td>
+            <td class="cursos-w-45 text-left">{{acao.descricao}}</td>
+            <td class="w-2 text-left" style="position: relative;">
+                <button id="buttonMenuAcoes{{acao.id}}" 
+                class="btn-circle">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>                        
+                </button>
+                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
+                id="hiddenMenuAcoes{{acao.id}}" 
+                class="btn-group-custom">
+                    <a id="linkVisualizarAcao{{acao.id}}" href="/visualizarAcao/({{acao.id}})"></a>
+                    <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
+                    <button onclick="carregarAcaoModalEditar({{acao.id}})">Editar</button> 
+                    <button onclick="deleteAcao({{acao.id}})" >Excluir</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    var buttonMenuAcoesId = "buttonMenuAcoes"
+    var hiddenMenuAcoesId = "hiddenMenuAcoes"
+    var cadastrarAcaoFormId = "cadastrarAcaoForm"
+    var dismissCadastrarAcaoId = "dismissCadastrarAcao"
+    var acaoModificadaEvent = {}
+    var acaoModificadaEventProxy = null
+    var modalCadastrarAcaoContainerId = "modalCadastrarAcaoContainer"
+    var idTabelaAcoes = "receberTabelaAcoes"
+    var rotaTabelaAcoes = "acoesTable"
+    var rotaDeletarAcao = "eliminarAcao"
+    var rotaVisualizarAcao = "visualizarAcao"
+
+    var rotaEditarAcao = "acaoModal"
+
+    function carregarAcaoModalEditar(id) {
+        let data = {id: id}
+        $.ajax({
+            url: "/"+rotaEditarAcao,
+            data: data,
+            success: function (data) {
+                $("#" + idModal).html(data);
+                $('#' + cadastrarAcaoModalId).modal('toggle');
+            }
+        });
+    }
+
+    function bindButtons() {
+        $("button[id^='"+buttonMenuAcoesId+"']").each(function (i, el) {
+            $(this).on("click", function () {
+                let id = $(this).attr('id').split("Acoes")[1];
+                let menuId = "#"+hiddenMenuAcoesId + id
+                $("div[id^='"+hiddenMenuAcoesId+"']").each(function (i, el) {
+                    
+                    if (menuId != "#" + $(this).attr("id")) {
+                        if ($(this).css('display') != 'none') {
+                            $(this).toggle()
+                        }
+                    }
+                })
+                let hiddenMenu = $(menuId).parent()
+                let isVisible = isvisibleOnViewport(hiddenMenu[0])
+                if (!isVisible) {
+                    $(menuId).css("bottom", "40px")
+                } 
+                $(menuId).toggle()
+            });
+        });
+    }
+
+    function isvisibleOnViewport(element) {
+        var rect = element.getBoundingClientRect();
+        var html = document.documentElement;
+        return (
+            (rect.top) >= 0 &&
+            rect.left >= 0 &&
+            (rect.bottom + 100) <= (window.innerHeight || html.clientHeight) &&
+            rect.right <= (window.innerWidth || html.clientWidth)
+        );
+    }
+
+    function deleteAcao(id) {
+        let deletar_url = rotaDeletarAcao+"/" + id
+
+        $.ajax({
+            url: "/"+deletar_url,
+            data: {},
+            success: function (data) {
+                let menuId = "#" + hiddenMenuAcoesId + id
+                $(menuId).toggle()
+                carregarAcoes()
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        acaoModificadaEventProxy = new Proxy(acaoModificadaEvent, {
+            set: function (target, key, value) {
+                target[key] = value;
+                if (value) {
+                    carregarAcoes()
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuAcoesId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        bindButtons()
+    })
+</script>

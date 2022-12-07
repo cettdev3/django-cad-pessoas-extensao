@@ -1,0 +1,137 @@
+<div class="w-100">
+    <form id="cadastraracaoForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>Tipo:</b></label>
+                <select required 
+                id="tipo"
+                onchange="changeTipoAcao()"
+                class="form-control" 
+                name="tipo">
+                    <option
+                    value="">
+                        Selecione uma opção
+                    </option>
+                    <option
+                    {% if acao and acao.tipo == "emprestimo" %} selected {% endif %}
+                    value="emprestimo">
+                        EMPRÉSTIMO
+                    </option>
+                    <option 
+                    {% if acao and acao.tipo == "curso_gps" %} selected {% endif %} 
+                    value="curso_gps">
+                        CURSO GPS
+                    </option>
+                    <option 
+                    {% if acao and acao.tipo == "feirao" %} selected {% endif %} 
+                    value="feirao">
+                        FEIRÃO
+                    </option>
+                    <option 
+                    {% if acao and acao.tipo == "outro" %} selected {% endif %}
+                    value="outro">
+                        OUTRO
+                    </option>
+                </select>
+            </div>
+            <div class="col-sm-8">
+                <label><b>Descrição:</b></label>
+                <input 
+                type="text" 
+                name="descricao" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.descricao}}"
+                {% endif %}>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <label><b>Data Início:</b></label>
+                <input 
+                type="date" 
+                name="data_inicio" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.data_inicio}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-3">
+                <label><b>Data Fim:</b></label>
+                <input 
+                type="date" 
+                name="data_fim" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.data_fim}}"
+                {% endif %}>
+            </div>
+            <div id="select_cidade" class="col-sm-3">
+            </div>
+            <div class="col-sm-3">
+                <label><b>CEP:</b></label>
+                <input 
+                type="text" 
+                name="cep" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.cep}}"
+                {% endif %}>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>Bairro:</b></label>
+                <input 
+                type="text" 
+                name="bairro" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.bairro}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-4">
+                <label><b>Logradouro:</b></label>
+                <input 
+                type="text" 
+                name="logradouro" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.logradouro}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-4">
+                <label><b>Complemento:</b></label>
+                <input 
+                type="text" 
+                name="complemento" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.complemento}}"
+                {% endif %}>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var cidade_id = "{% if acao %}{{ acao.cidade_id }}{% else %}''{% endif %}";
+
+    function changeTipoacao() {
+        console.log($("#tipo").val())
+    }
+
+    function carregarSelectCidades(cidade_id) {
+        $.ajax({
+            url: "/cidadesSelect",
+            method: "GET",
+            data: {selected: cidade_id},
+            success: function (data) {
+                $("#select_cidade").html(data)
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        carregarSelectCidades(cidade_id)
+    })
+</script>

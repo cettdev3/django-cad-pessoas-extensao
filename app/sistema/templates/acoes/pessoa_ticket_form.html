@@ -1,0 +1,158 @@
+<style>
+    .btn-icon-acao {
+        font-size: 0.8em;
+        transition: font-size 0.2s;
+        border-radius: 50%;
+    }
+
+    .btn-icon-acao:hover {
+        font-size: 0.95rem;
+        transition: font-size 0.2s;
+    }
+</style>
+<div id="pessoas_ticket_form_container_{{id_to_remove}}" class=" border pt-2 mt-3">
+    <form id="pessoaTicketAcaoForm-{{id_to_remove}}" class="container position-relative">
+        <div class="w-100 position-absolute"
+        style="top: -20px; right: 10px">
+            <div>
+                <div class="position-relative d-flex justify-content-end ">
+                    <span style="color: rgb(21, 125, 151);"
+                    class="btn-icon-acao"
+                    data-toggle="collapse"
+                    href="#collapse_endereco_{{id_to_remove}}" 
+                    role="button" 
+                    aria-expanded="false" 
+                    aria-controls="collapse_endereco_{{id_to_remove}}">
+                        <span class="fa-stack" data-toggle="tooltip" data-placement="top" title="Editar Endereço">
+                            <i class="fas fa-circle-thin fa-stack-2x shadow"></i>
+                            <i class="fa-regular fa-location-dot fa-stack-1x fa-inverse "></i>
+                        </span>
+                    </span>
+                    <span
+                    class="btn-icon-acao"
+                    role="button"
+                    id="btn-remove-pessoa-{{id_to_remove}}"
+                    onclick="removePessoa('{{id_to_remove}}')"
+                    {% if hide_remove_button == 'hide' %} style="display: none; color: Tomato;" {% else %} style="color: Tomato;" {% endif %}>
+                        <span class="fa-stack" data-toggle="tooltip" data-placement="top" title="Remover Pessoa">
+                            <i class="fas fa-circle-thin fa-stack-2x"></i>
+                            <i class="fa-solid fa-stack-1x fa-inverse fa-trash shadow"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
+                {% include "pessoas/pessoas_select.html" with pessoas=pessoas %}
+            </div>
+            <div class="col-sm-4">
+                <label><b>Tipo da solicitação:</b></label>
+                <select required 
+                id="tipo_solicitacao"
+                class="form-control" 
+                name="tipo">
+                    <option
+                    value="">
+                        Selecione uma opção
+                    </option>
+                    <option
+                    value="diaria">
+                        DIÁRIA
+                    </option>
+                    <option
+                    value="adiantamento">
+                        ADIANTAMENTO
+                    </option>
+                    <option
+                    value="veiculo">
+                        VEÍCULO
+                    </option>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <label><b>Data Início:</b></label>
+                <input 
+                type="date" 
+                name="descricao" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.data_inicio}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-2">
+                <label><b>Data Início:</b></label>
+                <input 
+                type="date" 
+                name="descricao" 
+                class="form-control" 
+                {% if acao %}
+                value="{{acao.data_inicio}}"
+                {% endif %}>
+            </div>
+        </div>
+        <div class="form-group column">
+            <div class="collapse w-100" id="collapse_endereco_{{id_to_remove}}">
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id %}
+                    </div>
+                    <div class="col-sm-6">
+                        <label><b>Complemento:</b></label>
+                        <input 
+                        type="text" 
+                        name="complemento" 
+                        class="form-control" 
+                        {% if acao %}
+                        value="{{acao.complemento}}"
+                        {% endif %}>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label><b>CEP:</b></label>
+                        <input 
+                        type="text" 
+                        name="cep" 
+                        class="form-control" 
+                        {% if acao %}
+                        value="{{acao.cep}}"
+                        {% endif %}>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><b>Bairro:</b></label>
+                        <input 
+                        type="text" 
+                        name="bairro" 
+                        class="form-control" 
+                        {% if acao %}
+                        value="{{acao.bairro}}"
+                        {% endif %}>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><b>Logradouro:</b></label>
+                        <input 
+                        type="text" 
+                        name="logradouro" 
+                        class="form-control" 
+                        {% if acao %}
+                        value="{{acao.logradouro}}"
+                        {% endif %}>
+                    </div>
+                </div>
+            </div>
+        </div>            
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "/cidadesSelect",
+            method: "GET",
+            data: {selected: cidade_id},
+            success: function (data) {
+                $("#select_cidade_form_ticket_pessoa").html(data)
+            }
+        });
+    });
+</script>

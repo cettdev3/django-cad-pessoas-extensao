@@ -92,6 +92,11 @@ def cursosSelect(request):
     return render(request,'pessoas/cursos_select.html',{'cursos':cursos})
 
 @login_required(login_url='/auth-user/login-user')
+def pessoasSelect(request):
+    pessoas = Pessoas.objects.all()
+    return render(request,'pessoas/pessoas_select.html',{'pessoas':pessoas})
+
+@login_required(login_url='/auth-user/login-user')
 def eliminarPessoa(request,codigo):
     user = Pessoas.objects.get(id=codigo)
     user.delete()
