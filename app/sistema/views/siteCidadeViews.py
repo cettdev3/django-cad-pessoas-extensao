@@ -73,8 +73,9 @@ def editarCidade(request, codigo):
 @login_required(login_url='/auth-user/login-user')
 def cidadesSelect(request):
     data = {}
+    print("id da cidade", request.GET)
     if request.GET.get('cidade_id'):
-        data['cidade_id'] = request.GET.get('cidade_id')
-
+        data['cidade_id'] = int(request.GET.get('cidade_id'))
     data["cidades"] = Cidade.objects.all()
+    print('cidadesSelect',data)
     return render(request,'cidades/cidades_select.html', data)

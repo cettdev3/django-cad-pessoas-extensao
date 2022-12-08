@@ -1,6 +1,7 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from ..models.acao import Acao
+from ..models.cidade import Cidade
 
 class AcaoSerializer(serializers.ModelSerializer):
     class Meta:

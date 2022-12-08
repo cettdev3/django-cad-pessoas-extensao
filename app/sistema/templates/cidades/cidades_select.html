@@ -1,6 +1,12 @@
 <label><b>Cidade:</b></label>
-<select class="form-control" 
+<select class="form-control"
+{% if id and id_complement %} 
+id="{{id}}_{{id_complement}}_cidade_id" 
+{% elif id %}
+id="{{id}}_cidade_id" 
+{% else %}
 id="cidade_id" 
+{% endif %}
 name="cidade_id">
     <option value="">Selecione uma Cidade</option>
     {% for cidade in cidades %}

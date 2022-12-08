@@ -37,7 +37,7 @@ from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, endere
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
-from sistema.views.siteAcaoViews import gerencia_acoes, pessoaTicketForm, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect
+from sistema.views.siteAcaoViews import gerencia_acoes, membroExecucaoForm, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect
 from sistema.views.siteComponentsView import calendario
 
 urlpatterns = [
@@ -132,7 +132,7 @@ urlpatterns = [
     
     # ROTAS PARA ACOES
     path("gerencia_acoes",gerencia_acoes),
-    path("pessoaTicketForm",pessoaTicketForm),
+    path("membroExecucaoForm",membroExecucaoForm),
     path("acaoTable",acaoTable),
     path("acaoModal",acaoModal),
     path("acoesSelect",acoesSelect),

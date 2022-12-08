@@ -37,7 +37,7 @@
                             style="display: none;"
                             role="tab"
                             href="#pessoas">2</a>
-                            <span>Pessoas</span>
+                            <span>Equipe de Execução</span>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -46,18 +46,35 @@
                         </div>
                         <div id="pessoas" class="tab-pane py-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="h3">Adicionar pessoas</span>
-                                <button id="btn-add-pessoa-0"
-                                type="button"
-                                class="btn btn-primary"
-                                onclick="addPessoa()">
-                                    Adicionar Pessoa
-                                </button>
+                                <span class="h3">Adicionar Equipe de Execução</span>
+                                <div class="d-flex justify-content-end">
+                                    <div class="form-group d-flex justify-content-start align-items-start">
+                                        <input name="use_acao_endereco"  
+                                        id="use_acao_endereco" 
+                                        style="width: 10%; cursor: pointer" 
+                                        type="checkbox">
+                                        <label for="use_acao_endereco" 
+                                        style="line-height: 1rem;white-space: nowrap;">
+                                            <b>Usar endereço da ação</b>
+                                        </label>
+                                    </div>
+                                    <button id="btn-add-pessoa-0"
+                                    type="button"
+                                    class="btn btn-primary d-inline-flex ml-2" style="height: 50%" 
+                                    onclick="addPessoa()">
+                                    Adicionar Membro
+                                    </button>
+                                </div>
                             </div>
                             <hr>
-                    
+                            {% if acao %}
+                            modo edicao
                             <div id="pessoas_tickets" class="w-100">
                             </div>
+                            {% else %}
+                            <div id="pessoas_tickets" class="w-100">
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -100,9 +117,21 @@
     var pessoasTicketsForm = "pessoaAcaoForm"
     var dismissCadastrarAcoesId = "dismissCadastrarAcoes"
 
+    function setMembroExecucaoAddressForm(addressValues, formId = null) {
+        let addressFormId = formId ? formId : "collapse_endereco_input_"
+        console.log("formId: ", addressFormId)
+        $("*[id^='"+addressFormId+"'").each(function(index) {
+            for (key in addressValues) {
+                if ($(this).attr("id").includes(key)) {
+                    $(this).val(addressValues[key])
+                }
+            }
+        })
+    }
+
     function addPessoa() {
         var forms = $("#pessoas_tickets").children().length
-        addPessoaTicketForm(forms)
+        addMembroExecucaoForm(forms)
         
         if (forms >= 1) {
             $("button[id^=btn-remove-pessoa-").each(function(index) {
@@ -113,14 +142,11 @@
 
     function setHideDelete() {
         var forms = $("div[id^='pessoas_ticket_form_container']").length
-        console.log("setando hides", forms)
         if (forms <= 1) {
-            console.log("setando hides if")
             $("span[id^=btn-remove-pessoa-]").each(function(index) {
                 $(this).hide()
             })
         } else {
-            console.log("setando hides else")
             $("span[id^=btn-remove-pessoa-]").each(function(index) {
                 $(this).show()
             })
@@ -134,13 +160,18 @@
         setHideDelete()
     }
 
-    function addPessoaTicketForm(id) {
+    function addMembroExecucaoForm(id) {
         $.ajax({
-            url: "/pessoaTicketForm",
+            url: "/membroExecucaoForm",
             type: "GET",
             data: {id: id, hide_remove_button: id == 0},
             success: function (data) {
                 $("#pessoas_tickets").append(data);
+                let formId = "collapse_endereco_input_" + id
+                if ($("#use_acao_endereco").is(":checked")) {
+                    setMembroExecucaoAddressForm(getFormData(), formId)
+                } 
+
                 setHideDelete()
             }
         });
@@ -167,7 +198,7 @@
     
     function editarAcoes(id) {
         $.ajax({
-            url: "/editarAcoes/"+id,
+            url: "/editarAcao/"+id,
             data: JSON.stringify({"data":getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
@@ -194,12 +225,10 @@
             $.map(pessoa_ticket_unindexed_array, function (n, i) {
                 pessoa_ticket[n['name']] = n['value'];
             });
-            console.log(pessoa_ticket)
             pessoa_tickets.push(pessoa_ticket)
         });
         values["pessoa_tickets"] = pessoa_tickets
 
-        console.log(values)
         return values
     }
 
@@ -287,7 +316,12 @@
         $("#formAcoesPrev").click(function () {
             processTabBtnClick(-1)
         })  
-        addPessoaTicketForm(0)
+
+        $("#use_acao_endereco").change(function () {
+            console.log(getFormData())
+            if (this.checked) setMembroExecucaoAddressForm(getFormData())
+        })
+        addMembroExecucaoForm(0)
         maskValues()
     });
 </script>

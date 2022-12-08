@@ -25,7 +25,7 @@
                     aria-controls="collapse_endereco_{{id_to_remove}}">
                         <span class="fa-stack" data-toggle="tooltip" data-placement="top" title="Editar Endereço">
                             <i class="fas fa-circle-thin fa-stack-2x shadow"></i>
-                            <i class="fa-regular fa-location-dot fa-stack-1x fa-inverse "></i>
+                            <i class="fa-solid fa-pen fa-stack-1x fa-inverse"></i>
                         </span>
                     </span>
                     <span
@@ -91,16 +91,18 @@
                 {% endif %}>
             </div>
         </div>
+
         <div class="form-group column">
             <div class="collapse w-100" id="collapse_endereco_{{id_to_remove}}">
                 <div class="form-group row">
                     <div class="col-sm-6">
-                        {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id %}
+                        {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id id=prefix_id id_complement=id_to_remove%}
                     </div>
                     <div class="col-sm-6">
                         <label><b>Complemento:</b></label>
                         <input 
                         type="text" 
+                        id="collapse_endereco_input_{{id_to_remove}}_complemento"
                         name="complemento" 
                         class="form-control" 
                         {% if acao %}
@@ -113,6 +115,7 @@
                         <label><b>CEP:</b></label>
                         <input 
                         type="text" 
+                        id="collapse_endereco_input_{{id_to_remove}}_cep"
                         name="cep" 
                         class="form-control" 
                         {% if acao %}
@@ -125,6 +128,7 @@
                         type="text" 
                         name="bairro" 
                         class="form-control" 
+                        id="collapse_endereco_input_{{id_to_remove}}_bairro"
                         {% if acao %}
                         value="{{acao.bairro}}"
                         {% endif %}>
@@ -135,6 +139,7 @@
                         type="text" 
                         name="logradouro" 
                         class="form-control" 
+                        id="collapse_endereco_input_{{id_to_remove}}_logradouro"
                         {% if acao %}
                         value="{{acao.logradouro}}"
                         {% endif %}>
@@ -145,14 +150,5 @@
     </form>
 </div>
 <script>
-    $(document).ready(function () {
-        $.ajax({
-            url: "/cidadesSelect",
-            method: "GET",
-            data: {selected: cidade_id},
-            success: function (data) {
-                $("#select_cidade_form_ticket_pessoa").html(data)
-            }
-        });
-    });
+    
 </script>

@@ -5,7 +5,6 @@
                 <label><b>Tipo:</b></label>
                 <select required 
                 id="tipo"
-                onchange="changeTipoAcao()"
                 class="form-control" 
                 name="tipo">
                     <option
@@ -114,19 +113,19 @@
     </form>
 </div>
 <script>
-    var cidade_id = "{% if acao %}{{ acao.cidade_id }}{% else %}''{% endif %}";
-
-    function changeTipoacao() {
-        console.log($("#tipo").val())
-    }
+    var cidade_id = "{% if acao %}{{acao.cidade.id}}{% else %}{% endif %}";
 
     function carregarSelectCidades(cidade_id) {
         $.ajax({
             url: "/cidadesSelect",
             method: "GET",
-            data: {selected: cidade_id},
+            data: {cidade_id: cidade_id},
             success: function (data) {
                 $("#select_cidade").html(data)
+                $("#select_cidade").children("select").on("change", function () {
+                    console.log("cidade modificada: ",$(this).val())
+                    $("collapse_endereco_")
+                });
             }
         });
     }
