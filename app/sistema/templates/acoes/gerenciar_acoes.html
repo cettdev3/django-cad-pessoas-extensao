@@ -200,23 +200,16 @@ z-index: 4
                 filtros[$(this).attr("name")] = $(this).val()
             }
         })
+        console.log(filtros)
         carregarAcoes(filtros)
     }
 
     function startFilterControl() {
         $("input[id^='"+filterPrefix+"']").each(function () {
-            let input = $(this)
-            if ($(this).attr("id").includes("Nome")) {
-                $(this)
-                .keyup(debounce(function() {
-                    filtrarAcao()
-                }, 500))
-            } else {
-                $(this)
-                .change(debounce(function() {
-                    filtrarAcao()
-                }, 500))
-            }
+            $(this)
+            .keyup(debounce(function() {
+                filtrarAcao()
+            }, 500))
         })
     }
 

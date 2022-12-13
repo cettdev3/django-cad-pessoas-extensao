@@ -36,7 +36,7 @@ class PessoaApiView(APIView):
         if user_camunda:
             pessoas = pessoas.filter(user_camunda=user_camunda)
         if nome:
-            pessoas = pessoas.filter(nome__contains = nome)
+            pessoas = pessoas.filter(nome__icontains = nome)
         if data_fim and data_inicio:
             pessoas = pessoas.annotate(count_alocacao=Count('alocacao', 
                 filter=Q(

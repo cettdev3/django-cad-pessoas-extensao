@@ -22,10 +22,11 @@ def gerencia_acoes(request):
 
 @login_required(login_url='/auth-user/login-user')
 def acaoTable(request):
-    nome = request.GET.get('nome')
+    tipo = request.GET.get('tipo')
+    print(request.GET)
     acoes = Acao.objects
-    if nome:
-        acoes = acoes.filter(nome__contains = nome)
+    if tipo:
+        acoes = acoes.filter(tipo__icontains = tipo)
     acoes = acoes.all()
     return render(request,'acoes/acoes_tabela.html',{'acoes':acoes})
 
