@@ -1,5 +1,6 @@
 from django.db import models
 from ..models.cidade import Cidade
+from ..models.pessoa import Pessoas
 
 class Acao(models.Model):
     id = models.AutoField(primary_key=True)
@@ -15,6 +16,19 @@ class Acao(models.Model):
     cep = models.CharField(null = True, max_length=100, blank= True)
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
-
+    membrosExecucao = models.ManyToManyField(Pessoas, through='MembroExecucao', blank=True)
     class Meta:
         db_table = 'acoes'
+
+    @property
+    def endereco_completo(self):
+        enderecoCompleto = "" 
+        if self.logradouro:
+            enderecoCompleto += self.logradouro
+        if self.bairro:
+            enderecoCompleto += ", "+self.bairro
+        if self.complemento:
+            enderecoCompleto += ", "+self.complemento
+        if self.cep:
+            enderecoCompleto += ". "+self.cep+"."
+        return enderecoCompleto

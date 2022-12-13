@@ -55,6 +55,7 @@ def saveAcao(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
+    print("body dentro da rota do site: ", body)
     response = requests.post('http://localhost:8000/acoes', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
@@ -72,13 +73,12 @@ def acoesSelect(request):
     return render(request,'acoes/acoes_select.html',{'acoes':acoes})
 
 @login_required(login_url='/auth-user/login-user')
-def membroExecucaoForm(request):
-    data = {}
-    data['id_to_remove'] = int(request.GET.get('id')) 
-    data['id_to_add'] = int(request.GET.get('id')) + 1
-    data["prefix_id"] = 'collapse_endereco_input' if data['id_to_remove'] > 0 else 'collapse_endereco_input_0'
-    data['hide_remove_button'] = "hide" if data["id_to_remove"] == 0 else "" 
-    data['pessoas'] = Pessoas.objects.all()
-    data['cidades'] = Cidade.objects.all()
-    print(data)
-    return render(request,'acoes/membro_execucao_form.html',data)
+def visualizarAcao(request,codigo):
+    acao = Acao.objects.get(id=codigo)
+    page_title = acao.descricao
+    path_back = "gerencia_acoes"
+    return render(request,'acoes/visualizar_acao.html',{
+        'acao':acao, 
+        'page_title': page_title,
+        'path_back': path_back
+    })

@@ -30,7 +30,7 @@ cellspacing="0">
                 id="hiddenMenuAcoes{{acao.id}}" 
                 class="btn-group-custom">
                     <a id="linkVisualizarAcao{{acao.id}}" href="/visualizarAcao/({{acao.id}})"></a>
-                    <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
+                    <button onclick="visualizarAcao({{acao.id}})">Visualizar</button> 
                     <button onclick="carregarAcaoModalEditar({{acao.id}})">Editar</button> 
                     <button onclick="deleteAcao({{acao.id}})" >Excluir</button>
                 </div>
@@ -52,7 +52,11 @@ cellspacing="0">
     var rotaDeletarAcao = "eliminarAcao"
     var rotaVisualizarAcao = "visualizarAcao"
 
-    var rotaEditarAcao = "acaoModal"
+    var rotaEditarAcao = "acaoModal"    
+    
+    function visualizarAcao(id) {
+        location.href = "visualizarAcao/" + id
+    }
 
     function carregarAcaoModalEditar(id) {
         let data = {id: id}

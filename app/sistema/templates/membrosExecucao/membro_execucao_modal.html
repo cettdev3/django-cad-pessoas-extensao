@@ -1,0 +1,232 @@
+<div class="modal fade" id="cadastrarMembroExecucaoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarMembroExecucaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form id="cadastrarMembroExecucaoForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cadastrarMembroExecucaoModalLabel">
+                        {% if is_edit %}
+                        Editar Cadastro de: {{membro_execucao.pessoa.nome}} 
+                        <span id="membroExecucaoModelId" hidden>{{membro_execucao.id}}</span>
+                        {% else %}
+                        Cadastrar Membro da Equipe de Execução
+                        <span id="membroExecucaoModelId" hidden></span>
+                        {% endif %}
+                    </h5>
+                    <button type="button" 
+                    id="dismissCadastrarMembrosExecucao" 
+                    class="close" 
+                    data-dismiss="modal" 
+                    aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs row">
+                        <li id="membroExecucaoTabs1" class="col py-2 active-form-tab">
+                            <a id="membrosExecucaoTabLink1" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="home" class="tab-pane py-3 active">
+                            {% include "membrosExecucao/membro_execucao_form.html" with membroExecucao=membro_execucao state='control_one' acao=acao %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="formMembrosExecucaoPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                        <span id="prevMembrosExecucaoLink" class=""></span>
+                        <span>Anterior</span>
+                    </button>
+                    <button id="formMembrosExecucaoNext" type="button" class="btn btn-primary">
+                        <span id="nextMembrosExecucaoLink" class="MembrosExecucaoMenuLink2">
+                        </span>
+                        <span>Próximo</span>
+                    </button>
+                    <button
+                    {% if is_edit %}
+                        onclick="editarMembrosExecucao('{{membro_execucao.id}}')" 
+                    {% else %}
+                        onclick="cadastrarMembroExecucao()" 
+                    {% endif %}
+                    id="finishCadastroMembrosExecucao" 
+                    type="button"
+                    class="btn btn-primary">
+                    {% if is_edit %}
+                        <span>Salvar Alterações</span>
+                    {% else %}
+                        <span>Cadastrar</span>
+                    {% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var formId = "cadastrarMembroExecucaoForm"
+    var membroExecucaoModelId = "membroExecucaoModelId"
+    var tabsId = "membroExecucaoTabs"
+    var pessoasTicketsForm = "pessoaMembroExecucaoForm"
+    var dismissCadastrarMembrosExecucaoId = "dismissCadastrarMembrosExecucao"
+
+    function setMembroExecucaoAddressForm(addressValues, formId = null) {
+        let addressFormId = formId ? formId : "collapse_endereco_input_"
+        console.log("formId: ", addressFormId)
+        $("*[id^='"+addressFormId+"'").each(function(index) {
+            for (key in addressValues) {
+                if ($(this).attr("id").includes(key)) {
+                    $(this).val(addressValues[key])
+                }
+            }
+        })
+    }
+
+    function clearModalForm(changedResource = null) {
+        if (changedResource) membroExecucaoModificadaEventProxy.modificado = changedResource
+        console.log($("#"+dismissCadastrarMembrosExecucaoId))
+        // $("#"+dismissCadastrarMembrosExecucaoId).click()
+    }
+
+    function cadastrarMembroExecucao() {
+        $.ajax({
+            url: "/saveMembroExecucao",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarMembrosExecucao(id) {
+        $.ajax({
+            url: "/editarMembroExecucao/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                console.log(data)
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+        var pessoa_tickets = []
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        let tabs = $("*[id^='"+tabsId+"']")
+        tabs = $("*[id^='"+tabsId+"']")
+        let length = tabs.length
+        console.log("tabs",tabs)
+        return length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#membrosExecucaoTabLink"+nextTab).trigger("click")
+        $("#membroExecucaoTabs"+nextTab).addClass("active-form-tab")
+        $("#membroExecucaoTabs"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formMembrosExecucaoNext"],
+                hide: ["formMembrosExecucaoPrev", "finishCadastroMembrosExecucao"]
+            },
+            last: {
+                show: ["formMembrosExecucaoPrev", "finishCadastroMembrosExecucao"],
+                hide: ["formMembrosExecucaoNext"]
+            },
+            middle: {
+                show: ["formMembrosExecucaoPrev", "formMembrosExecucaoNext"],
+                hide: ["finishCadastroMembrosExecucao"]
+            },
+            only: {
+                show: ["finishCadastroMembrosExecucao"],
+                hide: ["formMembrosExecucaoPrev", "formMembrosExecucaoNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        console.log(activTabFn, tabsQuantity)
+        if (activTabFn == 1 && tabsQuantity > 1) {
+            showHideTabs(tabsControl.first)
+        } else if (tabsQuantity == 1) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity && tabsQuantity > 1) {
+            showHideTabs(tabsControl.last)
+        } else if (tabsQuantity > 1) {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarMembroExecucaoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+membroExecucaoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formMembrosExecucaoNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formMembrosExecucaoPrev").click(function () {
+            processTabBtnClick(-1)
+        })  
+
+        $("#use_membroExecucao_endereco").change(function () {
+            console.log(getFormData())
+            if (this.checked) setMembroExecucaoAddressForm(getFormData())
+        })
+        maskValues()
+    });
+</script>

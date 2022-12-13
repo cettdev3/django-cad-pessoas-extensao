@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .cs-tab-link{
+        color: gray;
+        padding: 8px;
+    }
+    
+    .cs-tab-link .active {
+        background-color: #0c504b;
+        border-radius: 5px 5px 0px 0px;
+        padding: 8px 12px;
+        color: white;
+    }
+    
+    .cs-tab-link a{
+        text-decoration: none;
+        color: gray;
+    }
+
+    .cs-tab-link a:hover{
+        text-decoration: none;
+    }
+</style>
+<div class="card shadow mb-4 w-100">
+    <div class="d-flex justify-content-between pt-3 px-2">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-location-dot "></i>
+                <span class="ml-2"><strong>{{acao.cidade.nome}},  </strong>{{acao.endereco_completo}}</span>
+            </div>
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-calendar-days"></i>
+                 <span class="ml-2">de {{acao.data_inicio|date:"d-m-Y"}}  até </span>
+                <span class="ml-2">{{acao.data_fim|date:"d-m-Y"}}</span>
+            </div>
+        </div>
+        <div class="d-flex align-items-center ">            
+            <button onclick="addMembroExecucaoModal()" 
+            class="btn btn-success">Adicionar</button>
+        </div>
+    </div>
+    <div class="card-body w-100">
+        <ul class="nav nav-tabs w-100">
+            <li class=" cs-tab-link active">
+                <a id="linkDadosGerais" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
+            </li>
+        </ul>
+        <div class="tab-content w-100">
+            <div id="membrosExecucao" class="tab-pane active in">
+                <div id="receberTabelaMembrosExecucao"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalMembroExecucaoContainer"></div>
+
+<script>
+    let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
+    let buttonMenuMembrosExecucaoId = "buttonMenuMembrosExecucao"
+    let hiddenMenuMembrosExecucaoId = "hiddenMenuMembrosExecucao"
+    let cadastrarMembroExecucaoModalId = "cadastrarMembroExecucaoModal"
+    let cadastrarMembroExecucaoFormId = "cadastrarMembroExecucaoForm"
+    let dismissCadastrarMembroExecucaoId = "dismissCadastrarMembroExecucao"
+    let rotaDeletarMembroExecucao = "eliminarMembroExecucao"
+    let rotaModalMembroExecucao = "membroExcucaoModalCadastrar"
+    let rotaVisualizarMembroExecucao = "visualizarMembroExecucao"
+</script>
+<script>
+    let membroExecucaoModificadaEvent = {};
+    let membroExecucaoModificadaEventProxy = null
+    let idTabelaMembrosExecucao = "receberTabelaMembrosExecucao"
+    let rotaTabelaMembrosExecucao = "membrosExecucaoTable"
+    let acaoId = "{{acao.id}}" 
+
+    function addMembroExecucaoModal() {
+        $.ajax({
+            url: "/membroExecucaoModal",
+            method: "GET",
+            data: {
+                acao_id: acaoId
+            },
+            success: function (data) {
+                $("#modalMembroExecucaoContainer").html('');
+                $("#modalMembroExecucaoContainer").html(data);
+                $('#cadastrarMembroExecucaoModal').modal('show');
+            }
+        });
+    }
+
+    function deleteMembroExecucao(id) {
+        deletar_url = "/eliminarMembroExecucao/" + id
+
+        $.ajax({
+            url: deletar_url,
+            method: "DELETE",
+            data: {},
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            success: function (data) {
+                let menuId = "#"+hiddenMenuMembrosExecucaoId+ id
+                $(menuId).toggle()
+                carregarMembrosExecucao()
+            }
+        });
+    }
+
+    function carregarMembrosExecucao() {
+    let recarregarTabela = rotaTabelaMembrosExecucao
+        $.ajax({
+            url: "/"+recarregarTabela,
+            contentType: 'application/json',
+            data: {acao_id: acaoId},
+            success: function (data) {
+                $("#" + idTabelaMembrosExecucao).html(data);
+            }
+        });
+    }
+    
+    $(document).ready(function() {
+        membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
+            set: function (target, key, value) {
+                target[key] = value;
+                if (value) {
+                    carregarMembrosExecucao()
+                    $('#cadastrarMembroExecucaoModal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        $("#linkDadosGerais").trigger("click")
+        carregarMembrosExecucao()
+    })
+</script>
+
+{% endblock content %}

@@ -12,6 +12,7 @@
 </style>
 <div id="pessoas_ticket_form_container_{{id_to_remove}}" class=" border pt-2 mt-3">
     <form id="pessoaTicketAcaoForm-{{id_to_remove}}" class="container position-relative">
+        {% if state != 'control_one' %}
         <div class="w-100 position-absolute"
         style="top: -20px; right: 10px">
             <div>
@@ -42,9 +43,11 @@
                 </div>
             </div>
         </div>
+        {% endif %}
+
         <div class="form-group row">
             <div class="col-sm-4">
-                {% include "pessoas/pessoas_select.html" with pessoas=pessoas %}
+                {% include "pessoas/pessoas_select.html" with pessoas=pessoas pessoa_id=pessoa_id %}
             </div>
             <div class="col-sm-4">
                 <label><b>Tipo da solicitação:</b></label>
@@ -57,14 +60,23 @@
                         Selecione uma opção
                     </option>
                     <option
+                    {% if membro_execucao and membro_execucao.tipo == 'diaria' %}
+                    selected
+                    {% endif %}
                     value="diaria">
                         DIÁRIA
                     </option>
                     <option
+                    {% if membro_execucao and membro_execucao.tipo == 'adiantamento' %}
+                    selected
+                    {% endif %}
                     value="adiantamento">
                         ADIANTAMENTO
                     </option>
                     <option
+                    {% if membro_execucao and membro_execucao.tipo == 'veiculo' %}
+                    selected
+                    {% endif %}
                     value="veiculo">
                         VEÍCULO
                     </option>
@@ -74,26 +86,30 @@
                 <label><b>Data Início:</b></label>
                 <input 
                 type="date" 
-                name="descricao" 
+                name="data_inicio" 
                 class="form-control" 
-                {% if acao %}
-                value="{{acao.data_inicio}}"
+                {% if membro_execucao %}
+                value="{{membro_execucao.data_inicio}}"
                 {% endif %}>
             </div>
             <div class="col-sm-2">
-                <label><b>Data Início:</b></label>
+                <label><b>Data Fim:</b></label>
                 <input 
                 type="date" 
-                name="descricao" 
+                name="data_fim" 
                 class="form-control" 
-                {% if acao %}
-                value="{{acao.data_inicio}}"
+                {% if membro_execucao %}
+                value="{{membro_execucao.data_fim}}"
                 {% endif %}>
             </div>
         </div>
 
         <div class="form-group column">
+            {% if state != 'control_one' %}
             <div class="collapse w-100" id="collapse_endereco_{{id_to_remove}}">
+            {% else %}
+            <div class="w-100">
+            {% endif %}
                 <div class="form-group row">
                     <div class="col-sm-6">
                         {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id id=prefix_id id_complement=id_to_remove%}
@@ -105,8 +121,8 @@
                         id="collapse_endereco_input_{{id_to_remove}}_complemento"
                         name="complemento" 
                         class="form-control" 
-                        {% if acao %}
-                        value="{{acao.complemento}}"
+                        {% if membro_execucao %}
+                        value="{{membro_execucao.complemento}}"
                         {% endif %}>
                     </div>
                 </div>
@@ -118,8 +134,8 @@
                         id="collapse_endereco_input_{{id_to_remove}}_cep"
                         name="cep" 
                         class="form-control" 
-                        {% if acao %}
-                        value="{{acao.cep}}"
+                        {% if membro_execucao %}
+                        value="{{membro_execucao.cep}}"
                         {% endif %}>
                     </div>
                     <div class="col-sm-4">
@@ -129,8 +145,8 @@
                         name="bairro" 
                         class="form-control" 
                         id="collapse_endereco_input_{{id_to_remove}}_bairro"
-                        {% if acao %}
-                        value="{{acao.bairro}}"
+                        {% if membro_execucao %}
+                        value="{{membro_execucao.bairro}}"
                         {% endif %}>
                     </div>
                     <div class="col-sm-4">
@@ -140,15 +156,16 @@
                         name="logradouro" 
                         class="form-control" 
                         id="collapse_endereco_input_{{id_to_remove}}_logradouro"
-                        {% if acao %}
-                        value="{{acao.logradouro}}"
+                        {% if membro_execucao %}
+                        value="{{membro_execucao.logradouro}}"
                         {% endif %}>
                     </div>
+                    <input type="text" hidden name="acao_id" value="{{acao.id}}">
                 </div>
             </div>
         </div>            
     </form>
 </div>
 <script>
-    
+    var membro_execucao_cidade_id = "{% if membro_execucao %}{{membro_execucao.cidade_id}}{% endif %}"
 </script>

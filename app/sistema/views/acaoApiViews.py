@@ -3,9 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
+from django.db import transaction
+
 
 from ..models.acao import Acao
 from ..models.cidade import Cidade
+from ..models.membroExecucao import MembroExecucao
 from ..serializers.acaoSerializer import AcaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -21,7 +24,7 @@ class AcaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        acoes = Acao.objects.all()
+        acoes = Acao.objects.prefetch_related("membroexecucao_set").all()
         serializer = AcaoSerializer(acoes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -35,7 +38,7 @@ class AcaoApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        data = {
+        acaoData = {
             "tipo": request.data.get("tipo") if request.data.get("tipo") else None,
             "descricao": request.data.get("descricao") if request.data.get("descricao") else None,
             "data_inicio": request.data.get("data_inicio") if request.data.get("data_inicio") else None,
@@ -45,11 +48,33 @@ class AcaoApiView(APIView):
             "cep": request.data.get("cep") if request.data.get("cep") else None,
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "cidade": cidade,
-        }
-        acao = Acao.objects.create(**data)
-        serializer = AcaoSerializer(acao)
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        } 
+
+        membrosExecucaoData = []
+        if len(request.data.get("membros_execucao")):
+            for membroExecucao in request.data.get("membros_execucao"):
+                membroExecucaoData = {
+                    "pessoa_id": membroExecucao.get("pessoa_id") if membroExecucao.get("pessoa_id") else None,
+                    "tipo": membroExecucao.get("tipo") if membroExecucao.get("tipo") else None,
+                    "data_inicio": membroExecucao.get("data_inicio") if membroExecucao.get("data_inicio") else None,
+                    "data_fim": membroExecucao.get("data_fim") if membroExecucao.get("data_fim") else None,
+                    "cidade_id": membroExecucao.get("cidade_id") if membroExecucao.get("cidade_id") else None,
+                    "complemento": membroExecucao.get("complemento") if membroExecucao.get("complemento") else None,
+                    "cep": membroExecucao.get("cep") if membroExecucao.get("cep") else None,
+                    "bairro": membroExecucao.get("bairro") if membroExecucao.get("bairro") else None,
+                    "logradouro": membroExecucao.get("logradouro") if membroExecucao.get("logradouro") else None,
+                }
+                membrosExecucaoData.append(membroExecucaoData)
+            
+        with transaction.atomic():
+            acaoData = Acao.objects.create(**acaoData)
+            
+            for membroExecucao in membrosExecucaoData:
+                membroExecucao["acao_id"] = acaoData.id
+                membro = MembroExecucao.objects.create(**membroExecucao)
+            acaoSerializer= AcaoSerializer(acaoData)
+        print("resultado da ação: ", acaoSerializer.data)
+        return Response(acaoSerializer.data, status=status.HTTP_200_OK)
 
 class AcaoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]

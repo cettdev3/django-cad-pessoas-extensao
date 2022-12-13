@@ -3,7 +3,10 @@ from rest_framework import serializers
 from ..models.acao import Acao
 from ..models.cidade import Cidade
 
+from .membroExecucaoSerializer import MembroExecucaoSerializer
+
 class AcaoSerializer(serializers.ModelSerializer):
+    membroexecucao_set = MembroExecucaoSerializer(many=True, read_only=True)
     class Meta:
         model = Acao
         fields = [
@@ -20,5 +23,6 @@ class AcaoSerializer(serializers.ModelSerializer):
             "cep",
             "complemento",
             "cidade",
+            "membroexecucao_set"
         ]
         depth = 1

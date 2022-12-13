@@ -1,15 +1,15 @@
-<div class="modal fade" id="cadastrarAcoesModal" tabindex="-1" role="dialog"
-    aria-labelledby="cadastrarAcoesModalLabel" aria-hidden="true">
+<div class="modal fade" id="cadastrarAcaoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarAcaoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
-        <form id="cadastrarAcoesForm">
+        <form id="cadastrarAcaoForm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cadastrarAcoesModalLabel">
+                    <h5 class="modal-title" id="cadastrarAcaoModalLabel">
                         {% if acao is None %}
                             Cadastrar Ação
                             <span id="acaoModelId" hidden></span>
                         {% else %}
-                            Editar Cadastro de: {{acao.nome}}
+                            Editar Cadastro de: {{acao.descricao}}
                             <span id="acaoModelId" hidden>{{acao.id}}</span>
                         {% endif %}
                     </h5>
@@ -31,6 +31,7 @@
                             href="#home">1</a>
                             <span>Dados Gerais</span>
                         </li>
+                        {% if not acao %}
                         <li id="acaoTabs2" class="col py-2">
                             <a id="acoesTabLink2" 
                             data-toggle="tab"
@@ -39,11 +40,13 @@
                             href="#pessoas">2</a>
                             <span>Equipe de Execução</span>
                         </li>
+                        {% endif %}
                     </ul>
                     <div class="tab-content">
                         <div id="home" class="tab-pane py-3 active">
                             {% include "acoes/acao_form.html" with acao=acao %}
                         </div>
+                        {% if not acao %}
                         <div id="pessoas" class="tab-pane py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="h3">Adicionar Equipe de Execução</span>
@@ -76,6 +79,7 @@
                             </div>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -92,7 +96,7 @@
                     {% if acao %}
                         onclick="editarAcoes({{acao.id}})" 
                     {% else %}
-                        onclick="cadastrarAcoes()" 
+                        onclick="cadastrarAcao()" 
                     {% endif %}
                     id="finishCadastroAcoes" 
                     type="button"
@@ -110,10 +114,10 @@
 </div>
 
 <script>
-    var formId = "cadastrarAcoesForm"
+    var formId = "cadastrarAcaoForm"
     var acaoModelId = "acaoModelId"
     var tabsId = "acaoTabs"
-    var cadastrarAcaoModalId = "cadastrarAcoesModal"
+    var cadastrarAcaoModalId = "cadastrarAcaoModal"
     var pessoasTicketsForm = "pessoaAcaoForm"
     var dismissCadastrarAcoesId = "dismissCadastrarAcoes"
 
@@ -182,7 +186,9 @@
         if (changedResource) $("#"+dismissCadastrarAcoesId).click()
     }
 
-    function cadastrarAcoes() {
+    function cadastrarAcao() {
+        // console.log(getFormData())
+        // return
         $.ajax({
             url: "/saveAcao",
             data: JSON.stringify({"data":getFormData()}),
@@ -227,7 +233,7 @@
             });
             pessoa_tickets.push(pessoa_ticket)
         });
-        values["pessoa_tickets"] = pessoa_tickets
+        values["membros_execucao"] = pessoa_tickets
 
         return values
     }
@@ -302,7 +308,7 @@
     }
 
     $(document).ready(function () {
-        $("#cadastrarAcoesModal").on('hide.bs.modal', function(){
+        $("#cadastrarAcaoModal").on('hide.bs.modal', function(){
             let pessoaId = $("#"+acaoModelId).text()
             if (pessoaId) {
                 clearModalForm()
