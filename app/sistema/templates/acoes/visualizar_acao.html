@@ -55,7 +55,6 @@
     </div>
 </div>
 <div id="modalMembroExecucaoContainer"></div>
-
 <script>
     let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
     let buttonMenuMembrosExecucaoId = "buttonMenuMembrosExecucao"
@@ -106,16 +105,16 @@
     }
 
     function carregarMembrosExecucao() {
-    let recarregarTabela = rotaTabelaMembrosExecucao
-        $.ajax({
-            url: "/"+recarregarTabela,
-            contentType: 'application/json',
-            data: {acao_id: acaoId},
-            success: function (data) {
-                $("#" + idTabelaMembrosExecucao).html(data);
-            }
-        });
-    }
+        let recarregarTabela = rotaTabelaMembrosExecucao
+            $.ajax({
+                url: "/"+recarregarTabela,
+                contentType: 'application/json',
+                data: {acao_id: acaoId},
+                success: function (data) {
+                    $("#" + idTabelaMembrosExecucao).html(data);
+                }
+            });
+        }
     
     $(document).ready(function() {
         membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {

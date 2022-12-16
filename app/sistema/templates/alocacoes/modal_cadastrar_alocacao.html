@@ -180,7 +180,7 @@
     }
 
     function getCheckBoxValue(id) {
-        return $("#aulas_sabado").is(':checked')
+        return $("#"+id).is(':checked')
     }
 
     function updateSelectedCidade() {
@@ -273,7 +273,7 @@
             values[n['name']] = n['value'];
         });
         values["endereco"] = endereco
-        values["aulas_sabado"] = getCheckBoxValue()
+        values["aulas_sabado"] = getCheckBoxValue("aulas_sabado")
         values["turnos"] = getTurnosSelectData()
         return values
     }

@@ -307,6 +307,36 @@
         }
     }
 
+    function bindEnderecosInputs() {
+        console.log("bindig enderecos")
+        $("#logradouro").change(function() {
+            if ($("#use_acao_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+            console.log("logradouro")
+        })
+        $("#bairro").change(function() {
+            if ($("#use_acao_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#cep").change(function() {
+            if ($("#use_acao_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#complemento").change(function() {
+            if ($("#use_acao_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#cidade_id").change(function() {
+            if ($("#use_acao_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+    }
+
     $(document).ready(function () {
         $("#cadastrarAcaoModal").on('hide.bs.modal', function(){
             let pessoaId = $("#"+acaoModelId).text()
@@ -327,6 +357,7 @@
             console.log(getFormData())
             if (this.checked) setMembroExecucaoAddressForm(getFormData())
         })
+        bindEnderecosInputs()
         addMembroExecucaoForm(0)
         maskValues()
     });

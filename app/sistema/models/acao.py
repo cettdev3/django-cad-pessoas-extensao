@@ -1,5 +1,6 @@
 from django.db import models
 from ..models.cidade import Cidade
+from ..models.escola import Escola
 from ..models.pessoa import Pessoas
 
 class Acao(models.Model):
@@ -16,13 +17,17 @@ class Acao(models.Model):
     cep = models.CharField(null = True, max_length=100, blank= True)
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
+    escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
     membrosExecucao = models.ManyToManyField(Pessoas, through='MembroExecucao', blank=True)
+    
     class Meta:
         db_table = 'acoes'
 
     @property
     def endereco_completo(self):
         enderecoCompleto = "" 
+        if self.cidade:
+            enderecoCompleto += self.cidade.nome + " GO, "
         if self.logradouro:
             enderecoCompleto += self.logradouro
         if self.bairro:
@@ -32,3 +37,25 @@ class Acao(models.Model):
         if self.cep:
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
+    
+    @property
+    def extrato(self, format='html'):
+        extrato = "" 
+        if self.endereco_completo:
+            extrato += "<div><strong>Endereço</strong> : "+self.cidade.nome + " GO, " + self.endereco_completo + "</div>"
+        membrosEquipeExecucao = Acao.objects.prefetch_related("membroexecucao_set")
+        membrosEquipeExecucao = membrosEquipeExecucao.filter(id=self.id).first().membroexecucao_set.all()
+        if self.descricao:
+            extrato += "<div><strong>descricao</strong>: " + self.descricao + "</div><hr>"
+        for membro in membrosEquipeExecucao:
+            extrato += "<div>"
+            if membro.pessoa:
+                extrato += "<strong>nome beneficiado</strong>: " + membro.pessoa.nome + "<br>"
+            if membro.tipo:
+                extrato += "<strong>tipo</strong>: " + membro.tipo + "<br>"
+            if membro.data_inicio:
+                extrato += "<strong>data inicio</strong>: " + membro.data_inicio.strftime("%d/%m/%Y") + "<br>"
+            if membro.data_fim:
+                extrato += "<strong>data fim</strong>: " + membro.data_fim.strftime("%d/%m/%Y") + "<br>"
+            extrato += "</div><hr>"
+        return extrato

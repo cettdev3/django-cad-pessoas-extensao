@@ -47,7 +47,7 @@ def membroExecucaoModal(request):
         data['acao'] = Acao.objects.get(id=acao_id)
     if id:
         membro_execucao = MembroExecucao.objects.get(id=id)
-        data["cidade_id"] = membro_execucao.cidade.id
+        data["cidade_id"] = membro_execucao.cidade.id if membro_execucao.cidade else None
         data["pessoa_id"] = membro_execucao.pessoa.id
         data["is_edit"] = True
         data['membro_execucao'] = MembroExecucaoSerializer(membro_execucao).data 

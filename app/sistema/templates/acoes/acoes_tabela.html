@@ -1,9 +1,102 @@
 <style>
-    .acao-w-70 {
-        width: 70%;
+    .acao-vw-50 {
+        max-width: 30vw;
+        width: 30vw;
+        min-width: 30vw;
     }
-    .acao-w-25 {
-        width: 25%;
+    .acao-w-20 {
+        width: 20%;
+    }
+    .acao-w-10 {
+        width: 10%;
+    }
+    .acao-w-50 {
+        width: 50%;
+    }
+    .acao-w-15 {
+        width: 15%;
+    }
+
+    /* .overflow {
+        overflow: hidden;
+        white-space: nowrap;
+    } */
+
+    .width-100 {
+        max-width: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .flex-item {
+        flex: 0 0 15%;
+        
+    }
+
+    .counter-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #feb204;
+        border: none;
+        outline: inherit;
+        border-radius: 50%;
+        padding: 0;
+        text-align: center;
+        width: 30px;
+        line-height: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .counter-btn:hover {
+        background-color: #ffc200;
+        font-size: 1rem;
+        transition: font-size 0.1s;
+    }
+
+    .wrapped-item-text
+    {
+        overflow: hidden;
+        white-space:nowrap;
+        flex: 1;
+        text-overflow:ellipsis;
+    }
+
+    .btn-icon-acao {
+        font-size: 0.8em;
+        transition: font-size 0.2s;
+        border-radius: 50%;
+    }
+
+    .btn-icon-acao:hover {
+        font-size: 0.95rem;
+        transition: font-size 0.2s;
+    }
+
+    .membro-equipe-container:hover {
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        transition: box-shadow 0.2s;
+    }
+
+    .membro-equipe-red {
+        color: tomato; 
+        font-size: 0.9rem;
+    }
+    .membro-equipe-green {
+        color: #27b132; 
+        font-size: 0.9rem;
+    }
+
+    .boxed {
+        background-color: #27b132;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        font-weight: bolder;
     }
 </style>
 <table class="table table-borderless" 
@@ -11,20 +104,78 @@ width="100%"
 cellspacing="0">
     <thead class="border">
         <tr class="">
-            <th class="acao-w-25 text-left">Tipo</th>
-            <th class="acao-w-70 text-left">Descrição</th>
+            <th class="acao-w-50 text-left">Descrição</th>
+            <th class="acao-vw-50 text-left">Equipe de Execução</th>
             <th class="w-2 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
         {% for acao in acoes %}
         <tr>
-            <td class="cursos-w-45 text-left">{{acao.tipo}}</td>
-            <td class="cursos-w-45 text-left">{{acao.descricao}}</td>
+            <td class="acao-w-50 text-left">
+                <div>
+                    <span class="px-2 py-1 boxed">{{acao.tipo}}</span>
+                    <span>{{acao.endereco_completo}}</span>
+                </div>
+                <div><span class="font-weight-bold">{{acao.descricao}}</span></div>
+            </td>
+            <td  id="wrapper-container-{{acao.id}}"  class="acao-vw-50 text-left position-relative">
+                <div id="wrapper-overflow-{{acao.id}}" 
+                class="d-flex flex-wrap border py-1 px-2" 
+                style="overflow: hidden;">
+                    {% for membro in acao.membroexecucao_set %}
+                    <div id="wrapped-item-container-{{membro.id}}" 
+                    role="button"
+                    class="membro-equipe-container pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative">
+                        {% if membro.tipo == 'adiantamento' %}
+                        <span 
+                        class="membro-equipe-red">
+                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ADIANTAMENTO">
+                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                                <i style="border-radius: 50%;" class="fa-solid fa-money-bill fa-stack-1x fa-inverse "></i>
+                            </span>
+                        </span>
+                        {% endif %}
+                        {% if membro.tipo == 'veiculo' %}
+                        <span 
+                        class="membro-equipe-red">
+                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ALUGUEL DE VEÍCULO">
+                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                                <i style="border-radius: 50%;" class="fa-solid fa-car fa-stack-1x fa-inverse "></i>
+                            </span>
+                        </span>
+                        {% endif %}
+                        {% if membro.tipo == 'diaria' %}
+                        <span 
+                        class="membro-equipe-red">
+                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="DIÁRIA">
+                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                                <i style="border-radius: 50%;" class="fa-solid fa-hotel fa-stack-1x fa-inverse "></i>
+                            </span>
+                        </span>
+                        {% endif %}
+                        <span class="wrapped-item-text mx-2">{{membro.pessoa.nome}}</span>
+                    </div>
+                    {% endfor %}
+                    <span id="counter-btn-{{acao.id}}" onclick="changeOverflow('{{acao.id}}')" 
+                    class="counter-btn" data-toggle="tooltip" data-placement="top" title="EXPANDIR">+5</span>
+                    <span
+                    id="retrieve-btn-{{acao.id}}"
+                    style="color: #ffc200; position: absolute; top: 0; right: 0; display: none"
+                    class="btn-icon-acao"
+                    role="button"
+                    onclick="changeOverflow('{{acao.id}}')">
+                        <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ESCONDER">
+                            <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                            <i style="border-radius: 50%;" class="fa-solid fa-stack-1x fa-inverse fa-arrow-up shadow"></i>
+                        </span>
+                    </span>
+                </div>
+            </td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuAcoes{{acao.id}}" 
                 class="btn-circle">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>                        
+                    <i class="fa-solid fa-ellipsis-vertical"></i>                         
                 </button>
                 <div style="display: none; position: absolute; z-index: 2; right: 10%" 
                 id="hiddenMenuAcoes{{acao.id}}" 
@@ -51,8 +202,10 @@ cellspacing="0">
     var rotaTabelaAcoes = "acoesTable"
     var rotaDeletarAcao = "eliminarAcao"
     var rotaVisualizarAcao = "visualizarAcao"
-
     var rotaEditarAcao = "acaoModal"    
+    var wrappedItemHeight = []
+    var wrappedItemWidth = []
+    var wrapperContainerWidth = []
     
     function visualizarAcao(id) {
         location.href = "visualizarAcao/" + id
@@ -118,6 +271,87 @@ cellspacing="0">
         });
     }
     
+    function getElementFullWidth(element) {
+        let width = element.innerWidth()
+        let paddingLeft = parseInt(element.css('padding-left'))
+        let paddingRight = parseInt(element.css('padding-right'))
+        let marginLeft = parseInt(element.css('margin-left'))
+        let marginRight = parseInt(element.css('margin-right'))
+        let borderLeft = parseInt(element.css('border-left-width'))
+        let borderRight = parseInt(element.css('border-right-width'))
+        return width + paddingLeft + paddingRight + marginLeft + marginRight + borderLeft + borderRight
+    }
+
+    function getElementFullHeight(element) {
+        let height = element.innerHeight()
+        let marginTop = parseInt(element.css('margin-top'))
+        let marginBottom = parseInt(element.css('margin-bottom'))
+        return height + marginTop + marginBottom
+    }
+
+    function assignRows(cards, containerId) {
+        console.log(cards)
+        let row = 0;
+        let startCounting = false;
+        let count = 0;
+        $(cards).each(function(i) {
+            if (i == 0) return true
+
+            let currentLeft = $(this).position().left
+            let previousLeft = $(this).prev().position().left
+            if (currentLeft <= previousLeft) {
+                row++
+                if (!startCounting) {
+                    startCounting = !startCounting
+                }
+            }
+
+            if (startCounting) count++
+        })
+        let id = "#counter-btn-"+containerId
+        console.log(count)
+        if (count == 0) $(id).hide()
+        else {
+            $(id).show()
+            $(id).text("+"+count)
+        }
+    }
+
+    function changeOverflow(id) {
+        let containerId = "#wrapper-overflow-"+id
+        let scrollHeight = $(containerId).prop("scrollHeight");
+        let currentHeight = $(containerId).height();
+        let height = currentHeight <= wrappedItemHeight['wrappedItemHeight-'+id] ? scrollHeight+"px" : (wrappedItemHeight['wrappedItemHeight-'+id]+10)+"px"
+        console.log(currentHeight, scrollHeight, wrappedItemHeight, containerId, height)
+        $(containerId).animate({
+            height: height
+        }, 200);
+
+        $("#counter-btn-"+id).toggle()
+        $("#retrieve-btn-"+id).toggle()
+    }
+
+    function setupWrappersHeight() {
+        let wrappedOverflowContainer = $("div[id^='wrapper-overflow-']")
+        wrappedOverflowContainer.each(function (i, el) {
+            let id = $(this).attr('id').split("wrapper-overflow-")[1];
+            let items = $(this).find("div[id^='wrapped-item-container']")
+            wrappedItemHeight['wrappedItemHeight-'+id] = getElementFullHeight(items.first())
+            wrappedItemWidth["wrappedItemWidth-"+id] = getElementFullWidth(items.first())
+            let wrapperContainer = $("#wrapper-container-"+id)
+            wrapperContainerWidth["wrapperContainerWidth-"+id] = getElementFullWidth(wrapperContainer)
+            
+            $("#wrapper-container-"+id).children().first().height(wrappedItemHeight['wrappedItemHeight-'+id])
+            const wrappedItems = items
+            $(window).resize(function() {
+                assignRows(wrappedItems, id);
+            })
+
+            assignRows(wrappedItems, id);
+        })
+
+    }
+    
     $(document).ready(function () {
         acaoModificadaEventProxy = new Proxy(acaoModificadaEvent, {
             set: function (target, key, value) {
@@ -140,6 +374,7 @@ cellspacing="0">
             })
         });
 
+        setupWrappersHeight()
         bindButtons()
     })
 </script>

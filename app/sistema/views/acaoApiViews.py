@@ -8,6 +8,7 @@ from django.db import transaction
 
 from ..models.acao import Acao
 from ..models.cidade import Cidade
+from ..models.escola import Escola
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.acaoSerializer import AcaoSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -30,11 +31,20 @@ class AcaoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         cidade = None
+        escola = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
                 return Response(
                     {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("escola_id"):
+            escola = self.get_object(Escola, request.data.get("escola_id"))
+            if not escola:
+                return Response(
+                    {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -48,6 +58,7 @@ class AcaoApiView(APIView):
             "cep": request.data.get("cep") if request.data.get("cep") else None,
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "cidade": cidade,
+            "escola": escola,
         } 
 
         membrosExecucaoData = []
@@ -73,7 +84,6 @@ class AcaoApiView(APIView):
                 membroExecucao["acao_id"] = acaoData.id
                 membro = MembroExecucao.objects.create(**membroExecucao)
             acaoSerializer= AcaoSerializer(acaoData)
-        print("resultado da ação: ", acaoSerializer.data)
         return Response(acaoSerializer.data, status=status.HTTP_200_OK)
 
 class AcaoDetailApiView(APIView):
@@ -129,8 +139,17 @@ class AcaoDetailApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
             acao.cidade = cidade
+            
+        if request.data.get("escola_id"):
+            escola = self.get_object(Escola, request.data.get("escola_id"))
+            if not escola:
+                return Response(
+                    {"res": "Não existe escola com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            acao.escola = escola
+
 
         acao.save()
         serializer = AcaoSerializer(acao)

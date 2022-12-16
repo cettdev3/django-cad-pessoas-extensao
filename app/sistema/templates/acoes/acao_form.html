@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastraracaoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label><b>Tipo:</b></label>
                 <select required 
                 id="tipo"
@@ -33,7 +33,17 @@
                     </option>
                 </select>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                {% if acao %}
+                {% include 'escolas/escolas_select.html' with escola_id=acao.escola.id escolas=escolas %}
+                {% else %}
+                {% include 'escolas/escolas_select.html' %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-12">
                 <label><b>Descrição:</b></label>
                 <input 
                 type="text" 
@@ -72,6 +82,7 @@
                 <input 
                 type="text" 
                 name="cep" 
+                id="cep" 
                 class="form-control" 
                 {% if acao %}
                 value="{{acao.cep}}"
@@ -84,6 +95,7 @@
                 <input 
                 type="text" 
                 name="bairro" 
+                id="bairro" 
                 class="form-control" 
                 {% if acao %}
                 value="{{acao.bairro}}"
@@ -94,6 +106,7 @@
                 <input 
                 type="text" 
                 name="logradouro" 
+                id="logradouro" 
                 class="form-control" 
                 {% if acao %}
                 value="{{acao.logradouro}}"
@@ -104,6 +117,7 @@
                 <input 
                 type="text" 
                 name="complemento" 
+                id="complemento" 
                 class="form-control" 
                 {% if acao %}
                 value="{{acao.complemento}}"
@@ -112,8 +126,10 @@
         </div>
     </form>
 </div>
+{{ escolas|json_script:"escolas-script" }}
 <script>
     var cidade_id = "{% if acao %}{{acao.cidade.id}}{% else %}{% endif %}";
+    var escolas = JSON.parse(document.getElementById("escolas-script").textContent);
 
     function carregarSelectCidades(cidade_id) {
         $.ajax({
@@ -129,8 +145,43 @@
             }
         });
     }
+    
+    function getCheckBoxValue(id) {
+        return $("#"+id).is(':checked')
+    }
+
+    function bindEnderecoFields(escolaId) {
+        let escola = escolas.find(escola => escola.id == escolaId)
+        if (escola && getCheckBoxValue("use_select_value")) {
+            $("#logradouro").val(escola.logradouro).trigger("change")
+            $("#bairro").val(escola.bairro).trigger("change")
+            $("#cep").val(escola.cep).trigger("change")
+            $("#complemento").val(escola.complemento).trigger("change")
+            $("#cidade_id").val(escola.cidade.id).trigger("change")
+        }
+    } 
+
+    function carregarSelectEscolas() {
+        $.ajax({
+            url: "/escolasSelect",
+            method: "GET",
+            success: function (data) {
+                $("#acaoFormSelectCidade").html(data)
+                $("#escola_id").change(function (val) {
+                    let selectedEscola = $(this).val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+
+                $("#use_select_value").change(function (val) {
+                    let selectedEscola = $("#escola_id").val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+            }
+        });
+    }
 
     $(document).ready(function () {
         carregarSelectCidades(cidade_id)
+        carregarSelectEscolas()
     })
 </script>
