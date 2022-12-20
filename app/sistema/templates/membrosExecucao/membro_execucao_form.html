@@ -80,6 +80,13 @@
                     value="veiculo">
                         VEÍCULO
                     </option>
+                    <option
+                    {% if membro_execucao and membro_execucao.tipo == 'nao_se_aplica' %}
+                    selected
+                    {% endif %}
+                    value="nao_se_aplica">
+                        NÃO HAVERÁ SOLICITAÇÂO
+                    </option>
                 </select>
             </div>
             <div class="col-sm-2">

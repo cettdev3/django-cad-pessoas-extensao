@@ -125,11 +125,20 @@ cellspacing="0">
                 style="overflow: hidden;">
                     {% for membro in acao.membroexecucao_set %}
                     <div id="wrapped-item-container-{{membro.id}}" 
+                    {% if not membro.ticket and membro.tipo != 'nao_se_aplica' %}
                     role="button"
-                    class="membro-equipe-container pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative">
+                    onclick="openTicketModal('{{membro.id}}', '{{membro.tipo}}')"
+                    class="membro-equipe-container pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
+                    {% else %}
+                    class="pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
+                    {% endif %}>
                         {% if membro.tipo == 'adiantamento' %}
                         <span 
-                        class="membro-equipe-red">
+                        {% if not membro.ticket %}
+                        class="membro-equipe-red"
+                        {% else %}
+                        class="membro-equipe-green"
+                        {% endif %}>
                             <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ADIANTAMENTO">
                                 <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
                                 <i style="border-radius: 50%;" class="fa-solid fa-money-bill fa-stack-1x fa-inverse "></i>
@@ -137,8 +146,11 @@ cellspacing="0">
                         </span>
                         {% endif %}
                         {% if membro.tipo == 'veiculo' %}
-                        <span 
-                        class="membro-equipe-red">
+                        <span {% if not membro.ticket %}
+                        class="membro-equipe-red"
+                        {% else %}
+                        class="membro-equipe-green"
+                        {% endif %}>
                             <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ALUGUEL DE VEÍCULO">
                                 <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
                                 <i style="border-radius: 50%;" class="fa-solid fa-car fa-stack-1x fa-inverse "></i>
@@ -146,15 +158,22 @@ cellspacing="0">
                         </span>
                         {% endif %}
                         {% if membro.tipo == 'diaria' %}
-                        <span 
-                        class="membro-equipe-red">
+                        <span
+                        {% if not membro.ticket %}
+                        class="membro-equipe-red"
+                        {% else %}
+                        class="membro-equipe-green"
+                        {% endif %}>
                             <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="DIÁRIA">
                                 <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
                                 <i style="border-radius: 50%;" class="fa-solid fa-hotel fa-stack-1x fa-inverse "></i>
                             </span>
                         </span>
                         {% endif %}
-                        <span class="wrapped-item-text mx-2">{{membro.pessoa.nome}}</span>
+                        <div class="d-flex flex-column justify-content-start align-items-start">
+                            <span class="wrapped-item-text mx-2">{{membro.pessoa.nome}}</span>
+                            <span class=" mx-2"><strong>{{membro.ticket.id_protocolo}}</strong></span>
+                        </div>
                     </div>
                     {% endfor %}
                     <span id="counter-btn-{{acao.id}}" onclick="changeOverflow('{{acao.id}}')" 
@@ -190,6 +209,7 @@ cellspacing="0">
         {% endfor %}
     </tbody>
 </table>
+<div id="cadastrarTicketModalContainer"></div>
 <script>
     var buttonMenuAcoesId = "buttonMenuAcoes"
     var hiddenMenuAcoesId = "hiddenMenuAcoes"
@@ -197,6 +217,8 @@ cellspacing="0">
     var dismissCadastrarAcaoId = "dismissCadastrarAcao"
     var acaoModificadaEvent = {}
     var acaoModificadaEventProxy = null
+    var ticketModificadaEvent = {}
+    var ticketModificadaEventProxy = null
     var modalCadastrarAcaoContainerId = "modalCadastrarAcaoContainer"
     var idTabelaAcoes = "receberTabelaAcoes"
     var rotaTabelaAcoes = "acoesTable"
@@ -209,6 +231,18 @@ cellspacing="0">
     
     function visualizarAcao(id) {
         location.href = "visualizarAcao/" + id
+    }
+
+    function openTicketModal(membroId, tipo) {
+        let data = {membro_execucao_id: membroId, tipo: tipo}
+        $.ajax({
+            url: "/ticketModal",
+            data: data,
+            success: function (data) {
+                $("#cadastrarTicketModalContainer").html(data);
+                $('#cadastrarTicketModal').modal('toggle');
+            }
+        });
     }
 
     function carregarAcaoModalEditar(id) {
@@ -290,7 +324,6 @@ cellspacing="0">
     }
 
     function assignRows(cards, containerId) {
-        console.log(cards)
         let row = 0;
         let startCounting = false;
         let count = 0;
@@ -309,7 +342,6 @@ cellspacing="0">
             if (startCounting) count++
         })
         let id = "#counter-btn-"+containerId
-        console.log(count)
         if (count == 0) $(id).hide()
         else {
             $(id).show()
@@ -322,7 +354,6 @@ cellspacing="0">
         let scrollHeight = $(containerId).prop("scrollHeight");
         let currentHeight = $(containerId).height();
         let height = currentHeight <= wrappedItemHeight['wrappedItemHeight-'+id] ? scrollHeight+"px" : (wrappedItemHeight['wrappedItemHeight-'+id]+10)+"px"
-        console.log(currentHeight, scrollHeight, wrappedItemHeight, containerId, height)
         $(containerId).animate({
             height: height
         }, 200);
@@ -357,6 +388,18 @@ cellspacing="0">
             set: function (target, key, value) {
                 target[key] = value;
                 if (value) {
+                    carregarAcoes()
+                }
+                target[key] = false
+                return false;
+            }
+        });
+        
+        ticketModificadaEventProxy = new Proxy(ticketModificadaEvent, {
+            set: function (target, key, value) {
+                target[key] = value;
+                if (value) {
+                    console.log("ticketModificadaEventProxy")
                     carregarAcoes()
                 }
                 target[key] = false

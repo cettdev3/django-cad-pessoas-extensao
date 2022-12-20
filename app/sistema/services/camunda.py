@@ -23,12 +23,13 @@ class CamundaAPI:
         
         return requisicao
     
-    #INICIA O PREENCHIMENTO DO FORMULÁRIO
+    def getTasks(self, instanceId):
+        payload = {
+            "processInstanceId": instanceId,
+        }
+        resposta = requests.post(self.__host+"/task", json=payload, auth=self.__autenticacao)
+        return resposta
+
     def completeTask(self, taskId, variables):
-        print("host ",self.__host, taskId)
-        url =f'{self.__host}task/{taskId}/complete'        
-        headers = {'Content-type': 'application/json'}
-        response = requests.post(url,json=variables,headers=headers,auth=self.__autenticacao)
-        
-        #RETORNA O ID DA INSTÂNCIA E O CÓDIGO DE SUCESSO
-        return response
+        resposta = requests.post(self.__host+"/task/"+taskId+"/complete", json=variables, auth=self.__autenticacao)
+        return resposta

@@ -4,6 +4,15 @@ from ..models.escola import Escola
 from ..models.pessoa import Pessoas
 
 class Acao(models.Model):
+    EMPRESTIMO = 'emprestimo'
+
+    MAPPED_TIPOS = [
+        EMPRESTIMO
+    ]
+
+    STATUS_WAITING_TICKET = 'waiting_ticket'
+    STATUS_WAITING_RETURN = 'waiting_return'
+
     id = models.AutoField(primary_key=True)
     tipo = models.CharField(null = True, blank= True, max_length=50)   
     process_instance = models.CharField(null = True, blank= True, max_length=300)

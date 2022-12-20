@@ -1,0 +1,237 @@
+<div class="modal fade" id="cadastrarTicketModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarTicketModalLabel">
+                    {% if ticket is None %}
+                        Cadastrar Ticket: {{tipo}}
+                        <span id="ticketModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro do ticket: {{tipo}}
+                        <span id="ticketModelId" hidden>{{ticket.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarTicket" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <!-- <ul class="nav nav-tabs row"> -->
+                        <!-- <li id="escolasTab1" class="col py-2 active-form-tab">
+                            <a id="escolaTabLink1" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li> -->
+                        <!-- <li id="escolasTab2" class="col py-2">
+                            <a id="escolaTabLink2" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#endereco">2</a>
+                            <span>Endereco</span>
+                        </li> -->
+                    <!-- </ul> -->
+                    <form id="cadastrarTicketForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                {% include "tickets/ticket_form.html" with ticket=ticket %}
+                                <input 
+                                type="text" 
+                                hidden 
+                                name="membro_execucao_id" 
+                                value="{{membro_execucao_id}}">
+                                <input 
+                                type="text" 
+                                hidden 
+                                name="tipo" 
+                                value="{{tipo}}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="formTicketPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevTicketLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formTicketNext" type="button" class="btn btn-primary">
+                    <span id="nextTicketLink" class="TicketMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if ticket %}
+                    onclick="editarTicket({{ticket.id}})" 
+                {% else %}
+                    onclick="cadastrarTicket()" 
+                {% endif %}
+                id="finishCadastroTicket" 
+                type="button"
+                class="btn btn-primary">
+                {% if ticket %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarTicketForm"
+    var ticketModelId = "ticketModelId"
+    var tabsId = "ticketsTab"
+    var cadastrarTicketModalId = "cadastrarTicketModal"
+    var dismissCadastrarTicketId = "dismissCadastrarTicket"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        
+        if (changedResource) ticketModificadaEventProxy.modificado = changedResource
+        let dismissBtn = $("#"+dismissCadastrarTicketId)
+        console.log(dismissBtn)
+        dismissBtn.click()
+        console.log("modal fechada")
+        $('.modal-backdrop').remove()
+        $(document.body).removeClass("modal-open");
+    }
+
+    function cadastrarTicket() {
+        $.ajax({
+            url: "saveTicket",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarTicket(id) {
+        $.ajax({
+            url: "editarTicket/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+        
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#ticketTabLink"+nextTab).trigger("click")
+        $("#ticketsTab"+nextTab).addClass("active-form-tab")
+        $("#ticketsTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formTicketNext"],
+                hide: ["formTicketPrev", "finishCadastroTicket"]
+            },
+            last: {
+                show: ["formTicketPrev", "finishCadastroTicket"],
+                hide: ["formTicketNext"]
+            },
+            middle: {
+                show: ["formTicketPrev", "formTicketNext"],
+                hide: ["finishCadastroTicket"]
+            },
+            only: {
+                show: ["finishCadastroTicket"],
+                hide: ["formTicketPrev", "formTicketNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarTicketModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+ticketModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formTicketNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formTicketPrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        maskValues()
+    });
+</script>

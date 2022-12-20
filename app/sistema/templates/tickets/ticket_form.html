@@ -1,0 +1,16 @@
+<div class="w-100">
+    <form id="cadastrarTicketForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Id protocolo:</b></label>
+                <input 
+                type="text" 
+                {% if ticket %}
+                value="{{ ticket.ticket}}" 
+                {% endif %}
+                class="form-control" 
+                name="id_protocolo">
+            </div>
+        </div>
+    </form>
+</div>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from sistema.models.pessoa import Pessoas
 from sistema.models.acao import Acao
 from sistema.models.cidade import Cidade
+from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
 from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
@@ -26,12 +27,15 @@ def gerencia_acoes(request):
 @login_required(login_url='/auth-user/login-user')
 def acaoTable(request):
     tipo = request.GET.get('tipo')
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = {"tipo": tipo}
 
-    acoes = Acao.objects.prefetch_related('membroexecucao_set')
-    if tipo:
-        acoes = acoes.filter(tipo__icontains = tipo)
-    acoes = acoes.all()
-    acoes = AcaoSerializer(acoes, many=True).data
+    acaoResponse = requests.get('http://localhost:8000/acoes', json=body, headers=headers)
+    acaoResponseStatusCode = acaoResponse.status_code
+    acaoResponse = json.loads(acaoResponse.content.decode())
+    
+    acoes = acaoResponse
     return render(request,'acoes/acoes_tabela.html',{'acoes':acoes})
 
 @login_required(login_url='/auth-user/login-user')
@@ -46,6 +50,7 @@ def acaoModal(request):
     data = {}
     escolas = Escola.objects.all()
     data['escolas'] = EscolaSerializer(escolas, many=True).data
+    data['ct_emprestimo'] = Acao.EMPRESTIMO
     if id:
         acao = Acao.objects.get(id=id)
         data['acao'] = AcaoSerializer(acao).data 
@@ -53,8 +58,13 @@ def acaoModal(request):
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarAcao(request,codigo):
-    acao = Acao.objects.get(id=codigo)
-    acao.delete()
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    
+    acaoResponse = requests.delete('http://localhost:8000/acoes/'+str(codigo), headers=headers)
+    acaoResponseStatusCode = acaoResponse.status_code
+    acaoResponse = json.loads(acaoResponse.content.decode())
+
     return redirect('/gerencia_acoes')
 
 @login_required(login_url='/auth-user/login-user')
@@ -68,19 +78,22 @@ def saveAcao(request):
     acaoResponse = json.loads(acaoResponse.content.decode())
     acao = Acao.objects.get(id=acaoResponse['id'])
 
-    dados = {
-        "variables": {
-            "processDescription": {"value": acao.tipo + ", " + acao.cidade.nome, "type": "String"},
-            "acao_id": {"value": acao.id, "type": "String"},
-            "extrato": {"value": acao.extrato, "type": "String"},
-        },
-        "withVariablesInReturn": True
-    }
+    if acao.tipo in Acao.MAPPED_TIPOS:
+        dados = {
+            "variables": {
+                "processDescription": {"value": acao.tipo + ", " + acao.cidade.nome, "type": "String"},
+                "acao_id": {"value": acao.id, "type": "String"},
+                "extrato": {"value": acao.extrato, "type": "String"},
+            },
+            "withVariablesInReturn": True
+        }
 
-    camunda = CamundaAPI()
-    camundaResponse = camunda.startProcess("ProcessoDeEmprestimoDeIntensProcess",dados)
-    acao.process_instance = camundaResponse['id']
-    acao.save()
+        camunda = CamundaAPI()
+        camundaResponse = camunda.startProcess("ProcessoDeEmprestimoDeIntensProcess",dados)
+        acao.process_instance = camundaResponse['id']
+        if acao.tipo == Acao.EMPRESTIMO:
+            acao.status = Acao.STATUS_WAITING_TICKET
+        acao.save()
     return JsonResponse(acaoResponse, status=acaoResponseStatusCode)
 
 @login_required(login_url='/auth-user/login-user')

@@ -41,6 +41,8 @@ from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect,visualizarAcao
 from sistema.views.siteComponentsView import calendario
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao
+from sistema.views.siteTicketViews import ticketModal, saveTicket
+from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -152,7 +154,11 @@ urlpatterns = [
     path("editarAcao/<codigo>",editarAcao),
     path("eliminarAcao/<codigo>",eliminarAcao),
     path("acoesSelect",acoesSelect),
-
+   
+    # ROTAS PARA TICKETS
+    path("ticketModal",ticketModal),
+    path("saveTicket",saveTicket),
+    
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
 
@@ -193,6 +199,7 @@ urlpatterns = [
     path('membroExecucao/<int:membro_execucao_id>', MembroExecucaoDetailApiView.as_view()),
     
     path("tickets", TicketApiView.as_view()),
+    path('tickets/<int:ticket_id>', TicketDetailApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

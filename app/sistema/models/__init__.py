@@ -7,4 +7,5 @@ from .pessoa import Pessoas
 from .curso import Curso
 from .escola import Escola
 from .acao import Acao
+from .ticket import Ticket
 from .membroExecucao import MembroExecucao

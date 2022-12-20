@@ -16,5 +16,6 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "complemento",
             "cidade",
             "pessoa",
+            "ticket"
         ]
         depth = 1

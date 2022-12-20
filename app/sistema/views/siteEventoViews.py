@@ -17,7 +17,7 @@ from rest_framework.authtoken.models import Token
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_eventos(request):
-    page_title = "eventos"
+    page_title = "Ações de Ensino"
     count = 0
     eventos = Evento.objects.all()
     for p in eventos:

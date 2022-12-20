@@ -5,8 +5,9 @@ from rest_framework import status
 from rest_framework import permissions
 from django.db import transaction
 
-
+from django.db.models import Prefetch
 from ..models.acao import Acao
+from ..models.ticket import Ticket
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.membroExecucao import MembroExecucao
@@ -25,7 +26,15 @@ class AcaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        acoes = Acao.objects.prefetch_related("membroexecucao_set").all()
+        acoes = Acao.objects.prefetch_related(Prefetch(
+            'membroexecucao_set', 
+            queryset=MembroExecucao.objects.order_by('ticket__status')
+        ))
+        
+        if request.GET.get("tipo"):
+            acoes = acoes.filter(tipo__icontains = request.GET.get("tipo"))
+
+        acoes = acoes.all()
         serializer = AcaoSerializer(acoes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -157,12 +166,20 @@ class AcaoDetailApiView(APIView):
 
     def delete(self, request, acao_id, *args, **kwargs):
         
-        acao = self.get_object(acao_id)
+        acao = self.get_object(Acao, acao_id)
         if not acao:
             return Response(
                 {"res": "Não existe ação com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        membrosExecucao = MembroExecucao.objects.filter(acao_id=acao_id)
+        for membroExecucao in membrosExecucao:
+            tickets = Ticket.objects.filter(membro_execucao_id=membroExecucao.id)
+            for ticket in tickets:
+                ticket.delete()
+            membroExecucao.delete()
+
         acao.delete()
         return Response(
             {"res": "ação deletada!"},

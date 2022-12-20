@@ -7,6 +7,7 @@ from rest_framework import permissions
 from ..models.acao import Acao
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
+from ..models.ticket import Ticket
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
@@ -166,6 +167,11 @@ class MembroExecucaoDetailApiView(APIView):
                 {"res": "Não existe membro da equipe de execução com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        ticket = Ticket.objects.filter(membro_execucao=membroExecucao)
+        if ticket:
+            ticket.delete()
+
         membroExecucao.delete()
         return Response(
             {"res": "membro da equipe de execução deletada!"},
