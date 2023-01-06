@@ -216,51 +216,6 @@
                         Equipe
                     </div>
                     <div id="itinerario-membros-equipe-list">
-                        <div class="pessoa-card p-2">
-                            <div class="d-flex">
-                                <div class="d-flex justify-content-between align-items-between flex-column">
-                                    <span id="membro-equipe-nome" style="line-height: 1rem;">Brendany coutinho cabral de
-                                        freitas</span>
-                                    <div>
-                                        <span id="membro-equipe-tipo" class="mb-2 mt-1">diária</span>
-                                    </div>
-                                    <span style="font-size: 0.9rem; 
-                                        line-height: 0.9rem;
-                                        font-weight: bold;">12/12/2022 <br>até 22/12/2022</span>
-                                </div>
-                                <div class="d-flex flex-column justify-content-between align-items-end">
-                                    <div data-toggle="tooltip" data-placement="top"
-                                        title="Criar novo itinerário para este membro da equipe"
-                                        onclick="createNewItinerario(event)">
-                                        <i class="add-itinerario-icon fa fa-plus"></i>
-                                    </div>
-                                    <input type="checkbox" data-toggle="tooltip" data-placement="top"
-                                        title="Adicionar/Remover membro da equipe ao itinerário"
-                                        id="select-membro-itinerario" role="button" class="select-membro-itinerario"
-                                        onchange="selectMembroEquipeItinerario(event)" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pessoa-card p-2">
-                            <div class="d-flex">
-                                <div class="d-flex justify-content-between align-items-between flex-column">
-                                    <span id="membro-equipe-nome" style="line-height: 1rem;">Victtor alves Cabral</span>
-                                    <div>
-                                        <span id="membro-equipe-tipo" class="mb-2 mt-1">diária</span>
-                                    </div>
-                                    <span style="font-size: 0.9rem; 
-                                        line-height: 0.9rem;
-                                        font-weight: bold;">12/12/2022 <br>até 22/12/2022</span>
-                                </div>
-                                <div class="d-flex flex-column justify-content-between align-items-end">
-                                    <div onclick="createNewItinerario(event)">
-                                        <i class="add-itinerario-icon fa fa-plus"></i>
-                                    </div>
-                                    <input type="checkbox" id="select-membro-itinerario" role="button"
-                                        class="select-membro-itinerario" onchange="selectMembroEquipeItinerario(event)">
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="h-100 scroll-custom " style="max-height: 100%; overflow:auto; flex: 1;">
@@ -372,37 +327,6 @@
     </div>
 </div>
 
-<div class="pessoa-card p-2">
-    <div class="d-flex">
-        <div class="d-flex justify-content-between align-items-between flex-column">
-            <span id="membro-equipe-nome" style="line-height: 1rem;">
-                ${membroEquipe.nome}
-            </span>
-            <div>
-                <span id="membro-equipe-tipo" class="mb-2 mt-1">
-                    ${membroEquipe.tipo}
-                </span>
-            </div>
-            <span style="font-size: 0.9rem; 
-            line-height: 0.9rem;
-            font-weight: bold;">
-                ${membroEquipe.data_inicio} <br>até ${membroEquipe.data_fim}
-            </span>
-        </div>
-        <div class="d-flex flex-column justify-content-between align-items-end">
-            <div data-toggle="tooltip" data-placement="top"
-                title="Criar novo itinerário para este membro da equipe"
-                onclick="createNewItinerario(event)">
-                <i class="add-itinerario-icon fa fa-plus"></i>
-            </div>
-            <input type="checkbox" data-toggle="tooltip" data-placement="top"
-            title="Adicionar/Remover membro da equipe ao itinerário"
-            id="select-membro-itinerario" role="button" class="select-membro-itinerario"
-            onchange="selectMembroEquipeItinerario(event)" class="form-control">
-        </div>
-    </div>
-</div>
-
 <script>
     var reloadMap = new CustomEvent('reloadMap', { detail: { message: 'reloadMap' } });
     var map = null
@@ -412,49 +336,49 @@
     var itinerarios = [];
     var currentColor = "#add8e6";
     var pendenteListItems = [
-        {
-            id: 1,
-            endereco: "Rua yyy",
-            data_envio: "17/03/2022",
-            data: null,
-            lat: "-17.89134",
-            lng: "-51.72219",
-            cidade: "Jatai",
-            pendente: true,
-            order: 0
-        },
-        {
-            id: 2,
-            endereco: "Avenida x",
-            data_envio: "17/03/2022",
-            data: null,
-            lat: "-16.96828",
-            lng: "-51.82634",
-            cidade: "Caiapônia",
-            pendente: true,
-            order: 0
-        },
-        {
-            id: 3,
-            endereco: "Rua xyz",
-            data_envio: "17/03/2022",
-            data: null,
-            lng: null,
-            lat: null,
-            cidade: "Catalão",
-            pendente: true,
-            order: 0
-        }
+    {
+                id: 1,
+                endereco: "Rua yyy",
+                data_envio: "17/03/2022",
+                data: null,
+                lat: "-17.89134",
+                lng: "-51.72219",
+                cidade: "Jatai",
+                pendente: true,
+                order: 0
+            },
+            {
+                id: 2,
+                endereco: "Avenida x",
+                data_envio: "17/03/2022",
+                data: null,
+                lat: "-16.96828",
+                lng: "-51.82634",
+                cidade: "Caiapônia",
+                pendente: true,
+                order: 0
+            },
+            {
+                id: 3,
+                endereco: "Rua xyz",
+                data_envio: "17/03/2022",
+                data: null,
+                lng: null,
+                lat: null,
+                cidade: "Catalão",
+                pendente: true,
+                order: 0
+            }
     ]
     
     function addMembroEquipeOnItinerario(membroEquipe) {
-        console.log(membroEquipe)
+        if (!membroEquipe.nome) return
         let membroEquipeList = $("#itinerario-membros-equipe-list")
         $(`<div class="pessoa-card p-2">
                 <div class="d-flex">
                     <div class="d-flex justify-content-between align-items-between flex-column">
                         <span id="membro-equipe-nome" style="line-height: 1rem;">
-                            ${membroEquipe.pessoa_id}
+                            ${membroEquipe.nome}
                         </span>
                         <div>
                             <span id="membro-equipe-tipo" class="mb-2 mt-1">

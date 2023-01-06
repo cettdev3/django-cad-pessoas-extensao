@@ -9,3 +9,5 @@ from .escola import Escola
 from .acao import Acao
 from .ticket import Ticket
 from .membroExecucao import MembroExecucao
+from .itinerario import Itinerario
+from .itinerarioItem import ItinerarioItem

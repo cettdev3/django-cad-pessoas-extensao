@@ -1,6 +1,10 @@
 <label><b>Pessoa:</b></label>
-<select class="form-control" 
-id="pessoa_id" 
+<select class="form-control"
+{% if id %} 
+id="pessoa_id_{{id}}"
+{% else %} 
+id="pessoa_id"
+{% endif %} 
 name="pessoa_id">
     <option value="">Selecione Pessoa</option>
     {% for pessoa in pessoas %}
@@ -8,6 +12,15 @@ name="pessoa_id">
         {% if pessoa_id == pessoa.id %}selected{% endif %}>{{pessoa.nome}}</option>
     {% endfor %}
 </select>
-
+<input type="text" name="nome" hidden>
 <script>
+    $(document).ready(function(){
+        let id = "{{id}}";
+        let inputSelectId = id > 0 ? "#pessoa_id_"+id : "#pessoa_id";
+        $(inputSelectId).on("change", function(event){
+            let nextSibbling = $(event.target).next();
+            let selectedOption = $(event.target).find("option:selected").text();
+            nextSibbling.val(selectedOption);
+        });
+    });
 </script>
