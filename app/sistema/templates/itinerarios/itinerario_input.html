@@ -1,0 +1,1191 @@
+<style>
+    #map-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    /*
+        #itinerario-items-container,
+        #pendente-items-container {
+            width: 25%;
+        } */
+
+    #itinerario-items-list,
+    #pendente-items-list {
+        float: left;
+        border-radius: 6px;
+    }
+
+    #itinerario-items-list:after,
+    #pendente-items-list:after {
+        clear: both;
+        content: '';
+        display: table;
+    }
+
+    #itinerario-items-list li,
+    #pendente-items-list li {
+        cursor: grab;
+        background: white;
+        display: block;
+        position: relative;
+        padding: 12px 6px;
+        z-index: 1;
+        color: black;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #itinerario-items-list li:hover,
+    #pendente-items-list li:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    #itinerario-items-list li,
+    #pendente-items-list li {
+        transition: transform .2s;
+    }
+
+    .marker {
+        opacity: 0.0;
+        transition: .2s height
+    }
+
+    .ui-sortable-helper {
+        transform: scale(.9)
+    }
+
+    .border-red {
+        border: 1px solid red;
+    }
+
+    /* body {
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    } */
+
+    .pessoa-card {
+        background-color: #fff;
+        border-radius: 5px;
+        color: #000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        display: block;
+        margin: 10px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        width: 160px;
+    }
+
+    .pessoa-card:hover {
+
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .scroll-custom::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .scroll-custom::-moz-scrollbar {
+        width: 4px;
+    }
+
+    .scroll-custom::-ms-scrollbar {
+        width: 4px;
+    }
+
+    .scroll-custom::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .scroll-custom::-moz-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .scroll-custom::-ms-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .scroll-custom::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    .scroll-custom::-moz-scrollbar-button {
+        display: none;
+    }
+
+    .scroll-custom::-ms-scrollbar-button {
+        display: none;
+    }
+
+    .color-picker {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .color-option {
+        width: 75px;
+        height: 75px;
+        border: 1px solid black;
+        position: relative;
+    }
+
+    .color-option:hover {
+        cursor: pointer;
+        border-color: white;
+    }
+
+    .color-option.selected {
+        border-color: black;
+    }
+
+    .select-membro-itinerario {
+        width: 1.3rem;
+        height: 1.3rem;
+        transform: scale(1.3);
+        background-color: white;
+        border-radius: 50%;
+        vertical-align: middle;
+        border: 3px solid #ddd;
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .select-membro-itinerario:hover {
+        transform: scale(1.5);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .add-itinerario-icon {
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    .add-itinerario-icon:hover {
+        transform: scale(1.2);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    #membro-equipe-tipo {
+        line-height: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 2px 5px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    .itinerarios-toggle:hover {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .itinerarios-toggle-icon {
+        -moz-transition: transform 0.5s;
+        -webkit-transition: transform 0.5s;
+        transition: transform 0.5s;
+        font-size: 1.2rem;
+    }
+
+    .itinerarios-toggle-icon:hover {
+        transform: scale(1.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .flip {
+        transform: rotate(-180deg);
+    }
+</style>
+
+<div class="h-100 w-100 d-flex justify-content-end">
+    <div class="w-50">
+        <div class=" w-100 h-100 d-flex flex-column">
+            <div class="flex-grow-1 d-flex" style="max-height: 100%; overflow:hidden;">
+                <div class="flex-grow-0  scroll-custom" style="max-height: 100%; overflow:auto;">
+                    <div class="px-2 py-1 w-100 sticky-top bg-light" style="color: #000;">
+                        Equipe
+                    </div>
+                    <div id="itinerario-membros-equipe-list">
+                        <div class="pessoa-card p-2">
+                            <div class="d-flex">
+                                <div class="d-flex justify-content-between align-items-between flex-column">
+                                    <span id="membro-equipe-nome" style="line-height: 1rem;">Brendany coutinho cabral de
+                                        freitas</span>
+                                    <div>
+                                        <span id="membro-equipe-tipo" class="mb-2 mt-1">diária</span>
+                                    </div>
+                                    <span style="font-size: 0.9rem; 
+                                        line-height: 0.9rem;
+                                        font-weight: bold;">12/12/2022 <br>até 22/12/2022</span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-between align-items-end">
+                                    <div data-toggle="tooltip" data-placement="top"
+                                        title="Criar novo itinerário para este membro da equipe"
+                                        onclick="createNewItinerario(event)">
+                                        <i class="add-itinerario-icon fa fa-plus"></i>
+                                    </div>
+                                    <input type="checkbox" data-toggle="tooltip" data-placement="top"
+                                        title="Adicionar/Remover membro da equipe ao itinerário"
+                                        id="select-membro-itinerario" role="button" class="select-membro-itinerario"
+                                        onchange="selectMembroEquipeItinerario(event)" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pessoa-card p-2">
+                            <div class="d-flex">
+                                <div class="d-flex justify-content-between align-items-between flex-column">
+                                    <span id="membro-equipe-nome" style="line-height: 1rem;">Victtor alves Cabral</span>
+                                    <div>
+                                        <span id="membro-equipe-tipo" class="mb-2 mt-1">diária</span>
+                                    </div>
+                                    <span style="font-size: 0.9rem; 
+                                        line-height: 0.9rem;
+                                        font-weight: bold;">12/12/2022 <br>até 22/12/2022</span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-between align-items-end">
+                                    <div onclick="createNewItinerario(event)">
+                                        <i class="add-itinerario-icon fa fa-plus"></i>
+                                    </div>
+                                    <input type="checkbox" id="select-membro-itinerario" role="button"
+                                        class="select-membro-itinerario" onchange="selectMembroEquipeItinerario(event)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-100 scroll-custom " style="max-height: 100%; overflow:auto; flex: 1;">
+                    <div id="itinerario-header" data-toggle="tooltip" data-placement="top"
+                        title="Mostrar/ocultar itinerários" class="px-2 py-1 w-100 sticky-top itinerarios-toggle"
+                        style="color: #000; background-color: lightblue; border-radius: 5px;">
+                        <div class="position-relative" role="button" onclick="toggleColorPicker(event)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Itinerário</span>
+                                <div>
+                                    <i id="itinerarios-toggle-open"
+                                        class="itinerarios-toggle-icon fa-solid fa-chevron-down"></i>
+                                    <i class=""></i>
+                                    <i id="itinerarios-toggle-close" style="display: none;"
+                                        class="itinerarios-toggle-icon fa-solid fa-xmark"></i>
+                                </div>
+                            </div>
+                            <div style="display: none;" id="itinerario-color-picker"
+                                class="color-picker position-absolute w-100 h-100">
+                                <div onclick="selectItinerarioColor(event)" data-toggle="tooltip" data-placement="top"
+                                    title="Selecionar itinerário" class="color-option position-relative"
+                                    style="background-color: lightblue;">
+                                    <div onclick="deleteItinerario(event)" id="deletar-itinerario"
+                                        class="bg-danger p-2 rounded position-absolute"
+                                        style="top: 0; right: 0; font-size: 0.8rem;" data-toggle="tooltip"
+                                        data-placement="top" title="Deletar itinerário">
+                                        <i id="deletar-itinerario-icon" class="fa-solid fa-xmark fa-inverse "></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <ul class="m-0 py-0 px-2 w-100" style="min-height: 50px;" id="itinerario-items-list">
+                        </ul>
+                        <div class="w-100">
+                            <button onclick="addItem()" data-toggle="tooltip" data-placement="top"
+                                title="Adicionar item ao itinerário" class="btn btn-outline-secondary w-100"
+                                type="button" id="button-addon2">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-100 scroll-custom " style="max-height: 100%; overflow:auto;flex: 1;">
+                    <div data-toggle="tooltip" data-placement="top"
+                    title="Arraste e solte os itens para adicionar ao itinerário"
+                    class="px-2 py-1 w-100 sticky-top bg-light" style="color: #000;">
+                        Pendentes
+                    </div>
+                    <div class="w-100">
+                        <ul id="pendente-items-list" style="min-height: 50px;" class="m-0 py-0 px-1 w-100">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w-50">
+        <div id="map-container">
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-input-date" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="modal-input-date-input" type="date" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" data-dismiss="modal" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-input-itinerario" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button id="dismiss-itinerario-modal" type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="itinerario-item-cidade" type="text" class="form-control">
+                <input id="itinerario-item-data" type="date" class="form-control">
+                <input id="input-validated-itinerario" type="text" hidden class="form-control">
+                <div id="modal-itinerario-error-validacao" style="display: none;" class="bg-danger px-2">
+                    <span>Preencha todos os campos</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-save-button" type="button" onclick="validateItinerarioData(event)"
+                    class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pessoa-card p-2">
+    <div class="d-flex">
+        <div class="d-flex justify-content-between align-items-between flex-column">
+            <span id="membro-equipe-nome" style="line-height: 1rem;">
+                ${membroEquipe.nome}
+            </span>
+            <div>
+                <span id="membro-equipe-tipo" class="mb-2 mt-1">
+                    ${membroEquipe.tipo}
+                </span>
+            </div>
+            <span style="font-size: 0.9rem; 
+            line-height: 0.9rem;
+            font-weight: bold;">
+                ${membroEquipe.data_inicio} <br>até ${membroEquipe.data_fim}
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-between align-items-end">
+            <div data-toggle="tooltip" data-placement="top"
+                title="Criar novo itinerário para este membro da equipe"
+                onclick="createNewItinerario(event)">
+                <i class="add-itinerario-icon fa fa-plus"></i>
+            </div>
+            <input type="checkbox" data-toggle="tooltip" data-placement="top"
+            title="Adicionar/Remover membro da equipe ao itinerário"
+            id="select-membro-itinerario" role="button" class="select-membro-itinerario"
+            onchange="selectMembroEquipeItinerario(event)" class="form-control">
+        </div>
+    </div>
+</div>
+
+<script>
+    var reloadMap = new CustomEvent('reloadMap', { detail: { message: 'reloadMap' } });
+    var map = null
+    var pendenteMarkers = []
+    var markers = [];
+    var latLngs = {};
+    var itinerarios = [];
+    var currentColor = "#add8e6";
+    var pendenteListItems = [
+        {
+            id: 1,
+            endereco: "Rua yyy",
+            data_envio: "17/03/2022",
+            data: null,
+            lat: "-17.89134",
+            lng: "-51.72219",
+            cidade: "Jatai",
+            pendente: true,
+            order: 0
+        },
+        {
+            id: 2,
+            endereco: "Avenida x",
+            data_envio: "17/03/2022",
+            data: null,
+            lat: "-16.96828",
+            lng: "-51.82634",
+            cidade: "Caiapônia",
+            pendente: true,
+            order: 0
+        },
+        {
+            id: 3,
+            endereco: "Rua xyz",
+            data_envio: "17/03/2022",
+            data: null,
+            lng: null,
+            lat: null,
+            cidade: "Catalão",
+            pendente: true,
+            order: 0
+        }
+    ]
+    
+    function addMembroEquipeOnItinerario(membroEquipe) {
+        console.log(membroEquipe)
+        let membroEquipeList = $("#itinerario-membros-equipe-list")
+        $(`<div class="pessoa-card p-2">
+                <div class="d-flex">
+                    <div class="d-flex justify-content-between align-items-between flex-column">
+                        <span id="membro-equipe-nome" style="line-height: 1rem;">
+                            ${membroEquipe.pessoa_id}
+                        </span>
+                        <div>
+                            <span id="membro-equipe-tipo" class="mb-2 mt-1">
+                                ${membroEquipe.tipo}
+                            </span>
+                        </div>
+                        <span style="font-size: 0.9rem; 
+                        line-height: 0.9rem;
+                        font-weight: bold;">
+                            ${membroEquipe.data_inicio} <br>até ${membroEquipe.data_fim}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column justify-content-between align-items-end ml-1">
+                        <div data-toggle="tooltip" data-placement="top"
+                            title="Criar novo itinerário para este membro da equipe"
+                            onclick="createNewItinerario(event)">
+                            <i class="add-itinerario-icon fa fa-plus"></i>
+                        </div>
+                        <input type="checkbox" data-toggle="tooltip" data-placement="top"
+                        title="Adicionar/Remover membro da equipe ao itinerário"
+                        id="select-membro-itinerario" role="button" class="select-membro-itinerario"
+                        onchange="selectMembroEquipeItinerario(event)" class="form-control">
+                    </div>
+                </div>
+            </div>`).appendTo(membroEquipeList)
+    }
+
+    function removeItinerarioEquipeMembers() {
+        $("#itinerario-membros-equipe-list").empty()
+    }
+
+    function getItinerarioData() {
+        let itinerarioData = []
+        $(".pessoa-card").each(function (index, element) {
+            let color = rgb2hex($(element).css("background-color"))
+            let nome = $(element).find("#membro-equipe-nome").text()
+            console.log("nome: ", nome)
+            itinerarioData.push({
+                nome: nome,
+                color: color,
+                itinerario: itinerarios.find(itinerario => itinerario.color == color)
+            })
+        })
+        console.log("itinerarioData: ", itinerarioData)
+    }
+
+    function validateItinerarioData(event) {
+        let data = $('#itinerario-item-data').val();
+        let cidade = $('#itinerario-item-cidade').val();
+        if (data.length != 0 && cidade.length != 0) {
+            $("#input-validated-itinerario").val("validated");
+            $("#modal-input-itinerario").modal('toggle');
+        } else {
+            $("#modal-itinerario-error-validacao").show()
+        }
+    }
+
+    function toggleIcons() {
+        let toggleOpen = $("#itinerarios-toggle-open")
+        let toggleClose = $("#itinerarios-toggle-close")
+        if ($(toggleOpen).is(":visible")) {
+            toggleOpen.slideToggle(0, function () {
+                toggleClose.slideToggle(500);
+            })
+        } else {
+            toggleClose.slideToggle(0, function () {
+                toggleOpen.slideToggle(500);
+            })
+        }
+    }
+
+    function getColorFromColorOptionDescendent(element) {
+        let maxTry = 10
+        while (!element.hasClass("color-option") && maxTry > 0) {
+            element = element.parent()
+            maxTry--
+        }
+
+        if (maxTry == 0) return null
+        return rgb2hex(element.css('background-color'))
+    }
+
+    function deleteItinerario(event) {
+        let selectedColor = getColorFromColorOptionDescendent($(event.target))
+        let indexToDelete = itinerarios.findIndex(itinerario => itinerario.color == selectedColor)
+        let itinerario = itinerarios.splice(indexToDelete, 1)[0]
+
+        if (!itinerario) return
+
+        pendenteListItems
+            .filter(pendenteItem => pendenteItem.color == selectedColor)
+            .map(pendenteItem => pendenteItem.color = null)
+
+        $(".pessoa-card").each((i, membroEquipeContainer) => {
+            let membroEquipeColor = rgb2hex($(membroEquipeContainer).css("background-color"))
+            if (membroEquipeColor != selectedColor) return
+            let input = $(membroEquipeContainer).find("#select-membro-itinerario");
+            let membroEquipeTipoContainer = $(membroEquipeContainer).find("#membro-equipe-tipo");
+
+            input.css("background-color", "#ffffff");
+            input.css("border", "3px solid #ddd");
+            membroEquipeTipoContainer.css("border", "3px solid #ddd");
+            $(membroEquipeContainer).css("background-color", "#ffffff")
+            $(membroEquipeContainer).css("color", "#000000")
+        })
+
+        let colorOptions = $(".color-option")
+        let nextColorOption = colorOptions.filter((i, colorOption) => {
+            let color = rgb2hex($(colorOption).css("background-color"))
+            return color != selectedColor
+        }).first()
+        let colorOptionToRemove = colorOptions.filter((i, colorOption) => {
+            let color = rgb2hex($(colorOption).css("background-color"))
+            return color == selectedColor
+        }).first()
+        nextColorOption.trigger("click")
+        colorOptionToRemove.remove()
+
+        if (colorOptions.length == 1) {
+            $("#itinerario-header").css("background-color", "#f8f9fa")
+            $("#itinerario-header").css("color", "#000000")
+            $("#itinerario-items-list").empty()
+        }
+
+    }
+
+    function selectItinerarioColor(event) {
+        let colorOption = $(event.target)
+        let isDeleteButton = colorOption.attr("id") ? colorOption.attr("id").includes("deletar") : false
+        if (isDeleteButton) return
+
+        currentColor = rgb2hex(colorOption.css('background-color'))
+        let itinerario = setCurrentItinerario()
+        clearMap()
+        buildMap(itinerario)
+        $("#itinerario-header").css("background-color", currentColor)
+        $("#itinerario-header").css("color", getContrastYIQ(currentColor))
+        $("#itinerario-items-list").empty()
+        itinerario.itens.forEach(item => {
+            $("#itinerario-items-list").append(addItem(item))
+        })
+        toggleIcons()
+    }
+
+    function toggleColorPicker(event) {
+        let target = $(event.target)
+        let isDeleteButton = target.attr("id") ? target.attr("id").includes("deletar") : false
+        if (isDeleteButton) return
+        let isColorOption = target.hasClass("color-option")
+        $("#itinerario-color-picker").toggle()
+        if (!isColorOption) toggleIcons()
+    }
+
+    function createDeleteItinerarioBtn() {
+        return $(`<div id="deletar-itinerario" 
+            onclick="deleteItinerario(event)"
+            class="bg-danger p-2 rounded position-absolute" 
+            style="top: 0; right: 0; font-size: 0.8rem;"
+            data-toggle="tooltip" data-placement="top" 
+            title="Deletar itinerário">
+                <i id="deletar-itinerario-icon" class="fa-solid fa-xmark fa-inverse "></i>
+            </div>`)
+    }
+
+    function addItinerarioColor(color) {
+        const colorOption = $(`<div 
+            onclick="selectItinerarioColor(event)" 
+            class="color-option position-relative" 
+            style="background-color: ${color};"></div>`)
+
+        $("#itinerario-color-picker").append(colorOption)
+        colorOption.append(createDeleteItinerarioBtn(color))
+    }
+
+    function clearMap() {
+        map.eachLayer(function (layer) {
+            if (!!layer.toGeoJSON) map.removeLayer(layer);
+        });
+        $(".leaflet-top.leaflet-right").remove();
+        $(".leaflet-bottom.leaflet-right").remove();
+    }
+
+    function buildMap(itinerario) {
+        itinerario.itens.forEach(item => {
+            addMarker(item).then(itemWithMarker => {
+                item = itemWithMarker
+            })
+        })
+        pendenteListItems.forEach(item => {
+            addMarker(item).then(itemWithMarker => {
+                item = itemWithMarker
+            })
+        })
+        return createItinerarioRoute(itinerario)
+    }
+
+    function setCurrentItinerario(marker = null, routeControl = null) {
+        let currentItinerario = itinerarios.find(itinerario => itinerario.color == currentColor)
+
+        if (currentItinerario) return currentItinerario
+
+        let itinerario = {
+            itens: [],
+            color: currentColor,
+        }
+
+        itinerarios.push(itinerario);
+        return itinerario
+    }
+
+    function addItinerarioItem(item) {
+        let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor)
+        if (!itinerario) {
+            itinerario = { itens: [], color: currentColor }
+            itinerarios.push(itinerario)
+        }
+        itinerario.itens.push(item)
+        return itinerario
+    }
+
+    function createItinerarioRoute(itinerario) {
+        if (itinerario.itens.length < 2) return
+
+        let prevItem = null
+        itinerario.itens.forEach(item => {
+            if (item.marker && prevItem && prevItem.marker) {
+                let routeControl = createRoute(prevItem.marker, item.marker)
+                item.routeControl = routeControl
+                prevItem.routeControl = routeControl
+            }
+            prevItem = item
+        })
+
+        return itinerario
+    }
+
+    function addMarkerFromLatLng(item) {
+        iconOptions = {
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }
+        if (item.pendente && !item.color) {
+            iconOptions.iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png';
+        } else {
+            iconOptions.iconUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-icon.png';
+        }
+
+        var icon = L.icon(iconOptions);
+        let marker = L.marker([item.lat, item.lng]).addTo(map);
+
+        marker.setIcon(icon);
+        item.marker = marker;
+        return item
+    }
+
+    async function addMarker(item) {
+        if (item.pendente && item.color && item.color != currentColor) return
+
+        if (item.lat == null || item.lng == null) {
+            let address = item.cidade + ", GO "
+            await fetch(`https://geocode.xyz/${address}?json=1&auth=13274327318611213541x110865`)
+                .then(response => response.json())
+                .then(data => {
+                    item.lat = data.latt;
+                    item.lng = data.longt;
+                });
+        }
+
+        return addMarkerFromLatLng(item)
+    }
+
+    function selectMembroEquipeItinerario(event) {
+        let target = $(event.target);
+        let counter = 0;
+        while (!$(target).hasClass("pessoa-card") && counter < 15) {
+            target = target.parent();
+            counter++
+        }
+        let color = rgb2hex(target.css("background-color"));
+        let backgroundColor = color == "#ffffff" ? currentColor : "#ffffff";
+        let colorText = color == "#ffffff" ? getContrastYIQ(currentColor) : "#000000";
+        target.css("background-color", backgroundColor);
+        target.css("color", colorText);
+
+        let input = $(target).find("#select-membro-itinerario");
+        let membroEquipeTipoContainer = $(target).find("#membro-equipe-tipo");
+        input.css("background-color", backgroundColor);
+        input.css("border", backgroundColor == "#ffffff" ? "3px solid #ddd" : "3px solid " + colorText);
+        membroEquipeTipoContainer.css("border", backgroundColor == "#ffffff" ? "3px solid #ddd" : "3px solid " + colorText);
+    }
+
+    function clearItinerarioList() {
+        $("#itinerario-items-list").empty();
+    }
+
+    function rgb2hex(c) {
+        return '#' + c.match(/\d+/g).map(x => (+x).toString(16).padStart(2, 0)).join``
+    }
+
+    function getContrastYIQ(hexcolor) {
+        hexcolor = hexcolor.replace("#", "");
+        var r = parseInt(hexcolor.substr(0, 2), 16);
+        var g = parseInt(hexcolor.substr(2, 2), 16);
+        var b = parseInt(hexcolor.substr(4, 2), 16);
+        var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? 'black' : 'white';
+    }
+
+    function generateRandomColor() {
+        let generatedColors = $("#itinerario-color-picker").find(".color-option").map(function () {
+            return rgb2hex($(this).css("background-color"))
+        }).get();
+        // Generate a random color
+        const newColor = '#' + Math.random().toString(16).slice(2, 8);
+
+        // Check if the new color is significantly different from the colors in the generatedColors array
+        const isDifferentEnough = generatedColors.every(color => {
+            const r1 = parseInt(color.slice(1, 3), 16);
+            const g1 = parseInt(color.slice(3, 5), 16);
+            const b1 = parseInt(color.slice(5, 7), 16);
+            const r2 = parseInt(newColor.slice(1, 3), 16);
+            const g2 = parseInt(newColor.slice(3, 5), 16);
+            const b2 = parseInt(newColor.slice(5, 7), 16);
+            const difference = Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+            return difference > 25; // Adjust this threshold to control how different the colors must be
+        });
+
+        // If the new color is different enough, return it. Otherwise, generate a new color.
+        return isDifferentEnough ? newColor : generateRandomColor(generatedColors);
+    }
+
+    function createNewItinerario(event) {
+        currentColor = generateRandomColor();
+        let fonteColor = getContrastYIQ(currentColor);
+        let target = $(event.target)
+
+        let counter = 0;
+        while (!$(target).hasClass("pessoa-card") && counter < 10) {
+            target = target.parent();
+            counter++
+        }
+
+        let input = $(target).find("#select-membro-itinerario");
+        let membroEquipeTipoContainer = $(target).find("#membro-equipe-tipo");
+        input.prop("checked", true);
+
+        target.css("background-color", currentColor);
+        target.css("color", fonteColor);
+        input.css("background-color", currentColor);
+        input.css("border", "3px solid " + fonteColor);
+        membroEquipeTipoContainer.css("border", "2px solid " + fonteColor);
+
+
+        let itinerario = setCurrentItinerario();
+        clearMap();
+        clearItinerarioList();
+        buildMap(itinerario);
+        addItinerarioColor(currentColor);
+        $("#itinerario-header").css("background-color", currentColor);
+        $("#itinerario-header").css("color", getContrastYIQ(currentColor));
+    }
+
+    function createRoute(marker1, marker2) {
+        let control = L.Routing.control({
+            waypoints: [
+                L.latLng(marker1.getLatLng()),
+                L.latLng(marker2.getLatLng())
+            ],
+            fitSelectedRoutes: false,
+            // routeWhileDragging: true,
+            // geocoder: L.Control.Geocoder.nominatim(),
+            // router: L.Routing.osrmv1({
+            //     serviceUrl: 'http://localhost:5000/route/v1'
+            // })
+        }).on('routesfound', function (e) {
+            var route = e.routes[0];
+            var totalDistance = route.summary.totalDistance;
+            $(".leaflet-top.leaflet-right").remove();
+            $(".leaflet-bottom.leaflet-right").remove();
+        }).addTo(map);
+
+        return control
+    }
+
+    function removeItinerarioItem(parent) {
+        let endereco = parent.find("#endereco").text();
+        let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
+
+        itinerario.itens.forEach((item, index) => {
+            if (item.endereco.trim().replace(",", "") == endereco.trim().replace(',', "")) {
+                clearMap()
+                itinerario.itens.splice(index, 1);
+                buildMap(itinerario);
+                if (!item.pendente) parent.remove();
+                return
+            }
+        })
+    }
+
+    function createDeleteButton(endereco) {
+        let button = $("<button></button>");
+        button.addClass("btn");
+        button.addClass("btn-danger");
+        button.addClass("btn-sm");
+        button.css("position", "absolute");
+        button.css("right", "0");
+        button.css("top", "0");
+        button.css("outline", "none");
+
+        button.attr("id", "delete-button")
+        button.text("X");
+        button.click(function () {
+            let parent = $(this).parent();
+            let index = parent.index();
+            if (rgb2hex(parent.css("background-color")) == "#ff6347") {
+                removeItinerarioItem(parent);
+            }
+
+            parent.css("background-color", "#ff6347");
+            parent.css("color", "white");
+
+            setTimeout(function () {
+                parent.animate({
+                    backgroundColor: "white",
+                    color: "black",
+                }, 500)
+            }, 3000);
+        });
+        return button;
+    }
+
+    function getItinerarioItemDataFromModal() {
+        let modal = $('#modal-input-itinerario');
+        modal.modal('show');
+        $(".modal-backdrop").css("z-index", "999")
+        modal.on('shown.bs.modal', function () {
+            $('#itinerario-item-cidade').focus();
+        });
+
+        return new Promise(resolve => {
+            modal.on('hidden.bs.modal', function (event) {
+                let item = {
+                    data: null,
+                    cidade: null,
+                }
+
+                let clearForm = () => {
+                    $('#itinerario-item-data').val("");
+                    $('#itinerario-item-cidade').val("");
+                    $('#input-validated-itinerario').val("");
+                    $('#modal-itinerario-error-validacao').hide()
+                }
+
+                let validated = $('#input-validated-itinerario').val() ? true : false;
+                if (validated) {
+                    item.data = $('#itinerario-item-data').val();;
+                    item.cidade = $('#itinerario-item-cidade').val();
+                }
+                clearForm()
+                resolve(item);
+                modal.off('hidden.bs.modal shown.bs.modal');
+            });
+        });
+    }
+
+    async function getModalLifecycle(item) {
+        if (item) {
+            item.alreadyExists = true
+            return item
+        }
+
+        item = await getItinerarioItemDataFromModal()
+        item.alreadyExists = false
+        return item
+    }
+
+    async function addItem(item = null) {
+        item = await getModalLifecycle(item)
+        let hasCidade = item.cidade && item.cidade.length > 0;
+        let hasData = item.data && item.data.length > 0;
+        if (!hasCidade || !hasData) return;
+        let enderecoDiv = $("<div></div>");
+        let enderecoValue = item.cidade
+        let dataValue = item.data
+        let li = $('<li></li>');
+        let dataEnvioDiv = $("<div></div>");
+        let cidadeSpan = $("<span></span>");
+        let enderecoSpan = $("<span></span>");
+        let estadoSpan = $("<span></span>");
+
+        li.addClass('pendente-item');
+        li.addClass('ui-sortable-handle');
+        li.addClass('mx-0');
+        li.addClass('my-1');
+        li.addClass('position-relative');
+
+        cidadeSpan.text("");
+        cidadeSpan.attr("id", "cidade");
+
+        enderecoSpan.text(enderecoValue + ", ");
+        enderecoSpan.attr("id", "endereco");
+
+        estadoSpan.text(" GO");
+        estadoSpan.attr("id", "estado");
+
+        enderecoDiv.append(enderecoSpan);
+        enderecoDiv.append(cidadeSpan);
+        enderecoDiv.append(estadoSpan);
+
+        dataEnvioDiv.text("Data: " + dataValue);
+        dataEnvioDiv.addClass("data-envio");
+
+        li.append(enderecoDiv);
+        li.append(dataEnvioDiv);
+
+        $('#itinerario-items-list').append(li);
+
+        $('#input-itinerario-cidade').val('');
+        $('#input-itinerario-data').val('');
+        if (!item.alreadyExists) {
+            item = {
+                id: 1,
+                endereco: enderecoValue,
+                data_envio: null,
+                data: dataValue,
+                lat: null,
+                lng: null,
+                cidade: enderecoValue,
+                pendente: false,
+                order: 0
+            }
+
+            item = await addMarker(item);
+            let itinerario = addItinerarioItem(item);
+            createItinerarioRoute(itinerario);
+        }
+        item.data = dataValue;
+        if (!item.pendente) li.append(createDeleteButton(item.endereco));
+    }
+
+    function addPendenteItems() {
+        pendenteListItems.forEach((item, index) => {
+            let li = $('<li></li>');
+            let enderecoDiv = $("<div></div>");
+            let dataEnvioDiv = $("<div></div>");
+            let cidadeSpan = $("<span></span>");
+            let enderecoSpan = $("<span></span>");
+            let estadoSpan = $("<span></span>");
+
+            li.addClass('pendente-item');
+            li.addClass('ui-sortable-handle');
+            li.addClass('mx-0');
+            li.addClass('my-1');
+
+            cidadeSpan.text(item.cidade);
+            cidadeSpan.attr("id", "cidade");
+
+            enderecoSpan.text(item.endereco + ", ");
+            enderecoSpan.attr("id", "endereco");
+
+            estadoSpan.text(" GO");
+            estadoSpan.attr("id", "estado");
+
+            enderecoDiv.append(enderecoSpan);
+            enderecoDiv.append(cidadeSpan);
+            enderecoDiv.append(estadoSpan);
+
+            dataEnvioDiv.text("Data do envio: " + item.data_envio);
+            dataEnvioDiv.addClass("data-envio");
+
+            li.append(enderecoDiv);
+            li.append(dataEnvioDiv);
+
+            $('#pendente-items-list').append(li);
+
+            let updatedItem = addMarker(item)
+            item = updatedItem
+        })
+    }
+
+    function makeSortable(listSelector, itemSelector, conectWithSelector) {
+        var startIndex, changeIndex, uiHeight;
+
+        $(listSelector).sortable({
+            'placeholder': 'marker',
+            connectWith: conectWithSelector,
+            start: function (e, ui) {
+                console.log("start")
+                startIndex = ui.placeholder.index();
+                uiHeight = ui.item.outerHeight(true);
+
+                ui.item.nextAll(listSelector + ' li:not(.marker)').css({
+                    transform: 'translateY(' + uiHeight + 'px)'
+                });
+
+                ui.placeholder.css({
+                    height: 0,
+                    padding: 0,
+                });
+            },
+            change: function (e, ui) {
+                console.log("change")
+                changeIndex = ui.placeholder.index();
+
+
+                if (startIndex > changeIndex) {
+
+                    var slice = $(listSelector + ' li').slice(
+                        changeIndex,
+                        $(listSelector + ' li').length
+                    );
+
+                    slice.not('.ui-sortable-helper').each(function () {
+                        var item = $(this);
+                        item.css({
+                            transform: 'translateY(' + uiHeight + 'px)'
+                        });
+                    });
+
+                } else if (startIndex < changeIndex) {
+
+                    var slice = $(listSelector + ' li').slice(startIndex, changeIndex);
+
+                    slice.not('.ui-sortable-helper').each(function () {
+                        var item = $(this);
+                        item.css({
+                            transform: 'translateY(0px)'
+                        });
+                    });
+                }
+
+                startIndex = changeIndex
+            },
+            stop: function (e, ui) {
+                console.log("stop")
+                let origem = listSelector.substring(1)
+                let destino = ui.item.parent().attr("id")
+                let pendenteAddedToItinerario = origem == "pendente-items-list" && destino == "itinerario-items-list"
+                let item = ui.item;
+                let dataEnvio = item.children('.data-envio')
+                let cidade = dataEnvio.parent().find("#cidade").text()
+                let endereco = dataEnvio.parent().find("#endereco").text()
+                let itinerarioPendenteItem = pendenteListItems.find(item =>
+                    item.cidade.trim().replace(",", "") == cidade.trim().replace(",", "") &&
+                    item.endereco.trim().replace(",", "") == endereco.trim().replace(",", "")
+                )
+                let revertItem = origem == "itinerario-items-list" && destino == "pendente-items-list" && !itinerarioPendenteItem
+
+                if (revertItem) {
+                    $("#itinerario-items-list").sortable("cancel");
+                } else {
+                    if (itinerarioPendenteItem && itinerarioPendenteItem.data_envio) {
+                        itinerarioPendenteItem.color = null
+                        removeItinerarioItem(ui.item)
+                    }
+                }
+
+                if (pendenteAddedToItinerario) {
+                    let modal = $('#modal-input-date');
+                    modal.modal('show');
+                    $(".modal-backdrop").css("z-index", "999");
+                    modal.on('shown.bs.modal', function () {
+                        $('#list-input-data').focus();
+                    });
+
+                    let data = ""
+                    modal.on('hidden.bs.modal', function () {
+                        data = $('#modal-input-date-input').val();
+
+                        if (data.length > 0 && itinerarioPendenteItem) {
+                            let itinerario = addItinerarioItem(itinerarioPendenteItem)
+                            itinerarioPendenteItem.color = currentColor
+                            itinerarioPendenteItem.data = data
+                            dataEnvio.text(data);
+                            clearMap()
+                            buildMap(itinerario)
+                        } else {
+                            $("#pendente-items-list").sortable("cancel");
+                        }
+
+                        $('#modal-input-date-input').val('');
+                        modal.off('hidden.bs.modal shown.bs.modal');
+                    });
+                }
+                $('.ui-sortable-handle').css({
+                    transform: 'translateY(0px)'
+                })
+            }
+        });
+        $("#itinerario-header").css("background-color", "#" + currentColor)
+    }
+
+    function makeMap() {
+        map = L.map('map-container', {
+            minZoom: 6.2,
+            zoomControl: false,
+        }).setView([-15.93444444, -49.52027778], 6.2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '',
+        }).addTo(map);
+
+        var southWest = L.latLng(-13.150819336334086, -53.02207017838955),
+            northEast = L.latLng(-19.06470687839804, -43.80751979947091),
+            bounds = L.latLngBounds(southWest, northEast);
+
+        map.setMaxBounds(bounds);
+    }
+
+    $(document).ready(function () {
+        makeMap();
+        makeSortable("#itinerario-items-list", ".itinerario-item", "#pendente-items-list");
+        makeSortable("#pendente-items-list", ".pendente-item", "#itinerario-items-list");
+        addPendenteItems();
+        setCurrentItinerario();
+
+        $(document).on('mouseup', function (e) {
+            if ($(e.target).closest('#itinerario-header').length) return
+
+            if (!$("#itinerario-color-picker").is(":visible")) return
+
+            $("#itinerario-color-picker").toggle();
+            toggleIcons();
+        });
+
+        $('body').on('reloadMap', function (e) {
+            map.invalidateSize();
+        });
+
+    });
+
+</script>

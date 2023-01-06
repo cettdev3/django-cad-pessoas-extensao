@@ -4,6 +4,7 @@ from ..models.escola import Escola
 from ..models.pessoa import Pessoas
 
 class Acao(models.Model):
+    # Ação se refere a ações realizadas pelo departamento de extensaão
     EMPRESTIMO = 'emprestimo'
 
     MAPPED_TIPOS = [

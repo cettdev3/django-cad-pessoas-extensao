@@ -14,11 +14,11 @@
 
     <!-- Custom fonts for this template-->
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
-    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'/>
+    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css' />
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-        <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/gestao-cursos.css' %}" rel="stylesheet">
@@ -27,11 +27,21 @@
     <link href="{% static 'css/general.css' %}" rel="stylesheet">
     <link href="{% static 'css/visualizar_evento.css' %}" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    
-   <!-- FONT AWESOME -->
+
+    <!-- FONT AWESOME -->
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- LEAFLET MAP -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
 
 <body id="page-top">
@@ -40,9 +50,8 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="logout-last navbar-nav sidebar sidebar-dark accordion" 
-        style="background-color: #0c504b; position: sticky; top: 0; height: 100vh;" 
-        id="accordionSidebar">
+        <ul class="logout-last navbar-nav sidebar sidebar-dark accordion"
+            style="background-color: #0c504b; position: sticky; top: 0; height: 100vh;" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
@@ -75,38 +84,38 @@
             {% if user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-pessoas">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Pessoas</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Pessoas</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-eventos">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Ensino</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Ensino</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-cursos">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Cursos</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Cursos</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-cidades">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Cidades</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Cidades</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-escolas">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Escolas</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Escolas</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerencia_turnos">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Turnos</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Turnos</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerencia_acoes">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Ações</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Ações</span></a>
             </li>
             <!-- <li class="nav-item">
                 <a class="nav-link" href="/testeGerenciar">
@@ -132,28 +141,27 @@
                 </div>
             </li> -->
             <!-- {% endif %} -->
-            
+
             {% if user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link" href="/auth-user/logout-user">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Logout</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Logout</span></a>
             </li>
             {% else %}
             <li class="nav-item">
                 <a class="nav-link" href="/auth-user/login-user">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Login</span></a>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Login</span></a>
             </li>
             {% endif %}
-            
+
 
         </ul>
         <!-- End of Sidebar -->
         <div class="d-flex flex-column w-100">
             <!-- Topbar -->
-            <nav style="position: sticky; top: 0; z-index: 4;"
-            class=" navbar w-100 
+            <nav style="position: sticky; top: 0; z-index: 4;" class=" navbar w-100 
             navbar-expand navbar-light 
             bg-white topbar
             static-top shadow">
@@ -161,38 +169,38 @@
                     {% if page_title %}
                     <div class="align-items-center">
                         {% if path_back %}
-                            <a class="link-back" href="/{{path_back}}">
-                                <i class="fa-solid fa-arrow-left"></i>
-                            </a>
+                        <a class="link-back" href="/{{path_back}}">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
                         {% endif %}
                         <span class="h4 ml-2">{{ page_title }}</span>
                     </div>
                     {% endif %}
                     {% if user.is_authenticated %}
-                        <span >Bem vindo {{ user.get_username }}</span>
+                    <span>Bem vindo {{ user.get_username }}</span>
                     {% endif %}
                 </div>
             </nav>
             <!-- End of Topbar -->
-    
+
             <!-- Content Wrapper -->
             <div id="content-wrapper" class="d-flex flex-column">
-    
+
                 <!-- Main Content -->
                 <div id="content">
-    
+
                     <!-- Begin Page Content -->
                     <div class="w-100" style="min-height: 100vh;">
-    
+
                         {% block content %}
-    
+
                         {% endblock content %}
                     </div>
                     <!-- /.container-fluid -->
-                    
+
                 </div>
                 <!-- End of Main Content -->
-    
+
             </div>
             <!-- End of Content Wrapper -->
         </div>
@@ -216,19 +224,28 @@
     <!-- Custom scripts for all pages-->
     <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
 
-     <!-- Page level plugins -->
-     <script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
-     <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
-    
-     <script src="{% static 'js/gestao-pessoas.js' %}"></script>
-     <!-- Page level custom scripts -->
-     <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+    <!-- Page level plugins -->
+    <script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
 
-     <script src="{% static 'js/jquery.mask.js' %}"></script>
+    <script src="{% static 'js/gestao-pessoas.js' %}"></script>
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
 
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="{% static 'js/jquery.mask.js' %}"></script>
 
-     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <!-- leaflet -->
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- jquery ui -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
+        integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
     <script type="text/javascript">
         function maskValues() {
             $('#telefone').mask("(00)0 0000-0000");

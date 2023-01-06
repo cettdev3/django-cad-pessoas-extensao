@@ -1,118 +1,215 @@
-<div class="modal fade" id="cadastrarAcaoModal" tabindex="-1" role="dialog"
-    aria-labelledby="cadastrarAcaoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <form id="cadastrarAcaoForm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cadastrarAcaoModalLabel">
-                        {% if acao is None %}
-                            Cadastrar Ação
-                            <span id="acaoModelId" hidden></span>
-                        {% else %}
-                            Editar Cadastro de: {{acao.descricao}}
-                            <span id="acaoModelId" hidden>{{acao.id}}</span>
-                        {% endif %}
-                    </h5>
-                    <button type="button" 
-                    id="dismissCadastrarAcoes" 
-                    class="close" 
-                    data-dismiss="modal" 
-                    aria-label="Close">
-                        <span>&times;</span>
-                    </button>
+<style>
+    :root {
+        --acaoModalHeaderHeight: 120px;
+        --acaoModalFooterHeight: 50px;
+    }
+
+    .custom-modal-fade {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .custom-modal {
+        position: fixed;
+        border-radius: 5px;
+        top: 20%;
+        left: 50%;
+        max-height: 100vh;
+        max-width: 100vw;
+        overflow: hidden;
+        transform: translate(-50%, -20%);
+        background-color: #fff;
+        z-index: 1000;
+    }
+
+    .custom-modal-header {
+        position: relative;
+        width: 100%;
+        max-height: var(--acaoModalHeaderHeight);
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-modal-body {
+        position: relative;
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        height: var(--acaoModalFooterHeight);
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-close-modal {
+        height: 40px;
+        cursor: pointer;
+        background-color: #fff;
+        border:none;
+        z-index: 1002;
+    }
+
+    .custom-modal-large-content {
+        max-width: 95vw !important;
+        max-height: calc(100vh - var(--acaoModalFooterHeight) - var(--acaoModalHeaderHeight));
+    }
+
+    .custom-modal-medium-content {
+        max-width: 75vw !important;
+        max-height: calc(75vh - var(--acaoModalFooterHeight) - var(--acaoModalHeaderHeight));
+    }
+
+    .custom-modal-small-content {
+        max-width: 50vw !important;
+        max-height: calc(50vh - var(--acaoModalFooterHeight) - var(--acaoModalHeaderHeight));
+    }
+
+    .bg-red {
+        background-color: red;
+    }
+
+    .acao-modal-header-title {
+        font-size: 1.5rem;
+    }
+
+    .custom-modal-body-container {
+        max-height: calc(100vh - var(--acaoModalFooterHeight) - var(--acaoModalHeaderHeight)); 
+        overflow-y: auto; 
+        overflow-x: hidden;
+    }
+
+    .w-100-perc {
+        width: 100%!important; 
+    }
+    
+    .w-75-perc {
+        width: 75%!important; 
+    }
+
+    .w-100-vw {
+        width: 100vw!important; 
+    }
+    
+    .w-75-vw {
+        width: 75vw!important; 
+    }
+
+    .acao-modal-itinerario-container {
+        width: 100%; 
+        height: calc(95vh - var(--acaoModalFooterHeight) - var(--acaoModalHeaderHeight)); 
+        background-color: #fff;
+    }
+</style>
+<div id="document"></div>
+<div class="custom-modal-fade"></div>
+<div class="custom-modal">
+    <div class="custom-modal-header pl-2">
+        <div class="d-flex flex-column">
+            <div class="acao-modal-header-title d-flex justify-content-between">
+                <span class="py-2">Cadastrar ação</span>
+                <button type="button" style="width: 50px; color: gray;" 
+                class="custom-close-modal d-flex justify-content-center align-items-center p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <ul class="nav nav-tabs row" style="height: 100%;">
+                <li id="acaoTabs1" class="col mx-2 active-acao-form-tab ">
+                    <a id="acoesTabLink1" data-toggle="tab" style="display: none;" role="tab" href="#home">1</a>
+                    <span>1 Dados Gerais</span>
+                </li>
+                {% if not acao %}
+                <li id="acaoTabs2" class="col mx-2">
+                    <a id="acoesTabLink2" data-toggle="tab" style="display: none;" role="tab" href="#pessoas">2</a>
+                    <span>2 Equipe de Execução</span>
+                </li>
+                <li id="acaoTabs3" class="col mx-2">
+                    <a id="acoesTabLink3" data-toggle="tab" style="display: none;" role="tab" href="#itinerarios">3</a>
+                    <span>3 Itinerários</span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div class="custom-modal-body custom-modal-large-content">
+        <form id="cadastrarAcaoForm" class="custom-modal-body-container w-75-vw px-2">
+            <div id="acao-tabs" class="tab-content">
+                <div id="home" class="tab-pane active">
+                    {% include "acoes/acao_form.html" with acao=acao %}
                 </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs row">
-                        <li id="acaoTabs1" class="col py-2 active-form-tab">
-                            <a id="acoesTabLink1" 
-                            data-toggle="tab"
-                            style="display: none;"
-                            role="tab"
-                            href="#home">1</a>
-                            <span>Dados Gerais</span>
-                        </li>
-                        {% if not acao %}
-                        <li id="acaoTabs2" class="col py-2">
-                            <a id="acoesTabLink2" 
-                            data-toggle="tab"
-                            style="display: none;"
-                            role="tab"
-                            href="#pessoas">2</a>
-                            <span>Equipe de Execução</span>
-                        </li>
-                        {% endif %}
-                    </ul>
-                    <div class="tab-content">
-                        <div id="home" class="tab-pane py-3 active">
-                            {% include "acoes/acao_form.html" with acao=acao %}
+                <div id="pessoas" class="tab-pane">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h3">Adicionar Equipe de Execução</span>
+                        <div class="d-flex justify-content-end">
+                            <div class="form-group d-flex justify-content-start align-items-start">
+                                <input name="use_acao_endereco"  
+                                id="use_acao_endereco" 
+                                style="width: 10%; cursor: pointer" 
+                                type="checkbox">
+                                <label for="use_acao_endereco" 
+                                style="line-height: 1rem;white-space: nowrap;">
+                                    <b>Usar endereço da ação</b>
+                                </label>
+                            </div>
+                            <button id="btn-add-pessoa-0"
+                            type="button"
+                            class="btn btn-primary d-inline-flex ml-2" style="height: 50%" 
+                            onclick="addPessoa()">
+                            Adicionar Membro
+                            </button>
                         </div>
-                        {% if not acao %}
-                        <div id="pessoas" class="tab-pane py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h3">Adicionar Equipe de Execução</span>
-                                <div class="d-flex justify-content-end">
-                                    <div class="form-group d-flex justify-content-start align-items-start">
-                                        <input name="use_acao_endereco"  
-                                        id="use_acao_endereco" 
-                                        style="width: 10%; cursor: pointer" 
-                                        type="checkbox">
-                                        <label for="use_acao_endereco" 
-                                        style="line-height: 1rem;white-space: nowrap;">
-                                            <b>Usar endereço da ação</b>
-                                        </label>
-                                    </div>
-                                    <button id="btn-add-pessoa-0"
-                                    type="button"
-                                    class="btn btn-primary d-inline-flex ml-2" style="height: 50%" 
-                                    onclick="addPessoa()">
-                                    Adicionar Membro
-                                    </button>
-                                </div>
-                            </div>
-                            <hr>
-                            {% if acao %}
-                            modo edicao
-                            <div id="pessoas_tickets" class="w-100">
-                            </div>
-                            {% else %}
-                            <div id="pessoas_tickets" class="w-100">
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endif %}
                     </div>
+                    <hr>
+                    {% if acao %}
+                    modo edicao
+                    <div id="pessoas_tickets" class="w-100">
+                    </div>
+                    {% else %}
+                    <div id="pessoas_tickets" class="w-100">
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="modal-footer">
-                    <button id="formAcoesPrev" style="display: none;" type="button" class="btn btn-secondary prev">
-                        <span id="prevAcoesLink" class=""></span>
-                        <span>Anterior</span>
-                    </button>
-                    <button id="formAcoesNext" type="button" class="btn btn-primary">
-                        <span id="nextAcoesLink" class="AcoesMenuLink2">
-                        </span>
-                        <span>Próximo</span>
-                    </button>
-                    <button
-                    {% if acao %}
-                        onclick="editarAcoes({{acao.id}})" 
-                    {% else %}
-                        onclick="cadastrarAcao()" 
-                    {% endif %}
-                    id="finishCadastroAcoes" 
-                    type="button"
-                    class="btn btn-primary">
-                    {% if acao %}
-                        <span>Salvar Alterações</span>
-                    {% else %}
-                        <span>Cadastrar</span>
-                    {% endif %}
-                    </button>
+                <div id="itinerarios" class="tab-pane">
+                    <div class="acao-modal-itinerario-container">
+                        {% include "itinerarios/itinerario_input.html" %}
+                    </div>
                 </div>
             </div>
         </form>
     </div>
+    <div class="custom-modal-footer">      
+        <button id="formAcoesPrev" style="display: none;" type="button" class="btn btn-secondary prev mx-2">
+            <span id="prevAcoesLink" class=""></span>
+            <span>Anterior</span>
+        </button>
+        <button id="formAcoesNext" type="button" class="btn btn-primary mx-2">
+            <span id="nextAcoesLink" class="AcoesMenuLink2">
+            </span>
+            <span>Próximo</span>
+        </button>
+        <button 
+        {% if acao %}
+            onclick="editarAcoes({{acao.id}})" 
+        {% else %}
+            onclick="cadastrarAcao()" 
+        {% endif %}
+        id="finishCadastroAcoes" 
+        type="button" 
+        class="btn btn-primary mx-2">
+            <span>Cadastrar</span>
+        </button>
+    </div>
 </div>
-
 <script>
     var formId = "cadastrarAcaoForm"
     var acaoModelId = "acaoModelId"
@@ -123,8 +220,8 @@
 
     function setMembroExecucaoAddressForm(addressValues, formId = null) {
         let addressFormId = formId ? formId : "collapse_endereco_input_"
-        console.log("formId: ", addressFormId)
         $("*[id^='"+addressFormId+"'").each(function(index) {
+            let form = $(this)
             for (key in addressValues) {
                 if ($(this).attr("id").includes(key)) {
                     $(this).val(addressValues[key])
@@ -184,11 +281,13 @@
     function clearModalForm(changedResource = null) {
         if (changedResource) acaoModificadaEventProxy.modificado = changedResource
         if (changedResource) $("#"+dismissCadastrarAcoesId).click()
+        $(".custom-modal-fade").trigger("click")
     }
 
     function cadastrarAcao() {
-        // console.log(getFormData())
-        // return
+        console.log(getItinerarioData())
+        console.log(getFormData())
+        return 
         $.ajax({
             url: "/saveAcao",
             data: JSON.stringify({"data":getFormData()}),
@@ -238,9 +337,35 @@
         return values
     }
 
+    function closeBehavior() {
+        $('.custom-modal-fade').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+
+        $('.custom-close-modal').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+
+        $('.custom-complete-modal').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+    }
+
+    function openCustomModal() {
+        $('.custom-modal-fade').fadeIn(250);
+        $('.custom-modal').fadeIn(250);
+        $("body").css("overflow", "hidden")
+    }
+
     function getActiveTab() {
-        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
-            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        let activeTab = $("*[id^='" + "acaoTabs" + "']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-acao-form-tab")
         })
 
         id = $(activeTab[0]).attr("id")
@@ -252,25 +377,52 @@
     }
 
     function functionGetTabsQuantity() {
-        let tabs = $("*[id^='"+tabsId+"']")
-        return $("*[id^='"+tabsId+"']").length
+        let tabs = $("*[id^='" + "acaoTabs" + "']")
+        return $("*[id^='" + "acaoTabs" + "']").length
+    }
+
+    function addEquipeMembersToItinerario() {
+        getFormData().membros_execucao.forEach(function (membroEquipe, index) {
+            addMembroEquipeOnItinerario(membroEquipe)
+        })
+    }
+
+    function processItinerarioTab() {
+        let activeId = $("#acao-tabs > div:nth-child("+getActiveTab()+")").attr("id")
+        let customModalBodyContainer = $(".custom-modal-body-container").first()
+        if (activeId == "itinerarios") {
+            if (!customModalBodyContainer.hasClass("w-100-vw")) {
+                customModalBodyContainer.removeClass("w-75-vw")
+                customModalBodyContainer.addClass("w-100-vw")
+            }
+            addEquipeMembersToItinerario()
+            $('body').trigger('reloadMap')
+        } else {
+            removeItinerarioEquipeMembers()
+            customModalBodyContainer.removeClass("w-100-vw")
+            customModalBodyContainer.addClass("w-75-vw")
+        }
     }
 
     function showHideTabs(instructions) {
         instructions.show.forEach(function (elementId) {
-                $("#" + elementId).show()
+            $("#" + elementId).show()
         })
+
         instructions.hide.forEach(function (elementId) {
             $("#" + elementId).hide()
         })
+
+        processItinerarioTab()
     }
 
     function processTabBtnClick(direction) {
+        console.log("processando tab",direction)
         let activeTab = getActiveTab()
         let nextTab = parseInt(activeTab) + direction
-        $("#acoesTabLink"+nextTab).trigger("click")
-        $("#acaoTabs"+nextTab).addClass("active-form-tab")
-        $("#acaoTabs"+activeTab).removeClass("active-form-tab")
+        $("#acoesTabLink" + nextTab).trigger("click")
+        $("#acaoTabs" + nextTab).addClass("active-acao-form-tab")
+        $("#acaoTabs" + activeTab).removeClass("active-acao-form-tab")
         setTabsbehavior()
     }
 
@@ -308,12 +460,10 @@
     }
 
     function bindEnderecosInputs() {
-        console.log("bindig enderecos")
         $("#logradouro").change(function() {
             if ($("#use_acao_endereco").is(":checked")) {
                 setMembroExecucaoAddressForm(getFormData())
             }
-            console.log("logradouro")
         })
         $("#bairro").change(function() {
             if ($("#use_acao_endereco").is(":checked")) {
@@ -336,29 +486,25 @@
             }
         })
     }
-
+    
     $(document).ready(function () {
-        $("#cadastrarAcaoModal").on('hide.bs.modal', function(){
-            let pessoaId = $("#"+acaoModelId).text()
-            if (pessoaId) {
-                clearModalForm()
-            }
-        });
+        closeBehavior();
 
         setTabsbehavior()
-        $("#formAcoesNext").click(function () {
+        $("#formAcoesNext").click(function (event) {
+            event.preventDefault()
             processTabBtnClick(1)
         })
-        $("#formAcoesPrev").click(function () {
+        $("#formAcoesPrev").click(function (event) {
+            event.preventDefault()
             processTabBtnClick(-1)
-        })  
-
+        })
         $("#use_acao_endereco").change(function () {
-            console.log(getFormData())
             if (this.checked) setMembroExecucaoAddressForm(getFormData())
         })
+        $("body").css("overflow", "hidden")
         bindEnderecosInputs()
         addMembroExecucaoForm(0)
         maskValues()
-    });
+    })
 </script>

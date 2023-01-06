@@ -3,6 +3,7 @@ from ..models.endereco import Endereco
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 class Evento(models.Model):
+    # Eventos se tornou ensino, aqui ficam controles de alocação de professores nas escolas
     STATUS_PLANNEJADO = "planejamento"
     STATUS_ANDAMENTO = "andamento"
     STATUS_FINALIZADO = "finalizado"

@@ -92,9 +92,8 @@
         transition: background-color 0.1s;
     }
 
-    .active-form-tab {
-        background-color: #15865d;
-        color: white;
+    .active-acao-form-tab {
+        border-bottom: 5px solid #15865d;
     }
 </style>
 <div
@@ -162,6 +161,7 @@ z-index: 4
         let data = {
             id: id
         }
+
         $.ajax({
             url: rotaModalAcao,
             dataType: "html",
@@ -170,7 +170,7 @@ z-index: 4
             type: "GET",
             success: function (data) {
                 $("#"+idModal).html(data);
-                $('#'+cadastrarAcaoModalId).modal('toggle');
+                // $('#'+cadastrarAcaoModalId).modal('toggle');
             }
         });
     }
