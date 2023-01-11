@@ -211,14 +211,14 @@
     <div class="w-50">
         <div class=" w-100 h-100 d-flex flex-column">
             <div class="flex-grow-1 d-flex" style="max-height: 100%; overflow:hidden;">
-                <div class="flex-grow-0  scroll-custom" style="max-height: 100%; overflow:auto;">
+                <div class="flex-grow-0  scroll-custom" style="max-height: 100%; overflow-y: auto;">
                     <div class="px-2 py-1 w-100 sticky-top bg-light" style="color: #000;">
                         Equipe
                     </div>
                     <div id="itinerario-membros-equipe-list">
                     </div>
                 </div>
-                <div class="h-100 scroll-custom " style="max-height: 100%; overflow:auto; flex: 1;">
+                <div class="h-100 scroll-custom " style="max-height: 100%; overflow-y: auto; overflow-x: hidden;flex: 1;">
                     <div id="itinerario-header" data-toggle="tooltip" data-placement="top"
                         title="Mostrar/ocultar itinerários" class="px-2 py-1 w-100 sticky-top itinerarios-toggle"
                         style="color: #000; background-color: lightblue; border-radius: 5px;">
@@ -235,9 +235,9 @@
                             </div>
                             <div style="display: none;" id="itinerario-color-picker"
                                 class="color-picker position-absolute w-100 h-100">
-                                <div onclick="selectItinerarioColor(event)" data-toggle="tooltip" data-placement="top"
-                                    title="Selecionar itinerário" class="color-option position-relative"
-                                    style="background-color: lightblue;">
+                                <div onclick="selectItinerarioColor(event)" data-toggle="tooltip" 
+                                data-placement="top" title="Selecionar itinerário" 
+                                class="color-option position-relative" style="background-color: lightblue;">
                                     <div onclick="deleteItinerario(event)" id="deletar-itinerario"
                                         class="bg-danger p-2 rounded position-absolute"
                                         style="top: 0; right: 0; font-size: 0.8rem;" data-toggle="tooltip"
@@ -260,7 +260,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="h-100 scroll-custom " style="max-height: 100%; overflow:auto;flex: 1;">
+                <div class="h-100 scroll-custom " style="max-height: 100%; overflow-y: auto; flex: 1;">
                     <div data-toggle="tooltip" data-placement="top"
                     title="Arraste e solte os itens para adicionar ao itinerário"
                     class="px-2 py-1 w-100 sticky-top bg-light" style="color: #000;">
@@ -321,7 +321,7 @@
             </div>
             <div class="modal-footer">
                 <button id="modal-save-button" type="button" onclick="validateItinerarioData(event)"
-                    class="btn btn-primary">Save changes</button>
+                class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
@@ -336,39 +336,6 @@
     var itinerarios = [];
     var currentColor = "#add8e6";
     var pendenteListItems = [
-    {
-                id: 1,
-                endereco: "Rua yyy",
-                data_envio: "17/03/2022",
-                data: null,
-                lat: "-17.89134",
-                lng: "-51.72219",
-                cidade: "Jatai",
-                pendente: true,
-                order: 0
-            },
-            {
-                id: 2,
-                endereco: "Avenida x",
-                data_envio: "17/03/2022",
-                data: null,
-                lat: "-16.96828",
-                lng: "-51.82634",
-                cidade: "Caiapônia",
-                pendente: true,
-                order: 0
-            },
-            {
-                id: 3,
-                endereco: "Rua xyz",
-                data_envio: "17/03/2022",
-                data: null,
-                lng: null,
-                lat: null,
-                cidade: "Catalão",
-                pendente: true,
-                order: 0
-            }
     ]
     
     function addMembroEquipeOnItinerario(membroEquipe) {
@@ -380,6 +347,8 @@
                         <span id="membro-equipe-nome" style="line-height: 1rem;">
                             ${membroEquipe.nome}
                         </span>
+                        <span hidden id="membro-equipe-id" style="line-height: 1rem;">${membroEquipe.pessoa_id}</span>
+                        <span hidden id="membro-equipe-color" style="line-height: 1rem;"></span>
                         <div>
                             <span id="membro-equipe-tipo" class="mb-2 mt-1">
                                 ${membroEquipe.tipo}
@@ -411,18 +380,48 @@
     }
 
     function getItinerarioData() {
-        let itinerarioData = []
-        $(".pessoa-card").each(function (index, element) {
+        let itinerariosObj = []
+
+        $(".color-option").each(function (index, element) {
+            console.log("color-option", element, index)
+            let itinerarioObj = {
+                membros_equipe: [],
+                itens: [],
+                color: ""
+            }
             let color = rgb2hex($(element).css("background-color"))
-            let nome = $(element).find("#membro-equipe-nome").text()
-            console.log("nome: ", nome)
-            itinerarioData.push({
-                nome: nome,
-                color: color,
-                itinerario: itinerarios.find(itinerario => itinerario.color == color)
+            itinerarioObj.color = color
+            $(".pessoa-card").each(function (index, element) {
+                let pessoaColor = rgb2hex($(element).css("background-color"))
+                if (pessoaColor == color) {
+                    let pessoaId = $(element).find("#membro-equipe-id").text()
+                    let tipoSolicitacao = $(element).find("#membro-equipe-tipo").text()
+                    let membroEquipeObj = {
+                        pessoa_id: pessoaId.trim(),
+                        tipo_solicitacao: tipoSolicitacao.trim(),
+                        color: pessoaColor.trim()
+                    }
+                    itinerarioObj.membros_equipe.push(membroEquipeObj)
+                }
             })
+
+            itinerarios.filter(itinerario => itinerario.color == color).forEach(itinerario => {
+                itinerario.itens.forEach(itinerarioItem => {
+                    let itinerarioItemObj = {
+                        endereco: itinerarioItem.endereco,
+                        cidade: itinerarioItem.cidade,
+                        data: itinerarioItem.data,
+                        color: itinerario.color,
+                        latitude: itinerarioItem.lat,
+                        longitude: itinerarioItem.lng
+                    }
+                    itinerarioObj.itens.push(itinerarioItemObj)
+                })
+            })
+            itinerariosObj.push(itinerarioObj)
         })
-        console.log("itinerarioData: ", itinerarioData)
+
+        return itinerariosObj
     }
 
     function validateItinerarioData(event) {
@@ -647,9 +646,10 @@
                 .then(data => {
                     item.lat = data.latt;
                     item.lng = data.longt;
-                });
+                })
+                .catch(response => console.log(response))
         }
-
+        if (item.lat == null || item.lng == null) return null
         return addMarkerFromLatLng(item)
     }
 
@@ -667,6 +667,8 @@
         target.css("color", colorText);
 
         let input = $(target).find("#select-membro-itinerario");
+        let colorSpan = $(target).find("#membro-equipe-color");
+        colorSpan.text(color == "#ffffff" ? currentColor : "#ffffff");
         let membroEquipeTipoContainer = $(target).find("#membro-equipe-tipo");
         input.css("background-color", backgroundColor);
         input.css("border", backgroundColor == "#ffffff" ? "3px solid #ddd" : "3px solid " + colorText);
@@ -962,18 +964,65 @@
         })
     }
 
+    function createDraggableItem(target) {
+        let counter = 0
+        while (!$(target).hasClass("pendente-item") && counter < 10) {
+            target = target.parent();
+            counter++
+        }
+        let data = target.find(".data-envio").text()
+        let endereco = target.find("#endereco").text()
+        let li = $('<li></li>');
+        let enderecoDiv = $("<div></div>");
+        let dataEnvioDiv = $("<div></div>");
+        let cidadeSpan = $("<span></span>");
+        let enderecoSpan = $("<span></span>");
+        let estadoSpan = $("<span></span>");
+
+        li.addClass('pendente-item');
+        li.addClass('custom-draggable-item');
+        li.addClass('ui-sortable-handle');
+        li.addClass('mx-0');
+        li.addClass('my-1');
+
+        cidadeSpan.text("");
+        cidadeSpan.attr("id", "cidade");
+
+        enderecoSpan.text(endereco);
+        enderecoSpan.attr("id", "endereco");
+
+        estadoSpan.text(" GO");
+        estadoSpan.attr("id", "estado");
+
+        enderecoDiv.append(enderecoSpan);
+        enderecoDiv.append(cidadeSpan);
+        enderecoDiv.append(estadoSpan);
+
+        dataEnvioDiv.text(data);
+        dataEnvioDiv.addClass("data-envio");
+
+        li.append(enderecoDiv);
+        li.append(dataEnvioDiv);
+        return li
+    }
+
     function makeSortable(listSelector, itemSelector, conectWithSelector) {
         var startIndex, changeIndex, uiHeight;
 
         $(listSelector).sortable({
             'placeholder': 'marker',
             connectWith: conectWithSelector,
+            helper: function(e) {
+                let target = $(e.target);
+                var c = createDraggableItem(target);
+                return c;
+            },
             start: function (e, ui) {
                 console.log("start")
                 startIndex = ui.placeholder.index();
                 uiHeight = ui.item.outerHeight(true);
 
-                ui.item.nextAll(listSelector + ' li:not(.marker)').css({
+                ui.item.nextAll(`${listSelector}  li:not(.marker ) li:not(.custom-draggable-item)`).css({
                     transform: 'translateY(' + uiHeight + 'px)'
                 });
 
@@ -1029,7 +1078,6 @@
                     item.endereco.trim().replace(",", "") == endereco.trim().replace(",", "")
                 )
                 let revertItem = origem == "itinerario-items-list" && destino == "pendente-items-list" && !itinerarioPendenteItem
-
                 if (revertItem) {
                     $("#itinerario-items-list").sortable("cancel");
                 } else {

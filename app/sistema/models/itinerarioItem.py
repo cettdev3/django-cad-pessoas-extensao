@@ -6,7 +6,10 @@ from ..models.itinerario import Itinerario
 
 class ItinerarioItem(models.Model):
     id = models.AutoField(primary_key=True)
-    data_hora = models.DateField(null = True, blank= True)
+    latitude = models.CharField(null = True, max_length=100, blank= True)
+    longitude = models.CharField(null = True, max_length=100, blank= True)
+    data_hora = models.DateTimeField(null = True, blank= True)
+    endereco = models.CharField(null = True, max_length=250, blank= True)
     bairro = models.CharField(null = True, max_length=100, blank= True)
     logradouro = models.CharField(null = True, max_length=250, blank= True)
     cep = models.CharField(null = True, max_length=100, blank= True)

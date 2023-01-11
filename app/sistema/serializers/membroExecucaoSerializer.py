@@ -1,8 +1,10 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from ..models.membroExecucao import MembroExecucao
+from .itinerarioSerializer import ItinerarioSerializer
 
 class MembroExecucaoSerializer(serializers.ModelSerializer):
+    itinerario = ItinerarioSerializer(many=False, read_only=True)
     class Meta:
         model = MembroExecucao
         fields = [
@@ -16,6 +18,7 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "complemento",
             "cidade",
             "pessoa",
-            "ticket"
+            "ticket",
+            "itinerario"
         ]
-        depth = 1
+        depth = 4

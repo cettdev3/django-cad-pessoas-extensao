@@ -71,9 +71,13 @@ def eliminarAcao(request,codigo):
 def saveAcao(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
-
-    acaoResponse = requests.post('http://localhost:8000/acoes', json=body, headers=headers)
+    acaoData = json.loads(request.body)['data']
+    itinerarios = json.loads(request.body)['itinerarios']
+    acaoResponse = requests.post(
+        'http://localhost:8000/acoes', 
+        json={"acao": acaoData, "itinerarios": itinerarios}, 
+        headers=headers
+    )
     acaoResponseStatusCode = acaoResponse.status_code
     acaoResponse = json.loads(acaoResponse.content.decode())
     acao = Acao.objects.get(id=acaoResponse['id'])
@@ -94,6 +98,7 @@ def saveAcao(request):
         if acao.tipo == Acao.EMPRESTIMO:
             acao.status = Acao.STATUS_WAITING_TICKET
         acao.save()
+
     return JsonResponse(acaoResponse, status=acaoResponseStatusCode)
 
 @login_required(login_url='/auth-user/login-user')
@@ -102,6 +107,10 @@ def editarAcao(request, codigo):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/acoes/'+str(codigo), json=body, headers=headers)
+    acaoResponseStatusCode = response.status_code
+    acaoResponse = json.loads(response.content.decode())
+    return JsonResponse(acaoResponse, status=acaoResponseStatusCode)
+
 
 @login_required(login_url='/auth-user/login-user')
 def acoesSelect(request):

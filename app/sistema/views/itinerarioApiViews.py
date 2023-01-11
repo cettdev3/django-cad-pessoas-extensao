@@ -3,9 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
-from ..serializers.escolaSerializer import EscolaSerializer
+from ..serializers.itinerarioSerializer import ItinerarioSerializer
 from ..models.escola import Escola
-from ..models.endereco import Endereco
+from ..models.itinerario import Itinerario
 from ..models.cidade import Cidade
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -22,8 +22,9 @@ class ItinerarioApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        escolas = Escola.objects.all()
-        serializer = EscolaSerializer(escolas, many=True)
+        print("dentro de get itinerarios")
+        itinerarios = Itinerario.objects.all()
+        serializer = ItinerarioSerializer(itinerarios, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):

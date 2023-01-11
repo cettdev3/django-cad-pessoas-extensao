@@ -28,4 +28,4 @@ class AcaoSerializer(serializers.ModelSerializer):
             "endereco_completo",
             "membroexecucao_set"
         ]
-        depth = 1
+        depth = 10

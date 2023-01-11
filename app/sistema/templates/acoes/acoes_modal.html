@@ -285,12 +285,11 @@
     }
 
     function cadastrarAcao() {
-        console.log(getItinerarioData())
-        console.log(getFormData())
-        return 
+        console.log("itinerario: ",getItinerarioData())
+        console.log("formulario: ",getFormData())
         $.ajax({
             url: "/saveAcao",
-            data: JSON.stringify({"data":getFormData()}),
+            data: JSON.stringify({"data": getFormData(), "itinerarios": getItinerarioData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
@@ -417,7 +416,6 @@
     }
 
     function processTabBtnClick(direction) {
-        console.log("processando tab",direction)
         let activeTab = getActiveTab()
         let nextTab = parseInt(activeTab) + direction
         $("#acoesTabLink" + nextTab).trigger("click")
