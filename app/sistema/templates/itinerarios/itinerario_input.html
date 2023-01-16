@@ -546,14 +546,16 @@
 
         currentColor = rgb2hex(colorOption.css('background-color'))
         itinerarioId = colorOption.find("#itinerario-id").text()
+        console.log("itinerarioId", itinerarios)
         let itinerario = setCurrentItinerario(itinerarioId)
+        console.log("itinerario", itinerario.itens)
         clearMap()
         buildMap(itinerario)
         $("#itinerario-header").css("background-color", currentColor)
         $("#itinerario-header").css("color", getContrastYIQ(currentColor))
         $("#itinerario-items-list").empty()
         itinerario.itens.forEach(item => {
-            $("#itinerario-items-list").append(addItem(item))
+            $("#itinerario-items-list").append(addItem(item, false))
         })
         toggleIcons()
     } 
@@ -628,6 +630,7 @@
     }
 
     function addItinerarioItem(item) {
+        console.log("add itinerarioitem")
         let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor)
         if (!itinerario) {
             itinerario = { itens: [], color: currentColor }
@@ -1014,7 +1017,7 @@
         return date.utcOffset("-00:00").format("DD/MM/YYYY HH:mm")
     } 
 
-    async function addItem(item = null) {
+    async function addItem(item = null, shouldAddItinerarioItem = true) {
         item = await getModalLifecycle(item)
         let hasCidade = item.cidade && item.cidade.length > 0;
         let hasData = item.data && item.data.length > 0;
@@ -1080,6 +1083,7 @@
             }
 
         }
+        
         item = await addMarker(item);
         if(acao.id && !item.id) {
             let itinerarioId =  itinerarios.find(itinerario => itinerario.color == currentColor).id
@@ -1111,7 +1115,8 @@
                 }
             });
         }
-        let itinerario = addItinerarioItem(item);
+        let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
+        if(shouldAddItinerarioItem) itinerario = addItinerarioItem(item);
         createItinerarioRoute(itinerario);
         item.data = dataValue;
         
