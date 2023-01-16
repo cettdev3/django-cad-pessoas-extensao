@@ -193,13 +193,11 @@
     }
 
     function clearModalForm(changedResource = null) {
-        if (changedResource) acaoModificadaEventProxy.modificado = changedResource
+        if (changedResource) carregarAcoes()
         if (changedResource) $("#"+dismissCadastrarAcoesId).click()
     }
 
     function cadastrarAcao() {
-        // console.log(getFormData())
-        // return
         $.ajax({
             url: "/saveAcao",
             data: JSON.stringify({"data":getFormData()}),
