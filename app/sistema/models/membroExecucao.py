@@ -18,3 +18,18 @@ class MembroExecucao(models.Model):
     itinerario = models.ForeignKey(Itinerario, on_delete=models.SET_NULL, null=True, blank= True)
     class Meta:
         db_table = 'membros_execucao'
+    
+    @property
+    def endereco_completo(self):
+        enderecoCompleto = "" 
+        if self.cidade:
+            enderecoCompleto += self.cidade.nome + " GO, "
+        if self.logradouro:
+            enderecoCompleto += self.logradouro
+        if self.bairro:
+            enderecoCompleto += ", "+self.bairro
+        if self.complemento:
+            enderecoCompleto += ", "+self.complemento
+        if self.cep:
+            enderecoCompleto += ". "+self.cep+"."
+        return enderecoCompleto

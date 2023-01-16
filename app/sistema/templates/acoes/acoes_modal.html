@@ -382,6 +382,7 @@
 
     function addEquipeMembersToItinerario() {
         getFormData().membros_execucao.forEach(function (membroEquipe, index) {
+            console.log("membroEquipe: ", membroEquipe)
             addMembroEquipeOnItinerario(membroEquipe)
         })
     }

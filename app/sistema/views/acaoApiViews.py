@@ -41,14 +41,6 @@ class AcaoApiView(APIView):
         reset_queries()
         acoes = acoes.all()
         serializer = AcaoSerializer(acoes, many=True)
-        # data1 = serializer.data
-        # for acao in data1:
-        #     print("ação ", acao)
-        #     for membroequipe in acao.membroexecucao_set:
-        #         print(membroequipe)
-        #         for itinerarioItem in membroequipe.itinerario.itinerarioitem_set:
-        #             print(itinerarioItem.id)
-        # print(connection.queries)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -127,8 +119,9 @@ class AcaoApiView(APIView):
                                 {"res": "Não existe cidade com o id informado"},
                                 status=status.HTTP_400_BAD_REQUEST,
                             )
+                    print("dados vindos do post: ",postItinerarioItemData)
                     itinerarioItemData = {
-                        "data_hora": postItinerarioItemData["data_hora"] if postItinerarioItemData.get("data_hora") else None,
+                        "data_hora": postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None,
                         "endereco": postItinerarioItemData["endereco"] if postItinerarioItemData.get("endereco") else None,
                         "bairro": postItinerarioItemData["bairro"] if postItinerarioItemData.get("bairro") else None,
                         "logradouro": postItinerarioItemData["logradouro"] if postItinerarioItemData.get("logradouro") else None,
@@ -166,7 +159,7 @@ class AcaoDetailApiView(APIView):
 
     def get(self, request, acao_id, *args, **kwargs):
 
-        acao = self.get_object(acao_id)
+        acao = self.get_object(Acao, acao_id)
         if not acao:
             return Response(
                 {"res": "Não existe ação com o id informado"},

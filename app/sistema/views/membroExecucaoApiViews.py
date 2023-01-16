@@ -8,6 +8,7 @@ from ..models.acao import Acao
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
 from ..models.ticket import Ticket
+from ..models.itinerario import Itinerario
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
@@ -96,14 +97,14 @@ class MembroExecucaoDetailApiView(APIView):
             return None
             
     def get(self, request, membro_execucao_id, *args, **kwargs):
-        memebroExecucao = self.get_object(membro_execucao_id)
+        memebroExecucao = self.get_object(MembroExecucao, membro_execucao_id)
         if not memebroExecucao:
             return Response(
                 {"res": "Não existe membro da equipe de execução com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = AcaoSerializer(memebroExecucao)
+        serializer = MembroExecucaoSerializer(memebroExecucao)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, membro_execucao_id, *args, **kwargs):
@@ -147,20 +148,33 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.pessoa = pessoa
 
         if request.data.get("acao_id"):
-            acao = self.get_object(Pessoas, request.data.get("acao_id"))
+            acao = self.get_object(Acao, request.data.get("acao_id"))
             if not acao:
                 return Response(
                     {"res": "Não existe ação com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             membroExecucao.acao = acao
+        
+        itinerario = None
+        print("itinerario id na requisição: ",request.data.get("itinerario_id"))
+        if request.data.get("itinerario_id"):
+            itinerario = self.get_object(Itinerario, request.data.get("itinerario_id"))
+            # TODO: Separar rotas em put e patch, dentro desta mesma rota itinerario tem comportamento de put e os outros atributos tem comportamento de patch
+            # if not itinerario:
+            #     return Response(
+            #         {"res": "Não existe itinerario com o id informado"},
+            #         status=status.HTTP_400_BAD_REQUEST,
+            #     )
+        print("itinerario apos processamenot: ",itinerario)
+        membroExecucao.itinerario = itinerario
 
         membroExecucao.save()
-        serializer = AcaoSerializer(membroExecucao)
+        serializer = MembroExecucaoSerializer(membroExecucao)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, membro_execucao_id, *args, **kwargs):
-        
+        print("membro_execucao_id dentro da: ", membro_execucao_id)
         membroExecucao = self.get_object(MembroExecucao, membro_execucao_id)
         if not membroExecucao:
             return Response(

@@ -39,11 +39,14 @@ from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escola
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect,visualizarAcao
+from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao
 from sistema.views.siteTicketViews import ticketModal, saveTicket
+from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
+from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -107,7 +110,6 @@ urlpatterns = [
     path("editarAlocacao/<codigo>",editarAlocacao),
     path("eliminarAlocacao/<codigo>",eliminarAlocacao),
     path("visualizarAcao/<codigo>",visualizarAcao),
-
     
     # ROTAS PARA EVENTOS
     path("gerenciar-eventos",gerencia_eventos),
@@ -145,7 +147,6 @@ urlpatterns = [
     path("editarMembroExecucao/<codigo>",editarMembroExecucao),
     path("eliminarMembroExecucao/<codigo>",eliminarMembroExecucao),
 
-    
     # ROTAS PARA ACOES
     path("gerencia_acoes",gerencia_acoes),
     path("acaoTable",acaoTable),
@@ -160,6 +161,16 @@ urlpatterns = [
     path("ticketModal",ticketModal),
     path("saveTicket",saveTicket),
     
+    # ROTAS PARA ITENS DE ITINERARIO
+    path("saveItinerarioItem",saveItinerarioItem),
+    path("editarItinerarioItem/<codigo>",editarItinerarioItem),
+    path("eliminarItinerarioItem/<codigo>",eliminarItinerarioItem),
+    
+    # ROTAS PARA ITINERARIOS
+    path("saveItinerario", saveItinerario), 
+    path("editarItinerario/<codigo>", editarItinerario), 
+    path("eliminarItinerario/<codigo>", eliminarItinerario),
+        
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
 
@@ -203,7 +214,10 @@ urlpatterns = [
     path('tickets/<int:ticket_id>', TicketDetailApiView.as_view()),
     
     path("itinerarios", ItinerarioApiView.as_view()),
-    path('itinerarios/<int:ticket_id>', ItinerarioDetailApiView.as_view()),
+    path('itinerarios/<int:itinerario_id>', ItinerarioDetailApiView.as_view()),
+    
+    path("itinerario-itens", ItinerarioItemApiView.as_view()),
+    path('itinerario-itens/<int:itinerario_item_id>', ItinerarioItemDetailApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

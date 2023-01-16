@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.serializers.acaoSerializer import AcaoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
+from django.db.models import Prefetch
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_acoes(request):
@@ -107,10 +108,7 @@ def editarAcao(request, codigo):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/acoes/'+str(codigo), json=body, headers=headers)
-    acaoResponseStatusCode = response.status_code
-    acaoResponse = json.loads(response.content.decode())
-    return JsonResponse(acaoResponse, status=acaoResponseStatusCode)
-
+    return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
 def acoesSelect(request):
@@ -119,9 +117,17 @@ def acoesSelect(request):
 
 @login_required(login_url='/auth-user/login-user')
 def visualizarAcao(request,codigo):
-    acao = Acao.objects.get(id=codigo)
+    acao = Acao.objects.prefetch_related(
+        Prefetch(
+            "membroexecucao_set", 
+            queryset=MembroExecucao.objects
+            .select_related("itinerario")
+            .prefetch_related("itinerario__itinerarioitem_set")
+        ),
+    ).get(id=codigo)
     page_title = acao.descricao
     path_back = "gerencia_acoes"
+    acao = AcaoSerializer(acao).data
     return render(request,'acoes/visualizar_acao.html',{
         'acao':acao, 
         'page_title': page_title,

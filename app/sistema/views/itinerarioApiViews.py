@@ -6,6 +6,7 @@ from rest_framework import permissions
 from ..serializers.itinerarioSerializer import ItinerarioSerializer
 from ..models.escola import Escola
 from ..models.itinerario import Itinerario
+from ..models.itinerarioItem import ItinerarioItem
 from ..models.cidade import Cidade
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -22,17 +23,19 @@ class ItinerarioApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        print("dentro de get itinerarios")
         itinerarios = Itinerario.objects.all()
         serializer = ItinerarioSerializer(itinerarios, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        with transaction.atomic():
-            data = request.data.get 
-            print(data)
-            # serializer = EscolaSerializer(escola)
-            return Response({}, status=status.HTTP_201_CREATED)
+        print("body dentro da api: ", request.data)
+        itinerarioData = {
+            "color": request.data.get("color"),
+        }
+
+        itinerario = Itinerario.objects.create(**itinerarioData)
+        serializer = ItinerarioSerializer(itinerario)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ItinerarioDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,53 +47,52 @@ class ItinerarioDetailApiView(APIView):
         except fn.DoesNotExist:
             return None
             
-    def get(self, request, escola_id, *args, **kwargs):
+    def get(self, request, itinerario_id, *args, **kwargs):
 
-        escola = self.get_object(escola_id)
-        if not escola:
+        itinerario = self.get_object(Itinerario, itinerario_id)
+        if not itinerario:
             return Response(
-                {"res": "Não existe escola com o id informado"},
+                {"res": "Não existe itinerario com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = EscolaSerializer(escola)
+        serializer = ItinerarioSerializer(itinerario)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, escola_id, *args, **kwargs):
-        escola = self.get_object(Escola, escola_id)
-        if not escola:
+    def put(self, request, itinerario_id, *args, **kwargs):
+        itinerario = self.get_object(Itinerario, itinerario_id)
+        if not itinerario:
             return Response(
-                {"res": "Não existe escola com o id informado"}, 
+                {"res": "Não existe itinerario com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if request.data.get("nome"):
-            escola.nome = request.data.get("nome")
-        if request.data.get("bairro"):
-            escola.bairro = request.data.get("bairro")
-        if request.data.get("logradouro"): 
-            escola.logradouro = request.data.get("logradouro") 
-        if request.data.get("cep"):
-            escola.cep = request.data.get("cep") 
-        if request.data.get("complemento"):
-            escola.complemento = request.data.get("complemento") 
-        if request.data.get("cidade_id"):
-            escola.cidade = Cidade.objects.get(id = request.data.get("cidade_id"))
+        if request.data.get("color"):
+            itinerario.nome = request.data.get("color")
         
-        escola.save()
-        serializer = EscolaSerializer(escola)
+        itinerario.save()
+        serializer = ItinerarioSerializer(itinerario)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, escola_id, *args, **kwargs):
+    def delete(self, request, itinerario_id, *args, **kwargs):
         
-        escola = self.get_object(escola_id)
-        if not escola:
+        itinerario = self.get_object(Itinerario, itinerario_id)
+        if not itinerario:
             return Response(
-                {"res": "Não existe escola com o id informado"}, 
+                {"res": "Não existe itinerario com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        escola.delete()
-        return Response(
-            {"res": "escola deletada!"},
-            status=status.HTTP_200_OK
-        )
+        with transaction.atomic():
+            itinerarioItems = ItinerarioItem.objects.filter(itinerario=itinerario)
+            for itinerarioItem in itinerarioItems:
+                print("itinerarioItem deletaro: ", itinerarioItem.id)
+                itinerarioItem.delete()
+            
+            print("todos itens de itineraio deletados: ", itinerario.id)
+            itinerario.delete()
+            print("itinerario   deletado: ")
+            return Response(
+                {"res": "itinerario deletada!"},
+                status=status.HTTP_200_OK
+            )
+        

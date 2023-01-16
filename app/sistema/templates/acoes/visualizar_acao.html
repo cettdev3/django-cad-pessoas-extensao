@@ -23,7 +23,9 @@
         text-decoration: none;
     }
 </style>
-<div class="card shadow mb-4 w-100">
+<div 
+class="card shadow mb-4 w-100" 
+style="height: calc(100vh - 75px); overflow-y: hidden;">
     <div class="d-flex justify-content-between pt-3 px-2">
         <div class="d-flex flex-column">
             <div class="d-flex align-items-center ">
@@ -46,10 +48,18 @@
             <li class=" cs-tab-link active">
                 <a id="linkDadosGerais" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
             </li>
+            <li class=" cs-tab-link active">
+                <a onclick="reloadMap()" id="linkDadosGerais" data-toggle="tab" href="#itinerarios">Equipe de Execução</a>
+            </li>
         </ul>
-        <div class="tab-content w-100">
-            <div id="membrosExecucao" class="tab-pane active in">
+        <div class="tab-content w-100 h-100">
+            <div id="membrosExecucao" 
+            class="tab-pane active in h-100"
+            style="overflow-y: scroll;" >
                 <div id="receberTabelaMembrosExecucao"></div>
+            </div>
+            <div id="itinerarios" class="tab-pane" style="height: 100%;">
+                {% include "itinerarios/itinerario_input.html" with itinerario=acao %}
             </div>
         </div>
     </div>
@@ -72,6 +82,11 @@
     let idTabelaMembrosExecucao = "receberTabelaMembrosExecucao"
     let rotaTabelaMembrosExecucao = "membrosExecucaoTable"
     let acaoId = "{{acao.id}}" 
+
+    function reloadMap() {
+        console.log("triggering evcent")
+        $('body').trigger('reloadMap')
+    }
 
     function addMembroExecucaoModal() {
         $.ajax({
@@ -133,6 +148,7 @@
 
         $("#linkDadosGerais").trigger("click")
         carregarMembrosExecucao()
+        $("body").css("overflow", "hidden")
     })
 </script>
 

@@ -83,6 +83,7 @@ def editarMembroExecucao(request, codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarMembroExecucao(request,codigo):
+    print("membro de equipe a ser deletado: ", codigo)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.delete('http://localhost:8000/membroExecucao/'+str(codigo), headers=headers)

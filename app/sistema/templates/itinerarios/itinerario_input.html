@@ -215,7 +215,7 @@
                     <div class="px-2 py-1 w-100 sticky-top bg-light" style="color: #000;">
                         Equipe
                     </div>
-                    <div id="itinerario-membros-equipe-list">
+                    <div id="itinerario-membros-equipe-list" class="pb-5">
                     </div>
                 </div>
                 <div class="h-100 scroll-custom " style="max-height: 100%; overflow-y: auto; overflow-x: hidden;flex: 1;">
@@ -327,7 +327,9 @@
     </div>
 </div>
 
+{{ acao|json_script:"acao_script" }}
 <script>
+    var acao = JSON.parse($("#acao_script").text())
     var reloadMap = new CustomEvent('reloadMap', { detail: { message: 'reloadMap' } });
     var map = null
     var pendenteMarkers = []
@@ -337,18 +339,24 @@
     var currentColor = "#add8e6";
     var pendenteListItems = [
     ]
+    var disableRoutes = true
+    var disableMarkers = true
     
     function addMembroEquipeOnItinerario(membroEquipe) {
         if (!membroEquipe.nome) return
+        let membroEquipeId = membroEquipe.id ? membroEquipe.id : ""
+        let membroEquipeItinerarioId = membroEquipe.itinerario_id ? membroEquipe.itinerario_id : ""
         let membroEquipeList = $("#itinerario-membros-equipe-list")
-        $(`<div class="pessoa-card p-2">
+        let membroEquipeItem = $(`<div class="pessoa-card p-2">
                 <div class="d-flex">
                     <div class="d-flex justify-content-between align-items-between flex-column">
                         <span id="membro-equipe-nome" style="line-height: 1rem;">
                             ${membroEquipe.nome}
                         </span>
-                        <span hidden id="membro-equipe-id" style="line-height: 1rem;">${membroEquipe.pessoa_id}</span>
+                        <span hidden id="membro-equipe-pessoa-id" style="line-height: 1rem;">${membroEquipe.pessoa_id}</span>
                         <span hidden id="membro-equipe-color" style="line-height: 1rem;"></span>
+                        <span hidden id="membro-equipe-id" style="line-height: 1rem;">${membroEquipeId}</span>
+                        <span hidden id="membro-equipe-itinerario-id" style="line-height: 1rem;">${membroEquipeItinerarioId}</span>
                         <div>
                             <span id="membro-equipe-tipo" class="mb-2 mt-1">
                                 ${membroEquipe.tipo}
@@ -366,13 +374,19 @@
                             onclick="createNewItinerario(event)">
                             <i class="add-itinerario-icon fa fa-plus"></i>
                         </div>
+                        <div style="display: none;" id="spinner" class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <span id="spinner"></span>
                         <input type="checkbox" data-toggle="tooltip" data-placement="top"
                         title="Adicionar/Remover membro da equipe ao itinerário"
                         id="select-membro-itinerario" role="button" class="select-membro-itinerario"
                         onchange="selectMembroEquipeItinerario(event)" class="form-control">
                     </div>
                 </div>
-            </div>`).appendTo(membroEquipeList)
+            </div>`)
+            membroEquipeItem.appendTo(membroEquipeList)
+            return membroEquipeItem
     }
 
     function removeItinerarioEquipeMembers() {
@@ -383,7 +397,6 @@
         let itinerariosObj = []
 
         $(".color-option").each(function (index, element) {
-            console.log("color-option", element, index)
             let itinerarioObj = {
                 membros_equipe: [],
                 itens: [],
@@ -394,7 +407,7 @@
             $(".pessoa-card").each(function (index, element) {
                 let pessoaColor = rgb2hex($(element).css("background-color"))
                 if (pessoaColor == color) {
-                    let pessoaId = $(element).find("#membro-equipe-id").text()
+                    let pessoaId = $(element).find("#membro-equipe-pessoa-id").text()
                     let tipoSolicitacao = $(element).find("#membro-equipe-tipo").text()
                     let membroEquipeObj = {
                         pessoa_id: pessoaId.trim(),
@@ -460,13 +473,37 @@
         return rgb2hex(element.css('background-color'))
     }
 
-    function deleteItinerario(event) {
+    function processDeleteItinerarioApi (itinerarioId) {
+        return new Promise((resolve, reject) => {
+            let itinerarioId = $("#itinerario-id").text()
+            let url = `/eliminarItinerario/${itinerarioId}`
+
+            $.ajax({
+                url: url,
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                contentType: 'application/json',
+                method: "POST",
+                success: function (result) {
+                    console.log("deleting itinerario success")
+                    resolve(result)
+                },
+                error: function (error) {
+                    console.log("deleting itinerario error")
+                    reject(error)
+                }
+            })
+        })
+    }
+
+    async function deleteItinerario(event, itinerarioId) {
         let selectedColor = getColorFromColorOptionDescendent($(event.target))
         let indexToDelete = itinerarios.findIndex(itinerario => itinerario.color == selectedColor)
         let itinerario = itinerarios.splice(indexToDelete, 1)[0]
 
         if (!itinerario) return
-
+        console.log("deleting itinerario antes")
+        await processDeleteItinerarioApi(itinerarioId)
+        console.log("deleting itinerario depois")
         pendenteListItems
             .filter(pendenteItem => pendenteItem.color == selectedColor)
             .map(pendenteItem => pendenteItem.color = null)
@@ -510,7 +547,8 @@
         if (isDeleteButton) return
 
         currentColor = rgb2hex(colorOption.css('background-color'))
-        let itinerario = setCurrentItinerario()
+        itinerarioId = colorOption.find("#itinerario-id").text()
+        let itinerario = setCurrentItinerario(itinerarioId)
         clearMap()
         buildMap(itinerario)
         $("#itinerario-header").css("background-color", currentColor)
@@ -520,7 +558,7 @@
             $("#itinerario-items-list").append(addItem(item))
         })
         toggleIcons()
-    }
+    } 
 
     function toggleColorPicker(event) {
         let target = $(event.target)
@@ -531,9 +569,10 @@
         if (!isColorOption) toggleIcons()
     }
 
-    function createDeleteItinerarioBtn() {
+    function createDeleteItinerarioBtn(itinerarioId = null) {
+        itinerarioId = itinerarioId ? itinerarioId : ""
         return $(`<div id="deletar-itinerario" 
-            onclick="deleteItinerario(event)"
+            onclick="deleteItinerario(event, ${itinerarioId})"
             class="bg-danger p-2 rounded position-absolute" 
             style="top: 0; right: 0; font-size: 0.8rem;"
             data-toggle="tooltip" data-placement="top" 
@@ -542,14 +581,17 @@
             </div>`)
     }
 
-    function addItinerarioColor(color) {
+    function addItinerarioColor(color, itinerarioId = null) {
+        itinerarioId = itinerarioId ? itinerarioId : ""
         const colorOption = $(`<div 
             onclick="selectItinerarioColor(event)" 
             class="color-option position-relative" 
-            style="background-color: ${color};"></div>`)
+            style="background-color: ${color};">
+                <span hidden id="itinerario-id">${itinerarioId}</span>
+            </div>`)
 
         $("#itinerario-color-picker").append(colorOption)
-        colorOption.append(createDeleteItinerarioBtn(color))
+        colorOption.append(createDeleteItinerarioBtn(itinerarioId))
     }
 
     function clearMap() {
@@ -574,16 +616,15 @@
         return createItinerarioRoute(itinerario)
     }
 
-    function setCurrentItinerario(marker = null, routeControl = null) {
+    function setCurrentItinerario(id = null) {
         let currentItinerario = itinerarios.find(itinerario => itinerario.color == currentColor)
-
         if (currentItinerario) return currentItinerario
 
         let itinerario = {
+            id: id,
             itens: [],
             color: currentColor,
         }
-
         itinerarios.push(itinerario);
         return itinerario
     }
@@ -594,6 +635,8 @@
             itinerario = { itens: [], color: currentColor }
             itinerarios.push(itinerario)
         }
+
+        item.itinerario_id = itinerario.id
         itinerario.itens.push(item)
         return itinerario
     }
@@ -637,11 +680,12 @@
     }
 
     async function addMarker(item) {
+        if (disableMarkers) return item
         if (item.pendente && item.color && item.color != currentColor) return
 
         if (item.lat == null || item.lng == null) {
             let address = item.cidade + ", GO "
-            await fetch(`https://geocode.xyz/${address}?json=1&auth=13274327318611213541x110865`)
+            await fetch(`https://geocode.xyz/${address}?json=1&auth=248998147636557186450x114483`)
                 .then(response => response.json())
                 .then(data => {
                     item.lat = data.latt;
@@ -653,13 +697,7 @@
         return addMarkerFromLatLng(item)
     }
 
-    function selectMembroEquipeItinerario(event) {
-        let target = $(event.target);
-        let counter = 0;
-        while (!$(target).hasClass("pessoa-card") && counter < 15) {
-            target = target.parent();
-            counter++
-        }
+    function addSelectedStyleToPessoaCard(target) {
         let color = rgb2hex(target.css("background-color"));
         let backgroundColor = color == "#ffffff" ? currentColor : "#ffffff";
         let colorText = color == "#ffffff" ? getContrastYIQ(currentColor) : "#000000";
@@ -672,7 +710,46 @@
         let membroEquipeTipoContainer = $(target).find("#membro-equipe-tipo");
         input.css("background-color", backgroundColor);
         input.css("border", backgroundColor == "#ffffff" ? "3px solid #ddd" : "3px solid " + colorText);
+        let isChecked = backgroundColor == "#ffffff" ? false : true;
+        input.prop("checked", isChecked);
         membroEquipeTipoContainer.css("border", backgroundColor == "#ffffff" ? "3px solid #ddd" : "3px solid " + colorText);
+    }
+
+    function selectMembroEquipeItinerario(event) {
+        let target = $(event.target);
+        let counter = 0;
+        while (!$(target).hasClass("pessoa-card") && counter < 15) {
+            target = target.parent();
+            counter++
+        }
+        let input = $(target).find("#select-membro-itinerario");
+        if (acao.id) {
+            input.hide()
+            $("#spinner").show()
+            let membroEquipeId = $(target).find("#membro-equipe-id").text();
+            let membroEquipeObj = acao.membroexecucao_set.find(membroEquipe => membroEquipe.id == membroEquipeId);
+            let currentItinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
+            if (input.is(":checked")) membroEquipeObj.itinerario_id = currentItinerario.id
+            else membroEquipeObj.itinerario_id = null
+            
+            membroEquipeObj.acao_id = acao.id
+            membroEquipeObj.pessoa_id = membroEquipeObj.pessoa.id
+            membroEquipeObj.cidade_id = membroEquipeObj.cidade.id
+            $.ajax({
+                url: "/editarMembroExecucao/"+membroEquipeId,
+                data: JSON.stringify({"data": membroEquipeObj}),
+                dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                contentType: 'application/json',
+                method: "POST",
+                type: "POST",
+                success: function (data) {
+                    $("#spinner").hide()
+                    input.show()
+                }
+            });
+        }
+        addSelectedStyleToPessoaCard(target)
     }
 
     function clearItinerarioList() {
@@ -715,17 +792,7 @@
         return isDifferentEnough ? newColor : generateRandomColor(generatedColors);
     }
 
-    function createNewItinerario(event) {
-        currentColor = generateRandomColor();
-        let fonteColor = getContrastYIQ(currentColor);
-        let target = $(event.target)
-
-        let counter = 0;
-        while (!$(target).hasClass("pessoa-card") && counter < 10) {
-            target = target.parent();
-            counter++
-        }
-
+    function processCreateItinerario(target, fonteColor, itinerarioId = null) {
         let input = $(target).find("#select-membro-itinerario");
         let membroEquipeTipoContainer = $(target).find("#membro-equipe-tipo");
         input.prop("checked", true);
@@ -735,18 +802,66 @@
         input.css("background-color", currentColor);
         input.css("border", "3px solid " + fonteColor);
         membroEquipeTipoContainer.css("border", "2px solid " + fonteColor);
+        let membroEquipeId = $(target).find("#membro-equipe-id").text();
 
-
-        let itinerario = setCurrentItinerario();
+        if (membroEquipeId) {
+            $.ajax({
+                url: "/editarMembroExecucao/"+membroEquipeId,
+                data: JSON.stringify({"data": {"itinerario_id": itinerarioId}}),
+                dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                contentType: 'application/json',
+                method: "POST",
+                type: "POST",
+                success: function (data) {
+                    console.log("retorno de membro equipe update: ",data)
+                }
+            });
+        }
+        let itinerario = setCurrentItinerario(itinerarioId);
         clearMap();
         clearItinerarioList();
         buildMap(itinerario);
-        addItinerarioColor(currentColor);
+        addItinerarioColor(currentColor, itinerarioId);
         $("#itinerario-header").css("background-color", currentColor);
         $("#itinerario-header").css("color", getContrastYIQ(currentColor));
     }
 
+    function createNewItinerario(event) {
+        currentColor = generateRandomColor();
+        let fonteColor = getContrastYIQ(currentColor);
+
+        let target = $(event.target)
+        let counter = 0;
+        while (!$(target).hasClass("pessoa-card") && counter < 10) {
+            target = target.parent();
+            counter++
+        }
+        if (acao.id) {
+            $.ajax({
+                url: "/saveItinerario",
+                data: JSON.stringify({"data": {"color": currentColor}}),
+                dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                contentType: 'application/json',
+                method: "POST",
+                success: function (data) {
+                    let itinerarioId = data["id"]
+                    processCreateItinerario(target, fonteColor, itinerarioId)
+                }
+            });
+        } else {
+            processCreateItinerario(target)
+        }        
+    }
+
+    function creatItinerarioFromDatabase(data = null) {
+        currentColor = data["color"]
+        addItinerarioColor(currentColor, data["itinerario_id"]);
+    }
+
     function createRoute(marker1, marker2) {
+        if (disableRoutes) return null
         let control = L.Routing.control({
             waypoints: [
                 L.latLng(marker1.getLatLng()),
@@ -770,15 +885,35 @@
 
     function removeItinerarioItem(parent) {
         let endereco = parent.find("#endereco").text();
+        let itinerarioItemId = parent.find("#item-itinerario-id").text();
         let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
-
         itinerario.itens.forEach((item, index) => {
-            if (item.endereco.trim().replace(",", "") == endereco.trim().replace(',', "")) {
-                clearMap()
-                itinerario.itens.splice(index, 1);
-                buildMap(itinerario);
-                if (!item.pendente) parent.remove();
-                return
+            if (itinerarioItemId == item.id) {
+                if (itinerarioItemId) {
+                    $.ajax({
+                        url: "/eliminarItinerarioItem/"+itinerarioItemId,
+                        headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                        contentType: 'application/json',
+                        method: "DELETE",
+                        success: function (data) {
+                            clearMap()
+                            itinerario.itens.splice(index, 1);
+                            buildMap(itinerario);
+                            if (!item.pendente) parent.remove();
+                        },
+                        error: function (data) {
+                            console.log("erro ao eliminar itinerario item: ", data)
+                        }
+                    })
+                } else {
+                    if (item.endereco.trim().replace(",", "") == endereco.trim().replace(',', "")) {
+                        clearMap()
+                        itinerario.itens.splice(index, 1);
+                        buildMap(itinerario);
+                        if (!item.pendente) parent.remove();
+                        return
+                    }
+                }
             }
         })
     }
@@ -828,6 +963,9 @@
                 let item = {
                     data: null,
                     cidade: null,
+                    maker: null,
+                    routeControl: null,
+                    itinerario_id: null,
                 }
 
                 let clearForm = () => {
@@ -839,9 +977,11 @@
 
                 let validated = $('#input-validated-itinerario').val() ? true : false;
                 if (validated) {
-                    item.data = $('#itinerario-item-data').val();;
+                    item.data = $('#itinerario-item-data').val();
                     item.cidade = $('#itinerario-item-cidade').val();
+                    item.itinerario_id = itinerarios.find(itinerario => itinerario.color == currentColor).id
                 }
+
                 clearForm()
                 resolve(item);
                 modal.off('hidden.bs.modal shown.bs.modal');
@@ -868,11 +1008,13 @@
         let enderecoDiv = $("<div></div>");
         let enderecoValue = item.cidade
         let dataValue = item.data
+        let id = item.id ? item.id : ""
         let li = $('<li></li>');
         let dataEnvioDiv = $("<div></div>");
         let cidadeSpan = $("<span></span>");
         let enderecoSpan = $("<span></span>");
         let estadoSpan = $("<span></span>");
+        let idSpan = $("<span></span>");
 
         li.addClass('pendente-item');
         li.addClass('ui-sortable-handle');
@@ -889,6 +1031,10 @@
         estadoSpan.text(" GO");
         estadoSpan.attr("id", "estado");
 
+        idSpan.text(id);
+        idSpan.attr("id", "item-itinerario-id");
+        idSpan.css("display", "none");
+
         enderecoDiv.append(enderecoSpan);
         enderecoDiv.append(cidadeSpan);
         enderecoDiv.append(estadoSpan);
@@ -898,6 +1044,7 @@
 
         li.append(enderecoDiv);
         li.append(dataEnvioDiv);
+        li.append(idSpan);
 
         $('#itinerario-items-list').append(li);
 
@@ -905,7 +1052,6 @@
         $('#input-itinerario-data').val('');
         if (!item.alreadyExists) {
             item = {
-                id: 1,
                 endereco: enderecoValue,
                 data_envio: null,
                 data: dataValue,
@@ -913,14 +1059,48 @@
                 lng: null,
                 cidade: enderecoValue,
                 pendente: false,
-                order: 0
+                order: 0,
+                itinerario_id: itinerarios.find(itinerario => itinerario.color == currentColor).id,
+                marker: null,
+                routeControl: null,
             }
 
-            item = await addMarker(item);
-            let itinerario = addItinerarioItem(item);
-            createItinerarioRoute(itinerario);
         }
+        item = await addMarker(item);
+        if(acao.id && !item.id) {
+            let itinerarioId =  itinerarios.find(itinerario => itinerario.color == currentColor).id
+            let saveItem = {
+                id: item.id,
+                endereco: item.endereco ? item.endereco : item.cidade,
+                data_envio: item.data_envio,
+                data: item.data,
+                latitude: item.lat,
+                longitude: item.lng,
+                cidade: null,
+                pendente: item.pendente,
+                order: item.order,
+                itinerario_id: itinerarioId
+            }
+
+            $.ajax({
+                url: "/saveItinerarioItem",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                data: JSON.stringify({"data": saveItem}),
+                contentType: 'application/json',
+                method: "POST",
+                success: function (data) {
+                    console.log("item de itinerario salvo: ",data)
+                },
+                error: function (data) {
+                    console.log("item de itinerario salvo erro: ",data)
+                    console.log("dentro do erro", saveItem, itinerarios)
+                }
+            });
+        }
+        let itinerario = addItinerarioItem(item);
+        createItinerarioRoute(itinerario);
         item.data = dataValue;
+        
         if (!item.pendente) li.append(createDeleteButton(item.endereco));
     }
 
@@ -1138,6 +1318,65 @@
         map.setMaxBounds(bounds);
     }
 
+    function setAcaoItinerarios(acao) {
+        $("#itinerario-color-picker").empty()
+        itinerarios = []
+        let membrosExecucao = acao["membroexecucao_set"]
+        let membroExecucaoLenght = membrosExecucao.length
+        let colors = []
+        for(let index = 0; index < membroExecucaoLenght; index++) {
+            let membro = membrosExecucao[index]
+            let itinerario = membro["itinerario"]
+            let itinerarioItems = itinerario ? itinerario["itinerarioitem_set"] : null
+            let hasColor = false
+            membroEquipe = { 
+                id: membro["id"],
+                acao_id: acao.id,
+                bairro: membro["bairro"],
+                itinerario_id: membro["itinerario"] ? membro["itinerario"]["id"] : null,
+                cep: membro["cep"],
+                cidade_id: membro["cidade_id"],
+                complemento: membro["complemento"],
+                data_fim: membro["data_fim"],
+                data_inicio: membro["data_inicio"],
+                logradouro: membro["logradouro"],
+                nome: membro["pessoa"]["nome"],
+                pessoa_id: membro["pessoa"]["id"],
+                tipo: membro["tipo"],
+            }
+            let memebroEquipeHtmlElement = addMembroEquipeOnItinerario(membroEquipe)
+            if (!itinerarioItems) continue 
+            if (itinerario.color && !colors.includes(itinerario.color)) {
+                colors.push(itinerario.color)
+                creatItinerarioFromDatabase({"color": itinerario.color, "itinerarioItems": itinerarioItems, "itinerario_id": itinerario.id})
+                for (let index = 0; index < itinerarioItems.length; index++) {
+                    let itinerarioItem = itinerarioItems[index]
+                    item = {
+                        id: itinerarioItem["id"],
+                        itinerario_id: itinerarioItem["itinerario"]["id"],
+                        endereco: itinerarioItem["endereco"],
+                        data_envio: null,
+                        data: itinerarioItem["data_hora"],
+                        lat: itinerarioItem["latitude"],
+                        lng: itinerarioItem["longitude"],
+                        cidade: itinerarioItem["endereco"],
+                        pendente: false,
+                        order: 0,
+                        marker: null,
+                        routeControl: null,
+                    }
+                    let itinerarioAdicionado = setCurrentItinerario(itinerario.id)
+                    itinerarioAdicionado.itens.push(item)
+                }
+            }
+            if (!colors.includes(itinerario.color)) continue
+            currentColor = itinerario.color
+            addSelectedStyleToPessoaCard(memebroEquipeHtmlElement)
+        }
+
+        $(".color-option").first().click()
+    }
+
     $(document).ready(function () {
         makeMap();
         makeSortable("#itinerario-items-list", ".itinerario-item", "#pendente-items-list");
@@ -1154,10 +1393,12 @@
             toggleIcons();
         });
 
-        $('body').on('reloadMap', function (e) {
-            map.invalidateSize();
-        });
+        if (acao.id) setAcaoItinerarios(acao)
 
+        $('body').on('reloadMap', function (e) {
+            setTimeout(function(){ map.invalidateSize()}, 100);
+            map.invalidateSize()
+        });
     });
 
 </script>
