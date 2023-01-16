@@ -8,6 +8,8 @@ from .membroExecucaoSerializer import MembroExecucaoSerializer
 class AcaoSerializer(serializers.ModelSerializer):
     membroexecucao_set = MembroExecucaoSerializer(many=True, read_only=True)
     endereco_completo = serializers.CharField()
+    data_inicio_formatada = serializers.CharField()
+    data_inicio_formatada = serializers.CharField()
     class Meta:
         model = Acao
         fields = [
@@ -26,6 +28,8 @@ class AcaoSerializer(serializers.ModelSerializer):
             "cidade",
             "escola",
             "endereco_completo",
+            "data_inicio_formatada",
+            "data_fim_formatada",
             "membroexecucao_set"
         ]
         depth = 10

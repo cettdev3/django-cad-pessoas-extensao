@@ -2,7 +2,7 @@ from django.db import models
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.pessoa import Pessoas
-
+from datetime import datetime
 class Acao(models.Model):
     # Ação se refere a ações realizadas pelo departamento de extensaão
     EMPRESTIMO = 'emprestimo'
@@ -69,3 +69,12 @@ class Acao(models.Model):
                 extrato += "<strong>data fim</strong>: " + membro.data_fim.strftime("%d/%m/%Y") + "<br>"
             extrato += "</div><hr>"
         return extrato
+    
+    @property
+    def data_inicio_formatada(self):
+        return self.data_inicio.strftime("%d/%m/%Y")
+    
+    @property
+    def data_fim_formatada(self):
+        return self.data_fim.strftime("%d/%m/%Y")
+        
