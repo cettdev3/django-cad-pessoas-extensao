@@ -117,7 +117,11 @@
     <div class="custom-modal-header pl-2">
         <div class="d-flex flex-column">
             <div class="acao-modal-header-title d-flex justify-content-between">
+                {% if not acao %}
                 <span class="py-2">Cadastrar ação</span>
+                {% else %}
+                <span class="py-2">Editar ação</span>
+                {% endif %}
                 <button type="button" style="width: 50px; color: gray;" 
                 class="custom-close-modal d-flex justify-content-center align-items-center p-2">
                     <i class="fa-solid fa-xmark"></i>
@@ -147,6 +151,7 @@
                 <div id="home" class="tab-pane active">
                     {% include "acoes/acao_form.html" with acao=acao %}
                 </div>
+                {% if not acao %}
                 <div id="pessoas" class="tab-pane">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="h3">Adicionar Equipe de Execução</span>
@@ -184,6 +189,7 @@
                         {% include "itinerarios/itinerario_input.html" %}
                     </div>
                 </div>
+                {% endif %}
             </div>
         </form>
     </div>
@@ -206,7 +212,11 @@
         id="finishCadastroAcoes" 
         type="button" 
         class="btn btn-primary mx-2">
-            <span>Cadastrar</span>
+        {% if acao %}
+        <span>Salvar Alterações</span>
+        {% else %}
+        <span>Cadastrar</span>
+        {% endif %}
         </button>
     </div>
 </div>
@@ -374,6 +384,11 @@
         id = id.charAt(id.length - 1)
         return id
     }
+    
+    function getTabs() {
+        let activeTabs = $("*[id^='" + "acaoTabs" + "']")
+        return activeTabs
+    }
 
     function functionGetTabsQuantity() {
         let tabs = $("*[id^='" + "acaoTabs" + "']")
@@ -398,7 +413,11 @@
             addEquipeMembersToItinerario()
             $('body').trigger('reloadMap')
         } else {
-            removeItinerarioEquipeMembers()
+            try {
+                removeItinerarioEquipeMembers()
+            } catch (e) {
+                console.log("Erro ao remover membros do itinerario: ", e)
+            }
             customModalBodyContainer.removeClass("w-100-vw")
             customModalBodyContainer.addClass("w-75-vw")
         }
@@ -447,9 +466,11 @@
 
         activTabFn = getActiveTab()
         tabsQuantity = functionGetTabsQuantity()
-        if (activTabFn == 1) {
+        console.log("activTabFn: ", activTabFn)
+        console.log("tabsQuantity: ", tabsQuantity)
+        if (activTabFn == 1 && tabsQuantity > 1) {
             showHideTabs(tabsControl.first)
-        } else if (activTabFn == 0) {
+        } else if (tabsQuantity == 1) {
             showHideTabs(tabsControl.only)
         } else if (activTabFn == tabsQuantity) {
             showHideTabs(tabsControl.last)

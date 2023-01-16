@@ -5,6 +5,7 @@ import requests
 import json
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
+from sistema.models.membroExecucao import MembroExecucao
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -12,9 +13,13 @@ def ticketModal(request):
     ticket = None
     data = {}
     if request.GET.get('membro_execucao_id'):
+        membroExecucao = MembroExecucao.objects.get(id=request.GET.get('membro_execucao_id'))
         data['membro_execucao_id'] = request.GET.get('membro_execucao_id')
-    if request.GET.get('tipo'):
-        data['tipo'] = request.GET.get('tipo')
+        data['tipo'] = membroExecucao.tipo
+        data['data_inicio'] = membroExecucao.data_inicio
+        data['data_fim'] = membroExecucao.data_fim
+        data['nome_escola'] = membroExecucao.acao.escola.nome
+        data['endereco_completo'] = membroExecucao.endereco_completo
     if id:
         ticket = ticket.objects.get(id=id)
         data['ticket'] = ticket

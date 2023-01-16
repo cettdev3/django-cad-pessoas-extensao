@@ -1,24 +1,40 @@
 <div class="modal fade" id="cadastrarTicketModal" tabindex="-1" role="dialog"
     aria-labelledby="cadastrarTicketModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cadastrarTicketModalLabel">
-                    {% if ticket is None %}
-                        Cadastrar Ticket: {{tipo}}
-                        <span id="ticketModelId" hidden></span>
-                    {% else %}
-                        Editar Cadastro do ticket: {{tipo}}
-                        <span id="ticketModelId" hidden>{{ticket.id}}</span>
-                    {% endif %}
-                </h5>
-                <button type="button" 
-                id="dismissCadastrarTicket" 
-                class="close" 
-                data-dismiss="modal" 
-                aria-label="Close">
-                    <span>&times;</span>
-                </button>
+                <div class="d-flex flex-column">
+                    <button type="button" 
+                    id="dismissCadastrarTicket" 
+                    class="close" 
+                    data-dismiss="modal" 
+                    aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                    <div class="modal-title" id="cadastrarTicketModalLabel">
+                        {% if ticket is None %}
+                            <div class="d-flex justify-content-between">
+                                <span> <strong>Tipo:</strong> </span> <span>{{tipo}}</span>
+                            </div> 
+                            <div class="d-flex justify-content-between">
+                                <span> <strong>Inicio:</strong> </span> <span>{{data_inicio}}</span>
+                            </div> 
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Fim:</strong> </span> <span>{{data_fim}}</span>
+                            </div> 
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Escola:</strong> </span> <span>{{nome_escola}}</span>
+                            </div> 
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Endereco:</strong> </span> <span style="text-align: right;">{{endereco_completo}}</span>
+                            </div> 
+                            <span id="ticketModelId" hidden></span>
+                        {% else %}
+                            Editar Cadastro do ticket: {{tipo}}
+                            <span id="ticketModelId" hidden>{{ticket.id}}</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="w-100">
@@ -88,6 +104,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     var formId = "cadastrarTicketForm"

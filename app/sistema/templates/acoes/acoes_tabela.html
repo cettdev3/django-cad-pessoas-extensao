@@ -127,7 +127,7 @@ cellspacing="0">
                     <div id="wrapped-item-container-{{membro.id}}" 
                     {% if not membro.ticket and membro.tipo != 'nao_se_aplica' %}
                     role="button"
-                    onclick="openTicketModal('{{membro.id}}', '{{membro.tipo}}')"
+                    onclick="openTicketModal('{{membro.id}}')"
                     class="membro-equipe-container pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
                     {% else %}
                     class="pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
@@ -233,8 +233,8 @@ cellspacing="0">
         location.href = "visualizarAcao/" + id
     }
 
-    function openTicketModal(membroId, tipo) {
-        let data = {membro_execucao_id: membroId, tipo: tipo}
+    function openTicketModal(membroId) {
+        let data = {membro_execucao_id: membroId}
         $.ajax({
             url: "/ticketModal",
             data: data,
