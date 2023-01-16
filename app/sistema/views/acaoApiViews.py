@@ -17,6 +17,7 @@ from ..serializers.acaoSerializer import AcaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.db import reset_queries
+from datetime import datetime
 from django.db import connection
 
 class AcaoApiView(APIView):
@@ -120,8 +121,12 @@ class AcaoApiView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST,
                             )
                     print("dados vindos do post: ",postItinerarioItemData)
+                    data = postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None
+                    if data:
+                        # convert str '2023-01-16T10:09' to datetime
+                        data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
                     itinerarioItemData = {
-                        "data_hora": postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None,
+                        "data_hora": data,
                         "endereco": postItinerarioItemData["endereco"] if postItinerarioItemData.get("endereco") else None,
                         "bairro": postItinerarioItemData["bairro"] if postItinerarioItemData.get("bairro") else None,
                         "logradouro": postItinerarioItemData["logradouro"] if postItinerarioItemData.get("logradouro") else None,

@@ -313,7 +313,7 @@
             </div>
             <div class="modal-body">
                 <input id="itinerario-item-cidade" type="text" class="form-control">
-                <input id="itinerario-item-data" type="date" class="form-control">
+                <input id="itinerario-item-data" type="datetime-local" class="form-control">
                 <input id="input-validated-itinerario" type="text" hidden class="form-control">
                 <div id="modal-itinerario-error-validacao" style="display: none;" class="bg-danger px-2">
                     <span>Preencha todos os campos</span>
@@ -339,8 +339,8 @@
     var currentColor = "#add8e6";
     var pendenteListItems = [
     ]
-    var disableRoutes = false
-    var disableMarkers = false
+    var disableRoutes = true
+    var disableMarkers = true
     
     function addMembroEquipeOnItinerario(membroEquipe) {
         if (!membroEquipe.nome) return
@@ -501,9 +501,7 @@
         let itinerario = itinerarios.splice(indexToDelete, 1)[0]
 
         if (!itinerario) return
-        console.log("deleting itinerario antes")
         await processDeleteItinerarioApi(itinerarioId)
-        console.log("deleting itinerario depois")
         pendenteListItems
             .filter(pendenteItem => pendenteItem.color == selectedColor)
             .map(pendenteItem => pendenteItem.color = null)
@@ -883,39 +881,36 @@
         return control
     }
 
-    function removeItinerarioItem(parent) {
+    async function removeItinerarioItem(parent) {
         let endereco = parent.find("#endereco").text();
         let itinerarioItemId = parent.find("#item-itinerario-id").text();
         let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
         itinerario.itens.forEach((item, index) => {
             if (itinerarioItemId == item.id) {
                 if (itinerarioItemId) {
-                    $.ajax({
-                        url: "/eliminarItinerarioItem/"+itinerarioItemId,
-                        headers: { "X-CSRFToken":  '{{ csrf_token }}' },
-                        contentType: 'application/json',
-                        method: "DELETE",
-                        success: function (data) {
-                            clearMap()
-                            itinerario.itens.splice(index, 1);
-                            buildMap(itinerario);
-                            if (!item.pendente) parent.remove();
-                        },
-                        error: function (data) {
-                            console.log("erro ao eliminar itinerario item: ", data)
-                        }
-                    })
-                } else {
-                    if (item.endereco.trim().replace(",", "") == endereco.trim().replace(',', "")) {
-                        clearMap()
-                        itinerario.itens.splice(index, 1);
-                        buildMap(itinerario);
-                        if (!item.pendente) parent.remove();
-                        return
-                    }
-                }
+                    return new Promise(resolve => {
+                        $.ajax({
+                            url: "/eliminarItinerarioItem/"+itinerarioItemId,
+                            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                            contentType: 'application/json',
+                            method: "DELETE",
+                            success: function (data) {
+                                clearMap()
+                                itinerario.itens.splice(index, 1);
+                                buildMap(itinerario);
+                                if (!item.pendente) parent.remove();
+                                resolve(true)
+                            },
+                            error: function (data) {
+                                console.log("erro ao eliminar itinerario item: ", data)
+                                resolve(true)
+                            }
+                        })
+                    }) 
+                } 
             }
         })
+        return false
     }
 
     function createDeleteButton(endereco) {
@@ -929,12 +924,23 @@
         button.css("outline", "none");
 
         button.attr("id", "delete-button")
+        button.attr("type", "button");
         button.text("X");
-        button.click(function () {
+        button.click(async function () {
             let parent = $(this).parent();
             let index = parent.index();
             if (rgb2hex(parent.css("background-color")) == "#ff6347") {
-                removeItinerarioItem(parent);
+                let deleted = await removeItinerarioItem(parent);
+                let itinerario = itinerarios.find(itinerario => itinerario.color == currentColor);
+                itinerario.itens.forEach((item, index) => {
+                    if (!deleted && item.endereco.trim().replace(",", "") == endereco.trim().replace(',', "")) {
+                        clearMap()
+                        itinerario.itens.splice(index, 1);
+                        buildMap(itinerario);
+                        if (!item.pendente) parent.remove();
+                        return
+                    }
+                })
             }
 
             parent.css("background-color", "#ff6347");
@@ -1000,6 +1006,14 @@
         return item
     }
 
+    function formatDateTime(dateTime) {
+        dateTime = dateTime.includes("Z") ? dateTime : dateTime + ":00Z"
+        let date = moment(dateTime);
+        console.log(dateTime)
+        // get formatted date eithout timezone
+        return date.utcOffset("-00:00").format("DD/MM/YYYY HH:mm")
+    } 
+
     async function addItem(item = null) {
         item = await getModalLifecycle(item)
         let hasCidade = item.cidade && item.cidade.length > 0;
@@ -1039,7 +1053,7 @@
         enderecoDiv.append(cidadeSpan);
         enderecoDiv.append(estadoSpan);
 
-        dataEnvioDiv.text("Data: " + dataValue);
+        dataEnvioDiv.text("Data: " + formatDateTime(dataValue));
         dataEnvioDiv.addClass("data-envio");
 
         li.append(enderecoDiv);
@@ -1131,7 +1145,7 @@
             enderecoDiv.append(cidadeSpan);
             enderecoDiv.append(estadoSpan);
 
-            dataEnvioDiv.text("Data do envio: " + item.data_envio);
+            dataEnvioDiv.text("Data do envio: " + formatDateTime(item.data_envio));
             dataEnvioDiv.addClass("data-envio");
 
             li.append(enderecoDiv);
