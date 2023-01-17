@@ -16,6 +16,7 @@ def ticketModal(request):
         membroExecucao = MembroExecucao.objects.get(id=request.GET.get('membro_execucao_id'))
         data['membro_execucao_id'] = request.GET.get('membro_execucao_id')
         data['tipo'] = membroExecucao.tipo
+        data['nome'] = membroExecucao.pessoa.nome
         data['data_inicio'] = membroExecucao.data_inicio
         data['data_fim'] = membroExecucao.data_fim
         data['nome_escola'] = membroExecucao.acao.escola.nome
