@@ -14,6 +14,6 @@ class EnderecoSerializer(serializers.ModelSerializer):
             "bairro",
             "logradouro",
             "cep",
-            "complemento"
+            "complemento"   
         ]
         depth = 1

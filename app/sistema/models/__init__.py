@@ -11,3 +11,4 @@ from .ticket import Ticket
 from .membroExecucao import MembroExecucao
 from .itinerario import Itinerario
 from .itinerarioItem import ItinerarioItem
+from .tipoAtividade import TipoAtividade

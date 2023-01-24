@@ -44,9 +44,11 @@ from sistema.views.siteComponentsView import calendario
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao
 from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
+from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
+from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -139,6 +141,15 @@ urlpatterns = [
     path("eliminarTurno/<codigo>",eliminarTurno),
     path("turnosSelect",turnosSelect),
    
+    # ROTAS PARA TIPOS DE ATIVIDADES
+    path("gerenciarTipoAtividade", gerenciarTipoAtividade),
+    path("tiposAtividadesTable", tiposAtividadesTable),
+    path("tipoAtividadeModal", tipoAtividadeModal),
+    path("saveTipoAtividade", saveTipoAtividade),
+    path("eliminarTipoAtividade/<codigo>", eliminarTipoAtividade),
+    path("tipoAtividadeEditarModal/<codigo>", tipoAtividadeEditarModal),
+    path("editarTipoAtividade/<codigo>", editarTipoAtividade),
+   
     # ROTAS PARA MEMBROS DE EXECUCAO
     path("membrosExecucaoTable",membrosExecucaoTable),
     path("membroExecucaoForm",membroExecucaoForm),
@@ -218,6 +229,9 @@ urlpatterns = [
     
     path("itinerario-itens", ItinerarioItemApiView.as_view()),
     path('itinerario-itens/<int:itinerario_item_id>', ItinerarioItemDetailApiView.as_view()),
+    
+    path("tipos-atividades", TipoAtividadeApiView.as_view()),
+    path('tipos-atividades/<int:tipo_atividade_id>', TipoAtividadeDetailApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),
