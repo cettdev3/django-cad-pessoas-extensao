@@ -63,20 +63,19 @@ def editarTipoAtividade(request, codigo):
     response = requests.put('http://localhost:8000/tipos-atividades/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
+@login_required(login_url='/auth-user/login-user')
 def tipoAtividadeEditarModal(request, codigo):
     id = request.GET.get('id')
     tipoAtividade = TipoAtividade.objects.get(id=codigo)
     return render(request,'tiposAtividades/tiposAtividadesModal.html',{"tipoAtividade":tipoAtividade})
-    
-# @login_required(login_url='/auth-user/login-user')
-# def turnosSelect(request):
-#     turnos = Turno.objects.all()
-#     return render(request,'turnos/turnos_select.html',{'turnos':turnos})
 
-# @login_required(login_url='/auth-user/login-user')
-# def turnoForm(request):
-#     token, created = Token.objects.get_or_create(user=request.user)
-#     headers = {'Authorization': 'Token ' + token.key}
-#     body = json.loads(request.body)['data']
-#     response = requests.post('http://localhost:8000/alocacoes', json=body, headers=headers)
-#     return JsonResponse(json.loads(response.content),status=response.status_code)
+@login_required(login_url='/auth-user/login-user')
+def tiposAtividadesSelect(request):
+    print("dentro do select de atividade")
+    data = {}
+    if request.GET.get('tipo_atividade_id'):
+        data['tipo_atividade_id'] = int(request.GET.get('tipo_atividade_id'))
+    data["tiposAtividades"] = TipoAtividade.objects.all()
+    data["select_id"] = request.GET.get('select_id')
+    data["selected_tipo_atividade_id"] = int(request.GET.get('selected')) if request.GET.get('selected').strip() else None
+    return render(request,'tiposAtividades/tiposAtividadesSelect.html', data)

@@ -36,7 +36,7 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarTipoAtividade{{TipoAtividade.id}}" href="/visualizarTipoAtividade/({{TipoAtividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="editarTipoAtividadeModal({{TipoAtividade.id}})">Editar</button> 
+                    <button onclick="editarTipoAtividade({{TipoAtividade.id}})">Editar</button> 
                     <button onclick="deleteTipoAtividade({{TipoAtividade.id}})" >Excluir</button>
                 </div>
             </td>
@@ -58,7 +58,7 @@ cellspacing="0">
     var rotaModalTipoAtividade = "tiposAtividadesModalCadastrar"
     var rotaVisualizarTipoAtividade = "visualizarTipoAtividade"
 
-    function editarTipoAtividadeModal(id) {
+    function editarTipoAtividade(id) {
         $.ajax({
             url: "/tipoAtividadeEditarModal/" + id,
             success: function (data) {

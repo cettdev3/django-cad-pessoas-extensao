@@ -41,14 +41,16 @@ from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect,visualizarAcao
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario
-from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao
+from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
 from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
-from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade
+from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
+from sistema.views.siteAtividadeViews import atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
 from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
+from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -146,15 +148,25 @@ urlpatterns = [
     path("tiposAtividadesTable", tiposAtividadesTable),
     path("tipoAtividadeModal", tipoAtividadeModal),
     path("saveTipoAtividade", saveTipoAtividade),
+    path("tiposAtividadesSelect", tiposAtividadesSelect),
     path("eliminarTipoAtividade/<codigo>", eliminarTipoAtividade),
     path("tipoAtividadeEditarModal/<codigo>", tipoAtividadeEditarModal),
     path("editarTipoAtividade/<codigo>", editarTipoAtividade),
    
+    # ROTAS PARA ATIVIDADES
+    path("atividadesTable", atividadesTable),
+    path("atividadeModal", atividadeModal),
+    path("saveAtividade", saveAtividade),
+    path("eliminarAtividade/<codigo>", eliminarAtividade),
+    path("atividadeEditarModal/<codigo>", atividadeEditarModal),
+    path("editarAtividade/<codigo>", editarAtividade),
+    
     # ROTAS PARA MEMBROS DE EXECUCAO
     path("membrosExecucaoTable",membrosExecucaoTable),
     path("membroExecucaoForm",membroExecucaoForm),
     path("membroExecucaoModal",membroExecucaoModal),
     path("saveMembroExecucao",saveMembroExecucao),
+    path("membrosExecucaoSelect",membrosExecucaoSelect),
     path("editarMembroExecucao/<codigo>",editarMembroExecucao),
     path("eliminarMembroExecucao/<codigo>",eliminarMembroExecucao),
 
@@ -232,6 +244,9 @@ urlpatterns = [
     
     path("tipos-atividades", TipoAtividadeApiView.as_view()),
     path('tipos-atividades/<int:tipo_atividade_id>', TipoAtividadeDetailApiView.as_view()),
+    
+    path("atividades", AtividadeApiView.as_view()),
+    path('atividades/<int:atividade_id>', AtividadeDetailApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

@@ -1,0 +1,18 @@
+<label><b>Membro de Execução:</b></label>
+<select class="form-control" 
+{% if select_id %} 
+id="membro_execucao_select_{{select_id}}" 
+{% else %}
+id="membro_execucao_select" 
+{% endif %} 
+name="membro_execucao_id">
+    {% if not membro_execucao_id %}
+    <option value="">Selecione um Membro de Execução</option>
+    {% endif %}
+    {% for membroExecucao in membrosExecucao %}
+    <option {% if selected_membro_execucao_id == membroExecucao.id %} selected {% endif %} 
+    value="{{membroExecucao.id}}">
+        {{membroExecucao.pessoa.nome}} - {{membroExecucao.tipo}}
+    </option>
+    {% endfor %}
+</select>

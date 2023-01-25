@@ -1,0 +1,140 @@
+<style>
+    .atividade-w-90 {
+        width: 90%;
+    }
+    .atividade-w-15 {
+        width: 15%;
+    }
+    .atividade-w-60 {
+        width: 60%;
+    }
+</style>
+<table class="table table-borderless" 
+width="100%" 
+cellspacing="0">
+    <thead class="border">
+        <tr class="">
+            <th class="text-left">Descricao</th>
+            <th class="text-left">Status</th>
+            <th class="text-left">Responsável</th>
+            <th class="w-2 text-left">Tipo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for atividade in atividades %}
+        <tr>
+            <td class="atividade-w-60 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
+            <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.status}}</span></td>
+            <td class="atividade-w-15 text-left" style="vertical-align: middle;">
+                {% if atividade.responsavel %}
+                <span>{{atividade.responsavel.pessoa.nome}}</span>
+                {% endif %}
+            </td>
+            <td class="atividade-w-15 text-left" style="vertical-align: middle;">
+                {% if atividade.tipoAtividade %}
+                <span style="vertical-align: bottom;">{{atividade.tipoAtividade.nome}}</span>
+                {% endif %}
+            </td>
+            <td class="w-2 text-left" style="position: relative;">
+                <button id="buttonMenuAtividades{{atividade.id}}" 
+                class="btn-circle">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>                        
+                </button>
+                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
+                id="hiddenMenuAtividades{{atividade.id}}" 
+                class="btn-group-custom">
+                    <a id="linkVisualizarAtividade{{atividade.id}}" href="/visualizarAtividade/({{atividade.id}})"></a>
+                    <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
+                    <button onclick="editarAtividadeModal({{atividade.id}})">Editar</button> 
+                    <button onclick="deleteAtividade({{atividade.id}})" >Excluir</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script id="tabelaAtividadeScript">
+    var buttonMenuAtividadesId = "buttonMenuAtividades"
+    var hiddenMenuAtividadesId = "hiddenMenuAtividades"
+    var cadastrarAtividadeFormId = "cadastrarAtividadeForm"
+    var dismissCadastrarAtividadeId = "dismissCadastrarAtividade"
+    var AtividadeModificadaEvent = {}
+    var AtividadeModificadaEventProxy = null
+    var modalCadastrarAtividadeContainerId = "modalCadastrarAtividadeContainer"
+    var idTabelaAtividades = "receberTabelaAtividades"
+    var rotaTabelaAtividades = "atividadesTable"
+    var rotaDeletarAtividade = "eliminarAtividade"
+    var rotaModalAtividade = "atividadesModalCadastrar"
+    var rotaVisualizarAtividade = "visualizarAtividade"
+
+    function editarAtividadeModal(id) {
+        $.ajax({
+            url: "/atividadeEditarModal/" + id,
+            success: function (data) {
+                $("#modalAtividadeContainer").html(data);
+                $('#cadastrarAtividadeModal').modal('toggle');
+            }
+        });
+    }
+
+    function deleteAtividade(id) {
+        $.ajax({
+            url: "/eliminarAtividade/" + id,
+            data: {},
+            success: function (data) {
+                let menuId = "#hiddenMenuAtividadesId" + id
+                $(menuId).toggle()
+                carregarAtividades()
+            }
+        });
+    }
+
+    function bindButtons() {
+        $("button[id^='"+buttonMenuAtividadesId+"']").each(function (i, el) {
+            $(this).on("click", function () {
+                let id = $(this).attr('id').split("Atividades")[1];
+                let menuId = "#"+hiddenMenuAtividadesId + id
+                $("div[id^='"+hiddenMenuAtividadesId+"']").each(function (i, el) {
+                    
+                    if (menuId != "#" + $(this).attr("id")) {
+                        if ($(this).css('display') != 'none') {
+                            $(this).toggle()
+                        }
+                    }
+                })
+                let hiddenMenu = $(menuId).parent()
+                let isVisible = isvisibleOnViewport(hiddenMenu[0])
+                if (!isVisible) {
+                    $(menuId).css("bottom", "40px")
+                } 
+                $(menuId).toggle()
+            });
+        });
+    }
+
+    function isvisibleOnViewport(element) {
+        var rect = element.getBoundingClientRect();
+        var html = document.documentElement;
+        return (
+            (rect.top) >= 0 &&
+            rect.left >= 0 &&
+            (rect.bottom + 100) <= (window.innerHeight || html.clientHeight) &&
+            rect.right <= (window.innerWidth || html.clientWidth)
+        );
+    }
+    
+    $(document).ready(function () {
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuAtividadesId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+        });
+
+        bindButtons()
+    })
+</script>

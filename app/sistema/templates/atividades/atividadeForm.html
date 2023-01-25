@@ -1,0 +1,206 @@
+<div class="w-100">
+    <form id="cadastrarAtividadeForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-8">
+                <label><b>Descrição:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.descricao}}"
+                {% endif %}
+                id="descricao"
+                name="descricao">
+            </div>
+            <div class="col-sm-4">
+                <label><b>Status:</b></label>
+                <select required 
+                class="form-control" 
+                id="status" 
+                name="status">
+                    <option 
+                    {% if atividade.status == "pendente" %}
+                    selected
+                    {% endif %}
+                    value="pendente">
+                    PENDENTE
+                    </option>
+                    <option
+                    {% if atividade.status == "realizada" %}
+                    selected
+                    {% endif %}
+                    value="realizada">
+                    REALIZADA
+                    </option>
+                    <option
+                    {% if atividade.status == "cancelada" %}
+                    selected
+                    {% endif %}
+                    value="cancelada">
+                    CANCELADA
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Link de Documentos:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.linkDocumentos}}"
+                {% endif %}
+                id="linkDocumentos"
+                name="linkDocumentos">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div id="tipoAtividadeSelectContainer" class="col-sm-4">
+            </div>
+            <div id="membroExecucaoSelectContainer" class="col-sm-4">
+            </div>
+            <div id="cidadesSelectContainer" class="col-sm-4">
+            </div>
+        </div>
+        {% if acao %}
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
+                <span>Usar endereço da ação</span> 
+            </div>
+        </div>
+        {% endif %}
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>Logradouro:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.logradouro}}"
+                {% endif %}
+                id="logradouro"
+                name="logradouro">
+            </div>
+            <div class="col-sm-4">
+                <label><b>Bairro:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.bairro}}"
+                {% endif %}
+                id="bairro"
+                name="bairro">
+            </div>
+            <div class="col-sm-4">
+                <label><b>CEP:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.cep}}"
+                {% endif %}
+                id="cep"
+                name="cep">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Complemento:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.complemento}}"
+                {% endif %}
+                id="complemento"
+                name="complemento">
+            </div>
+        </div>
+        {% if atividade.acao %}
+        <input type="text" hidden 
+        id="acao_id"
+        name="acao_id" 
+        value="{{atividade.acao.id}}">
+        {% else %}
+        <input type="text" hidden 
+        id="acao_id"
+        name="acao_id" 
+        value="{{acao.id}}">
+        {% endif %}
+    </form>
+    <span hidden id="selected-membro-equipe">{% if atividade %}{{atividade.responsavel.id}}{% endif %}
+    </span>
+    <span hidden id="selected-tipo-atividade">{% if atividade %}{{atividade.tipoAtividade.id}}{% endif %}
+    </span>
+    <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
+    <span hidden id="acao-logradouro">{{acao.logradouro}}</span>
+    <span hidden id="acao-cep">{{acao.cep}}</span>
+    <span hidden id="acao-bairro">{{acao.bairro}}</span>
+    <span hidden id="acao-complemento">{{acao.complemento}}</span>
+    <span hidden id="acao-cidade">{{acao.cidade.id}}</span>
+</div>
+
+<script>
+    function carregarSelectMembroExecucao() {
+        let data = {}
+        data["title"] = "Responsável"
+        if ($("#acao_id").val()) data["acao_id"] = $("#acao_id").val()
+        if ($("#selected-membro-equipe").text()) data["selected"] = $("#selected-membro-equipe").text()
+        $.ajax({
+            url: "/membrosExecucaoSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#membroExecucaoSelectContainer").html(data);
+            }
+        });
+    }
+    
+    function carregarSelectTipoAtividade() {
+        let data = {}
+        if ($("#selected-tipo-atividade").text()) data["selected"] = $("#selected-tipo-atividade").text()
+
+        $.ajax({
+            url: "/tiposAtividadesSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#tipoAtividadeSelectContainer").html(data);
+            }
+        });
+    }
+
+    function carregarSelectCidades() {
+        let data = {}
+        if ($("#selected-cidade").text()) data["selected"] = $("#selected-cidade").text()
+
+        $.ajax({
+            url: "/cidadesSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#cidadesSelectContainer").html(data);
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        carregarSelectMembroExecucao();
+        carregarSelectTipoAtividade();
+        carregarSelectCidades();
+
+        $("#atividade-user-acao-endereco").change(function() {
+            if (this.checked) {
+                $("#logradouro, #bairro, #cep, #complemento").val(function() {
+                    return $("#acao-" + this.id).text();
+                });
+                $("#cidadesSelectContainer select").val($("#acao-cidade").text());
+            } else {
+                 $("#logradouro, #bairro, #cep, #complemento").val("");
+            }
+        });
+    });
+</script>

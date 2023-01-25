@@ -89,3 +89,19 @@ def eliminarMembroExecucao(request,codigo):
     response = requests.delete('http://localhost:8000/membroExecucao/'+str(codigo), headers=headers)
     
     return HttpResponse(status=response.status_code)
+
+
+@login_required(login_url='/auth-user/login-user')
+def membrosExecucaoSelect(request):
+    data = {}
+    if request.GET.get('membro_execucao_id'):
+        data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
+    acao_id = request.GET.get('acao_id')
+    print("acao id", acao_id)
+    if acao_id:
+        data["membrosExecucao"] = MembroExecucao.objects.filter(acao__id=acao_id)
+    else:
+        data["membrosExecucao"] = MembroExecucao.objects.all()
+    data["select_id"] = request.GET.get('select_id')
+    data["selected_membro_execucao_id"] = int(request.GET.get('selected')) if request.GET.get('selected').strip() else None
+    return render(request,'membrosExecucao/membroExecucaoSelect.html', data)
