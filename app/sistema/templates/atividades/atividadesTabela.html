@@ -5,8 +5,11 @@
     .atividade-w-15 {
         width: 15%;
     }
-    .atividade-w-60 {
-        width: 60%;
+    .atividade-w-25 {
+        width: 25%;
+    }
+    .atividade-w-50 {
+        width: 50%;
     }
 </style>
 <table class="table table-borderless" 
@@ -23,9 +26,9 @@ cellspacing="0">
     <tbody>
         {% for atividade in atividades %}
         <tr>
-            <td class="atividade-w-60 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
+            <td class="atividade-w-50 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
             <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.status}}</span></td>
-            <td class="atividade-w-15 text-left" style="vertical-align: middle;">
+            <td class="atividade-w-25 text-left" style="vertical-align: middle;">
                 {% if atividade.responsavel %}
                 <span>{{atividade.responsavel.pessoa.nome}}</span>
                 {% endif %}
