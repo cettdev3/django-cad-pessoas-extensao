@@ -7,7 +7,7 @@ from sistema.models.curso import Curso
 from sistema.models.endereco import Endereco
 from sistema.models.escola import Escola
 from sistema.models.cidade import Cidade
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
@@ -19,7 +19,7 @@ from rest_framework.authtoken.models import Token
 def gerencia_eventos(request):
     page_title = "Ações de Ensino"
     count = 0
-    eventos = Evento.objects.all()
+    eventos = Ensino.objects.all()
     for p in eventos:
         count += 1
 
@@ -29,7 +29,7 @@ def gerencia_eventos(request):
 @login_required(login_url='/auth-user/login-user')
 def eventosTable(request):
     nome = request.GET.get('nome')
-    eventos = Evento.objects
+    eventos = Ensino.objects
     if nome:
         eventos = eventos.filter(nome__contains = nome)
     eventos = eventos.all()
@@ -37,7 +37,7 @@ def eventosTable(request):
 
 @login_required(login_url='/auth-user/login-user')
 def visualizarEvento(request,codigo):
-    evento = Evento.objects.get(id=codigo)
+    evento = Ensino.objects.get(id=codigo)
     page_title = evento.observacao
     path_back = "gerenciar-eventos"
     return render(request,'eventos/visualizar_evento.html',{
@@ -53,14 +53,14 @@ def eventosModalCadastrar(request):
     escolas = Escola.objects.all()
     data = {}
     if id:
-        evento = Evento.objects.get(id=id)
+        evento = Ensino.objects.get(id=id)
         data['evento'] = EventoSerializer(evento).data
     data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarEvento(request,codigo):
-    evento = Evento.objects.get(id=codigo)
+    evento = Ensino.objects.get(id=codigo)
     evento.delete()
     return redirect('/gerenciar-eventos')
 

@@ -4,14 +4,14 @@ from rest_framework import serializers
 from .enderecoSerializer import EnderecoSerializer
 
 from ..models.endereco import Endereco
-from ..models.evento import Evento
+from ..models.ensino import Ensino
 
 class EventoSerializer(serializers.ModelSerializer):
     data_inicio = serializers.DateTimeField(format='%Y-%m-%dT%H:%M')
     data_fim = serializers.DateTimeField(format='%Y-%m-%dT%H:%M')
 
     class Meta:
-        model = Evento
+        model = Ensino
         fields = [
             "id",
             "data_inicio",

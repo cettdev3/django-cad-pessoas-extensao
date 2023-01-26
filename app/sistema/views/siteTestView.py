@@ -8,7 +8,7 @@ from sistema.serializers.eventoSerializer import EventoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from sistema.models.curso import Curso
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from sistema.models.escola import Escola
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -47,7 +47,7 @@ def testeEdit(request):
 def testeModal(request):
     # buscar apenas 1 id para editar
     data = {}
-    eventos = Evento.objects.filter(~Q(status="finalizado"))
+    eventos = Ensino.objects.filter(~Q(status="finalizado"))
     eventos = EventoSerializer(eventos, many=True)
     data['eventos'] = eventos.data
 

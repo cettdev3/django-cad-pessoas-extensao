@@ -8,7 +8,7 @@ from rest_framework import permissions
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.endereco import Endereco
-from ..models.evento import Evento
+from ..models.ensino import Ensino
 from ..serializers.eventoSerializer import EventoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -24,7 +24,7 @@ class EventoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        eventos = Evento.objects.all()
+        eventos = Ensino.objects.all()
         serializer = EventoSerializer(eventos, many=True)
         return Response(serializer.data, status=str.HTTP_200_OK)
 
@@ -72,7 +72,7 @@ class EventoApiView(APIView):
                     status=str.HTTP_400_BAD_REQUEST
                 )
 
-        evento = Evento.objects.create(
+        evento = Ensino.objects.create(
             data_inicio = data_inicio,
             data_fim = data_fim,
             observacao = observacao,
@@ -100,7 +100,7 @@ class EventoDetailApiView(APIView):
             
     def get(self, request, evento_id, *args, **kwargs):
 
-        evento = self.get_object(Evento, evento_id)
+        evento = self.get_object(Ensino, evento_id)
         if not evento:
             return Response(
                 {"res": "Não existe evento com o id informado"},
@@ -112,7 +112,7 @@ class EventoDetailApiView(APIView):
 
     def put(self, request, evento_id, *args, **kwargs):
 
-        evento = self.get_object(Evento, evento_id)
+        evento = self.get_object(Ensino, evento_id)
         if not evento:
             return Response(
                 {"res": "Não existe evento com o id informado"}, 
@@ -159,7 +159,7 @@ class EventoDetailApiView(APIView):
 
     def delete(self, request, evento_id, *args, **kwargs):
         
-        evento = self.get_object(Evento, evento_id)
+        evento = self.get_object(Ensino, evento_id)
         if not evento:
             return Response(
                 {"res": "Não existe evento com o id informado"}, 

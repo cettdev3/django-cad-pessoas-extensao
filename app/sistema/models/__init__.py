@@ -1,5 +1,5 @@
 from .cidade import Cidade
-from .evento import Evento 
+from .ensino import Ensino 
 from .endereco import Endereco
 from .alocacao import Alocacao
 from .avaliacao import Avaliacao

@@ -2,7 +2,8 @@ from django.db import models
 from ..models.endereco import Endereco
 from ..models.cidade import Cidade
 from ..models.escola import Escola
-class Evento(models.Model):
+
+class Ensino(models.Model):
     # Eventos se tornou ensino, aqui ficam controles de alocação de professores nas escolas
     STATUS_PLANNEJADO = "planejamento"
     STATUS_ANDAMENTO = "andamento"
@@ -33,7 +34,7 @@ class Evento(models.Model):
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        db_table = 'eventos'
+        db_table = 'ensino'
 
     @property
     def status_class(self):

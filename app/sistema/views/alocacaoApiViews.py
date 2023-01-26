@@ -8,7 +8,7 @@ from django.db import transaction
 from ..models.alocacao import Alocacao
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
-from ..models.evento import Evento
+from ..models.ensino import Ensino
 from ..models.curso import Curso
 from ..models.dataRemovida import DataRemovida
 from ..serializers.alocacaoSerializer import AlocacaoSerializer
@@ -59,7 +59,7 @@ class AlocacaoApiView(APIView):
                                 status=st.HTTP_400_BAD_REQUEST
                             )
                     if alocacaoData["evento_id"]:
-                        evento = self.get_object(Evento, alocacaoData["evento_id"])
+                        evento = self.get_object(Ensino, alocacaoData["evento_id"])
                         if not evento:
                             return Response(
                                 {"res": "Não existe evento com o id informado"}, 
@@ -134,7 +134,7 @@ class AlocacaoApiView(APIView):
         else:
             with transaction.atomic():
                 if request.data.get("evento_id"):
-                    evento = self.get_object(Evento, request.data.get("evento_id"))
+                    evento = self.get_object(Ensino, request.data.get("evento_id"))
                     if not evento:
                         return Response(
                             {"res": "Não existe evento com o id informado"}, 
@@ -264,7 +264,7 @@ class AlocacaoDetailApiView(APIView):
             alocacao.curso = None
 
         if request.data.get("evento_id"):
-            evento = self.get_object(Evento, request.data.get("evento_id"))
+            evento = self.get_object(Ensino, request.data.get("evento_id"))
             if not evento:
                 return Response(
                     {"res": "Não existe evento com o id informado"}, 

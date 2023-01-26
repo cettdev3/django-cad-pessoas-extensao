@@ -9,7 +9,7 @@ from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from django.db.models import Prefetch, Count
 from sistema.models.curso import Curso
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
@@ -39,7 +39,7 @@ def modalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Evento.objects.filter(~Q(status="finalizado"))
+        eventos = Ensino.objects.filter(~Q(status="finalizado"))
         eventos = EventoSerializer(eventos, many=True)
         data['eventos'] = eventos.data
     return render(request,'pessoas/modal_alocar_pessoa.html',data)

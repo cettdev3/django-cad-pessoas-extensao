@@ -15,7 +15,7 @@ from sistema.serializers.turnoSerializer import TurnoSerializer
 from sistema.models.pessoa import Pessoas
 from rest_framework.authtoken.models import Token
 from sistema.models.curso import Curso
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from sistema.models.turno import Turno
 from django.db.models import Q, Exists
 from django.contrib import messages
@@ -81,7 +81,7 @@ def pessoasModalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Evento.objects.filter(~Q(status="finalizado"))
+        eventos = Ensino.objects.filter(~Q(status="finalizado"))
         eventos = EventoSerializer(eventos, many=True)
         data['eventos'] = eventos.data
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
