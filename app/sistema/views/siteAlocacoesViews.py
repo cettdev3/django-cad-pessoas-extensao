@@ -89,7 +89,7 @@ def horasTrabalhadas(request):
     if data_fim and data_inicio:
         pessoas = pessoas.prefetch_related(
             Prefetch("alocacao_set", queryset=
-                Alocacao.objects.filter(
+                Alocacao.objects.prefetch_related("dataremovida_set").filter(
                    Q(
                         Q(data_inicio__gte=data_inicio,data_inicio__lte=data_fim) |
                         Q(data_fim__gte=data_inicio,data_fim__lte=data_fim) |
@@ -119,6 +119,7 @@ def horasTrabalhadas(request):
         
         for alocacao in pessoa['alocacao_set']:
             alocacao['horas_trabalhadas'] = 0
+            datasRemovidas = [item["date"] for item in alocacao["dataremovida_set"]]
             cargaHorariaDia = 0
             for turno in alocacao['turnos']:
                 cargaHorariaDia += turno["carga_horaria"]
@@ -133,7 +134,7 @@ def horasTrabalhadas(request):
                 count_sabado = (not isSatturday) or alocacao["aulas_sabado"]
                 is_alocation_date = queryDataInicio >= alocacaoDataInicio and queryDataInicio <= alocacaoDataFim 
                 is_sunday = queryDataInicio.weekday() == 6
-                if queryDataInicio.strftime('%Y-%m-%d') not in removed_dates and count_sabado and is_alocation_date and not is_sunday:
+                if queryDataInicio.strftime('%Y-%m-%d') not in removed_dates and queryDataInicio.strftime('%Y-%m-%d') not in datasRemovidas and count_sabado and is_alocation_date and not is_sunday:
                     chave = queryDataInicio.strftime('%Y-%m-%d')
                     carga_horaria_dia[chave]["carga_horaria"] += cargaHorariaDia
                     total_horas_pessoa += cargaHorariaDia
