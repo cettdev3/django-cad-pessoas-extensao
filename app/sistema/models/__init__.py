@@ -13,3 +13,4 @@ from .itinerario import Itinerario
 from .itinerarioItem import ItinerarioItem
 from .tipoAtividade import TipoAtividade
 from .atividade import Atividade
+from .dataRemovida import DataRemovida

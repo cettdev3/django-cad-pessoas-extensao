@@ -74,6 +74,12 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label><b>Datas Removidas:</b></label>
+                                {% include 'componentes/datasRemovidasInput/datasRemovidasInput.html' with id=alocacao.id datasRemovidas=alocacao.dataremovida_set is_editing='true' %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div class="col-sm-3">
                                 <label><b>logradouro:</b></label>
                                 <input 
@@ -179,6 +185,17 @@
         return turnosId
     }
 
+    function getRemovedDatesValues(pessoaId) {
+        const chips = $(`#removed_dates-${pessoaId} .chips .chip`);
+        const values = [];
+        chips.each((index, chip) => {
+            const chipText = $(chip).text();
+            const date = moment(chipText, "DD/MM/YYYY");
+            values.push(date.format("YYYY-MM-DD"));
+        });
+        return values;
+    }
+
     function getCheckBoxValue(id) {
         return $("#"+id).is(':checked')
     }
@@ -190,7 +207,6 @@
     }
     
     function updateSelectedTurnos(turnos) {
-        console.log(turnos)
         setTimeout(() => {  
             $("input[name='turnos']").each(function (i, elem) {
                 for (let index = 0; index < turnos.length; index++) {
@@ -275,6 +291,7 @@
         values["endereco"] = endereco
         values["aulas_sabado"] = getCheckBoxValue("aulas_sabado")
         values["turnos"] = getTurnosSelectData()
+        values["datas_removidas"] = getRemovedDatesValues(values["pessoa_id"])
         return values
     }
 

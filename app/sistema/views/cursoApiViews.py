@@ -21,7 +21,7 @@ class CursoApiView(APIView):
         data = {
             "nome": request.data.get("nome"),
         }
-
+        
         serializer = CursoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

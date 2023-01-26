@@ -1,0 +1,121 @@
+<style>
+    #removed_dates {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .chips .chip {
+        display: inline-block;
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #e0e0e0;
+        color: #000;
+        border-radius: 20px;
+        font-size: 14px;
+        line-height: 20px;
+        white-space: nowrap;
+    }
+
+    .chips .chip .close-button {
+        margin-left: 10px;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        font-size: 14px;
+        color: #000;
+        cursor: pointer;
+    }
+</style>
+<div class="col-sm-12 row">
+    <div id="removed_dates-{{id}}" class="col-sm-12 row">
+        <div class="chips">
+            {% for dataRemovida in datasRemovidas %}
+            <div class="chip">
+                {{dataRemovida.date_formatted}}
+                <button type="button" 
+                id="btn-remover-date-{{dataRemovida.id}}" 
+                class="close-button">x</button>
+            </div>
+            {% endfor %}
+        </div>
+        <input type="date" id="date-input" class="form-control col-sm-2" placeholder="Add a date">
+        <button id="add-button" type="button" class="btn btn-secondary">
+            <i class="fas fa-plus"></i>
+        </button>          
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        (function(params) {
+            console.log("dentro da funcao: ",params.id, params.isEditing);
+            function formatDate(dateStr) {
+                const date = moment(dateStr, "YYYY-MM-DD");
+                return date.format("DD/MM/YYYY");
+            }
+
+            function deleteDataRemovida(id) {
+                $.ajax({
+                    url: "/eliminarDataRemovida/" + id,
+                    type: "POST",
+                    headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                    data: {},
+                    success: function (data) {
+                        $("#btn-remover-date-" + id).parent().remove();
+                    }
+                });
+            }
+
+            function createDataRemovida(date, id) {
+                $.ajax({
+                    url: "/createDataRemovida",
+                    type: "POST",
+                    headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                    data: JSON.stringify({date: date, alocacao_id: id}),
+                    contentType: "application/json",
+                    success: function (data) {
+                        console.log(data)
+                        const chip = $("<div></div>").addClass("chip").text(formatDate(date));
+                        const closeButton = $("<button></button>").addClass("close-button").text("x");
+                        closeButton.attr("id", "btn-remover-date-" + data.id);
+                        closeButton.on("click", () => deleteDataRemovida(data.id));
+                        chip.append(closeButton);
+                        chips.append(chip);
+                    }
+                });
+            }
+        
+            const removedDates = $("#removed_dates-"+params.id);
+            const chips = removedDates.find(".chips");
+            const dateInput = removedDates.find("#date-input");
+            const addButton = removedDates.find("#add-button");
+            const removeButtons = removedDates.find("button[id^='btn-remover-date-']");
+            removeButtons.on("click", function() {
+                deleteDataRemovida($(this).attr("id").split("-")[3]);
+            });
+
+            addButton.on("click", () => {
+                const dateValue = dateInput.val();
+                if (!dateValue) {
+                    return;
+                }
+                
+                if (params.isEditing == "true") {
+                    console.log("isEditing")
+                    createDataRemovida(dateValue, params.id);
+                    return
+                }
+
+                const chip = $("<div></div>").addClass("chip").text(formatDate(dateValue));
+        
+                const closeButton = $("<button></button>").addClass("close-button").text("x");
+                closeButton.on("click", () => chip.remove());
+        
+                chip.append(closeButton);
+                chips.append(chip);
+                dateInput.val("")
+            });
+
+        })({id: "{{id}}", isEditing: "{{is_editing}}"});
+    });
+
+</script>

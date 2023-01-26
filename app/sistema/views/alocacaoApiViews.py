@@ -10,11 +10,13 @@ from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
 from ..models.evento import Evento
 from ..models.curso import Curso
+from ..models.dataRemovida import DataRemovida
 from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from ..serializers.pessoaSerializer import PessoaSerializer
 from ..serializers.eventoSerializer import EventoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+
 class AlocacaoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -26,7 +28,7 @@ class AlocacaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        alocacoes = Alocacao.objects.all()
+        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set").all()
         serializer = AlocacaoSerializer(alocacoes, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
@@ -48,7 +50,7 @@ class AlocacaoApiView(APIView):
                     cidade = None
                     cep = None
                     aulas_sabado = False
-
+                    
                     if "curso_id" in alocacaoData:
                         curso = self.get_object(Curso, alocacaoData["curso_id"])
                         if not curso:
@@ -117,6 +119,14 @@ class AlocacaoApiView(APIView):
                     turnos = alocacaoData["turnos"]
                     if turnos:
                         alocacao.turnos.add(*turnos)
+                    
+                    datasRemovidas = alocacaoData["datas_removidas"]
+                    if datasRemovidas:
+                        for dataRemovida in datasRemovidas:
+                            DataRemovida.objects.create(
+                                date = datetime.strptime(dataRemovida, "%Y-%m-%d").date(),
+                                alocacao = alocacao
+                            )
 
                     alocacaoSerializer = AlocacaoSerializer(alocacao)
                     alocacoesCriadas.append(alocacaoSerializer.data)
@@ -155,7 +165,6 @@ class AlocacaoApiView(APIView):
                 aulas_sabado = False
 
                 if request.data.get("data_inicio"):
-                    print
                     data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
                 if request.data.get("data_fim"):
                     data_fim = datetime.strptime(request.data.get("data_fim"), "%Y-%m-%d").date()
@@ -201,7 +210,15 @@ class AlocacaoApiView(APIView):
                 if request.data.get("turnos"):
                     turnos = request.data.get("turnos")
                     alocacao.turnos.add(*turnos)
-
+                
+                datasRemovidas = alocacaoData["datas_removidas"]
+                if datasRemovidas:
+                    for dataRemovida in datasRemovidas:
+                        DataRemovida.objects.create(
+                            date = datetime.strptime(dataRemovida, "%Y-%m-%d").date(),
+                            alocacao = alocacao
+                        )
+                        
                 alocacaoSerializer = AlocacaoSerializer(alocacao)
             return Response(alocacaoSerializer.data, status=st.HTTP_201_CREATED)
 

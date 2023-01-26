@@ -46,11 +46,13 @@ from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
 from sistema.views.siteAtividadeViews import atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
+from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
 from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
+from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -142,6 +144,10 @@ urlpatterns = [
     path("editarTurno/<codigo>",editarTurno),
     path("eliminarTurno/<codigo>",eliminarTurno),
     path("turnosSelect",turnosSelect),
+    
+    # ROTAS PARA DATAS REMOVIDAS
+    path("createDataRemovida",createDataRemovida),
+    path("eliminarDataRemovida/<codigo>",eliminarDataRemovida),
    
     # ROTAS PARA TIPOS DE ATIVIDADES
     path("gerenciarTipoAtividade", gerenciarTipoAtividade),
@@ -247,6 +253,8 @@ urlpatterns = [
     
     path("atividades", AtividadeApiView.as_view()),
     path('atividades/<int:atividade_id>', AtividadeDetailApiView.as_view()),
+    
+    path("datas-removidas", DataRemovidaApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

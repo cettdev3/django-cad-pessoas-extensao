@@ -50,7 +50,7 @@ def alocacaoModalCadastrar(request):
     alocacao = None
     data = {}
     if id:
-        alocacao = Alocacao.objects.get(id=id)
+        alocacao = Alocacao.objects.prefetch_related("dataremovida_set").get(id=id)
         alocacao = AlocacaoSerializer(alocacao).data
         data['alocacao'] = alocacao
     return render(request,'alocacoes/modal_cadastrar_alocacao.html',data)
@@ -78,35 +78,6 @@ def eliminarAlocacao(request,codigo):
     response = requests.delete('http://localhost:8000/alocacoes/'+str(codigo), headers=headers)
     
     return HttpResponse(status=response.status_code)
- 
-def intervening_weekdays(start, end, inclusive=True, weekdays=[0, 1, 2, 3, 4, 5, 6]):
-    if isinstance(start, datetime.datetime):
-        start = start.date()               # make a date from a datetime
-
-    if isinstance(end, datetime.datetime):
-        end = end.date()                   # make a date from a datetime
-
-    if end < start:
-        # you can opt to return 0 or swap the dates around instead
-        raise ValueError("start date must be before end date")
-
-    if inclusive:
-        end += datetime.timedelta(days=1)  # correct for inclusivity
-
-    try:
-        # collapse duplicate weekdays
-        weekdays = {weekday % 7 for weekday in weekdays}
-    except TypeError:
-        weekdays = [weekdays % 7]
-
-    ref = datetime.date.today()                    # choose a reference date
-    ref -= datetime.timedelta(days=ref.weekday())  # and normalize its weekday
-
-    # sum up all selected weekdays (max 7 iterations)
-    return sum((ref_plus - start).days // 7 - (ref_plus - end).days // 7
-            for ref_plus in
-            (ref + datetime.timedelta(days=weekday) for weekday in weekdays))
-        
 
 @login_required(login_url='/auth-user/login-user')
 def horasTrabalhadas(request):

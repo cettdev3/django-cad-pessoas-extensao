@@ -22,6 +22,7 @@ class Alocacao(models.Model):
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True)
     turnos = models.ManyToManyField(Turno, blank=True)
     aulas_sabado = models.BooleanField(default=False)
+    
     class Meta:
         db_table = 'alocacoes'
     
