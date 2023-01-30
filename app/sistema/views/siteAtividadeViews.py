@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from sistema.models.atividade import Atividade
 from sistema.models.acao import Acao
+from sistema.models.dpEvento import DpEvento
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import requests
@@ -29,12 +30,34 @@ def atividadesTable(request):
     return render(request,'atividades/atividadesTabela.html',{'atividades':atividades})
 
 @login_required(login_url='/auth-user/login-user')
+def atividadesDpEventoTable(request):
+    nome = request.GET.get('nome')
+    evento_id = request.GET.get('dp_evento_id')
+    atividades = Atividade.objects
+    if evento_id:
+        atividades = atividades.filter(evento__id = evento_id)
+    if nome:
+        atividades = atividades.filter(
+            Q(descricao__contains = nome) | 
+            Q(tipoAtividade__nome__contains = nome)
+        )
+
+    atividades = atividades.all()
+    print(atividades)
+    return render(request,'atividades/atividadesTabela.html',{'atividades':atividades})
+
+@login_required(login_url='/auth-user/login-user')
 def atividadeModal(request):
     acao_id = request.GET.get('acao_id')
+    evento_id = request.GET.get('dp_evento_id')
+    print("evento_id", evento_id)
     data = {}
     if acao_id:
         acao = Acao.objects.get(id=acao_id)
         data['acao'] = acao
+    if evento_id:
+        evento = DpEvento.objects.get(id=evento_id)
+        data['evento'] = evento
     return render(request,'atividades/atividadesModal.html',data)
 
 @login_required(login_url='/auth-user/login-user')

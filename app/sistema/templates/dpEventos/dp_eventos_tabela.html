@@ -1,19 +1,19 @@
 <style>
-    .acao-vw-50 {
+    .dpEvento-vw-50 {
         max-width: 30vw;
         width: 30vw;
         min-width: 30vw;
     }
-    .acao-w-20 {
+    .dpEvento-w-20 {
         width: 20%;
     }
-    .acao-w-10 {
+    .dpEvento-w-10 {
         width: 10%;
     }
-    .acao-w-50 {
+    .dpEvento-w-50 {
         width: 50%;
     }
-    .acao-w-15 {
+    .dpEvento-w-15 {
         width: 15%;
     }
 
@@ -66,13 +66,13 @@
         text-overflow:ellipsis;
     }
 
-    .btn-icon-acao {
+    .btn-icon-dpEvento {
         font-size: 0.8em;
         transition: font-size 0.2s;
         border-radius: 50%;
     }
 
-    .btn-icon-acao:hover {
+    .btn-icon-dpEvento:hover {
         font-size: 0.95rem;
         transition: font-size 0.2s;
     }
@@ -104,26 +104,26 @@ width="100%"
 cellspacing="0">
     <thead class="border">
         <tr class="">
-            <th class="acao-w-50 text-left">Descrição</th>
-            <th class="acao-vw-50 text-left">Equipe de Execução</th>
+            <th class="dpEvento-w-50 text-left">Descrição</th>
+            <th class="dpEvento-vw-50 text-left">Equipe de Execução</th>
             <th class="w-2 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
-        {% for acao in acoes %}
+        {% for dpEvento in dpEventos %}
         <tr>
-            <td class="acao-w-50 text-left">
+            <td class="dpEvento-w-50 text-left">
                 <div>
-                    <span class="px-2 py-1 boxed">{{acao.tipo}}</span>
-                    <span>{{acao.endereco_completo}}</span>
+                    <span class="px-2 py-1 boxed">{{dpEvento.tipo}}</span>
+                    <span>{{dpEvento.endereco_completo}}</span>
                 </div>
-                <div><span class="font-weight-bold">{{acao.descricao}}</span></div>
+                <div><span class="font-weight-bold">{{dpEvento.descricao}}</span></div>
             </td>
-            <td  id="wrapper-container-{{acao.id}}"  class="acao-vw-50 text-left position-relative">
-                <div id="wrapper-overflow-{{acao.id}}" 
+            <td  id="wrapper-container-{{dpEvento.id}}"  class="dpEvento-vw-50 text-left position-relative">
+                <div id="wrapper-overflow-{{dpEvento.id}}" 
                 class="d-flex flex-wrap border py-1 px-2" 
                 style="overflow: hidden;">
-                    {% for membro in acao.membroexecucao_set %}
+                    {% for membro in dpEvento.membroexecucao_set %}
                     <div id="wrapped-item-container-{{membro.id}}" 
                     {% if not membro.ticket and membro.tipo != 'nao_se_aplica' %}
                     role="button"
@@ -176,14 +176,14 @@ cellspacing="0">
                         </div>
                     </div>
                     {% endfor %}
-                    <span id="counter-btn-{{acao.id}}" onclick="changeOverflow('{{acao.id}}')" 
+                    <span id="counter-btn-{{dpEvento.id}}" onclick="changeOverflow('{{dpEvento.id}}')" 
                     class="counter-btn" data-toggle="tooltip" data-placement="top" title="EXPANDIR">+5</span>
                     <span
-                    id="retrieve-btn-{{acao.id}}"
+                    id="retrieve-btn-{{dpEvento.id}}"
                     style="color: #ffc200; position: absolute; top: 0; right: 0; display: none"
-                    class="btn-icon-acao"
+                    class="btn-icon-dpEvento"
                     role="button"
-                    onclick="changeOverflow('{{acao.id}}')">
+                    onclick="changeOverflow('{{dpEvento.id}}')">
                         <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ESCONDER">
                             <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
                             <i style="border-radius: 50%;" class="fa-solid fa-stack-1x fa-inverse fa-arrow-up shadow"></i>
@@ -192,17 +192,17 @@ cellspacing="0">
                 </div>
             </td>
             <td class="w-2 text-left" style="position: relative;">
-                <button id="buttonMenuAcoes{{acao.id}}" 
+                <button id="buttonMenuDpEventos{{dpEvento.id}}" 
                 class="btn-circle">
                     <i class="fa-solid fa-ellipsis-vertical"></i>                         
                 </button>
                 <div style="display: none; position: absolute; z-index: 2; right: 10%" 
-                id="hiddenMenuAcoes{{acao.id}}" 
+                id="hiddenMenuDpEventos{{dpEvento.id}}" 
                 class="btn-group-custom">
-                    <a id="linkVisualizarAcao{{acao.id}}" href="/visualizarAcao/({{acao.id}})"></a>
-                    <button onclick="visualizarAcao({{acao.id}})">Visualizar</button> 
-                    <button onclick="carregarAcaoModalEditar({{acao.id}})">Editar</button> 
-                    <button onclick="deleteAcao({{acao.id}})" >Excluir</button>
+                    <a id="linkVisualizarDpEvento{{dpEvento.id}}" href="/visualizarDpEvento/({{dpEvento.id}})"></a>
+                    <button onclick="visualizarDpEvento({{dpEvento.id}})">Visualizar</button> 
+                    <button onclick="carregarDpEventoModalEditar({{dpEvento.id}})">Editar</button> 
+                    <button onclick="deleteDpEvento({{dpEvento.id}})" >Excluir</button>
                 </div>
             </td>
         </tr>
@@ -211,30 +211,30 @@ cellspacing="0">
 </table>
 <div id="cadastrarTicketModalContainer"></div>
 <script>
-    var buttonMenuAcoesId = "buttonMenuAcoes"
-    var hiddenMenuAcoesId = "hiddenMenuAcoes"
-    var cadastrarAcaoFormId = "cadastrarAcaoForm"
-    var dismissCadastrarAcaoId = "dismissCadastrarAcao"
-    var acaoModificadaEvent = {}
-    var acaoModificadaEventProxy = null
+    var buttonMenuDpEventosId = "buttonMenuDpEventos"
+    var hiddenMenuDpEventosId = "hiddenMenuDpEventos"
+    var cadastrarDpEventoFormId = "cadastrarDpEventoForm"
+    var dismissCadastrarDpEventoId = "dismissCadastrarDpEvento"
+    var dpEventoModificadaEvent = {}
+    var dpEventoModificadaEventProxy = null
     var ticketModificadaEvent = {}
     var ticketModificadaEventProxy = null
-    var modalCadastrarAcaoContainerId = "modalCadastrarAcaoContainer"
-    var idTabelaAcoes = "receberTabelaAcoes"
-    var rotaTabelaAcoes = "acoesTable"
-    var rotaDeletarAcao = "eliminarAcao"
-    var rotaVisualizarAcao = "visualizarAcao"
-    var rotaEditarAcao = "acaoModal"    
+    var modalCadastrarDpEventoContainerId = "modalCadastrarDpEventoContainer"
+    var idTabelaDpEventos = "receberTabelaDpEventos"
+    var rotaTabelaDpEventos = "dpEventosTable"
+    var rotaDeletarDpEvento = "eliminarDpEvento"
+    var rotaVisualizarDpEvento = "visualizarDpEvento"
+    var rotaEditarDpEvento = "dpEventoModal"    
     var wrappedItemHeight = []
     var wrappedItemWidth = []
     var wrapperContainerWidth = []
     
-    function visualizarAcao(id) {
-        location.href = "visualizarAcao/" + id
+    function visualizarDpEvento(id) {
+        location.href = "visualizarDpEvento/" + id
     }
 
     function openTicketModal(membroId) {
-        let data = {membro_execucao_id: membroId, from: "acao"}
+        let data = {membro_execucao_id: membroId, from: "dpEvento"}
         $.ajax({
             url: "/ticketModal",
             data: data,
@@ -245,24 +245,24 @@ cellspacing="0">
         });
     }
 
-    function carregarAcaoModalEditar(id) {
+    function carregarDpEventoModalEditar(id) {
         let data = {id: id}
         $.ajax({
-            url: "/"+rotaEditarAcao,
+            url: "/"+rotaEditarDpEvento,
             data: data,
             success: function (data) {
                 $("#" + idModal).html(data);
-                $('#' + cadastrarAcaoModalId).modal('toggle');
+                $('#' + cadastrarDpEventoModalId).modal('toggle');
             }
         });
     }
 
     function bindButtons() {
-        $("button[id^='"+buttonMenuAcoesId+"']").each(function (i, el) {
+        $("button[id^='"+buttonMenuDpEventosId+"']").each(function (i, el) {
             $(this).on("click", function () {
-                let id = $(this).attr('id').split("Acoes")[1];
-                let menuId = "#"+hiddenMenuAcoesId + id
-                $("div[id^='"+hiddenMenuAcoesId+"']").each(function (i, el) {
+                let id = $(this).attr('id').split("DpEventos")[1];
+                let menuId = "#"+hiddenMenuDpEventosId + id
+                $("div[id^='"+hiddenMenuDpEventosId+"']").each(function (i, el) {
                     
                     if (menuId != "#" + $(this).attr("id")) {
                         if ($(this).css('display') != 'none') {
@@ -291,16 +291,16 @@ cellspacing="0">
         );
     }
 
-    function deleteAcao(id) {
-        let deletar_url = rotaDeletarAcao+"/" + id
+    function deleteDpEvento(id) {
+        let deletar_url = rotaDeletarDpEvento+"/" + id
 
         $.ajax({
             url: "/"+deletar_url,
             data: {},
             success: function (data) {
-                let menuId = "#" + hiddenMenuAcoesId + id
+                let menuId = "#" + hiddenMenuDpEventosId + id
                 $(menuId).toggle()
-                carregarAcoes()
+                carregarDpEventos()
             }
         });
     }
@@ -384,11 +384,11 @@ cellspacing="0">
     }
     
     $(document).ready(function () {
-        acaoModificadaEventProxy = new Proxy(acaoModificadaEvent, {
+        dpEventoModificadaEventProxy = new Proxy(dpEventoModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;
                 if (value) {
-                    carregarAcoes()
+                    carregarDpEventos()
                 }
                 target[key] = false
                 return false;
@@ -400,7 +400,7 @@ cellspacing="0">
                 target[key] = value;
                 if (value) {
                     console.log("ticketModificadaEventProxy")
-                    carregarAcoes()
+                    carregarDpEventos()
                 }
                 target[key] = false
                 return false;
@@ -408,7 +408,7 @@ cellspacing="0">
         });
 
         $(document).mouseup(function (e) {
-            $("div[id^='"+hiddenMenuAcoesId+"']").each(function (i, el) {
+            $("div[id^='"+hiddenMenuDpEventosId+"']").each(function (i, el) {
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
                     if ($(this).css('display') != 'none') {
                         $(this).toggle()

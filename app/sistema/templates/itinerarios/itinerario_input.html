@@ -322,8 +322,10 @@
 </div>
 
 {{ acao|json_script:"acao_script" }}
+{{ itinerario|json_script:"itinerario_script" }}
 <script>
     var acao = JSON.parse($("#acao_script").text())
+    var itinerario = JSON.parse($("#itinerario_script").text())
     var reloadMap = new CustomEvent('reloadMap', { detail: { message: 'reloadMap' } });
     var map = null
     var pendenteMarkers = []
@@ -1333,6 +1335,7 @@
     }
 
     function setAcaoItinerarios(acao) {
+        console.log("acao dentro de setAcaoItinerarios", acao)
         $("#itinerario-color-picker").empty()
         itinerarios = []
         let membrosExecucao = acao["membroexecucao_set"]
@@ -1408,6 +1411,7 @@
         });
 
         if (acao.id) setAcaoItinerarios(acao)
+        else if (itinerario.id) setAcaoItinerarios(itinerario)
 
         $('body').on('reloadMap', function (e) {
             setTimeout(function(){ map.invalidateSize()}, 100);

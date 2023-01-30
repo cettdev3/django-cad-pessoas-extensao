@@ -19,7 +19,7 @@ from django.urls import path, include
 from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
-from sistema.views.eventoApiViews import EventoApiView, EventoDetailApiView
+from sistema.views.ensinoApiViews import EventoApiView, EventoDetailApiView
 from sistema.views.membroExecucaoApiViews import MembroExecucaoApiView, MembroExecucaoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
@@ -38,14 +38,15 @@ from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, endere
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
-from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, acoesSelect,visualizarAcao
+from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, visualizarAcao
+from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario
-from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
+from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
 from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
-from sistema.views.siteAtividadeViews import atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
+from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
@@ -53,6 +54,7 @@ from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, Itinerar
 from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
+from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
 
 urlpatterns = [
     # ROTAS DO SITE
@@ -115,7 +117,6 @@ urlpatterns = [
     path("saveAlocacao",saveAlocacao),
     path("editarAlocacao/<codigo>",editarAlocacao),
     path("eliminarAlocacao/<codigo>",eliminarAlocacao),
-    path("visualizarAcao/<codigo>",visualizarAcao),
     
     # ROTAS PARA EVENTOS
     path("gerenciar-eventos",gerencia_eventos),
@@ -166,9 +167,11 @@ urlpatterns = [
     path("eliminarAtividade/<codigo>", eliminarAtividade),
     path("atividadeEditarModal/<codigo>", atividadeEditarModal),
     path("editarAtividade/<codigo>", editarAtividade),
+    path("atividadesDpEventoTable", atividadesDpEventoTable),
     
     # ROTAS PARA MEMBROS DE EXECUCAO
     path("membrosExecucaoTable",membrosExecucaoTable),
+    path("membrosExecucaoDpEventoTable",membrosExecucaoDpEventoTable),
     path("membroExecucaoForm",membroExecucaoForm),
     path("membroExecucaoModal",membroExecucaoModal),
     path("saveMembroExecucao",saveMembroExecucao),
@@ -185,6 +188,18 @@ urlpatterns = [
     path("editarAcao/<codigo>",editarAcao),
     path("eliminarAcao/<codigo>",eliminarAcao),
     path("acoesSelect",acoesSelect),
+    path("visualizarAcao/<codigo>",visualizarAcao),
+
+    # ROTAS PARA EVENTOS
+    path("gerencia_dp_eventos", gerencia_dp_eventos), 
+    path("dpEventoTable", dpEventoTable), 
+    path("dpEventoModal", dpEventoModal), 
+    path("dp_eventosSelect", dp_eventosSelect), 
+    path("saveDpEvento", saveDpEvento), 
+    path("eliminarDpEvento", eliminarDpEvento), 
+    path("editarDpEvento", editarDpEvento), 
+    path("acoesSelect", acoesSelect),
+    path("visualizarDpEvento/<codigo>", visualizarDpEvento),
    
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),
@@ -253,6 +268,9 @@ urlpatterns = [
     
     path("atividades", AtividadeApiView.as_view()),
     path('atividades/<int:atividade_id>', AtividadeDetailApiView.as_view()),
+    
+    path("dp-eventos", DpEventoApiView.as_view()),
+    path('dp-eventos/<int:dp_evento_id>', DpEventoDetailApiView.as_view()),
     
     path("datas-removidas", DataRemovidaApiView.as_view()),
 

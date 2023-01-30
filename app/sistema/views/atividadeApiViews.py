@@ -10,6 +10,7 @@ from ..models.acao import Acao
 from ..models.tipoAtividade import TipoAtividade
 from ..models.cidade import Cidade
 from ..models.atividade import Atividade
+from ..models.dpEvento import DpEvento
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.atividadeSerializer import AtividadeSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -49,11 +50,19 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        if data["acao_id"]:
+        if data.get("acao_id"):
             acao = self.get_object(Acao, data["acao_id"])
             if not acao:
                 return Response(
                     {"res": "Não existe acao com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        
+        if data.get("evento_id"):
+            evento = self.get_object(DpEvento, data["evento_id"])
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
@@ -78,6 +87,7 @@ class AtividadeApiView(APIView):
             "status": data["status"] if data["status"] else "planejado",
             "linkDocumentos": data["linkDocumentos"] if data["linkDocumentos"] else None,
             "acao": acao,
+            "evento": evento,
             "tipoAtividade": tipoAtividade,
             "responsavel": responsavel,
             "cidade": cidade,
@@ -131,7 +141,7 @@ class AtividadeDetailApiView(APIView):
                 )
             atividade.cidade = cidade
         
-        if data["acao_id"]:
+        if data.get("acao_id"):
             acao = self.get_object(Acao, data["acao_id"])
             if not acao:
                 return Response(
@@ -139,6 +149,15 @@ class AtividadeDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             atividade.acao = acao
+
+        if data.get("evento_id"):
+            evento = self.get_object(DpEvento, data["evento_id"])
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            atividade.evento = evento
 
         if data["tipo_atividade_id"]:
             tipoAtividade = self.get_object(TipoAtividade, data["tipo_atividade_id"])
@@ -174,7 +193,7 @@ class AtividadeDetailApiView(APIView):
             atividade.complemento = data["complemento"]
 
         atividade.save()
-        serializer = AtividadeSerializer(acao)
+        serializer = AtividadeSerializer(atividade)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, atividade_id, *args, **kwargs):

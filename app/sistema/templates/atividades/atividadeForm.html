@@ -124,12 +124,26 @@
         id="acao_id"
         name="acao_id" 
         value="{{atividade.acao.id}}">
-        {% else %}
+        {% elif acao %}
         <input type="text" hidden 
         id="acao_id"
         name="acao_id" 
         value="{{acao.id}}">
         {% endif %}
+
+        {% if atividade.evento %}
+        <input type="text" hidden
+        id="evento_id"
+        name="evento_id"
+        value="{{atividade.evento.id}}">
+        {% elif evento %}
+        <input type="text" hidden
+        id="evento_id"
+        name="evento_id"
+        value="{{evento.id}}">
+        {% endif %}
+
+
     </form>
     <span hidden id="selected-membro-equipe">{% if atividade %}{{atividade.responsavel.id}}{% endif %}
     </span>
@@ -144,11 +158,18 @@
 </div>
 
 <script>
-    function carregarSelectMembroExecucao() {
+    function getMembroExecucaoData() {
         let data = {}
         data["title"] = "Responsável"
         if ($("#acao_id").val()) data["acao_id"] = $("#acao_id").val()
+        if ($("#evento_id").val()) data["evento_id"] = $("#evento_id").val()
         if ($("#selected-membro-equipe").text()) data["selected"] = $("#selected-membro-equipe").text()
+        return data
+    }
+
+    function carregarSelectMembroExecucao() {
+        let data = getMembroExecucaoData()
+        console.log(data)
         $.ajax({
             url: "/membrosExecucaoSelect",
             data: data,

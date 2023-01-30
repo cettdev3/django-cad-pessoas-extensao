@@ -237,7 +237,7 @@
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
 
-        if (changedResource) eventoModificadaEventProxy.modificado = changedResource
+        if (changedResource) carregarDpEventos()
         if (changedResource) $("#"+dismissCadastrarEventoId).click()
     }
 

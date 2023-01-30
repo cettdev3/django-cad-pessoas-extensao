@@ -11,7 +11,7 @@
     }
 </style>
 <div id="pessoas_ticket_form_container_{{id_to_remove}}" class=" border pt-2 mt-3">
-    <form id="pessoaTicketAcaoForm-{{id_to_remove}}" class="container position-relative">
+    <form id="pessoaTicketForm-{{id_to_remove}}" class="container position-relative">
         {% if state != 'control_one' %}
         <div class="w-100 position-absolute"
         style="top: -20px; right: 10px">
@@ -167,7 +167,12 @@
                         value="{{membro_execucao.logradouro}}"
                         {% endif %}>
                     </div>
+                    {% if acao %}
                     <input type="text" hidden name="acao_id" value="{{acao.id}}">
+                    {% endif %}
+                    {% if evento %}
+                    <input type="text" hidden name="evento_id" value="{{evento.id}}">
+                    {% endif %}
                 </div>
             </div>
         </div>            

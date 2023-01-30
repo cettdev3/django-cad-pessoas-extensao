@@ -2,25 +2,24 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import permissions
 from django.db import transaction
 
 from django.db.models import Prefetch
-from ..models.acao import Acao
+from ..models.dpEvento import DpEvento
 from ..models.ticket import Ticket
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.itinerario import Itinerario
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
-from ..serializers.acaoSerializer import AcaoSerializer
+from ..serializers.dpEventoSerializer import DpEventoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
 
-class AcaoApiView(APIView):
+class DpEventoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
@@ -31,57 +30,59 @@ class AcaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        acoes = Acao.objects.prefetch_related(Prefetch(
+        print("kdsfjksahfljkashflkash")
+        dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
             queryset=MembroExecucao.objects.order_by('ticket__status')
         ))
 
         if request.GET.get("tipo"):
-            acoes = acoes.filter(tipo__icontains=request.GET.get("tipo"))
+            dp_eventos = dp_eventos.filter(tipo__icontains=request.GET.get("tipo"))
         reset_queries()
-        acoes = acoes.all()
-        serializer = AcaoSerializer(acoes, many=True)
+        dp_eventos = dp_eventos.all()
+        serializer = DpEventoSerializer(dp_eventos, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         cidade = None
         escola = None
-        postAcaoData = request.data.get("acao")
+        postDpEventoData = request.data.get("dpEvento")
+        print("postDpEventoData", request.data)
         postItinerariosData = request.data.get("itinerarios")
 
-        if postAcaoData["cidade_id"]:
-            cidade = self.get_object(Cidade, postAcaoData["cidade_id"])
+        if postDpEventoData["cidade_id"]:
+            cidade = self.get_object(Cidade, postDpEventoData["cidade_id"])
             if not cidade:
                 return Response(
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        if postAcaoData["escola_id"]:
-            escola = self.get_object(Escola, postAcaoData["escola_id"])
+        if postDpEventoData["escola_id"]:
+            escola = self.get_object(Escola, postDpEventoData["escola_id"])
             if not escola:
                 return Response(
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        acaoData = {
-            "tipo": postAcaoData["tipo"] if postAcaoData["tipo"] else None,
-            "descricao": postAcaoData["descricao"] if postAcaoData["descricao"] else None,
-            "data_inicio": postAcaoData["data_inicio"] if postAcaoData["data_inicio"] else None,
-            "data_fim": postAcaoData["data_fim"] if postAcaoData["data_fim"] else None,
-            "bairro": postAcaoData["bairro"] if postAcaoData["bairro"] else None,
-            "logradouro": postAcaoData["logradouro"] if postAcaoData["logradouro"] else None,
-            "cep": postAcaoData["cep"] if postAcaoData["cep"] else None,
-            "complemento": postAcaoData["complemento"] if postAcaoData["complemento"] else None,
+        dp_eventoData = {
+            "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
+            "descricao": postDpEventoData["descricao"] if postDpEventoData["descricao"] else None,
+            "data_inicio": postDpEventoData["data_inicio"] if postDpEventoData["data_inicio"] else None,
+            "data_fim": postDpEventoData["data_fim"] if postDpEventoData["data_fim"] else None,
+            "bairro": postDpEventoData["bairro"] if postDpEventoData["bairro"] else None,
+            "logradouro": postDpEventoData["logradouro"] if postDpEventoData["logradouro"] else None,
+            "cep": postDpEventoData["cep"] if postDpEventoData["cep"] else None,
+            "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
             "cidade": cidade,
             "escola": escola,
         }
 
         membrosExecucaoData = []
-        if len(postAcaoData["membros_execucao"]):
-            for membroExecucao in postAcaoData["membros_execucao"]:
+        if len(postDpEventoData["membros_execucao"]):
+            for membroExecucao in postDpEventoData["membros_execucao"]:
                 membroExecucaoData = {
                     "pessoa_id": membroExecucao.get("pessoa_id") if membroExecucao.get("pessoa_id") else None,
                     "tipo": membroExecucao.get("tipo") if membroExecucao.get("tipo") else None,
@@ -96,10 +97,10 @@ class AcaoApiView(APIView):
                 membrosExecucaoData.append(membroExecucaoData)
         
         with transaction.atomic():
-            acaoData = Acao.objects.create(**acaoData)
+            dp_eventoData = DpEvento.objects.create(**dp_eventoData)
             databaseMembrsoExecucao = []
             for membrosExecucaoData in membrosExecucaoData:
-                membrosExecucaoData["acao"] = acaoData
+                membrosExecucaoData["evento"] = dp_eventoData
                 membroExecucao = MembroExecucao.objects.create(**membrosExecucaoData)
                 databaseMembrsoExecucao.append(membroExecucao)
 
@@ -122,6 +123,7 @@ class AcaoApiView(APIView):
                     print("dados vindos do post: ",postItinerarioItemData)
                     data = postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None
                     if data:
+                        # convert str '2023-01-16T10:09' to datetime
                         data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
                     itinerarioItemData = {
                         "data_hora": data,
@@ -146,11 +148,11 @@ class AcaoApiView(APIView):
                             membroExecucao.itinerario = itinerario
                             membroExecucao.save()
 
-            acaoSerializer = AcaoSerializer(acaoData)
-            print("dados salvos", acaoSerializer.data)
-        return Response(acaoSerializer.data, status=status.HTTP_200_OK)
+            dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
+            print("dados salvos", dp_eventoSerializer.data)
+        return Response(dp_eventoSerializer.data, status=status.HTTP_200_OK)
 
-class AcaoDetailApiView(APIView):
+class DpEventoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
@@ -160,42 +162,42 @@ class AcaoDetailApiView(APIView):
         except fn.DoesNotExist:
             return None
 
-    def get(self, request, acao_id, *args, **kwargs):
+    def get(self, request, dp_evento_id, *args, **kwargs):
 
-        acao = self.get_object(Acao, acao_id)
-        if not acao:
+        dp_evento = self.get_object(DpEvento, dp_evento_id)
+        if not dp_evento:
             return Response(
                 {"res": "Não existe ação com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = AcaoSerializer(acao)
+        serializer = DpEventoSerializer(dp_evento)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, acao_id, *args, **kwargs):
-        acao = self.get_object(Acao, acao_id)
-        if not acao:
+    def put(self, request, dp_evento_id, *args, **kwargs):
+        dp_evento = self.get_object(DpEvento, dp_evento_id)
+        if not dp_evento:
             return Response(
                 {"res": "Não existe ação com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if request.data.get("tipo"):
-            acao.tipo = request.data.get("tipo")
+            dp_evento.tipo = request.data.get("tipo")
         if request.data.get("descricao"):
-            acao.descricao = request.data.get("descricao")
+            dp_evento.descricao = request.data.get("descricao")
         if request.data.get("data_inicio"):
-            acao.data_inicio = request.data.get("data_inicio")
+            dp_evento.data_inicio = request.data.get("data_inicio")
         if request.data.get("data_fim"):
-            acao.data_fim = request.data.get("data_fim")
+            dp_evento.data_fim = request.data.get("data_fim")
         if request.data.get("bairro"):
-            acao.bairro = request.data.get("bairro")
+            dp_evento.bairro = request.data.get("bairro")
         if request.data.get("logradouro"):
-            acao.logradouro = request.data.get("logradouro")
+            dp_evento.logradouro = request.data.get("logradouro")
         if request.data.get("cep"):
-            acao.cep = request.data.get("cep")
+            dp_evento.cep = request.data.get("cep")
         if request.data.get("complemento"):
-            acao.complemento = request.data.get("complemento")
+            dp_evento.complemento = request.data.get("complemento")
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
@@ -203,7 +205,7 @@ class AcaoDetailApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            acao.cidade = cidade
+            dp_evento.cidade = cidade
 
         if request.data.get("escola_id"):
             escola = self.get_object(Escola, request.data.get("escola_id"))
@@ -212,22 +214,22 @@ class AcaoDetailApiView(APIView):
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            acao.escola = escola
+            dp_evento.escola = escola
 
-        acao.save()
-        serializer = AcaoSerializer(acao)
+        dp_evento.save()
+        serializer = DpEventoSerializer(dp_evento)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, acao_id, *args, **kwargs):
+    def delete(self, request, dp_evento_id, *args, **kwargs):
 
-        acao = self.get_object(Acao, acao_id)
-        if not acao:
+        dp_evento = self.get_object(DpEvento, dp_evento_id)
+        if not dp_evento:
             return Response(
                 {"res": "Não existe ação com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        membrosExecucao = MembroExecucao.objects.filter(acao_id=acao_id)
+        membrosExecucao = MembroExecucao.objects.filter(dp_evento_id=dp_evento_id)
         for membroExecucao in membrosExecucao:
             tickets = Ticket.objects.filter(
                 membro_execucao_id=membroExecucao.id)
@@ -235,7 +237,7 @@ class AcaoDetailApiView(APIView):
                 ticket.delete()
             membroExecucao.delete()
 
-        acao.delete()
+        dp_evento.delete()
         return Response(
             {"res": "ação deletada!"},
             status=status.HTTP_200_OK

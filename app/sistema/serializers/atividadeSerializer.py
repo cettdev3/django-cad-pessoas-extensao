@@ -12,6 +12,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "linkDocumentos",
             "status",
             "acao",
+            "evento",
             "tipoAtividade",
             "responsavel",
             "cidade",

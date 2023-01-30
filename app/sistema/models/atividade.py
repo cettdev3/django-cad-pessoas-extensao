@@ -1,6 +1,7 @@
 from django.db import models
 from .acao import Acao
 from .tipoAtividade import TipoAtividade
+from .dpEvento import DpEvento
 from .membroExecucao import MembroExecucao
 from .cidade import Cidade
 
@@ -10,6 +11,7 @@ class Atividade(models.Model):
     linkDocumentos = models.CharField(null = True, blank=True, max_length=300)
     status = models.CharField(null = True, blank=True, max_length=50)
     acao = models.ForeignKey(Acao, on_delete=models.SET_NULL, null=True, blank=True)
+    evento = models.ForeignKey(DpEvento, on_delete=models.SET_NULL, null=True, blank= True)
     tipoAtividade = models.ForeignKey(TipoAtividade, on_delete=models.SET_NULL, null=True, blank=True)
     responsavel = models.ForeignKey(MembroExecucao, on_delete=models.SET_NULL, null=True, blank=True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank=True)
