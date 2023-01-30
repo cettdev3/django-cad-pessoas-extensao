@@ -58,38 +58,41 @@ class TicketApiView(APIView):
         ticketData = Ticket.objects.create(**ticketData)
 
         acao = membro_execucao.acao
-        membersWithoutTickets = MembroExecucao.objects.filter( Q(acao__id=acao.id, ticket__isnull=True)).all()
 
-        if len(membersWithoutTickets) == 0 and acao.status == Acao.STATUS_WAITING_TICKET:
+        membersWithoutTickets = []
+        if acao:
+            membersWithoutTickets = MembroExecucao.objects.filter( Q(acao__id=acao.id, ticket__isnull=True)).all()
 
-            membersWithTickets = MembroExecucao.objects.filter( Q(acao__id=acao.id, ticket__isnull=False)).all()
-            tickets = []
-            for member in membersWithTickets:
-                tickets.append({
-                    "id_protocolo": member.ticket.id_protocolo, 
-                    "tipo": member.ticket.tipo, 
-                    "status": member.ticket.status,
-                    "membro_execucao": member.pessoa.id,
-                    "member_nome": member.pessoa.nome,
-                    "member_cpf": member.pessoa.cpf,
-                })
+            if len(membersWithoutTickets) == 0 and acao.status == Acao.STATUS_WAITING_TICKET:
 
-            dados = {
-                "variables": {
-                    "tickets": {"value": json.dumps(tickets), 
-                    "type": "Json"},
-                },
-                "withVariablesInReturn": True
-            }
+                membersWithTickets = MembroExecucao.objects.filter( Q(acao__id=acao.id, ticket__isnull=False)).all()
+                tickets = []
+                for member in membersWithTickets:
+                    tickets.append({
+                        "id_protocolo": member.ticket.id_protocolo, 
+                        "tipo": member.ticket.tipo, 
+                        "status": member.ticket.status,
+                        "membro_execucao": member.pessoa.id,
+                        "member_nome": member.pessoa.nome,
+                        "member_cpf": member.pessoa.cpf,
+                    })
 
-            camundaApi = CamundaAPI()
-            tasks = camundaApi.getTasks(acao.process_instance)
-            tasksFromInstance = json.loads(tasks.content)
-            for i,task in enumerate(tasksFromInstance):
-                completedTask = camundaApi.completeTask(task["id"], variables=dados)
-            
-            acao.status = Acao.STATUS_WAITING_RETURN
-            acao.save()
+                dados = {
+                    "variables": {
+                        "tickets": {"value": json.dumps(tickets), 
+                        "type": "Json"},
+                    },
+                    "withVariablesInReturn": True
+                }
+
+                camundaApi = CamundaAPI()
+                tasks = camundaApi.getTasks(acao.process_instance)
+                tasksFromInstance = json.loads(tasks.content)
+                for i,task in enumerate(tasksFromInstance):
+                    completedTask = camundaApi.completeTask(task["id"], variables=dados)
+                
+                acao.status = Acao.STATUS_WAITING_RETURN
+                acao.save()
 
         acaoSerializer= TicketSerializer(ticketData)
         return Response(acaoSerializer.data, status=st.HTTP_200_OK)
