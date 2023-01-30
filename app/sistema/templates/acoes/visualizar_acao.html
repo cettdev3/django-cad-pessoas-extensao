@@ -70,7 +70,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 <div id="receberTabelaMembrosExecucao"></div>
             </div>
             <div id="itinerarios" class="tab-pane" style="height: 100%;">
-                {% include "itinerarios/itinerario_input.html" with itinerario=acao %}
+                {% include "itinerarios/itinerario_input.html" with itinerario=acao acao=acao %}
             </div>
             <div id="atividades" class="tab-pane" style="height: 100%;">
                 <div id="atividadesTableContainer"></div>

@@ -1096,7 +1096,7 @@
                 order: item.order,
                 itinerario_id: itinerarioId
             }
-
+            
             $.ajax({
                 url: "/saveItinerarioItem",
                 headers: { "X-CSRFToken":  '{{ csrf_token }}' },
@@ -1337,6 +1337,7 @@
     function setAcaoItinerarios(acao) {
         console.log("acao dentro de setAcaoItinerarios", acao)
         $("#itinerario-color-picker").empty()
+        $("#itinerario-header").css("background-color", "#ffffff")
         itinerarios = []
         let membrosExecucao = acao["membroexecucao_set"]
         let membroExecucaoLenght = membrosExecucao.length
