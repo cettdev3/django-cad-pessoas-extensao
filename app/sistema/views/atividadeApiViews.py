@@ -10,6 +10,7 @@ from ..models.acao import Acao
 from ..models.tipoAtividade import TipoAtividade
 from ..models.cidade import Cidade
 from ..models.atividade import Atividade
+from ..models.departamento import Departamento
 from ..models.dpEvento import DpEvento
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.atividadeSerializer import AtividadeSerializer
@@ -30,7 +31,7 @@ class AtividadeApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        atividades = Atividade.objects.select_related("acao", "tipoAtividade", "responsavel", "cidade").all()
+        atividades = Atividade.objects.select_related("acao", "tipoAtividade", "departamento", "responsavel", "cidade").all()
         serializer = AtividadeSerializer(atividades, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -41,6 +42,7 @@ class AtividadeApiView(APIView):
         responsavel = None 
         cidade = None
         evento = None
+        departamento = None
 
         data = request.data
         if data["cidade_id"]:
@@ -83,6 +85,14 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
+        if data["departamento_id"]:
+            departamento = self.get_object(Departamento, data["departamento_id"])
+            if not departamento:
+                return Response(
+                    {"res": "Não existe departamento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        
         atividadeData = {
             "descricao": data["descricao"] if data["descricao"] else None,
             "status": data["status"] if data["status"] else "planejado",
@@ -91,6 +101,7 @@ class AtividadeApiView(APIView):
             "evento": evento,
             "tipoAtividade": tipoAtividade,
             "responsavel": responsavel,
+            "departamento": departamento,
             "cidade": cidade,
             "logradouro": data["logradouro"] if data["logradouro"] else None,
             "bairro": data["bairro"] if data["bairro"] else None,
@@ -177,6 +188,15 @@ class AtividadeDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             atividade.responsavel = responsavel
+
+        if data["departamento_id"]:
+            departamento = self.get_object(Departamento, data["departamento_id"])
+            if not departamento:
+                return Response(
+                    {"res": "Não existe departamento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            atividade.departamento = departamento
         
         if data["descricao"]:
             atividade.descricao = data["descricao"]

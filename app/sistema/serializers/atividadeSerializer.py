@@ -15,6 +15,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "evento",
             "tipoAtividade",
             "responsavel",
+            "departamento",
             "cidade",
             "logradouro",
             "bairro",

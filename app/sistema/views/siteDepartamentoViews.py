@@ -67,3 +67,13 @@ def editarDepartamento(request, codigo):
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/departamentos/' + str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+def departamentosSelect(request):
+    data = {}
+    if request.GET.get('selected'):
+        data['departamento_id'] = int(request.GET.get('selected')) if request.GET.get('selected').strip() else None
+    if request.GET.get('departamento_id'):
+        data['departamento_id'] = int(request.GET.get('departamento_id')) if request.GET.get('departamento_id').strip() else None
+    data["departamentos"] = Departamento.objects.all()
+
+    return render(request,'departamentos/departamentos_select.html', data)

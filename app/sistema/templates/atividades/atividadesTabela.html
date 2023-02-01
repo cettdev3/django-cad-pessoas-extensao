@@ -18,6 +18,7 @@ cellspacing="0">
     <thead class="border">
         <tr class="">
             <th class="text-left">Descricao</th>
+            <th class="text-left">Departamento</th>
             <th class="text-left">Status</th>
             <th class="text-left">Responsável</th>
             <th class="w-2 text-left">Tipo</th>
@@ -27,6 +28,7 @@ cellspacing="0">
         {% for atividade in atividades %}
         <tr>
             <td class="atividade-w-50 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
+            <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.departamento.nome}}</span></td>
             <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.status}}</span></td>
             <td class="atividade-w-25 text-left" style="vertical-align: middle;">
                 {% if atividade.responsavel %}

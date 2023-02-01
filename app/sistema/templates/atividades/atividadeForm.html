@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-sm-12">
+            <div class="col-sm-9">
                 <label><b>Link de Documentos:</b></label>
                 <input type="text"
                 required
@@ -53,6 +53,8 @@
                 {% endif %}
                 id="linkDocumentos"
                 name="linkDocumentos">
+            </div>
+            <div id="departamentoSelectContainer" class="col-sm-3">
             </div>
         </div>
         <div class="form-group row">
@@ -149,6 +151,7 @@
     </span>
     <span hidden id="selected-tipo-atividade">{% if atividade %}{{atividade.tipoAtividade.id}}{% endif %}
     </span>
+    <span hidden id="selected-departamento">{% if atividade %}{{atividade.departamento.id}}{% endif %}</span>
     <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
     <span hidden id="acao-logradouro">{{acao.logradouro}}</span>
     <span hidden id="acao-cep">{{acao.cep}}</span>
@@ -176,6 +179,23 @@
             type: "GET",
             success: function(data) {
                 $("#membroExecucaoSelectContainer").html(data);
+            }
+        });
+    }
+    
+    function carregarSelectDepartamento() {
+        let data = {}
+        if ($("#selected-departamento").text()) data["selected"] = $("#selected-departamento").text()
+
+        $.ajax({
+            url: "/departamentosSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#departamentoSelectContainer").html(data);
+            },
+            error: function(data) {
+                console.log(data)
             }
         });
     }
@@ -212,6 +232,7 @@
         carregarSelectMembroExecucao();
         carregarSelectTipoAtividade();
         carregarSelectCidades();
+        carregarSelectDepartamento();
 
         $("#atividade-user-acao-endereco").change(function() {
             if (this.checked) {

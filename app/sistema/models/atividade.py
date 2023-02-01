@@ -4,6 +4,7 @@ from .tipoAtividade import TipoAtividade
 from .dpEvento import DpEvento
 from .membroExecucao import MembroExecucao
 from .cidade import Cidade
+from .departamento import Departamento
 
 class Atividade(models.Model):
     id = models.AutoField(primary_key=True)
@@ -14,6 +15,7 @@ class Atividade(models.Model):
     evento = models.ForeignKey(DpEvento, on_delete=models.SET_NULL, null=True, blank= True)
     tipoAtividade = models.ForeignKey(TipoAtividade, on_delete=models.SET_NULL, null=True, blank=True)
     responsavel = models.ForeignKey(MembroExecucao, on_delete=models.SET_NULL, null=True, blank=True)
+    departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank=True)
     logradouro = models.CharField(null = True, blank=True, max_length=100)
     bairro = models.CharField(null = True, blank=True, max_length=100)
