@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-success"></h6>
+    </div>
+    <div class="card-body">
+        <form class="user">
+            <div class="form-group row">
+                <div class="col-sm-2">
+                    <label><b>Nome:</b></label><br>
+                    {{departamento.nome}}
+                </div>
+            </div>
+            <a href="/gerenciar-departamentos" class="btn btn-success btn-user btn-block" >VOLTAR</a>
+        </form>
+
+    
+    </div>
+</div>
+
+{% endblock content %}

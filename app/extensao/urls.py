@@ -45,6 +45,7 @@ from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItin
 from sistema.views.siteComponentsView import calendario
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
 from sistema.views.siteTicketViews import ticketModal, saveTicket
+from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
 from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
@@ -87,6 +88,16 @@ urlpatterns = [
     path("saveCurso",saveCurso),
     path("editarCurso/<codigo>",editarCurso),
     
+    
+    # ROTAS PARA DEPARTAMENTOS
+    path("gerenciar-departamentos",gerencia_departamentos),
+    path("departamentosTable",departamentosTable),
+    path("departamentosModalCadastrar",departamentosModalCadastrar),
+    path("eliminarDepartamento/<codigo>",eliminarDepartamento),
+    path("saveDepartamento",saveDepartamento),
+    path("editarDepartamento/<codigo>",editarDepartamento),
+    path("visualizarDepartamento/<codigo>",visualizarDepartamento),
+
     # ROTAS PARA ENDERECOS
     path("saveEndereco",saveEndereco),
     path("editarEndereco/<codigo>",editarEndereco),

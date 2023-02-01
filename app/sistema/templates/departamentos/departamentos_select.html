@@ -1,0 +1,17 @@
+<label><b>Departamento:</b></label>
+<select class="form-control"
+{% if id and id_complement %} 
+id="{{id}}_{{id_complement}}_departamento_id" 
+{% elif id %}
+id="{{id}}_departamento_id" 
+{% else %}
+id="departamento_id" 
+{% endif %}
+name="departamento_id">
+    {% if not departamento_id %}
+    <option value="">Selecione uma Cidade</option>
+    {% endif %}
+    {% for departamento in departamentos %}
+        <option {% if departamento_id == departamento.id %} selected {% endif %}  value="{{departamento.id}}">{{departamento.nome}}</option>
+    {% endfor %}
+</select>
