@@ -19,7 +19,7 @@ from django.urls import path, include
 from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
-from sistema.views.ensinoApiViews import EventoApiView, EventoDetailApiView
+from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
 from sistema.views.membroExecucaoApiViews import MembroExecucaoApiView, MembroExecucaoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
@@ -227,8 +227,8 @@ urlpatterns = [
     path("enderecos", EnderecoApiView.as_view()),
     path('enderecos/<int:endereco_id>', EnderecoDetailApiView.as_view()),
     
-    path("eventos", EventoApiView.as_view()),
-    path('eventos/<int:evento_id>', EventoDetailApiView.as_view()),
+    path("ensino", EnsinoApiView.as_view()),
+    path('ensino/<int:evento_id>', EnsinoDetailApiView.as_view()),
 
     path("cidades", CidadeApiView.as_view()),
     path('cidades/<int:cidade_id>', CidadeDetailApiView.as_view()),

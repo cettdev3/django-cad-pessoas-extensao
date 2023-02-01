@@ -30,7 +30,6 @@ class DpEventoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        print("kdsfjksahfljkashflkash")
         dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
             queryset=MembroExecucao.objects.order_by('ticket__status')

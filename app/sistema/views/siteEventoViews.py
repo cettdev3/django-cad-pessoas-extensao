@@ -70,7 +70,7 @@ def saveEvento(request):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     print(body)
-    response = requests.post('http://localhost:8000/eventos', json=body, headers=headers)
+    response = requests.post('http://localhost:8000/ensino', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
@@ -78,5 +78,5 @@ def editarEvento(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    response = requests.put('http://localhost:8000/eventos/'+str(codigo), json=body, headers=headers)
+    response = requests.put('http://localhost:8000/ensino/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

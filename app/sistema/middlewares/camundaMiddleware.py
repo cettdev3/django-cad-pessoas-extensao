@@ -1,0 +1,16 @@
+from django.http import HttpResponse
+from ..services.gpsProcessService import GPSProcessService
+class CamundaMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.gpsProcess = GPSProcessService()
+
+    def __call__(self, request):
+        route = request.path
+        method = request.method
+        print("route: ", route, method)
+        response = self.get_response(request)
+        self.gpsProcess.processGps(route=route, method=method, request=request, response=response)
+        print("route depoirs: ", route, method)
+
+        return response

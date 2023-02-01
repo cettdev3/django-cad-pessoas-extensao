@@ -13,7 +13,7 @@ from ..serializers.eventoSerializer import EventoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-class EventoApiView(APIView):
+class EnsinoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
@@ -88,7 +88,7 @@ class EventoApiView(APIView):
         eventoSerializer = EventoSerializer(evento)
         return Response(eventoSerializer.data, status=str.HTTP_201_CREATED)
 
-class EventoDetailApiView(APIView):
+class EnsinoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     
