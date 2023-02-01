@@ -40,6 +40,7 @@ class AtividadeApiView(APIView):
         tipoAtividade = None
         responsavel = None 
         cidade = None
+        evento = None
 
         data = request.data
         if data["cidade_id"]:
