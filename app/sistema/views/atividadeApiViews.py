@@ -31,6 +31,7 @@ class AtividadeApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
+        
         atividades = Atividade.objects.select_related("acao", "tipoAtividade", "departamento", "responsavel", "cidade").all()
         serializer = AtividadeSerializer(atividades, many=True)
 

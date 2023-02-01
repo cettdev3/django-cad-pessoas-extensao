@@ -2,8 +2,21 @@
 from rest_framework import serializers
 from ..models.alocacao import Alocacao
 from ..models.atividade import Atividade
+from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
+from ..serializers.acaoSerializer import AcaoSerializer
+from ..serializers.tipoAtividadeSerializer import TipoAtividadeSerializer
+from ..serializers.departamentoSerializer import DepartamentoSerializer
+from ..serializers.cidadeSerializer import CidadeSerializer
+from ..serializers.dpEventoSerializer import DpEventoSerializer
 
 class AtividadeSerializer(serializers.ModelSerializer):
+    acao = AcaoSerializer(many=False, read_only=True)   
+    evento = DpEventoSerializer(many=False, read_only=True)
+    tipoAtividade = TipoAtividadeSerializer(many=False, read_only=True)
+    responsavel = MembroExecucaoSerializer(many=False, read_only=True)
+    departamento = DepartamentoSerializer(many=False, read_only=True)
+    cidade = CidadeSerializer(many=False, read_only=True) 
+
     class Meta:
         model = Atividade
         fields = [
