@@ -15,3 +15,4 @@ from .tipoAtividade import TipoAtividade
 from .atividade import Atividade
 from .dataRemovida import DataRemovida
 from .dpEvento import DpEvento
+from .departamento import Departamento

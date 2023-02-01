@@ -28,6 +28,7 @@ from sistema.views.escolaApiViews import EscolaApiView, EscolaDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
 from sistema.views.turnoApiViews import TurnoApiView, TurnoDetailApiView
+from sistema.views.departamentoApiViews import DepartamentoApiView, DepartamentoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
@@ -271,6 +272,9 @@ urlpatterns = [
     
     path("dp-eventos", DpEventoApiView.as_view()),
     path('dp-eventos/<int:dp_evento_id>', DpEventoDetailApiView.as_view()),
+   
+    path("departamentos", DepartamentoApiView.as_view()),
+    path('departamentos/<int:departamento_id>', DepartamentoDetailApiView.as_view()),
     
     path("datas-removidas", DataRemovidaApiView.as_view()),
 
