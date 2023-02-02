@@ -118,27 +118,20 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div id="eventoFormSelectCidade" class="col-sm-4">
+                                    <div class="col-sm-4">
+                                        <label><b>Tipo:</b></label>
+                                        <select class="form-control"
+                                        name="tipo">
+                                            <option {% if evento.tipo == 'gps' %} selected {% endif %}  
+                                            value="gps">GPS</option>
+                                            <option {% if evento.tipo != 'gps' %} selected {% endif %}  
+                                            value="outros">Outros</option>
+                                        </select>
                                     </div>
                                 </div>
                                 
                                 <div class="dadosNovoEndereco form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Logradouro:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if evento %}
-                                            {% if evento.logradouro %}
-                                            value="{{evento.logradouro}}" 
-                                            {% else %}
-                                            value="{{evento.endereco.logradouro}}" 
-                                            {% endif %}
-                                        {% endif %}
-                                        id="logradouro" 
-                                        name="logradouro" 
-                                        placeholder=""
-                                        required>
+                                    <div id="eventoFormSelectCidade" class="col-sm-4">
                                     </div>
                                     <div class="col-sm-4">
                                         <label><b>Bairro:</b></label>
@@ -176,7 +169,24 @@
                                     </div>
                                 </div>
                                 <div class="dadosNovoEndereco form-group row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-4">
+                                        <label><b>Logradouro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if evento %}
+                                            {% if evento.logradouro %}
+                                            value="{{evento.logradouro}}" 
+                                            {% else %}
+                                            value="{{evento.endereco.logradouro}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="logradouro" 
+                                        name="logradouro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-8">
                                         <label><b>Complemento:</b></label>
                                         <input 
                                         type="text" 
