@@ -9,7 +9,7 @@ id="departamento_id"
 {% endif %}
 name="departamento_id">
     {% if not departamento_id %}
-    <option value="">Selecione um Departamento</option>
+        <option value="">Selecione um Departamento</option>
     {% endif %}
     {% for departamento in departamentos %}
         <option {% if departamento_id == departamento.id %} selected {% endif %}  value="{{departamento.id}}">{{departamento.nome}}</option>
