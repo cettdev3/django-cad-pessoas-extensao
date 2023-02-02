@@ -15,11 +15,12 @@ def startProcessSignalHandler(sender, **kwargs):
     
     camundaVariables = {"variables": {}}
     for key, value in response.items():
-        camundaVariables["variables"].update(camundaApi.camundaVariableFormat(key, value, "String"))
+        if key == "id":
+            camundaVariables["variables"].update(camundaApi.camundaVariableFormat("acao_ensino_id", value, "String"))
     camundaResponse = camundaApi.startProcess(process_id, dados=camundaVariables)
     process_instance_id = camundaResponse["id"]
     acaoEnsino = Ensino.objects.get(id=response["id"])
     acaoEnsino.process_instance = process_instance_id
     acaoEnsino.save()
-    
+
 startProcessSignal.connect(startProcessSignalHandler)
