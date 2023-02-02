@@ -10,7 +10,7 @@ from django.db.models import Count
 from django.shortcuts import render, redirect
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.turnoSerializer import TurnoSerializer
 from sistema.models.pessoa import Pessoas
 from rest_framework.authtoken.models import Token
@@ -82,7 +82,7 @@ def pessoasModalAlocar(request):
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
         eventos = Ensino.objects.filter(~Q(status="finalizado"))
-        eventos = EventoSerializer(eventos, many=True)
+        eventos = EnsinoSerializer(eventos, many=True)
         data['eventos'] = eventos.data
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 

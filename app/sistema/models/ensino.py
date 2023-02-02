@@ -4,7 +4,6 @@ from ..models.cidade import Cidade
 from ..models.escola import Escola
 
 class Ensino(models.Model):
-    # Eventos se tornou ensino, aqui ficam controles de alocação de professores nas escolas
     STATUS_PLANNEJADO = "planejamento"
     STATUS_ANDAMENTO = "andamento"
     STATUS_FINALIZADO = "finalizado"
@@ -22,6 +21,7 @@ class Ensino(models.Model):
     id = models.AutoField(primary_key=True)
     data_inicio = models.DateTimeField(null = True)
     data_fim = models.DateTimeField(null = True)
+    tipo = models.CharField(null = True, max_length=100)
     observacao = models.CharField(null = True, max_length=500)
     status = models.CharField(null = True, max_length=100)
     bairro = models.CharField(null = True, max_length=100) 

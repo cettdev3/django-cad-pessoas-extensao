@@ -9,7 +9,7 @@ from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.endereco import Endereco
 from ..models.ensino import Ensino
-from ..serializers.eventoSerializer import EventoSerializer
+from ..serializers.ensinoSerializer import EnsinoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -25,7 +25,7 @@ class EnsinoApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         eventos = Ensino.objects.all()
-        serializer = EventoSerializer(eventos, many=True)
+        serializer = EnsinoSerializer(eventos, many=True)
         return Response(serializer.data, status=str.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -41,6 +41,7 @@ class EnsinoApiView(APIView):
         cep = request.data.get("cep")
         complemento = request.data.get("complemento")
         status = request.data.get("status")
+        tipo = request.data.get("tipo")
         endereco = None
         escola = None
         cidade = None
@@ -77,6 +78,7 @@ class EnsinoApiView(APIView):
             data_fim = data_fim,
             observacao = observacao,
             status = status,
+            tipo = tipo,
             logradouro = logradouro,
             complemento = complemento,
             bairro = bairro,
@@ -85,7 +87,7 @@ class EnsinoApiView(APIView):
             escola = escola
         )
 
-        eventoSerializer = EventoSerializer(evento)
+        eventoSerializer = EnsinoSerializer(evento)
         return Response(eventoSerializer.data, status=str.HTTP_201_CREATED)
 
 class EnsinoDetailApiView(APIView):
@@ -107,7 +109,7 @@ class EnsinoDetailApiView(APIView):
                 status=str.HTTP_400_BAD_REQUEST
             )
 
-        serializer = EventoSerializer(evento)
+        serializer = EnsinoSerializer(evento)
         return Response(serializer.data, status=str.HTTP_200_OK)
 
     def put(self, request, evento_id, *args, **kwargs):
@@ -127,6 +129,8 @@ class EnsinoDetailApiView(APIView):
             evento.observacao = request.data.get("observacao")
         if request.data.get("status"):
             evento.status = request.data.get("status")
+        if request.data.get("tipo"):
+            evento.tipo = request.data.get("tipo")
         if request.data.get("logradouro"):
             evento.logradouro = request.data.get("logradouro")
         if request.data.get("complemento"):
@@ -153,7 +157,7 @@ class EnsinoDetailApiView(APIView):
             evento.cep = request.data.get("cep")
 
         evento.save()
-        serializer = EventoSerializer(evento)
+        serializer = EnsinoSerializer(evento)
         
         return Response(serializer.data, status=str.HTTP_200_OK)
 

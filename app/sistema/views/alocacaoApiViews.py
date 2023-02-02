@@ -13,7 +13,7 @@ from ..models.curso import Curso
 from ..models.dataRemovida import DataRemovida
 from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from ..serializers.pessoaSerializer import PessoaSerializer
-from ..serializers.eventoSerializer import EventoSerializer
+from ..serializers.ensinoSerializer import EnsinoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 

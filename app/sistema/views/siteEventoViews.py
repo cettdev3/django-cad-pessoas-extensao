@@ -1,7 +1,7 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
 from sistema.models.curso import Curso
 from sistema.models.endereco import Endereco
@@ -54,7 +54,7 @@ def eventosModalCadastrar(request):
     data = {}
     if id:
         evento = Ensino.objects.get(id=id)
-        data['evento'] = EventoSerializer(evento).data
+        data['evento'] = EnsinoSerializer(evento).data
     data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
