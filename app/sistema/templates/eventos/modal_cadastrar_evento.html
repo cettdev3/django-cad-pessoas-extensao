@@ -212,7 +212,7 @@
             <div class="modal-footer">
                 <button
                 {% if evento %}
-                    onclick="processarEditarEvento({{evento.id}})" 
+                    onclick="processarEditarEvento('{{evento.id}}')" 
                 {% else %}
                     onclick="processarCadastrarEvento()" 
                 {% endif %}
