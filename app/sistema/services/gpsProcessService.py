@@ -2,39 +2,40 @@ import envconfiguration as env_config
 from requests.auth import HTTPBasicAuth
 from ..signals.completeTaskSignal import completeTaskSignal
 from ..signals.startProcessSignal import startProcessSignal
+import json
 
 class GPSProcessService:
     def __init__(self):
-        self.process_name = "gps"
+        self.process_id = "Process_0ujigdr"
 
-    def processGps(self, **kwargs):
+    def processar(self, **kwargs):
         route = kwargs.get("route")
         method = kwargs.get("method")
         request = kwargs.get("request")
         response = kwargs.get("response")
 
+
+        if response.status_code != 200 and response.status_code != 201:
+            return
+
         if route == "/ensino" and method == "POST":
             self.iniciarProcesso(request, response)
 
-        return "json_object"
-
     def iniciarProcesso(self, request, response):
-        startProcessSignal.send(
-            sender=self.__class__,
-            process_id=self.process_name,
-            response=response,
-            request=request,
-            variables={}
-        )
-        
-        return "json_object"
+        tipo = json.loads(response.content).get("tipo")
+        if tipo == 'gps':
+            startProcessSignal.send(
+                sender=self.__class__,
+                process_id=self.process_id,
+                response=response,
+                request=request,
+                variables={}
+            )
    
     def solicitarCursos(self):
         completeTaskSignal.send(
             sender=self.__class__, 
-            process_id=self.process_name, 
+            process_id=self.process_id, 
             task_id="iniciarProcesso", 
             variables={}
         )
-        
-        return "json_object"

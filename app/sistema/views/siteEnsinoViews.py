@@ -59,10 +59,16 @@ def eventosModalCadastrar(request):
     return render(request,'eventos/modal_cadastrar_evento.html',data)
 
 @login_required(login_url='/auth-user/login-user')
-def eliminarEvento(request,codigo):
-    evento = Ensino.objects.get(id=codigo)
-    evento.delete()
-    return redirect('/gerenciar-eventos')
+def eliminarEnsino(request,codigo):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.delete('http://localhost:8000/ensino/'+str(codigo), headers=headers)
+    print(response.content)
+    if response.status_code == 204:
+        messages.success(request, 'Evento eliminado com sucesso!')
+    else:
+        messages.error(request, 'Erro ao eliminar evento!')
+    return redirect('/gerenciar-eventos', messages)
 
 @login_required(login_url='/auth-user/login-user')
 def saveEvento(request):

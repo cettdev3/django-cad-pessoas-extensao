@@ -7,7 +7,14 @@ class CamundaAPI:
     def __init__(self):
         self.__host = env_config.ENG_REST_URL
         self.__autenticacao = HTTPBasicAuth(env_config.ENG_REST_USERNAME, env_config.ENG_REST_PASSWORD)
-    
+
+    def camundaVariableFormat(self, variableName, variableValue, variableType):
+        return { variableName: {
+            "value": variableValue,
+            "type": variableType,
+            "name": variableName
+        }}
+
     def startProcess(self, processName, dados):
         url = f'{self.__host}/process-definition/key/{processName}/start'
         requisicao = requests.post(url,json=dados,auth=self.__autenticacao)

@@ -33,7 +33,7 @@ from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edica
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
-from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEvento, visualizarEvento, saveEvento, editarEvento
+from sistema.views.siteEnsinoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEnsino, visualizarEvento, saveEvento, editarEvento
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
@@ -135,7 +135,7 @@ urlpatterns = [
     path("gerenciar-eventos",gerencia_eventos),
     path("eventosTable",eventosTable),
     path("eventosModalCadastrar",eventosModalCadastrar),
-    path("eliminarEvento/<codigo>",eliminarEvento),
+    path("eliminarEnsino/<codigo>",eliminarEnsino),
     path("visualizarEvento/<codigo>",visualizarEvento),
     path("saveEvento",saveEvento),
     path("editarEvento/<codigo>",editarEvento),
@@ -241,7 +241,7 @@ urlpatterns = [
     path('enderecos/<int:endereco_id>', EnderecoDetailApiView.as_view()),
     
     path("ensino", EnsinoApiView.as_view()),
-    path('ensino/<int:evento_id>', EnsinoDetailApiView.as_view()),
+    path('ensino/<int:ensino_id>', EnsinoDetailApiView.as_view()),
 
     path("cidades", CidadeApiView.as_view()),
     path('cidades/<int:cidade_id>', CidadeDetailApiView.as_view()),

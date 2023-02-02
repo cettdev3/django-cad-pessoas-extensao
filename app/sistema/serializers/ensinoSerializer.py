@@ -18,6 +18,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "data_fim",
             "observacao",
             "tipo",
+            "process_instance",
             "status",
             "endereco",
             "status_class",

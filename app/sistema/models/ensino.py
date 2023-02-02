@@ -22,6 +22,7 @@ class Ensino(models.Model):
     data_inicio = models.DateTimeField(null = True)
     data_fim = models.DateTimeField(null = True)
     tipo = models.CharField(null = True, max_length=100)
+    process_instance = models.CharField(null = True, max_length=100)
     observacao = models.CharField(null = True, max_length=500)
     status = models.CharField(null = True, max_length=100)
     bairro = models.CharField(null = True, max_length=100) 

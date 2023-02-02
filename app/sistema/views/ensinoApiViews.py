@@ -4,9 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as str
 from rest_framework import permissions
-
+from django.db import transaction
 from ..models.cidade import Cidade
 from ..models.escola import Escola
+from ..models.alocacao import Alocacao
 from ..models.endereco import Endereco
 from ..models.ensino import Ensino
 from ..serializers.ensinoSerializer import EnsinoSerializer
@@ -161,16 +162,27 @@ class EnsinoDetailApiView(APIView):
         
         return Response(serializer.data, status=str.HTTP_200_OK)
 
-    def delete(self, request, evento_id, *args, **kwargs):
+    def delete(self, request, ensino_id, *args, **kwargs):
         
-        evento = self.get_object(Ensino, evento_id)
-        if not evento:
+        ensino = self.get_object(Ensino, ensino_id)
+        if not ensino:
             return Response(
-                {"res": "Não existe evento com o id informado"}, 
+                {"res": "Não existe ação de ensino com o id informado"}, 
                 status=str.HTTP_400_BAD_REQUEST
             )
-        evento.delete()
+        with transaction.atomic():
+            # try:
+            alocacoes = Alocacao.objects.filter(evento__id=ensino.id)
+            for alocacao in alocacoes:
+                alocacao.delete()
+            ensino.delete()
+            # except Exception as e:
+            #     return Response(
+            #         {"res": "Não foi possível deletar a ação de ensino"}, 
+            #         status=str.HTTP_400_BAD_REQUEST
+            #     )
+
         return Response(
-            {"res": "evento deletada!"},
+            {"res": "ensino deletada!"},
             status=str.HTTP_200_OK
         )
