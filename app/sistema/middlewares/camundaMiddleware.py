@@ -14,7 +14,6 @@ class CamundaMiddleware:
         self.gpsProcess.processar(
             route=route, 
             method=method, 
-            request=request, 
             response=response
         )
 

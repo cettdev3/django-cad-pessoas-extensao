@@ -6,3 +6,5 @@ fontawesomefree
 requests
 xlsxwriter
 mysqlclient
+celery
+redis
