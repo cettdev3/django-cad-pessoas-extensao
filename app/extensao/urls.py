@@ -50,6 +50,7 @@ from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, 
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
 from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
+from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -217,6 +218,10 @@ urlpatterns = [
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),
     path("saveTicket",saveTicket),
+    
+    # ROTAS PARA AVALIACOES
+    path("avaliacoesTable",avaliacoesTable),
+    path("eliminarAvaliacao/<id>",eliminarAvaliacao),
     
     # ROTAS PARA ITENS DE ITINERARIO
     path("saveItinerarioItem",saveItinerarioItem),

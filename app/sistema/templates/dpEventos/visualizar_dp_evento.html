@@ -62,6 +62,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <li class=" cs-tab-link active">
                 <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
             </li>
+            <li class=" cs-tab-link active">
+                <a id="atividades-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
+            </li>
         </ul>
         <div class="tab-content w-100 h-100">
             <div id="membrosExecucao" 
@@ -74,6 +77,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             </div>
             <div id="atividades" class="tab-pane" style="height: 100%;">
                 <div id="atividadesTableContainer"></div>
+            </div>
+            <div id="avaliacao" class="tab-pane" style="height: 100%;">
+                <div id="avaliacaoLocalTableContainer"></div>
             </div>
         </div>
     </div>
@@ -143,6 +149,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
         });
     }
 
+    function carregarAvaliacaoLocal() {
+        $.ajax({
+            url: "/avaliacoesTable",
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#avaliacaoLocalTableContainer").html(data);
+            }
+        });
+    }
+
     function deleteMembroExecucao(id) {
         deletar_url = "/eliminarMembroExecucao/" + id
 
@@ -202,6 +218,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
 
         carregarMembrosExecucao()
         carregarAtividades()
+        carregarAvaliacaoLocal()
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

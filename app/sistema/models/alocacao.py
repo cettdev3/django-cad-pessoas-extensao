@@ -8,7 +8,7 @@ from ..models.turno import Turno
 
 class Alocacao(models.Model):
     id = models.AutoField(primary_key=True)
-    evento = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True)
+    acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True)
     professor = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True) 
     curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True) 
     data_inicio = models.DateField(null = True)

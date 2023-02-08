@@ -9,7 +9,7 @@ class AlocacaoSerializer(serializers.ModelSerializer):
         model = Alocacao
         fields = [
             "id",
-            "evento",
+            "acaoEnsino",
             "professor",
             "curso",
             "data_inicio",
