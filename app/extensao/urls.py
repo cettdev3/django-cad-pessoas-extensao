@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
 from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
@@ -60,6 +61,9 @@ from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
 
 urlpatterns = [
+    path('token', TokenObtainPairView.as_view()),
+    path('token/refresh', TokenRefreshView.as_view()),
+
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
     path("eliminarPessoa/<codigo>", eliminarPessoa),

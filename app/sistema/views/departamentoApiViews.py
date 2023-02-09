@@ -7,10 +7,11 @@ from ..models.departamento import Departamento
 from ..serializers.departamentoSerializer import DepartamentoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class DepartamentoApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
         departamentos = Departamento.objects.all()

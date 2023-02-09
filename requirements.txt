@@ -8,3 +8,4 @@ xlsxwriter
 mysqlclient
 celery
 redis
+djangorestframework-simplejwt
