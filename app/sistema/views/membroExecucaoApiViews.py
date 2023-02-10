@@ -142,6 +142,9 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.complemento = request.data.get("complemento")
         if request.data.get("avaliador"):
             membroExecucao.avaliador = request.data.get("avaliador")
+        else:
+            membroExecucao.avaliador = False
+            
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:

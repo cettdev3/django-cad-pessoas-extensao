@@ -128,7 +128,18 @@
         var values = {};
         var pessoa_tickets = []
         $.map(unindexed_array, function (n, i) {
-            values[n['name']] = n['value'];
+            // if avaliador checkbox is checked
+            if (n['name'] == "avaliador") {
+                console.log("dentro do avaliador")
+                if (n['value'] == "on") {
+                    values[n['name']] = true
+                    console.log("true", values[n['name']])
+                } else {
+                    values[n['name']] = false
+                }
+            } else {
+                values[n['name']] = n['value'];
+            }
         });
 
         return values

@@ -27,7 +27,11 @@
     </thead>
     <tbody>
         {% for membroExecucao in membros_execucao %}
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.pessoa.nome}}</td>
+        <td class="membro-execucao-w-15 text-left">{{membroExecucao.pessoa.nome}} 
+            {% if membroExecucao.avaliador %}
+            - <strong>Avaliador</strong>
+            {% endif %}
+        </td>
         <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_inicio|date:"d-m-Y"}}</td>
         <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_fim|date:"d-m-Y"}}</td>
         <td class="membro-execucao-w-25 text-left">{{membroExecucao.tipo}}</td>
