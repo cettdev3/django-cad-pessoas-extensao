@@ -19,6 +19,8 @@ class MembroExecucao(models.Model):
     acao = models.ForeignKey(Acao, on_delete=models.SET_NULL, null=True, blank= True)
     evento = models.ForeignKey(DpEvento, on_delete=models.SET_NULL, null=True, blank= True)
     itinerario = models.ForeignKey(Itinerario, on_delete=models.SET_NULL, null=True, blank= True)
+    avaliador = models.BooleanField(default=False, null = True, blank= True)
+
     class Meta:
         db_table = 'membros_execucao'
     
