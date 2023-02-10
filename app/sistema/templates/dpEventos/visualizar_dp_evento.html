@@ -176,7 +176,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
 
     function carregarAvaliacaoLocal() {
         $.ajax({
-            url: "/avaliacoesTable",
+            url: "/avaliacoesDpEventoTable",
             data: {dp_evento_id: dpEventoId},
             success: function (data) {
                 $("#avaliacaoLocalTableContainer").html(data);

@@ -15,7 +15,25 @@ from rest_framework import status
 
 @login_required(login_url='/auth-user/login-user')
 def avaliacoesTable(request):
-    avaliacoes = Avaliacao.objects.all()
+    acao_id = request.GET.get('acao_id')
+    avaliacoes = Avaliacao.objects
+    if acao_id:
+        avaliacoes = avaliacoes.filter(acao__id = acao_id)
+
+    avaliacoes = avaliacoes.all()
+    print(avaliacoes)
+    return render(request,'avaliacoes/avaliacoes_table.html',{'avaliacoes':avaliacoes})
+
+
+@login_required(login_url='/auth-user/login-user')
+def avaliacoesDpEventoTable(request):
+    evento_id = request.GET.get('dp_evento_id')
+    avaliacoes = Avaliacao.objects
+    if evento_id:
+        avaliacoes = avaliacoes.filter(evento__id = evento_id)
+
+    avaliacoes = avaliacoes.all()
+    print(avaliacoes)
     return render(request,'avaliacoes/avaliacoes_table.html',{'avaliacoes':avaliacoes})
 
 @login_required(login_url='/auth-user/login-user')
