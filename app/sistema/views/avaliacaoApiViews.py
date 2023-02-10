@@ -6,11 +6,21 @@ from rest_framework import permissions
 
 from ..serializers.avaliacaoSerializer import AvaliacaoSerializer
 from ..models.avaliacao import Avaliacao
+from ..models.acao import Acao
+from ..models.cidade import Cidade
+from ..models.dpEvento import DpEvento
+from ..models.membroExecucao import MembroExecucao
 from ..serializers.pessoaSerializer import PessoaSerializer
 
 class AvaliacaoApiView(APIView):
     # add permission to check if user is authenticated
     permission_classes = [permissions.AllowAny]
+
+    def get_object(self, fn, object_id):
+        try:
+            return fn.objects.get(id=object_id)
+        except fn.DoesNotExist:
+            return None
 
     # 1. List all
     def get(self, request, *args, **kwargs):
@@ -24,6 +34,52 @@ class AvaliacaoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
+        acao = None
+        evento = None
+        avaliador = None
+        cidade = None
+        requestHasAcao = request.data.get("acao_id") is not None
+        requestHasEvento = request.data.get("evento_id") is not None
+
+        if (requestHasAcao and requestHasEvento) or (not requestHasAcao and not requestHasEvento):
+            return Response(
+                {"res": "Informe o id da ação ou do evento"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if request.data.get("acao_id"):
+            acao = self.get_object(Acao, request.data.get("acao_id"))
+            if not acao:
+                return Response(
+                    {"res": "Não existe ação com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        
+        if request.data.get("evento_id"):
+            evento = self.get_object(DpEvento, request.data.get("evento_id"))
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("membro_execucao_id"):
+            avaliador = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+            if not avaliador:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+                
         data = {
             "nome": request.data.get("nome"),
             "endereco": request.data.get("endereco"),
@@ -81,19 +137,25 @@ class AvaliacaoApiView(APIView):
             "UsuariolAvaliador": request.data.get("UsuariolAvaliador"),
             "avalLocalNomeAvaliador": request.data.get("avalLocalNomeAvaliador"),
             "infomatica": request.data.get("infomatica"),
+            "bairro": request.data.get("bairro"),
+            "logradouro": request.data.get("logradouro"),
+            "cep": request.data.get("cep"),
+            "complemento": request.data.get("complemento"),
+            "acao": acao,
+            "evento": evento,
+            "avaliador": avaliador,
+            "cidade": cidade,
         }
-
-        serializer = AvaliacaoSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        avaliacao = Avaliacao.objects.create(**data)
+        serializer = AvaliacaoSerializer(avaliacao)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class AvaliacaoDetailApiView(APIView):
-    def get_object(self, avaliacao_id):
+    def get_object(self, fn, object_id):
         try:
-            return Avaliacao.objects.get(id=avaliacao_id)
-        except Avaliacao.DoesNotExist:
+            return fn.objects.get(id=object_id)
+        except fn.DoesNotExist:
             return None
             
     # 3. Retrieve
@@ -231,12 +293,42 @@ class AvaliacaoDetailApiView(APIView):
             data["avalLocalNomeAvaliador"] = request.data.get("avalLocalNomeAvaliador")
         if request.data.get("infomatica"):
             data["infomatica"] = request.data.get("infomatica")
-
-        serializer = AvaliacaoSerializer(instance = avaliacao, data=data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.data.get("evento_id"):
+            evento = self.get_object(DpEvento, request.data.get("evento_id"))
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data["evento"] = evento
+        if request.data.get("acao_id"):
+            acao = self.get_object(Acao, request.data.get("acao_id"))
+            if not acao:
+                return Response(
+                    {"res": "Não existe ação com o id informado"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data["acao"] = acao
+        if request.data.get("membro_execucao_id"):
+            avaliador = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+            if not avaliador:
+                return Response(
+                    {"res": "Não existe avaliador com o id informado"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data["avaliador"] = avaliador
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data["cidade"] = cidade    
+        
+        avaliacao = Avaliacao.objects.create(**data)
+        serializer = AvaliacaoSerializer(avaliacao)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     # 5. Delete
     def delete(self, request, avaliacao_id, *args, **kwargs):

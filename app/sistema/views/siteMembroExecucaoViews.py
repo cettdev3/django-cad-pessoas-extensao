@@ -49,11 +49,15 @@ def membroExecucaoModal(request):
     acao_id = request.GET.get('acao_id')
     evento_id = request.GET.get('evento_id')
     membro_execucao = None
+    title = request.GET.get('title')
+
     data = {}
     data["state"] = "create_one"
     data["is_edit"] = False
     data['pessoas'] = Pessoas.objects.all()
     data['cidades'] = Cidade.objects.all()
+    data['title'] = title
+
     if acao_id:
         data['acao'] = Acao.objects.get(id=acao_id)
     if evento_id:
@@ -119,6 +123,7 @@ def membrosExecucaoSelect(request):
     else:
         data["membrosExecucao"] = MembroExecucao.objects.all()
     data["select_id"] = request.GET.get('select_id')
+    data['title'] = request.GET.get('title')
     selectedId = request.GET.get('selected') if request.GET.get('selected') else ""
     selectedId = selectedId.strip()
     selectedId = int(selectedId) if selectedId else ""

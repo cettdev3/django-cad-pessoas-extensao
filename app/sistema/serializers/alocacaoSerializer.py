@@ -23,6 +23,14 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "cidade",
             "turnos",
             "aulas_sabado",
-            "dataremovida_set"
+            "dataremovida_set",
+            "acao",
+            "evento",
+            "avaliador",
+            "bairro",
+            "logradouro",
+            "cep",
+            "complemento",
+            "cidade"
         ]
         depth = 2

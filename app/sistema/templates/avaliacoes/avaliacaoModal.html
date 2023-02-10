@@ -1,0 +1,281 @@
+<div class="modal fade" id="cadastrarAvaliacaoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarAvaliacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarAvaliacaoModalLabel">
+                    {% if avaliacao is None %}
+                        Cadastrar Avaliacao
+                        <span id="avaliacaoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{avaliacao.nome}}
+                        <span id="avaliacaoModelId" hidden>{{avaliacao.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarAvaliacao" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <!-- <ul class="nav nav-tabs row">
+                        <li id="avaliacaoList1" class="col py-2 active-form-tab">
+                            <a id="avaliacaoMenuLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul> -->
+                    <form id="cadastrarAvaliacaoForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div id="membroExecucaoSelectContainer" class="col-sm-4">
+                                    </div>
+                                </div>
+                                {% if acao %}
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
+                                        <span>Usar endereço da ação</span> 
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if evento %}
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
+                                        <span>Usar endereço do evento</span> 
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Logradouro:</b></label>
+                                        <input type="text"
+                                        required
+                                        class="form-control"
+                                        {% if avaliacao.id %}
+                                        value="{{avaliacao.logradouro}}"
+                                        {% endif %}
+                                        id="logradouro"
+                                        name="logradouro">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Bairro:</b></label>
+                                        <input type="text"
+                                        required
+                                        class="form-control"
+                                        {% if avaliacao.id %}
+                                        value="{{avaliacao.bairro}}"
+                                        {% endif %}
+                                        id="bairro"
+                                        name="bairro">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>CEP:</b></label>
+                                        <input type="text"
+                                        required
+                                        class="form-control"
+                                        {% if avaliacao.id %}
+                                        value="{{avaliacao.cep}}"
+                                        {% endif %}
+                                        id="cep"
+                                        name="cep">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div id="cidadesSelectContainer" class="col-sm-4">
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label><b>Complemento:</b></label>
+                                        <input type="text"
+                                        required
+                                        class="form-control"
+                                        {% if avaliacao.id %}
+                                        value="{{avaliacao.complemento}}"
+                                        {% endif %}
+                                        id="complemento"
+                                        name="complemento">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if avaliacao.acao %}
+                        <input type="text" hidden 
+                        id="acao_id"
+                        name="acao_id" 
+                        value="{{avaliacao.acao.id}}">
+                        {% elif acao %}
+                        <input type="text" hidden 
+                        id="acao_id"
+                        name="acao_id" 
+                        value="{{acao.id}}">
+                        {% endif %}
+
+                        {% if avaliacao.evento %}
+                        <input type="text" hidden
+                        id="evento_id"
+                        name="evento_id"
+                        value="{{avaliacao.evento.id}}">
+                        {% elif evento %}
+                        <input type="text" hidden
+                        id="evento_id"
+                        name="evento_id"
+                        value="{{evento.id}}">
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                {% if avaliacao %}
+                    onclick="editarAvaliacao('{{avaliacao.id}}')" 
+                {% else %}
+                    onclick="cadastrarAvaliacao()" 
+                {% endif %}
+                id="finishCadastroAvaliacao" 
+                type="button"
+                class="btn btn-primary">
+                {% if avaliacao %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<span hidden id="selected-cidade">{% if avaliacao %}{{avaliacao.cidade.id}}{% endif %}</span>
+{% if acao %}
+<span hidden id="acao-logradouro">{{acao.logradouro}}</span>
+<span hidden id="acao-cep">{{acao.cep}}</span>
+<span hidden id="acao-bairro">{{acao.bairro}}</span>
+<span hidden id="acao-complemento">{{acao.complemento}}</span>
+<span hidden id="acao-cidade">{{acao.cidade.id}}</span>
+{% endif %}
+{% if evento %}
+<span hidden id="acao-logradouro">{{evento.logradouro}}</span>
+<span hidden id="acao-cep">{{evento.cep}}</span>
+<span hidden id="acao-bairro">{{evento.bairro}}</span>
+<span hidden id="acao-complemento">{{evento.complemento}}</span>
+<span hidden id="acao-cidade">{{evento.cidade.id}}</span>
+{% endif %}
+<span hidden id="selected-membro-equipe">{% if avaliacao %}{{avaliacao.responsavel.id}}{% endif %}
+</span>
+<script>
+    formId = "cadastrarAvaliacaoForm"
+    avaliacaoModelId = "avaliacaoModelId"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) carregarAvaliacaoLocal()
+        if (changedResource) $("#cadastrarAvaliacaoModal").click()
+    }
+
+    function cadastrarAvaliacao() {
+        $.ajax({
+            url: "/saveAvaliacao",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarAvaliacao(id) {
+        $.ajax({
+            url: "editarAvaliacao/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getMembroExecucaoData() {
+        let data = {}
+        data["title"] = "Responsável pela avaliação"
+        if ($("#acao_id").val()) data["acao_id"] = $("#acao_id").val()
+        if ($("#evento_id").val()) data["evento_id"] = $("#evento_id").val()
+        if ($("#selected-membro-equipe").text()) data["selected"] = $("#selected-membro-equipe").text()
+        return data
+    }
+
+    function carregarSelectMembroExecucao() {
+        let data = getMembroExecucaoData()
+        console.log(data)
+        $.ajax({
+            url: "/membrosExecucaoSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#membroExecucaoSelectContainer").html(data);
+            }
+        });
+    }
+
+    function carregarSelectCidades() {
+        let data = {}
+        if ($("#selected-cidade").text()) data["selected"] = $("#selected-cidade").text()
+
+        $.ajax({
+            url: "/cidadesSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#cidadesSelectContainer").html(data);
+            }
+        });
+    }
+    
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarAvaliacaoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+avaliacaoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        $("#avaliacao-user-acao-endereco").change(function() {
+            console.log("dsaf")
+            if (this.checked) {
+                $("#logradouro, #bairro, #cep, #complemento").val(function() {
+                    return $("#acao-" + this.id).text();
+                });
+                $("#cidadesSelectContainer select").val($("#acao-cidade").text());
+            } else {
+                $("#logradouro, #bairro, #cep, #complemento").val("");
+            }
+        });
+
+        carregarSelectMembroExecucao()
+        carregarSelectCidades()
+    });
+</script>

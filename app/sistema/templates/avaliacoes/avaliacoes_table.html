@@ -19,8 +19,8 @@ cellspacing="0">
     <tbody>
         {% for avaliacao in avaliacoes %}
         <tr>
-            <td class="avaliaceos-w-30 text-left">{{avaliacao.nome}}</td>
-            <td class="avaliaceos-w-55 text-left">{{avaliacao.endereco}}</td>
+            <td class="avaliaceos-w-30 text-left">{{avaliacao.avaliador.pessoa.nome}}</td>
+            <td class="avaliaceos-w-55 text-left">{{avaliacao.endereco_completo}}</td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuAvaliacoes{{avaliacao.id}}" 
                 class="btn-circle">
