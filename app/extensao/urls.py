@@ -52,6 +52,7 @@ from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAt
 from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao
+from sistema.views.siteUserViews import usersSelect
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -93,6 +94,8 @@ urlpatterns = [
     path("saveCurso",saveCurso),
     path("editarCurso/<codigo>",editarCurso),
     
+    # ROTAS PARA USERS
+    path("usersSelect",usersSelect),
     
     # ROTAS PARA DEPARTAMENTOS
     path("gerenciar-departamentos",gerencia_departamentos),

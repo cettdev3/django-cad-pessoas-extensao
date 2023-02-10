@@ -1,0 +1,28 @@
+<style>
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-space-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+</style>
+<label><b>Usuário:</b></label>
+<select class="form-control" 
+id="user_id" 
+name="user_id">
+    <option value="">Selecione um usuário</option>
+    {% for user in users %}
+        <option  
+        {% if selected == user.id %}
+        selected
+        {% endif %}
+        value="{{user.id}}">
+            {{user.username}}
+        </option>
+    {% endfor %}
+</select>
