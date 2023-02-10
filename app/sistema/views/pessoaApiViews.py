@@ -15,6 +15,8 @@ from datetime import datetime
 from django.db import reset_queries
 from django.db import connection
 from django.db.models import Prefetch, Count
+from django.contrib.auth.models import User
+
 class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -93,7 +95,10 @@ class PessoaApiView(APIView):
         tipo = request.data.get("tipo")
         qtd_contratacoes = request.data.get("qtd_contratacoes")
         user_camunda = request.data.get("user_camunda")
-
+        
+        user = None
+        if request.data.get("user_id"):
+            user = User.objects.get(id=request.data.get("user_id"))
 
         pessoa = Pessoas.objects.create(
             nome = nome,
@@ -127,6 +132,7 @@ class PessoaApiView(APIView):
             tipo = tipo,
             qtd_contratacoes = qtd_contratacoes,
             user_camunda = user_camunda,
+            user = user
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
@@ -247,8 +253,9 @@ class PessoaDetailApiView(APIView):
             pessoa.numero_endereco = request.data.get("numero_endereco")
         if request.data.get("estado"):
             pessoa.estado = request.data.get("estado")
+        if request.data.get("user_id"):
+            pessoa.user = User.objects.get(id=request.data.get("user_id"))
         
-                
         pessoa.save()
         serializer = PessoaSerializer(pessoa)
         
@@ -267,12 +274,3 @@ class PessoaDetailApiView(APIView):
             {"res": "pessoa deletada!"},
             status=st.HTTP_200_OK
         )
-
-
-    """
-    SELECT 
-    `alocacoes`.`id`, `alocacoes`.`evento_id`, `alocacoes`.`professor_id`, `alocacoes`.`curso_id`, `alocacoes`.`data_inicio`, `alocacoes`.`data_fim`, `alocacoes`.`status`, `alocacoes`.`observacao`, `alocacoes`.`bairro`, `alocacoes`.`logradouro`, `alocacoes`.`cep`, `alocacoes`.`complemento`, `alocacoes`.`cidade_id`, `alocacoes`.`aulas_sabado` 
-    FROM `alocacoes` 
-    WHERE (`alocacoes`.`data_inicio` BETWEEN '2022-12-03' AND '2022-12-06' 
-    OR `alocacoes`.`data_fim` BETWEEN '2022-12-03' AND '2022-12-06')"
-    """
