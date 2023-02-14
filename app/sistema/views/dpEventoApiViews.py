@@ -10,6 +10,7 @@ from ..models.ticket import Ticket
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.itinerario import Itinerario
+from ..models.ensino import Ensino
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
@@ -65,6 +66,14 @@ class DpEventoApiView(APIView):
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        
+        if not postDpEventoData["acao_ensino_id"]:
+            acaoEnsino = self.get_object(Ensino, postDpEventoData["acao_ensino_id"])
+            if not acaoEnsino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
@@ -77,6 +86,7 @@ class DpEventoApiView(APIView):
             "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
             "cidade": cidade,
             "escola": escola,
+            "acaoEnsino": acaoEnsino,
         }
 
         membrosExecucaoData = []
@@ -214,6 +224,15 @@ class DpEventoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             dp_evento.escola = escola
+
+        if request.data.get("acao_ensino_id"):
+            acaoEnsino = self.get_object(Ensino, request.data.get("acao_ensino_id"))
+            if not acaoEnsino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            dp_evento.acaoEnsino = acaoEnsino
 
         dp_evento.save()
         serializer = DpEventoSerializer(dp_evento)

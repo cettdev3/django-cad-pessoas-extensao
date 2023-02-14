@@ -2,6 +2,7 @@ from django.db import models
 from .cidade import Cidade
 from .escola import Escola
 from .pessoa import Pessoas
+from .ensino import Ensino
 from datetime import datetime
 
 class DpEvento(models.Model):
@@ -28,6 +29,7 @@ class DpEvento(models.Model):
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
+    acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True, blank= True)
     
     class Meta:
         db_table = 'dp_eventos'
