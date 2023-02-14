@@ -33,6 +33,11 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "logradouro",
             "bairro",
             "cep",
-            "complemento"
+            "complemento",
+            "quantidadeCertificacoes",
+            "quantidadeMatriculas",
+            "quantidadeAtendimentos",
+            "quantidadeInscricoes",
+            "cargaHoraria",
         ]
         depth = 2

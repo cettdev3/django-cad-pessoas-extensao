@@ -21,6 +21,11 @@ class Atividade(models.Model):
     bairro = models.CharField(null = True, blank=True, max_length=100)
     cep = models.CharField(null = True, blank=True, max_length=20)
     complemento = models.CharField(null = True, blank=True, max_length=250)
+    quantidadeCertificacoes = models.IntegerField(null = True, blank=True)
+    quantidadeMatriculas = models.IntegerField(null = True, blank=True)
+    quantidadeAtendimentos = models.IntegerField(null = True, blank=True)
+    quantidadeInscricoes = models.IntegerField(null = True, blank=True)
+    cargaHoraria = models.FloatField(null = True, blank=True)
 
     class Meta:
         db_table = 'atividades'

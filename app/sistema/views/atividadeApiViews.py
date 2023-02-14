@@ -96,6 +96,11 @@ class AtividadeApiView(APIView):
         
         atividadeData = {
             "descricao": data["descricao"] if data["descricao"] else None,
+            "quantidadeCertificacoes": data["quantidadeCertificacoes"] if data["quantidadeCertificacoes"] else None,
+            "quantidadeMatriculas": data["quantidadeMatriculas"] if data["quantidadeMatriculas"] else None,
+            "quantidadeAtendimentos": data["quantidadeAtendimentos"] if data["quantidadeAtendimentos"] else None,
+            "quantidadeInscricoes": data["quantidadeInscricoes"] if data["quantidadeInscricoes"] else None,
+            "cargaHoraria": data["cargaHoraria"] if data["cargaHoraria"] else None,
             "status": data["status"] if data["status"] else "planejado",
             "linkDocumentos": data["linkDocumentos"] if data["linkDocumentos"] else None,
             "acao": acao,
@@ -213,6 +218,16 @@ class AtividadeDetailApiView(APIView):
             atividade.cep = data["cep"]
         if data["complemento"]:
             atividade.complemento = data["complemento"]
+        if data["quantidadeCertificacoes"]:
+            atividade.quantidadeCertificacoes = data["quantidadeCertificacoes"]
+        if data["quantidadeMatriculas"]:
+            atividade.quantidadeMatriculas = data["quantidadeMatriculas"]
+        if data["quantidadeAtendimentos"]:
+            atividade.quantidadeAtendimentos = data["quantidadeAtendimentos"]
+        if data["quantidadeInscricoes"]:
+            atividade.quantidadeInscricoes = data["quantidadeInscricoes"]
+        if data["cargaHoraria"]:
+            atividade.cargaHoraria = data["cargaHoraria"]
 
         atividade.save()
         serializer = AtividadeSerializer(atividade)
