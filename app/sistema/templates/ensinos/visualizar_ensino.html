@@ -28,16 +28,16 @@
         <div class="d-flex flex-column">
             <div class="d-flex align-items-center ">
                 <i class="fa-solid fa-location-dot "></i>
-                <span class="ml-2"><strong>{{evento.escola.nome}},  </strong>{{evento.endereco_completo}}</span>
+                <span class="ml-2"><strong>{{ensino.escola.nome}},  </strong>{{ensino.endereco_completo}}</span>
             </div>
             <div class="d-flex align-items-center ">
                 <i class="fa-solid fa-calendar-days"></i>
-                 <span class="ml-2">de {{evento.data_inicio|date:"d-m-Y"}}  até </span>
-                <span class="ml-2">{{evento.data_fim|date:"d-m-Y"}}</span>
+                 <span class="ml-2">de {{ensino.data_inicio|date:"d-m-Y"}}  até </span>
+                <span class="ml-2">{{ensino.data_fim|date:"d-m-Y"}}</span>
             </div>
         </div>
         <div class="d-flex align-items-center ">
-            <span class="{{evento.status_class}}">{{evento.status}}</span>
+            <span class="{{ensino.status_class}}">{{ensino.status}}</span>
         </div>
     </div>
     <div class="card-body w-100">
@@ -70,7 +70,7 @@
     let alocacaoModificadaEventProxy = null
     let idTabelaAlocacoes = "receberTabelaAlocacoes"
     let rotaTabelaAlocacoes = "alocacoesTable"
-    let eventoId = "{{evento.id}}" 
+    let acaoEnsinoId = "{{ensino.id}}" 
 
     function deleteAlocacao(id) {
         deletar_url = "/eliminarAlocacao/" + id
@@ -89,11 +89,10 @@
     }
 
     function carregarAlocacoes() {
-        let recarregarTabela = rotaTabelaAlocacoes
         $.ajax({
-            url: "/"+recarregarTabela,
+            url: "/"+rotaTabelaAlocacoes,
             contentType: 'application/json',
-            data: {evento_id: eventoId},
+            data: {acaoEnsino_id: acaoEnsinoId},
             success: function (data) {
                 $("#" + idTabelaAlocacoes).html(data);
             }

@@ -129,120 +129,119 @@ z-index: 4
     px-3 py-3 my-3
     bg-white">
         <!-- <div>
-            <input id="nomeEventoFilter" 
+            <input id="nomeEnsinoFilter" 
             placeholder="Digite um nome" 
             class="form-control-sm border-secondary"
             name="nome" 
-            onchange="buscarEventos('nomeEventoFilter')" type="text">
+            onchange="buscarEnsinos('nomeEnsinoFilter')" type="text">
         </div> -->
         <div>
             <button id="adicionarPessoas" 
-            onclick="carregarEventosModalCadastrar()"
+            onclick="carregarEnsinosModalCadastrar()"
             class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
                 <span> cadastrar Ação de Ensino</span>
             </button>
         </div>
     </div>
-    <div id="receberTabelaEventos" class="shadow bg-white w-100">
+    <div id="receberTabelaEnsinos" class="shadow bg-white w-100">
     </div>
 </div>
 
 <!-- Modal -->
-<div id="modalCadastrarEventoContainer">
+<div id="modalCadastrarEnsinoContainer">
 </div>
 <script>
-    let buttonMenuEventosId = "buttonMenuEventos"
-    let hiddenMenuEventosId = "hiddenMenuEventos"
-    let cadastrarEventoModalId = "cadastrarEventoModal"
-    let cadastrarEventoFormId = "cadastrarEventoForm"
-    let dismissCadastrarEventoId = "dismissCadastrarEvento"
+    let buttonMenuEnsinosId = "buttonMenuEnsinos"
+    let hiddenMenuEnsinosId = "hiddenMenuEnsinos"
+    let cadastrarEnsinoModalId = "cadastrarEnsinoModal"
+    let cadastrarEnsinoFormId = "cadastrarEnsinoForm"
+    let dismissCadastrarEnsinoId = "dismissCadastrarEnsino"
 </script>
 
 <script>
-    var eventoModificadaEvent = {};
-    var eventoModificadaEventProxy = null
-    let modalCadastrarEventoContainerId = "modalCadastrarEventoContainer"
-    let idTabelaEventos = "receberTabelaEventos"
-    let rotaTabelaEventos = "eventosTable"
-    let rotaDeletarEvento = "eliminarEnsino"
-    let rotaModalEvento = "eventosModalCadastrar"
-    let rotaVisualizarEvento = "visualizarEvento"
+    var ensinoModificadaEvent = {};
+    var ensinoModificadaEventProxy = null
+    let modalCadastrarEnsinoContainerId = "modalCadastrarEnsinoContainer"
+    let idTabelaEnsinos = "receberTabelaEnsinos"
+    let rotaTabelaEnsinos = "ensinosTable"
+    let rotaDeletarEnsino = "eliminarEnsino"
+    let rotaModalEnsino = "ensinosModalCadastrar"
+    let rotaVisualizarEnsino = "visualizarEnsino"
 
-    function deleteEvento(id) {
-        deletar_url = rotaDeletarEvento+"/" + id
+    function deleteEnsino(id) {
+        deletar_url = rotaDeletarEnsino+"/" + id
 
         $.ajax({
             url: deletar_url,
             data: {},
             success: function (data) {
-                let menuId = "#" + hiddenMenuEventosId + id
+                let menuId = "#" + hiddenMenuEnsinosId + id
                 $(menuId).toggle()
-                carregarEventos()
+                carregarEnsinos()
             }
         });
     }
 
-    function carregarEventos(filter = null) {
-        let recarregarTabela = rotaTabelaEventos
+    function carregarEnsinos(filter = null) {
+        let recarregarTabela = rotaTabelaEnsinos
         $.ajax({
             url: recarregarTabela,
             data: filter ? filter : {},
             success: function (data) {
-                $("#"+idTabelaEventos).html(data);
+                $("#"+idTabelaEnsinos).html(data);
             }
         });
     }
 
-    function carregarEventosModalCadastrar(id = null) {
-        let recarregarTabela = rotaModalEvento
+    function carregarEnsinosModalCadastrar(id = null) {
         $.ajax({
-            url: recarregarTabela,
+            url: "/"+rotaModalEnsino,
             data: id ? {id: id} : {},
             success: function (data) {
-                $("#"+modalCadastrarEventoContainerId).html(data);
-                $('#'+cadastrarEventoModalId).modal('toggle');
+                $("#"+modalCadastrarEnsinoContainerId).html(data);
+                $('#'+cadastrarEnsinoModalId).modal('toggle');
             }
         });
     }
         
-    function visualizarEvento(id) {
-        location.href = rotaVisualizarEvento+"/" + id
+    function visualizarEnsino(id) {
+        location.href = rotaVisualizarEnsino+"/" + id
     }
 
-    function buscarEventos(filter) {
+    function buscarEnsinos(filter) {
         let value = $("#" + filter).val()
-        carregarEventos({ nome: value })
+        carregarEnsinos({ nome: value })
     }
 
     $(document).ready(function () {
-        eventoModificadaEventProxy = new Proxy(eventoModificadaEvent, {
+        ensinoModificadaEventProxy = new Proxy(ensinoModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;
                 if (value) {
-                    carregarEventos()
+                    carregarEnsinos()
                 }
                 target[key] = false
                 return false;
             }
         });
 
-        function editarEvento(id) {
+        function editarEnsino(id) {
             $.ajax({
-                url: "eventos",
+                url: "ensinos",
                 data: JSON.stringify(getFormData()),
                 dataType: "json",
                 contentType: 'application/json',
                 method: "POST",
                 success: function (data) {
-                    $('#'+cadastrarEventoFormId)[0].reset();
-                    $("#"+dismissCadastrarEventoId).click()
-                    carregarEventos()
+                    $('#'+cadastrarEnsinoFormId)[0].reset();
+                    $("#"+dismissCadastrarEnsinoId).click()
+                    carregarEnsinos()
                 }
             });
         }
 
         $(document).mouseup(function (e) {
-            $("div[id^='"+hiddenMenuEventosId+"']").each(function (i, el) {
+            $("div[id^='"+hiddenMenuEnsinosId+"']").each(function (i, el) {
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
                     if ($(this).css('display') != 'none') {
                         $(this).toggle()
@@ -251,7 +250,7 @@ z-index: 4
             })
         });
 
-        carregarEventos()
+        carregarEnsinos()
     });
 
 </script>

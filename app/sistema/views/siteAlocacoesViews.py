@@ -24,10 +24,10 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
-    evento_id = request.GET.get('evento_id')
+    acaoEnsino_id = request.GET.get('acaoEnsino_id')
     alocacoes = Alocacao.objects
-    if evento_id:
-        alocacoes = alocacoes.filter(evento_id = evento_id)
+    if acaoEnsino_id:
+        alocacoes = alocacoes.filter(acaoEnsino_id = acaoEnsino_id)
     alocacoes = alocacoes.all()
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 

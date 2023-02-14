@@ -34,7 +34,7 @@ from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edica
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
-from sistema.views.siteEnsinoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEnsino, visualizarEvento, saveEvento, editarEvento
+from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
@@ -140,13 +140,13 @@ urlpatterns = [
     path("eliminarAlocacao/<codigo>",eliminarAlocacao),
     
     # ROTAS PARA EVENTOS
-    path("gerenciar-eventos",gerencia_eventos),
-    path("eventosTable",eventosTable),
-    path("eventosModalCadastrar",eventosModalCadastrar),
+    path("gerenciar-ensinos",gerencia_ensinos),
+    path("ensinosTable",ensinosTable),
+    path("ensinosModalCadastrar",ensinosModalCadastrar),
     path("eliminarEnsino/<codigo>",eliminarEnsino),
-    path("visualizarEvento/<codigo>",visualizarEvento),
-    path("saveEvento",saveEvento),
-    path("editarEvento/<codigo>",editarEvento),
+    path("visualizarEnsino/<codigo>",visualizarEnsino),
+    path("saveEnsino",saveEnsino),
+    path("editarEnsino/<codigo>",editarEnsino),
     
     # ROTAS PARA TESTES
     path("testeForm",testeForm),

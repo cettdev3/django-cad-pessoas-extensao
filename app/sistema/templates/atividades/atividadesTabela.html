@@ -27,7 +27,11 @@ cellspacing="0">
     <tbody>
         {% for atividade in atividades %}
         <tr>
-            <td class="atividade-w-50 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
+            <td class="atividade-w-50 text-left"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Certificações: {{atividade.quantidadeCertificacoes}} - matriculas: {{atividade.quantidadeMatriculas}} - atendimentos: {{atividade.quantidadeAtendimentos}} - inscrições: {{atividade.quantidadeInscricoes}} - carga horária: {{atividade.cargaHoraria}}"
+            style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
             <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.departamento.nome}}</span></td>
             <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.status}}</span></td>
             <td class="atividade-w-25 text-left" style="vertical-align: middle;">

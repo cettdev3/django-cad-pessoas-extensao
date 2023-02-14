@@ -262,8 +262,8 @@ class AlocacaoDetailApiView(APIView):
         else:
             alocacao.curso = None
 
-        if request.data.get("evento_id"):
-            acaoEnsino = self.get_object(Ensino, request.data.get("evento_id"))
+        if request.data.get("acaoEnsino_id"):
+            acaoEnsino = self.get_object(Ensino, request.data.get("acaoEnsino_id"))
             if not acaoEnsino:
                 return Response(
                     {"res": "Não existe ação de ensino com o id informado"}, 

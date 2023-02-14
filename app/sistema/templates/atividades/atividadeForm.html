@@ -121,6 +121,65 @@
                 name="complemento">
             </div>
         </div>
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <label><b>Quantidade de Certificações:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeCertificacoes}}"
+                {% endif %}
+                id="quantidadeCertificacoes"
+                name="quantidadeCertificacoes">    
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Matrículas:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeMatriculas}}"
+                {% endif %}
+                id="quantidadeMatriculas"
+                name="quantidadeMatriculas">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Atendimentos:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeAtendimentos}}"
+                {% endif %}
+                id="quantidadeAtendimentos"
+                name="quantidadeAtendimentos">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Inscrições:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeInscricoes}}"
+                {% endif %}
+                id="quantidadeInscricoes"
+                name="quantidadeInscricoes">
+            </div>
+            <div class="col-sm-2">
+                <label><b>Carga Horária:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.cargaHoraria}}"
+                {% endif %}
+                id="cargaHoraria"
+                name="cargaHoraria">
+            </div>
+        </div>
+        
+        
         {% if atividade.acao %}
         <input type="text" hidden 
         id="acao_id"
