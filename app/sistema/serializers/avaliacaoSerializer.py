@@ -3,6 +3,8 @@ from rest_framework import serializers
 from ..models.avaliacao import Avaliacao
 
 class AvaliacaoSerializer(serializers.ModelSerializer):
+    endereco_completo = serializers.CharField(read_only=True)
+    
     class Meta:
         model = Avaliacao
         fields = [
@@ -63,4 +65,14 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             "UsuariolAvaliador",
             "avalLocalNomeAvaliador",
             "infomatica",
+            "acao",
+            "evento",
+            "avaliador",
+            "bairro",
+            "logradouro",
+            "cep",
+            "complemento",
+            "cidade",
+            "endereco_completo"
         ]
+        depth = 3

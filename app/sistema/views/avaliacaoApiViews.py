@@ -11,10 +11,13 @@ from ..models.cidade import Cidade
 from ..models.dpEvento import DpEvento
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.pessoaSerializer import PessoaSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class AvaliacaoApiView(APIView):
-    # add permission to check if user is authenticated
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
     def get_object(self, fn, object_id):
         try:
@@ -24,13 +27,12 @@ class AvaliacaoApiView(APIView):
 
     # 1. List all
     def get(self, request, *args, **kwargs):
-        cidade = request.GET.get('cidade')
-        todos = None
-        if cidade:
-            todos = Avaliacao.objects.filter(cidade=cidade).all()
-        else: 
-            todos = Avaliacao.objects.all()
-        serializer = AvaliacaoSerializer(todos, many=True)
+        # get auth user
+        user = request.user
+        print(user.id)
+        avaliacoes = Avaliacao.objects.filter(avaliador__pessoa__user__id=user.id)
+        avaliacoes = avaliacoes.all()
+        serializer = AvaliacaoSerializer(avaliacoes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -79,7 +81,7 @@ class AvaliacaoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-                
+
         data = {
             "nome": request.data.get("nome"),
             "endereco": request.data.get("endereco"),

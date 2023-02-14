@@ -21,7 +21,6 @@ class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     
-    # 1. List all
     def get(self, request, *args, **kwargs):
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
@@ -30,7 +29,6 @@ class PessoaApiView(APIView):
         data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
         is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
 
-        print(f"cpf: {cpf}, user_camunda: {user_camunda}, nome: {nome}, data_inicio: {data_inicio}, data_fim: {data_fim}, is_alocated: {is_alocated}")
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
@@ -138,7 +136,6 @@ class PessoaApiView(APIView):
         serializer = PessoaSerializer(pessoa)
         return Response(serializer.data, status=st.HTTP_201_CREATED)
 
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PessoaDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
