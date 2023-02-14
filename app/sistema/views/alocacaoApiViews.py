@@ -271,7 +271,10 @@ class AlocacaoDetailApiView(APIView):
                 )
             alocacao.acaoEnsino = acaoEnsino
         else:
-            alocacao.acaoEnsino = None
+            return Response(
+                {"res": "É necessário informar a ação de ensino"}, 
+                status=st.HTTP_400_BAD_REQUEST
+            )
 
         if request.data.get("professor_id"):
             professor = self.get_object(Pessoas, request.data.get("professor_id"))
