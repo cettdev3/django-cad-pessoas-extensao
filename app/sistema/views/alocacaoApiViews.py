@@ -55,8 +55,8 @@ class AlocacaoApiView(APIView):
                                 {"res": "Não existe curso com o id informado"}, 
                                 status=st.HTTP_400_BAD_REQUEST
                             )
-                    if alocacaoData["evento_id"]:
-                        acaoEnsino = self.get_object(Ensino, alocacaoData["evento_id"])
+                    if alocacaoData["ensino_id"]:
+                        acaoEnsino = self.get_object(Ensino, alocacaoData["ensino_id"])
                         if not acaoEnsino:
                             return Response(
                                 {"res": "Não existe ação de ensino com o id informado"}, 
@@ -132,8 +132,8 @@ class AlocacaoApiView(APIView):
             return Response(alocacoesCriadas, status=st.HTTP_201_CREATED)
         else:
             with transaction.atomic():
-                if request.data.get("evento_id"):
-                    acaoEnsino = self.get_object(Ensino, request.data.get("evento_id"))
+                if request.data.get("ensino_id"):
+                    acaoEnsino = self.get_object(Ensino, request.data.get("ensino_id"))
                     if not acaoEnsino:
                         return Response(
                             {"res": "Não existe ação de ensino com o id informado"}, 

@@ -88,9 +88,10 @@ def pessoasModalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Ensino.objects.filter(~Q(status="finalizado"))
-        eventos = EnsinoSerializer(eventos, many=True)
-        data['eventos'] = eventos.data
+        ensinos = Ensino.objects.filter(~Q(status="finalizado"))
+        ensinos = EnsinoSerializer(ensinos, many=True)
+        data['ensinos'] = ensinos.data
+
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')
