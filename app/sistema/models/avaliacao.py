@@ -22,8 +22,6 @@ class Avaliacao(models.Model):
     @property
     def endereco_completo(self):
         enderecoCompleto = "" 
-        if self.cidade:
-            enderecoCompleto += self.cidade.nome + " GO, "
         if self.logradouro:
             enderecoCompleto += self.logradouro
         if self.bairro:
