@@ -217,7 +217,7 @@ urlpatterns = [
     path("dpEventoModal", dpEventoModal), 
     path("dp_eventosSelect", dp_eventosSelect), 
     path("saveDpEvento", saveDpEvento), 
-    path("eliminarDpEvento", eliminarDpEvento), 
+    path("eliminarDpEvento/<codigo>", eliminarDpEvento), 
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
     path("visualizarDpEvento/<codigo>", visualizarDpEvento),

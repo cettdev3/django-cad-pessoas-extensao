@@ -330,6 +330,7 @@
         var values = {};
         var pessoa_tickets = []
         $.map(unindexed_array, function (n, i) {
+            console.log(n['name'], n['value'])
             values[n['name']] = n['value'];
         });
 

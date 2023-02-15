@@ -161,16 +161,17 @@
             bg-white topbar
             static-top shadow">
                 <div class="w-100 d-flex justify-content-between align-items-center">
-                    {% if page_title %}
                     <div class="align-items-center">
                         {% if path_back %}
                         <a class="link-back" href="/{{path_back}}">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
                         {% endif %}
+
+                        {% if page_title %}
                         <span class="h4 ml-2">{{ page_title }}</span>
+                        {% endif %}
                     </div>
-                    {% endif %}
                     {% if user.is_authenticated %}
                     <span>Bem vindo {{ user.get_username }}</span>
                     {% endif %}

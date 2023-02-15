@@ -11,10 +11,10 @@ class CamundaMiddleware:
         
         response = self.get_response(request)
 
-        self.gpsProcess.processar(
-            route=route, 
-            method=method, 
-            response=response
-        )
+        # self.gpsProcess.processar(
+        #     route=route, 
+        #     method=method, 
+        #     response=response
+        # )
 
         return response

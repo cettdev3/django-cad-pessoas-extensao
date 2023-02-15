@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from sistema.models.dpEvento import DpEvento
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
+from sistema.models.ensino import Ensino
 from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
 import requests
@@ -9,6 +10,7 @@ import json
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.serializers.dpEventoSerializer import DpEventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
 from django.db.models import Prefetch
 
@@ -43,7 +45,9 @@ def dpEventoModal(request):
     dpEvento = None
     data = {}
     escolas = Escola.objects.all()
+    ensinos = Ensino.objects.all()
     data['escolas'] = EscolaSerializer(escolas, many=True).data
+    data['ensinos'] = EnsinoSerializer(ensinos, many=True).data
     data['ct_emprestimo'] = DpEvento.EMPRESTIMO
     if id:
         dpEvento = DpEvento.objects.get(id=id)

@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <label><b>Tipo:</b></label>
                 <select required 
                 id="tipo"
@@ -33,11 +33,18 @@
                     </option>
                 </select>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 {% if dpEvento %}
                 {% include 'escolas/escolas_select.html' with escola_id=dpEvento.escola.id escolas=escolas %}
                 {% else %}
                 {% include 'escolas/escolas_select.html' %}
+                {% endif %}
+            </div>
+            <div class="col-sm-4">
+                {% if dpEvento %}
+                {% include 'ensinos/ensino_select.html' with selectes=dpEvento.acaoEnsino.id ensinos=ensinos %}
+                {% else %}
+                {% include 'ensinos/ensino_select.html' %}
                 {% endif %}
             </div>
         </div>
