@@ -78,4 +78,3 @@ class DpEvento(models.Model):
     @property
     def data_fim_formatada(self):
         return self.data_fim.strftime("%d/%m/%Y")
-        

@@ -41,7 +41,7 @@ from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escola
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, visualizarAcao
-from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, visualizarDpEvento
+from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
@@ -139,7 +139,7 @@ urlpatterns = [
     path("editarAlocacao/<codigo>",editarAlocacao),
     path("eliminarAlocacao/<codigo>",eliminarAlocacao),
     
-    # ROTAS PARA EVENTOS
+    # ROTAS PARA ENSINO
     path("gerenciar-ensinos",gerencia_ensinos),
     path("ensinosTable",ensinosTable),
     path("ensinosModalCadastrar",ensinosModalCadastrar),
@@ -221,6 +221,7 @@ urlpatterns = [
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
     path("visualizarDpEvento/<codigo>", visualizarDpEvento),
+    path("relatorioDpEvento", relatorioDpEvento),
    
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),

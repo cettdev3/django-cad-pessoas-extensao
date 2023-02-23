@@ -3,16 +3,27 @@ from sistema.models.dpEvento import DpEvento
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
 from sistema.models.ensino import Ensino
+from sistema.models.tipoAtividade import TipoAtividade
+from sistema.models.atividade import Atividade
 from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+import itertools
 import requests
+from docx.enum.text import WD_UNDERLINE
+from docx.shared import Pt
 import json
+import os
+from django.http import HttpResponse
+from django.http import FileResponse
+import docx
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.serializers.dpEventoSerializer import DpEventoSerializer
 from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
 from django.db.models import Prefetch
+from collections import defaultdict
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_dp_eventos(request):
@@ -130,3 +141,146 @@ def visualizarDpEvento(request,codigo):
         'page_title': page_title,
         'path_back': path_back
     })
+
+@login_required(login_url='/auth-user/login-user')
+def relatorioDpEvento(request):
+    eventos = DpEvento.objects.prefetch_related(
+        Prefetch(
+            'atividade_set',
+            queryset=Atividade.objects.select_related('tipoAtividade')
+        ))
+
+    result = {}
+
+    for evento in eventos:
+        tipo = evento.tipo
+        result.setdefault(tipo, {})
+        
+        for atividade in evento.atividade_set.all():
+            tipo_atividade = atividade.tipoAtividade.nome
+            result[tipo].setdefault(tipo_atividade, [])
+            result[tipo][tipo_atividade].append(atividade)
+
+
+    doc = docx.Document()
+
+    # doc.add_paragraph(f'${descricaoEvento}')
+
+    for key,tipoEvento in result.items():
+        print("chave no primeiro for: ", key)
+        title = doc.add_paragraph()
+        title_run = title.add_run(f'{key}')
+        title_run.bold = True
+        title_run.underline = WD_UNDERLINE.SINGLE
+        title.space_after = Pt(0)
+
+        for skey, values in tipoEvento.items():        
+            print("chave no segundo for: ", skey)
+            title_run = doc.add_paragraph()
+            title_run = title_run.add_run(f'{skey}')
+            title_run.bold = True
+            title_run.underline = WD_UNDERLINE.SINGLE
+            title_run.space_after = Pt(0)
+
+            atividades = values
+            tipoAtividadeDescricao = doc.add_paragraph()
+            print(atividades)
+            tipoAtividadeDescricao = tipoAtividadeDescricao.add_run(f'{atividades[0].tipoAtividade.descricao}')
+
+            for atividade in atividades:
+                acaoCargaHoraria = ""
+                cidade = ""
+                matriculas = ""
+                alunosCertificados = ""
+                dataInicio = ""
+                dataFim = ""
+                local = ""
+                etapa = ""
+                cursos = []
+                acaoCargaHoraria = f"Ação {str(atividade.id)}: {int(atividade.cargaHoraria)}h"
+                cidade = f"{atividade.cidade.nome}"
+                if atividade.quantidadeMatriculas:
+                    matriculas = f"{atividade.quantidadeMatriculas}"
+                if atividade.quantidadeCertificacoes:
+                    alunosCertificados = f"{atividade.quantidadeCertificacoes}"
+                evento = atividade.evento
+                dataInicio = f"{evento.data_inicio.strftime('%d/%m/%Y')}" 
+                dataFim = f"{evento.data_fim.strftime('%d/%m/%Y')}"
+                local = f"{atividade.endereco_completo}"
+                if evento.acaoEnsino:
+                    print("atividades da rodada: ", atividade)
+                    etapa = f"{evento.acaoEnsino.observacao}"
+                    alocacoes = evento.acaoEnsino.alocacao_set.all()
+                    if alocacoes:
+                        for alocacao in alocacoes:
+                            cursos.append(f"{alocacao.curso.nome}")
+
+                section_title = doc.add_paragraph()
+                section_title_run = section_title.add_run(f'{acaoCargaHoraria}')
+                section_title_run.bold = True
+                section_title_run.underline = WD_UNDERLINE.SINGLE
+                section_title_format = section_title.paragraph_format
+                section_title_format.space_after = Pt(0)
+
+                cidadeParagraph = doc.add_paragraph()
+                cidadeParagraph.add_run(f"cidade:").bold = True
+                cidadeParagraph.add_run(f" {cidade}")
+                cidadeParagraphFormat = cidadeParagraph.paragraph_format
+                cidadeParagraphFormat.space_after = Pt(0)
+                
+                if matriculas:
+                    matriculasParagraph = doc.add_paragraph()
+                    matriculasParagraph.add_run(f"Matriculas:").bold = True
+                    matriculasParagraph.add_run(f" {matriculas}")
+                    matriculasParagraphFormat = matriculasParagraph.paragraph_format
+                    matriculasParagraphFormat.space_after = Pt(0)
+
+                dataParagraph = doc.add_paragraph()
+                dataParagraph.add_run(f"data:").bold = True
+                dataParagraph.add_run(f" {dataInicio} até {dataFim}")
+                dataParagraphFormat = dataParagraph.paragraph_format
+                dataParagraphFormat.space_after = Pt(0)
+
+                localParagraph = doc.add_paragraph()
+                localParagraph.add_run(f"local:").bold = True
+                localParagraph.add_run(f" {local}")
+                localParagraphFormat = localParagraph.paragraph_format
+                localParagraphFormat.space_after = Pt(0)
+
+                etapaParagraph = doc.add_paragraph()
+                etapaParagraph.add_run(f"etapa:").bold = True
+                etapaParagraph.add_run(f" {etapa}")
+                etapaParagraphFormat = etapaParagraph.paragraph_format
+                etapaParagraphFormat.space_after = Pt(0)
+
+                cursosParagraph = doc.add_paragraph()
+                cursosParagraph.add_run(f"Cursos oferecidos:").bold = True
+                cursosParagraphFormat = cursosParagraph.paragraph_format
+                cursosParagraphFormat.space_after = Pt(0)
+                
+                for curso in cursos:
+                    cursoParagraph = doc.add_paragraph(f"{curso};")
+                    cursoParagraphFormat = cursoParagraph.paragraph_format
+                    cursoParagraphFormat.space_after = Pt(0)
+
+                if alunosCertificados:
+                    etapaParagraph = doc.add_paragraph()
+                    etapaParagraph.add_run(f"Alunos certificados:").bold = True
+                    etapaParagraph.add_run(f" {alunosCertificados}")
+                    etapaParagraphFormat = etapaParagraph.paragraph_format
+                    etapaParagraphFormat.space_after = Pt(0)
+                doc.add_paragraph()
+                
+
+            
+    with open('dp_evento_report.docx', 'wb') as f:
+        doc.save(f)
+
+    response = FileResponse(open('dp_evento_report.docx', 'rb'))
+    response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    response['Content-Disposition'] = 'attachment; filename="dp_evento_report.docx"'
+
+    os.remove('dp_evento_report.docx')
+    return response
+
+

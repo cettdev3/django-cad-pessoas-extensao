@@ -72,6 +72,13 @@
                 <span>Usar endereço da ação</span> 
             </div>
         </div>
+        {% elif evento %}
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
+                <span>Usar endereço do evento</span> 
+            </div>
+        </div>
         {% endif %}
         <div class="form-group row">
             <div class="col-sm-4">
@@ -116,6 +123,10 @@
                 class="form-control"
                 {% if atividade.id %}
                 value="{{atividade.complemento}}"
+                {% elif acao.id %}
+                value="{{acao.complemento}}"
+                {% elif evento.id %}
+                value="{{evento.complemento}}"
                 {% endif %}
                 id="complemento"
                 name="complemento">
@@ -212,11 +223,20 @@
     </span>
     <span hidden id="selected-departamento">{% if atividade %}{{atividade.departamento.id}}{% endif %}</span>
     <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
+    {% if acao %}
     <span hidden id="acao-logradouro">{{acao.logradouro}}</span>
     <span hidden id="acao-cep">{{acao.cep}}</span>
     <span hidden id="acao-bairro">{{acao.bairro}}</span>
     <span hidden id="acao-complemento">{{acao.complemento}}</span>
     <span hidden id="acao-cidade">{{acao.cidade.id}}</span>
+    {% endif %}
+    {% if evento %}
+    <span hidden id="acao-logradouro">{{evento.logradouro}}</span>
+    <span hidden id="acao-cep">{{evento.cep}}</span>
+    <span hidden id="acao-bairro">{{evento.bairro}}</span>
+    <span hidden id="acao-complemento">{{evento.complemento}}</span>
+    <span hidden id="acao-cidade">{{evento.cidade.id}}</span>
+    {% endif %}
 </div>
 
 <script>
@@ -301,6 +321,7 @@
                 $("#cidadesSelectContainer select").val($("#acao-cidade").text());
             } else {
                 $("#logradouro, #bairro, #cep, #complemento").val("");
+                $("#cidadesSelectContainer select").val("");
             }
         });
     });
