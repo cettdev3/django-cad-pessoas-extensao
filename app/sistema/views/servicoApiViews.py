@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework import permissions
 
 from ..models.servico import Servico
+from ..models.cidade import Cidade
 from ..models.atividade import Atividade
 from ..serializers.servicoSerializer import ServicoSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -27,6 +28,7 @@ class ServicoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         atividade = None
+        cidade = None
         if request.data.get("atividade_id"):
             atividade = Atividade.objects.get(id=request.data.get("atividade_id"))
             if not atividade:
@@ -39,12 +41,29 @@ class ServicoApiView(APIView):
                 {"res": "O campo atividade_id é obrigatório"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        if request.data.get("cidade_id"):
+            cidade = Cidade.objects.get(id=request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"res": "O campo cidade_id é obrigatório"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         data = {
             "nome": request.data.get("nome"),
             "quantidadeAtendimentos": request.data.get("quantidadeAtendimentos"),
             "quantidadeVendas": request.data.get("quantidadeVendas"),
             "atividade": atividade,
+            "cidade": cidade,
+            "logradouro": request.data.get("logradouro"),
+            "bairro": request.data.get("bairro"),
+            "cep": request.data.get("cep"),
+            "complemento": request.data.get("complemento"),
         }
         
         servico = Servico.objects.create(**data)
@@ -96,6 +115,24 @@ class ServicoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             servico.atividade = atividade
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            servico.cidade = cidade
+        if request.data.get("logradouro"):
+            servico.logradouro = request.data.get("logradouro")
+        if request.data.get("bairro"):
+            servico.bairro = request.data.get("bairro")
+        if request.data.get("cep"):
+            servico.cep = request.data.get("cep")
+        if request.data.get("complemento"):
+            servico.complemento = request.data.get("complemento")
+
+        servico.save()
 
         serializer = ServicoSerializer(servico)
         return Response(serializer.data, status=status.HTTP_200_OK)

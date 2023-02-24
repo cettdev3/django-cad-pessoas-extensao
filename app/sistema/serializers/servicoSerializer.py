@@ -11,4 +11,9 @@ class ServicoSerializer(serializers.ModelSerializer):
             "quantidadeAtendimentos",
             "quantidadeVendas",
             "atividade",
+            "cidade",
+            "logradouro",
+            "bairro",
+            "cep",
+            "complemento",
         ]
