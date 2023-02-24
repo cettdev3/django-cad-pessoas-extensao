@@ -60,6 +60,7 @@ from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtivid
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
+from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),
@@ -303,6 +304,9 @@ urlpatterns = [
    
     path("departamentos", DepartamentoApiView.as_view()),
     path('departamentos/<int:departamento_id>', DepartamentoDetailApiView.as_view()),
+    
+    path("servicos", ServicoApiView.as_view()),
+    path('servicos/<int:servico_id>', ServicoDetailApiView.as_view()),
     
     path("datas-removidas", DataRemovidaApiView.as_view()),
 
