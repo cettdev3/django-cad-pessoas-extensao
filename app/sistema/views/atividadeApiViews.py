@@ -32,7 +32,12 @@ class AtividadeApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         
-        atividades = Atividade.objects.select_related("acao", "tipoAtividade", "departamento", "responsavel", "cidade").all()
+        atividades = Atividade.objects.select_related(
+            "acao", 
+            "tipoAtividade", 
+            "departamento", 
+            "responsavel",
+            "cidade").prefetch_related("servico_set").all()
         serializer = AtividadeSerializer(atividades, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,0 +1,196 @@
+<div class="modal fade" id="cadastrarServicoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarServicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarServicoModalLabel">
+                    {% if servico is None %}
+                        Cadastrar Servico
+                        <span id="servicoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{servico.nome}}
+                        <span id="servicoModelId" hidden>{{servico.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarServico" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "servicos/servicoForm.html" with servico=servico atividade=atividade %}
+            </div>
+            <div class="modal-footer">
+                <button id="formServicoPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevServicoLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formServicoNext" type="button" class="btn btn-primary">
+                    <span id="nextServicoLink" class="ServicoMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if servico %}
+                    onclick="editarServico('{{servico.id}}')" 
+                {% else %}
+                    onclick="cadastrarServico()" 
+                {% endif %}
+                id="finishCadastroServico" 
+                type="button"
+                class="btn btn-primary">
+                {% if servico %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarServicoForm"
+    var servicoModelId = "servicoModelId"
+    var tabsId = "servicosTab"
+    var servicoFormSelectCidadeId = "servicoFormSelectCidade"
+    var selectedCidadeId = "{{servico.cidade.id}}"
+    var cadastrarServicoModalId = "cadastrarServicoModal"
+
+    function clearModalForm(dismiss = true) {
+        document.getElementById(formId).reset();
+        if (dismiss) $("#dismissCadastrarServico").click()
+        carregarAtividades()
+    }
+
+    function cadastrarServico() {
+        $.ajax({
+            url: "/saveServico",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarServico(id) {
+        $.ajax({
+            url: "/editarServico/" + id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#servicoTabLink"+nextTab).trigger("click")
+        $("#servicosTab"+nextTab).addClass("active-form-tab")
+        $("#servicosTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formServicoNext"],
+                hide: ["formServicoPrev", "finishCadastroServico"]
+            },
+            last: {
+                show: ["formServicoPrev", "finishCadastroServico"],
+                hide: ["formServicoNext"]
+            },
+            middle: {
+                show: ["formServicoPrev", "formServicoNext"],
+                hide: ["finishCadastroServico"]
+            },
+            only: {
+                show: ["finishCadastroServico"],
+                hide: ["formServicoPrev", "formServicoNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarServicoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+servicoModelId).text()
+            if (pessoaId) {
+                clearModalForm(false)
+            }
+        });
+
+        setTabsbehavior()
+        $("#formServicoNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formServicoPrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        maskValues()
+    });
+</script>

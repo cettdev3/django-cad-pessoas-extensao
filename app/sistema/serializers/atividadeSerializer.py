@@ -8,6 +8,7 @@ from ..serializers.tipoAtividadeSerializer import TipoAtividadeSerializer
 from ..serializers.departamentoSerializer import DepartamentoSerializer
 from ..serializers.cidadeSerializer import CidadeSerializer
 from ..serializers.dpEventoSerializer import DpEventoSerializer
+from ..serializers.servicoSerializer import ServicoSerializer
 
 class AtividadeSerializer(serializers.ModelSerializer):
     acao = AcaoSerializer(many=False, read_only=True)   
@@ -16,7 +17,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
     responsavel = MembroExecucaoSerializer(many=False, read_only=True)
     departamento = DepartamentoSerializer(many=False, read_only=True)
     cidade = CidadeSerializer(many=False, read_only=True) 
-
+    servico_set = ServicoSerializer(many=True, read_only=True)
     class Meta:
         model = Atividade
         fields = [
@@ -39,5 +40,6 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "quantidadeAtendimentos",
             "quantidadeInscricoes",
             "cargaHoraria",
+            "servico_set"
         ]
         depth = 2

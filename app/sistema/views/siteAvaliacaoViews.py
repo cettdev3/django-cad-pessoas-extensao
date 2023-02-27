@@ -31,7 +31,6 @@ def avaliacoesDpEventoTable(request):
     avaliacoes = Avaliacao.objects
     if evento_id:
         avaliacoes = avaliacoes.filter(evento__id = evento_id)
-
     avaliacoes = avaliacoes.all()
     print(avaliacoes)
     return render(request,'avaliacoes/avaliacoes_table.html',{'avaliacoes':avaliacoes})

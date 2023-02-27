@@ -10,10 +10,11 @@ from ..models.atividade import Atividade
 from ..serializers.servicoSerializer import ServicoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class ServicoApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
     def get_object(self, fn, object_id):
         try:
@@ -72,7 +73,7 @@ class ServicoApiView(APIView):
 
 class ServicoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get_object(self, fn, object_id):
         try:
@@ -94,7 +95,7 @@ class ServicoDetailApiView(APIView):
 
     def put(self, request, servico_id, *args, **kwargs):
 
-        servico = self.get_object(servico_id)
+        servico = self.get_object(Servico, servico_id)
         if not servico:
             return Response(
                 {"res": "Não existe servico com o id informado"}, 

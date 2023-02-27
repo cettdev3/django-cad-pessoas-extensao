@@ -5,6 +5,7 @@ from sistema.models.acao import Acao
 from sistema.models.dpEvento import DpEvento
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from ..serializers.atividadeSerializer import AtividadeSerializer
 import requests
 import json
 from django.http import JsonResponse
@@ -25,8 +26,8 @@ def atividadesTable(request):
             Q(tipoAtividade__nome__contains = nome)
         )
 
-    atividades = atividades.all()
-    print(atividades)
+    atividades = atividades.prefetch_related("servico_set").all()
+    atividades = AtividadeSerializer(atividades, many=True).data
     return render(request,'atividades/atividadesTabela.html',{'atividades':atividades})
 
 @login_required(login_url='/auth-user/login-user')

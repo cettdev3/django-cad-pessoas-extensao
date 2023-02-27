@@ -10,10 +10,10 @@ class ServicoSerializer(serializers.ModelSerializer):
             "nome",
             "quantidadeAtendimentos",
             "quantidadeVendas",
-            "atividade",
             "cidade",
             "logradouro",
             "bairro",
             "cep",
             "complemento",
-        ]
+    ]
+    depth = 2
