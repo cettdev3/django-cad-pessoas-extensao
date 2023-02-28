@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
 from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
@@ -33,16 +34,16 @@ from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edica
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
-from sistema.views.siteEventoViews import gerencia_eventos, eventosTable, eventosModalCadastrar, eliminarEvento, visualizarEvento, saveEvento, editarEvento
+from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, visualizarAcao
-from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, visualizarDpEvento
+from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
-from sistema.views.siteComponentsView import calendario
+from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
 from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
@@ -50,6 +51,9 @@ from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, 
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
 from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
+from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable
+from sistema.views.siteUserViews import usersSelect
+from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -57,8 +61,12 @@ from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtivid
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
+from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 
 urlpatterns = [
+    path('token', TokenObtainPairView.as_view()),
+    path('token/refresh', TokenRefreshView.as_view()),
+
     # ROTAS DO SITE
     path('admin/', admin.site.urls),
     path("eliminarPessoa/<codigo>", eliminarPessoa),
@@ -88,6 +96,8 @@ urlpatterns = [
     path("saveCurso",saveCurso),
     path("editarCurso/<codigo>",editarCurso),
     
+    # ROTAS PARA USERS
+    path("usersSelect",usersSelect),
     
     # ROTAS PARA DEPARTAMENTOS
     path("gerenciar-departamentos",gerencia_departamentos),
@@ -131,14 +141,14 @@ urlpatterns = [
     path("editarAlocacao/<codigo>",editarAlocacao),
     path("eliminarAlocacao/<codigo>",eliminarAlocacao),
     
-    # ROTAS PARA EVENTOS
-    path("gerenciar-eventos",gerencia_eventos),
-    path("eventosTable",eventosTable),
-    path("eventosModalCadastrar",eventosModalCadastrar),
-    path("eliminarEvento/<codigo>",eliminarEvento),
-    path("visualizarEvento/<codigo>",visualizarEvento),
-    path("saveEvento",saveEvento),
-    path("editarEvento/<codigo>",editarEvento),
+    # ROTAS PARA ENSINO
+    path("gerenciar-ensinos",gerencia_ensinos),
+    path("ensinosTable",ensinosTable),
+    path("ensinosModalCadastrar",ensinosModalCadastrar),
+    path("eliminarEnsino/<codigo>",eliminarEnsino),
+    path("visualizarEnsino/<codigo>",visualizarEnsino),
+    path("saveEnsino",saveEnsino),
+    path("editarEnsino/<codigo>",editarEnsino),
     
     # ROTAS PARA TESTES
     path("testeForm",testeForm),
@@ -209,14 +219,24 @@ urlpatterns = [
     path("dpEventoModal", dpEventoModal), 
     path("dp_eventosSelect", dp_eventosSelect), 
     path("saveDpEvento", saveDpEvento), 
-    path("eliminarDpEvento", eliminarDpEvento), 
+    path("eliminarDpEvento/<codigo>", eliminarDpEvento), 
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
     path("visualizarDpEvento/<codigo>", visualizarDpEvento),
+    path("relatorioDpEvento", relatorioDpEvento),
    
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),
     path("saveTicket",saveTicket),
+    
+    # ROTAS PARA SERVICOS
+    path("ServicoModalCadastrar",ServicoModalCadastrar),
+    path("editarServico/<codigo>",editarServico),
+    path("eliminarServico/<codigo>",eliminarServico),
+    path("saveServico",saveServico),
+
+    # ROTAS PARA AVALIACOES
+    path("avaliacoesDpEventoTable",avaliacoesDpEventoTable),
     
     # ROTAS PARA ITENS DE ITINERARIO
     path("saveItinerarioItem",saveItinerarioItem),
@@ -230,6 +250,7 @@ urlpatterns = [
         
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
+    path("filtrosRelatorioEventosModal",filtrosRelatorioEventosModal),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
@@ -241,7 +262,7 @@ urlpatterns = [
     path('enderecos/<int:endereco_id>', EnderecoDetailApiView.as_view()),
     
     path("ensino", EnsinoApiView.as_view()),
-    path('ensino/<int:evento_id>', EnsinoDetailApiView.as_view()),
+    path('ensino/<int:ensino_id>', EnsinoDetailApiView.as_view()),
 
     path("cidades", CidadeApiView.as_view()),
     path('cidades/<int:cidade_id>', CidadeDetailApiView.as_view()),
@@ -287,6 +308,9 @@ urlpatterns = [
    
     path("departamentos", DepartamentoApiView.as_view()),
     path('departamentos/<int:departamento_id>', DepartamentoDetailApiView.as_view()),
+    
+    path("servicos", ServicoApiView.as_view()),
+    path('servicos/<int:servico_id>', ServicoDetailApiView.as_view()),
     
     path("datas-removidas", DataRemovidaApiView.as_view()),
 

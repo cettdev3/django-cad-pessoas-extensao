@@ -91,7 +91,7 @@ class TipoAtividadeDetailApiView(APIView):
                 {"res": "Não existe tipo de atividade com o id informado"}, 
                 status=st.HTTP_400_BAD_REQUEST
             )
-
+    
         # tipoAtividade.delete()
         return Response(
             {"res": "tipo de atividade deletado!"},

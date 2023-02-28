@@ -8,9 +8,13 @@ class CamundaMiddleware:
     def __call__(self, request):
         route = request.path
         method = request.method
-        print("route: ", route, method)
+        
         response = self.get_response(request)
-        self.gpsProcess.processGps(route=route, method=method, request=request, response=response)
-        print("route depoirs: ", route, method)
+
+        # self.gpsProcess.processar(
+        #     route=route, 
+        #     method=method, 
+        #     response=response
+        # )
 
         return response

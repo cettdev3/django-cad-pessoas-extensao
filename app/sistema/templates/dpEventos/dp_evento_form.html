@@ -1,10 +1,11 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <label><b>Tipo:</b></label>
                 <select required 
                 id="tipo"
+                onchange="selectTipoDpEvento(this.value)"
                 class="form-control" 
                 name="tipo">
                     <option
@@ -24,7 +25,17 @@
                     <option 
                     {% if dpEvento and dpEvento.tipo == "feirao" %} selected {% endif %} 
                     value="feirao">
-                        FEIRÃO
+                        FEIRÃO DO EMPREGO
+                    </option>
+                    <option 
+                    {% if dpEvento and dpEvento.tipo == "goias_feito_a_mao" %} selected {% endif %} 
+                    value="goias_feito_a_mao">
+                        GOIÁS FEITO À MÃO
+                    </option>
+                    <option 
+                    {% if dpEvento and dpEvento.tipo == "mutirao" %} selected {% endif %} 
+                    value="mutirao">
+                        MUTIRÃO
                     </option>
                     <option 
                     {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
@@ -33,11 +44,18 @@
                     </option>
                 </select>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 {% if dpEvento %}
                 {% include 'escolas/escolas_select.html' with escola_id=dpEvento.escola.id escolas=escolas %}
                 {% else %}
                 {% include 'escolas/escolas_select.html' %}
+                {% endif %}
+            </div>
+            <div id="acao-ensino-select-container" class="col-sm-4">
+                {% if dpEvento %}
+                {% include 'ensinos/ensino_select.html' with selectes=dpEvento.acaoEnsino.id ensinos=ensinos %}
+                {% else %}
+                {% include 'ensinos/ensino_select.html' %}
                 {% endif %}
             </div>
         </div>
@@ -45,13 +63,10 @@
         <div class="form-group row">
             <div class="col-sm-12">
                 <label><b>Descrição:</b></label>
-                <input 
-                type="text" 
+                <textarea 
+                rows="4"
                 name="descricao" 
-                class="form-control" 
-                {% if dpEvento %}
-                value="{{dpEvento.descricao}}"
-                {% endif %}>
+                class="form-control">{% if dpEvento %}{{dpEvento.descricao}}{% endif %}</textarea>
             </div>
         </div>
         <div class="form-group row">
@@ -130,6 +145,11 @@
 <script>
     var cidade_id = "{% if dpEvento %}{{dpEvento.cidade.id}}{% else %}{% endif %}";
     var escolas = JSON.parse(document.getElementById("escolas-script").textContent);
+
+    function selectTipoDpEvento(value) {
+        if (value != "curso_gps") $("#acao-ensino-select-container").hide()
+        else $("#acao-ensino-select-container").show()
+    }
 
     function carregarSelectCidades(cidade_id) {
         $.ajax({

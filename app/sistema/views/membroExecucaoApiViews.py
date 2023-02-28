@@ -85,6 +85,7 @@ class MembroExecucaoApiView(APIView):
             "cep": request.data.get("cep") if request.data.get("cep") else None,
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "tipo": request.data.get("tipo") if request.data.get("tipo") else None,
+            "avaliador": request.data.get("avaliador") if request.data.get("avaliador") else None,
             "cidade": cidade,
             "pessoa": pessoa,
             "acao": acao,
@@ -139,6 +140,11 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.cep = request.data.get("cep")
         if request.data.get("complemento"):
             membroExecucao.complemento = request.data.get("complemento")
+        if request.data.get("avaliador"):
+            membroExecucao.avaliador = request.data.get("avaliador")
+        else:
+            membroExecucao.avaliador = False
+            
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:

@@ -44,9 +44,25 @@
             </div>
         </div>
         {% endif %}
-
+        
         <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-4 position-relative">
+                <div class="position-absolute"
+                style="top: 10px; right: 20px">
+                    <div data-toggle="tooltip" 
+                    data-placement="top" 
+                    title="Selecionar Membro da Equipe como Avaliador do Local">
+                        <div class="position-relative d-flex justify-content-center align=items-center ">
+                            <input type="checkbox" 
+                            {% if membro_execucao and membro_execucao.avaliador %}
+                            checked
+                            {% endif %}
+                            name="avaliador" 
+                            id="avaliador">
+                            <span class="ml-1" for="avaliador" style="line-height: 100%;">Avaliador</span>
+                        </div>
+                    </div>
+                </div>
                 {% include "pessoas/pessoas_select.html" with pessoas=pessoas pessoa_id=pessoa_id id=id_to_remove %}
             </div>
             <div class="col-sm-4">

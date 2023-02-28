@@ -11,6 +11,31 @@
     .atividade-w-50 {
         width: 50%;
     }
+    .servico-btn {
+        padding: 3px 6px;
+        font-size: 0.9rem;
+        height: 100%;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .servico-btn:hover {
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        transition: box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .servico-delete-btn:hover {
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+
+    .delete-container {
+        background-color: #df4759;
+        color: white;
+    }
 </style>
 <table class="table table-borderless" 
 width="100%" 
@@ -18,27 +43,40 @@ cellspacing="0">
     <thead class="border">
         <tr class="">
             <th class="text-left">Descricao</th>
-            <th class="text-left">Departamento</th>
-            <th class="text-left">Status</th>
-            <th class="text-left">Responsável</th>
-            <th class="w-2 text-left">Tipo</th>
+            <!-- <th class="text-left">Departamento</th> -->
+            <!-- <th class="text-left">Status</th> -->
+            <th class="text-left">Serviços</th>
+            <!-- <th class="w-2 text-left">Tipo</th> -->
         </tr>
     </thead>
     <tbody>
         {% for atividade in atividades %}
         <tr>
-            <td class="atividade-w-50 text-left" style="vertical-align: middle;"><span>{{atividade.descricao}}</span></td>
-            <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.departamento.nome}}</span></td>
-            <td class="atividade-w-15 text-left" style="vertical-align: middle;"><span>{{atividade.status}}</span></td>
-            <td class="atividade-w-25 text-left" style="vertical-align: middle;">
-                {% if atividade.responsavel %}
-                <span>{{atividade.responsavel.pessoa.nome}}</span>
-                {% endif %}
+            <td class="atividade-w-50">
+                {% include "atividades/atividadeCard.html" with atividade=atividade %}
             </td>
-            <td class="atividade-w-15 text-left" style="vertical-align: middle;">
-                {% if atividade.tipoAtividade %}
-                <span style="vertical-align: bottom;">{{atividade.tipoAtividade.nome}}</span>
-                {% endif %}
+            <td>
+                <div class="d-flex flex-wrap">
+                    {% for servico in atividade.servico_set.all %}
+                    <div id="deleteServicoContainer-{{servico.id}}" 
+                    class="d-flex justify-content-center align-items-center border rounded mx-1 my-1">
+                        <span class="servico-btn mr-1" 
+                        onclick="openServicoDialog('{{atividade.id}}', '{{servico.id}}')">
+                        <strong>{{servico.nome}}</strong>
+                        </span>
+                        <span class="fa-stack servico-delete-btn "  
+                        style="border-radius: 50%;" 
+                        id="deleteServico-{{servico.id}}"
+                        onclick="deleteServico('{{servico.id}}')"
+                        data-toggle="tooltip" 
+                        data-placement="top"
+                        title="Deletar Serviço">
+                            <i style="border-radius: 50%; color: #df4759;" class="fas fa-circle-thin fa-stack-2x"></i>
+                            <i style="border-radius: 50%;" class="fa-solid fa-trash fa-stack-1x fa-inverse "></i>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
             </td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuAtividades{{atividade.id}}" 
@@ -50,8 +88,9 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarAtividade{{atividade.id}}" href="/visualizarAtividade/({{atividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="editarAtividadeModal({{atividade.id}})">Editar</button> 
-                    <button onclick="deleteAtividade({{atividade.id}})" >Excluir</button>
+                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Servico</button> 
+                    <button onclick="editarAtividadeModal('{{atividade.id}}')">Editar</button> 
+                    <button onclick="deleteAtividade('{{atividade.id}}')" >Excluir</button>
                 </div>
             </td>
         </tr>
@@ -71,6 +110,7 @@ cellspacing="0">
     var rotaDeletarAtividade = "eliminarAtividade"
     var rotaModalAtividade = "atividadesModalCadastrar"
     var rotaVisualizarAtividade = "visualizarAtividade"
+    var deleteServicoControl = []
 
     function editarAtividadeModal(id) {
         $.ajax({
@@ -78,6 +118,50 @@ cellspacing="0">
             success: function (data) {
                 $("#modalAtividadeContainer").html(data);
                 $('#cadastrarAtividadeModal').modal('toggle');
+            }
+        });
+    }
+
+    function precessDelete(servicoId) {
+        $.ajax({
+            url: "/eliminarServico/" + servicoId,
+            data: {},
+            success: function (data) {
+                carregarAtividades()
+            }
+        });
+    }
+
+    function deleteServico(servicoId) {
+        console.log("delete "+ servicoId)
+        deleteServicoControl[servicoId] = deleteServicoControl[servicoId] == null ? 0 : 1
+        
+        if (deleteServicoControl[servicoId] == 0) {
+            $("#deleteServicoContainer-" + servicoId).addClass("delete-container")
+            setTimeout(function () {
+                $("#deleteServicoContainer-" + servicoId).removeClass("delete-container")
+                deleteServicoControl[servicoId] = null
+            }, 2000)
+        }  else precessDelete(servicoId)
+    }
+
+    function openServicoDialog(atividadeId, servicoId = null) {
+        let data = {
+            atividade_id: atividadeId
+        }
+
+        if (servicoId != null) {
+            data.servico_id = servicoId
+        }
+
+        $.ajax({
+            url: "/ServicoModalCadastrar",
+            data: data,
+            contentType: "application/json",
+            success: function (data) {
+                $("#modalServicoContainer").html('');
+                $("#modalServicoContainer").html(data);
+                $('#cadastrarServicoModal').modal('show');
             }
         });
     }

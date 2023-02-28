@@ -15,11 +15,12 @@ from datetime import datetime
 from django.db import reset_queries
 from django.db import connection
 from django.db.models import Prefetch, Count
+from django.contrib.auth.models import User
+
 class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     
-    # 1. List all
     def get(self, request, *args, **kwargs):
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
@@ -28,7 +29,6 @@ class PessoaApiView(APIView):
         data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
         is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
 
-        print(f"cpf: {cpf}, user_camunda: {user_camunda}, nome: {nome}, data_inicio: {data_inicio}, data_fim: {data_fim}, is_alocated: {is_alocated}")
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
@@ -93,7 +93,10 @@ class PessoaApiView(APIView):
         tipo = request.data.get("tipo")
         qtd_contratacoes = request.data.get("qtd_contratacoes")
         user_camunda = request.data.get("user_camunda")
-
+        
+        user = None
+        if request.data.get("user_id"):
+            user = User.objects.get(id=request.data.get("user_id"))
 
         pessoa = Pessoas.objects.create(
             nome = nome,
@@ -127,12 +130,12 @@ class PessoaApiView(APIView):
             tipo = tipo,
             qtd_contratacoes = qtd_contratacoes,
             user_camunda = user_camunda,
+            user = user
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
         return Response(serializer.data, status=st.HTTP_201_CREATED)
 
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PessoaDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -247,8 +250,9 @@ class PessoaDetailApiView(APIView):
             pessoa.numero_endereco = request.data.get("numero_endereco")
         if request.data.get("estado"):
             pessoa.estado = request.data.get("estado")
+        if request.data.get("user_id"):
+            pessoa.user = User.objects.get(id=request.data.get("user_id"))
         
-                
         pessoa.save()
         serializer = PessoaSerializer(pessoa)
         
@@ -267,12 +271,3 @@ class PessoaDetailApiView(APIView):
             {"res": "pessoa deletada!"},
             status=st.HTTP_200_OK
         )
-
-
-    """
-    SELECT 
-    `alocacoes`.`id`, `alocacoes`.`evento_id`, `alocacoes`.`professor_id`, `alocacoes`.`curso_id`, `alocacoes`.`data_inicio`, `alocacoes`.`data_fim`, `alocacoes`.`status`, `alocacoes`.`observacao`, `alocacoes`.`bairro`, `alocacoes`.`logradouro`, `alocacoes`.`cep`, `alocacoes`.`complemento`, `alocacoes`.`cidade_id`, `alocacoes`.`aulas_sabado` 
-    FROM `alocacoes` 
-    WHERE (`alocacoes`.`data_inicio` BETWEEN '2022-12-03' AND '2022-12-06' 
-    OR `alocacoes`.`data_fim` BETWEEN '2022-12-03' AND '2022-12-06')"
-    """

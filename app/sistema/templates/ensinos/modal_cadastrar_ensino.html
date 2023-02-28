@@ -1,19 +1,19 @@
-<div class="modal fade" id="cadastrarEventoModal" tabindex="-1" role="dialog"
-    aria-labelledby="cadastrarEventoModalLabel" aria-hidden="true">
+<div class="modal fade" id="cadastrarEnsinoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarEnsinoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cadastrarEventoModalLabel">
-                    {% if evento is None %}
+                <h5 class="modal-title" id="cadastrarEnsinoModalLabel">
+                    {% if ensino is None %}
                         Cadastrar Ação de Ensino
-                        <span id="eventoModelId" hidden></span>
+                        <span id="ensinoModelId" hidden></span>
                     {% else %}
-                        Editar Cadastro de: {{evento.nome}}
-                        <span id="eventoModelId" hidden>{{evento.id}}</span>
+                        Editar Cadastro de: {{ensino.nome}}
+                        <span id="ensinoModelId" hidden>{{ensino.id}}</span>
                     {% endif %}
                 </h5>
                 <button type="button" 
-                id="dismissCadastrarEvento" 
+                id="dismissCadastrarEnsino" 
                 class="close" 
                 data-dismiss="modal" 
                 aria-label="Close">
@@ -23,14 +23,14 @@
             <div class="modal-body">
                 <div class="w-100">
                     <ul class="nav nav-tabs row">
-                        <li id="eventoList1" class="col py-2 active-form-tab">
-                            <a id="eventoMenuLink1" 
+                        <li id="ensinoList1" class="col py-2 active-form-tab">
+                            <a id="ensinoMenuLink1" 
                             style="display: none;" 
                             href="#home">1</a>
                             <span>Dados Gerais</span>
                         </li>
                     </ul>
-                    <form id="cadastrarEventoForm" action="/" method="POST">
+                    <form id="cadastrarEnsinoForm" action="/" method="POST">
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 <div class="form-group row">
@@ -38,8 +38,8 @@
                                         <label><b>Descrição:</b></label>
                                         <input 
                                         type="text" 
-                                        {% if evento %}
-                                        value="{{evento.observacao}}" 
+                                        {% if ensino %}
+                                        value="{{ensino.observacao}}" 
                                         {% endif %}
                                         class="form-control" 
                                         id="observacao" 
@@ -47,43 +47,43 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div id="eventoFormSelectEscola" class="col-sm-3">
+                                    <div id="ensinoFormSelectEscola" class="col-sm-3">
                                     </div>
                                     <div class="col-sm-4">
                                         <label><b>Status:</b></label>
                                         <select required class="form-control" 
                                         id="status" name="status">
                                             <option 
-                                            {% if evento %}
-                                                {% if evento.status == 'planejamento' %}
+                                            {% if ensino %}
+                                                {% if ensino.status == 'planejamento' %}
                                                     selected
                                                 {% endif %}
                                             {% endif %}
                                             value="planejamento">Planejamento</option>
                                             <option 
-                                            {% if evento %}
-                                                {% if evento.status == 'andamento' %}
+                                            {% if ensino %}
+                                                {% if ensino.status == 'andamento' %}
                                                     selected
                                                 {% endif %}
                                             {% endif %}
                                             value="andamento">Em Andamento</option>
                                             <option 
-                                            {% if evento %}
-                                                {% if evento.status == 'finalizado' %}
+                                            {% if ensino %}
+                                                {% if ensino.status == 'finalizado' %}
                                                     selected
                                                 {% endif %}
                                             {% endif %}
                                             value="finalizado">Finalizado</option>
                                             <option 
-                                            {% if evento %}
-                                                {% if evento.status == 'adiado' %}
+                                            {% if ensino %}
+                                                {% if ensino.status == 'adiado' %}
                                                     selected
                                                 {% endif %}
                                             {% endif %}
                                             value="adiado">Adiado</option>
                                             <option 
-                                            {% if evento %}
-                                                {% if evento.status == 'cancelado' %}
+                                            {% if ensino %}
+                                                {% if ensino.status == 'cancelado' %}
                                                     selected
                                                 {% endif %}
                                             {% endif %}
@@ -96,8 +96,8 @@
                                         <label><b>Data de Inicio:</b></label>
                                         <input 
                                         type="datetime-local"
-                                        {% if evento %}
-                                        value="{{ evento.data_inicio}}" 
+                                        {% if ensino %}
+                                        value="{{ ensino.data_inicio}}" 
                                         {% endif %}
                                         class="form-control" 
                                         id="data_inicio"
@@ -109,8 +109,8 @@
                                         <label><b>Data de Fim:</b></label>
                                         <input 
                                         type="datetime-local"
-                                        {% if evento %}
-                                        value="{{ evento.data_fim}}" 
+                                        {% if ensino %}
+                                        value="{{ ensino.data_fim}}" 
                                         {% endif %}
                                         class="form-control" 
                                         id="data_fim"
@@ -118,38 +118,33 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div id="eventoFormSelectCidade" class="col-sm-4">
+                                    <div class="col-sm-4">
+                                        <label><b>Tipo:</b></label>
+                                        <select class="form-control"
+                                        name="tipo">
+                                            <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
+                                            value="gps">GPS</option>
+                                            <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
+                                            value="gps">Empréstimo</option>
+                                            <option {% if ensino.tipo != 'gps' %} selected {% endif %}  
+                                            value="outros">Outros</option>
+                                        </select>
                                     </div>
                                 </div>
                                 
                                 <div class="dadosNovoEndereco form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Logradouro:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if evento %}
-                                            {% if evento.logradouro %}
-                                            value="{{evento.logradouro}}" 
-                                            {% else %}
-                                            value="{{evento.endereco.logradouro}}" 
-                                            {% endif %}
-                                        {% endif %}
-                                        id="logradouro" 
-                                        name="logradouro" 
-                                        placeholder=""
-                                        required>
+                                    <div id="ensinoFormSelectCidade" class="col-sm-4">
                                     </div>
                                     <div class="col-sm-4">
                                         <label><b>Bairro:</b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
-                                        {% if evento %}
-                                            {% if evento.bairro %}
-                                            value="{{evento.bairro}}" 
+                                        {% if ensino %}
+                                            {% if ensino.bairro %}
+                                            value="{{ensino.bairro}}" 
                                             {% else %}
-                                            value="{{evento.endereco.bairro}}" 
+                                            value="{{ensino.endereco.bairro}}" 
                                             {% endif %}
                                         {% endif %}
                                         id="bairro" 
@@ -162,11 +157,11 @@
                                         <input 
                                         type="text" 
                                         class="form-control" 
-                                        {% if evento %}
-                                            {% if evento.cep %}
-                                            value="{{evento.cep}}" 
+                                        {% if ensino %}
+                                            {% if ensino.cep %}
+                                            value="{{ensino.cep}}" 
                                             {% else %}
-                                            value="{{evento.endereco.cep}}" 
+                                            value="{{ensino.endereco.cep}}" 
                                             {% endif %}
                                         {% endif %}
                                         id="cep" 
@@ -176,16 +171,33 @@
                                     </div>
                                 </div>
                                 <div class="dadosNovoEndereco form-group row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-4">
+                                        <label><b>Logradouro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if ensino %}
+                                            {% if ensino.logradouro %}
+                                            value="{{ensino.logradouro}}" 
+                                            {% else %}
+                                            value="{{ensino.endereco.logradouro}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="logradouro" 
+                                        name="logradouro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-8">
                                         <label><b>Complemento:</b></label>
                                         <input 
                                         type="text" 
                                         class="form-control" 
-                                        {% if evento %}
-                                            {% if evento.complemento %}
-                                            value="{{evento.complemento}}" 
+                                        {% if ensino %}
+                                            {% if ensino.complemento %}
+                                            value="{{ensino.complemento}}" 
                                             {% else %}
-                                            value="{{evento.endereco.complemento}}" 
+                                            value="{{ensino.endereco.complemento}}" 
                                             {% endif %}
                                         {% endif %}
                                         id="complemento" 
@@ -201,15 +213,15 @@
             </div>
             <div class="modal-footer">
                 <button
-                {% if evento %}
-                    onclick="processarEditarEvento({{evento.id}})" 
+                {% if ensino %}
+                    onclick="processarEditarEnsino('{{ensino.id}}')" 
                 {% else %}
-                    onclick="processarCadastrarEvento()" 
+                    onclick="processarCadastrarEnsino()" 
                 {% endif %}
-                id="finishCadastroEvento" 
+                id="finishCadastroEnsino" 
                 type="button"
                 class="btn btn-primary">
-                {% if evento %}
+                {% if ensino %}
                     <span>Salvar Alterações</span>
                 {% else %}
                     <span>Cadastrar</span>
@@ -223,27 +235,27 @@
 {{ escolas|json_script:"escolas-script" }}
 
 <script>
-    formId = "cadastrarEventoForm"
-    eventoModelId = "eventoModelId"
-    eventoFormSelectCidadeId = "eventoFormSelectCidade"
-    eventoFormSelectEnderecosId = "eventoFormSelectEnderecos"
-    selectedCidadeId = "{% if evento.cidade %}{{evento.cidade.id}}{% else %}{{evento.endereco.cidade.id}}{% endif %}"
-    selectedEscolaId = "{{evento.escola.id}}"
-    selectedEnderecoId = "{{evento.endereco.id}}"
-    isEditing = "{{evento.id}}"
+    formId = "cadastrarEnsinoForm"
+    ensinoModelId = "ensinoModelId"
+    ensinoFormSelectCidadeId = "ensinoFormSelectCidade"
+    ensinoFormSelectEnderecosId = "ensinoFormSelectEnderecos"
+    selectedCidadeId = "{% if ensino.cidade %}{{ensino.cidade.id}}{% else %}{{ensino.endereco.cidade.id}}{% endif %}"
+    selectedEscolaId = "{{ensino.escola.id}}"
+    selectedEnderecoId = "{{ensino.endereco.id}}"
+    isEditing = "{{ensino.id}}"
     var escolas = JSON.parse(document.getElementById('escolas-script').textContent);
-    eventoFormSelectEscolaId = "eventoFormSelectEscola"
+    ensinoFormSelectEscolaId = "ensinoFormSelectEscola"
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
 
-        if (changedResource) carregarEventos()
-        if (changedResource) $("#"+dismissCadastrarEventoId).click()
+        if (changedResource) carregarEnsinos()
+        if (changedResource) $("#"+dismissCadastrarEnsinoId).click()
     }
 
-    function cadastrarEvento(data) {
+    function cadastrarEnsino(data) {
         $.ajax({
-            url: "saveEvento",
+            url: "saveEnsino",
             data: JSON.stringify({"data":data}),
             dataType: "json",
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
@@ -255,7 +267,7 @@
         });
     }
 
-    function processarCadastrarEvento() {
+    function processarCadastrarEnsino() {
         let formData = getFormData()
         if (formData["endereco_id"] == "novo") {
             $.ajax({
@@ -267,18 +279,18 @@
                 method: "POST",
                 success: function (data) {
                     formData["endereco_id"] = data["id"]
-                    cadastrarEvento(formData)
+                    cadastrarEnsino(formData)
                 }
             });
         } else {
-            cadastrarEvento(formData)
+            cadastrarEnsino(formData)
         }
     }
 
-    function editarEvento(eventoId, formData) {
+    function editarEnsino(ensinoId, formData) {
         
         $.ajax({
-            url: "editarEvento/"+eventoId,
+            url: "editarEnsino/"+ensinoId,
             data: JSON.stringify({"data":formData}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
@@ -335,7 +347,7 @@
             url: "cidadesSelect",
             method: "GET",
             success: function (data) {
-                $("#"+eventoFormSelectCidadeId).html(data)
+                $("#"+ensinoFormSelectCidadeId).html(data)
                 updateSelectedCidade()
             }
         });
@@ -361,7 +373,7 @@
             url: "escolasSelect",
             method: "GET",
             success: function (data) {
-                $("#"+eventoFormSelectEscolaId).html(data)
+                $("#"+ensinoFormSelectEscolaId).html(data)
                 $("#escola_id").change(function (val) {
                     let selectedEscola = $(this).val() 
                     bindEnderecoFields(selectedEscola)
@@ -376,14 +388,14 @@
         });
     }
     
-    function processarEditarEvento(eventoId) {
+    function processarEditarEnsino(ensinoId) {
         let formData = getFormData()
-        editarEvento(eventoId,formData)
+        editarEnsino(ensinoId,formData)
     }
 
     $(document).ready(function () {
-        $("#"+cadastrarEventoModalId).on('hide.bs.modal', function(){
-            let pessoaId = $("#"+eventoModelId).text()
+        $("#"+cadastrarEnsinoModalId).on('hide.bs.modal', function(){
+            let pessoaId = $("#"+ensinoModelId).text()
             if (pessoaId) {
                 clearModalForm()
             }

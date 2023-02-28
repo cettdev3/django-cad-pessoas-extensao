@@ -10,6 +10,7 @@ from ..models.ticket import Ticket
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.itinerario import Itinerario
+from ..models.ensino import Ensino
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
@@ -46,8 +47,8 @@ class DpEventoApiView(APIView):
     def post(self, request, *args, **kwargs):
         cidade = None
         escola = None
+        acaoEnsino = None
         postDpEventoData = request.data.get("dpEvento")
-        print("postDpEventoData", request.data)
         postItinerariosData = request.data.get("itinerarios")
 
         if postDpEventoData["cidade_id"]:
@@ -65,6 +66,14 @@ class DpEventoApiView(APIView):
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        
+        if postDpEventoData["acao_ensino_id"]:
+            acaoEnsino = self.get_object(Ensino, postDpEventoData["acao_ensino_id"])
+            if not acaoEnsino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
@@ -77,6 +86,7 @@ class DpEventoApiView(APIView):
             "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
             "cidade": cidade,
             "escola": escola,
+            "acaoEnsino": acaoEnsino,
         }
 
         membrosExecucaoData = []
@@ -214,29 +224,49 @@ class DpEventoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             dp_evento.escola = escola
+        
+        print(request.data.get("acao_ensino_id"))
+        if request.data.get("acao_ensino_id"):
+            acaoEnsino = self.get_object(Ensino, request.data.get("acao_ensino_id"))
+            if not acaoEnsino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            dp_evento.acaoEnsino = acaoEnsino
+        else:
+            dp_evento.acaoEnsino = None
 
         dp_evento.save()
         serializer = DpEventoSerializer(dp_evento)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, dp_evento_id, *args, **kwargs):
+        # default return message, rota invalida, contate o administrador do sistema
+        # return_message = {"res": "Rota inválida, contate o administrador do sistema"}
+        # return Response(return_message, status=status.HTTP_400_BAD_REQUEST)
 
-        dp_evento = self.get_object(DpEvento, dp_evento_id)
-        if not dp_evento:
+        instance = self.get_object(DpEvento, dp_evento_id)
+        if not instance:
             return Response(
                 {"res": "Não existe ação com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        membrosExecucao = MembroExecucao.objects.filter(dp_evento_id=dp_evento_id)
-        for membroExecucao in membrosExecucao:
-            tickets = Ticket.objects.filter(
-                membro_execucao_id=membroExecucao.id)
-            for ticket in tickets:
+        instance.atividade_set.all().delete()
+        instance.avaliacao_set.all().delete()
+        membro_execucao_set = instance.membroexecucao_set.all()
+        for membro_execucao in membro_execucao_set:
+            ticket = Ticket.objects.filter(membro_execucao=membro_execucao).first()
+            print("ticket, ",ticket)
+            if ticket is not None:
                 ticket.delete()
-            membroExecucao.delete()
+            itinerario = membro_execucao.itinerario
+            if itinerario is not None:
+                itinerario.delete()
+            membro_execucao.delete()
 
-        dp_evento.delete()
+        instance.delete()
         return Response(
             {"res": "ação deletada!"},
             status=status.HTTP_200_OK

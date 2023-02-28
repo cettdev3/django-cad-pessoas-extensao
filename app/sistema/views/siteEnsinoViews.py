@@ -1,7 +1,7 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
 from sistema.models.curso import Curso
 from sistema.models.endereco import Endereco
@@ -16,56 +16,62 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 
 @login_required(login_url='/auth-user/login-user')
-def gerencia_eventos(request):
+def gerencia_ensinos(request):
     page_title = "Ações de Ensino"
     count = 0
-    eventos = Ensino.objects.all()
-    for p in eventos:
+    ensinos = Ensino.objects.all()
+    for p in ensinos:
         count += 1
 
-    return render(request,'eventos/gerencia_eventos.html',
-    {'eventos':eventos,'contagem':count, "page_title": page_title})
+    return render(request,'ensinos/gerencia_ensinos.html',
+    {'ensinos':ensinos,'contagem':count, "page_title": page_title})
 
 @login_required(login_url='/auth-user/login-user')
-def eventosTable(request):
+def ensinosTable(request):
     nome = request.GET.get('nome')
-    eventos = Ensino.objects
+    ensinos = Ensino.objects
     if nome:
-        eventos = eventos.filter(nome__contains = nome)
-    eventos = eventos.all()
-    return render(request,'eventos/eventos_table.html',{'eventos':eventos})
+        ensinos = ensinos.filter(nome__contains = nome)
+    ensinos = ensinos.all()
+    return render(request,'ensinos/ensinos_table.html',{'ensinos':ensinos})
 
 @login_required(login_url='/auth-user/login-user')
-def visualizarEvento(request,codigo):
-    evento = Ensino.objects.get(id=codigo)
-    page_title = evento.observacao
-    path_back = "gerenciar-eventos"
-    return render(request,'eventos/visualizar_evento.html',{
-        'evento':evento, 
+def visualizarEnsino(request,codigo):
+    ensino = Ensino.objects.get(id=codigo)
+    page_title = ensino.observacao
+    path_back = "gerenciar-ensinos"
+    return render(request,'ensinos/visualizar_ensino.html',{
+        'ensino':ensino, 
         'page_title': page_title,
         'path_back': path_back
     })
 
 @login_required(login_url='/auth-user/login-user')
-def eventosModalCadastrar(request):
+def ensinosModalCadastrar(request):
     id = request.GET.get('id')
-    evento = None
+    ensino = None
     escolas = Escola.objects.all()
     data = {}
     if id:
-        evento = Ensino.objects.get(id=id)
-        data['evento'] = EventoSerializer(evento).data
+        ensino = Ensino.objects.get(id=id)
+        data['ensino'] = EnsinoSerializer(ensino).data
     data['escolas'] = EscolaSerializer(escolas, many=True).data
-    return render(request,'eventos/modal_cadastrar_evento.html',data)
+    return render(request,'ensinos/modal_cadastrar_ensino.html',data)
 
 @login_required(login_url='/auth-user/login-user')
-def eliminarEvento(request,codigo):
-    evento = Ensino.objects.get(id=codigo)
-    evento.delete()
-    return redirect('/gerenciar-eventos')
+def eliminarEnsino(request,codigo):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key, 'Content-Type': 'application/json', 'Accept': 'application/json'}
+    response = requests.delete('http://localhost:8000/ensino/'+str(codigo), headers=headers)
+    print(response.content)
+    if response.status_code == 204:
+        messages.success(request, 'Ensino eliminado com sucesso!')
+    else:
+        messages.error(request, 'Erro ao eliminar evento!')
+    return redirect('/gerenciar-ensinos', messages)
 
 @login_required(login_url='/auth-user/login-user')
-def saveEvento(request):
+def saveEnsino(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
@@ -74,7 +80,7 @@ def saveEvento(request):
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
-def editarEvento(request, codigo):
+def editarEnsino(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']

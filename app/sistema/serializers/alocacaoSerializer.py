@@ -9,7 +9,7 @@ class AlocacaoSerializer(serializers.ModelSerializer):
         model = Alocacao
         fields = [
             "id",
-            "evento",
+            "acaoEnsino",
             "professor",
             "curso",
             "data_inicio",
@@ -23,6 +23,6 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "cidade",
             "turnos",
             "aulas_sabado",
-            "dataremovida_set"
+            "dataremovida_set",
         ]
         depth = 2

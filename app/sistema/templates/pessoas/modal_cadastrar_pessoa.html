@@ -691,7 +691,7 @@
                             </div>
                             <div id="menu3" class="tab-pane py-3 fade">
                                 <div class="form-group row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Cargo:</b></label>
                                         <select required class="form-control" id="cargo" name="cargo">
                                             <option 
@@ -745,7 +745,7 @@
                                             value="outro">Outro</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Tipo de Contratação:</b></label>
                                         <select required class="form-control" id="tipo" name="tipo">
                                             <option 
@@ -778,7 +778,7 @@
                                             value="outro">Outros</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Qtd de Contratações:</b></label>
                                         <input 
                                         min="0" 
@@ -792,6 +792,9 @@
                                         name="qtd_contratacoes" 
                                         placeholder="" 
                                         required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        {% include 'users/users_select.html' with users=users selected=pessoa.user.id %}
                                     </div>
 
                                 </div>

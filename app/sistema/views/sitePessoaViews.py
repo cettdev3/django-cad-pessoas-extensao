@@ -10,7 +10,8 @@ from django.db.models import Count
 from django.shortcuts import render, redirect
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.userSerializer import UserSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.turnoSerializer import TurnoSerializer
 from sistema.models.pessoa import Pessoas
 from rest_framework.authtoken.models import Token
@@ -20,6 +21,7 @@ from sistema.models.turno import Turno
 from django.db.models import Q, Exists
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # Create your views here. teste
 
@@ -31,7 +33,7 @@ def gerencia_pessoas(request):
     return render(request,'pessoas/gerencia_pessoas.html',
     {'contagem':count, "page_title": page_title})
 
-# @login_required(login_url='/auth-user/login-user')
+@login_required(login_url='/auth-user/login-user')
 def pessoasTable(request):
     token, created = Token.objects.get_or_create(user=request.user)
 
@@ -56,9 +58,12 @@ def visualizarPessoa(request,codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def pessoasModalCadastrar(request):
+    print("request",request)
     id = request.GET.get('id')
     pessoa = None
     cursos = None
+    users = User.objects.all()
+
     if id:
         token, created = Token.objects.get_or_create(user=request.user)
     
@@ -68,7 +73,9 @@ def pessoasModalCadastrar(request):
         if pessoa["cursos"]:
             pessoa = pessoa
             cursos = pessoa["cursos"]
-    return render(request,'pessoas/modal_cadastrar_pessoa.html',{'pessoa':pessoa, 'cursos':cursos})
+        print(pessoa)
+    print("usuarios", UserSerializer(users, many=True).data)
+    return render(request,'pessoas/modal_cadastrar_pessoa.html',{'pessoa':pessoa, 'cursos':cursos, 'users':users})
 
 @login_required(login_url='/auth-user/login-user')
 def pessoasModalAlocar(request):
@@ -81,9 +88,10 @@ def pessoasModalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Ensino.objects.filter(~Q(status="finalizado"))
-        eventos = EventoSerializer(eventos, many=True)
-        data['eventos'] = eventos.data
+        ensinos = Ensino.objects.filter(~Q(status="finalizado"))
+        ensinos = EnsinoSerializer(ensinos, many=True)
+        data['ensinos'] = ensinos.data
+
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')

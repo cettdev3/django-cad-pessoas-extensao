@@ -1,4 +1,5 @@
 from django.core.signals import Signal
+from celery import shared_task
 
 completeTaskSignal = Signal()
 

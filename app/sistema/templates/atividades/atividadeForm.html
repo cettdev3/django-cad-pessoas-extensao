@@ -1,18 +1,18 @@
 <div class="w-100">
     <form id="cadastrarAtividadeForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-8">
-                <label><b>Descrição:</b></label>
+            <div class="col-sm-6">
+                <label><b>Link de Documentos:</b></label>
                 <input type="text"
                 required
                 class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.descricao}}"
+                {% if atividade.id and atividade.linkDocumentos and atividade.linkDocumentos != 'None' %}
+                value="{{atividade.linkDocumentos}}"
                 {% endif %}
-                id="descricao"
-                name="descricao">
+                id="linkDocumentos"
+                name="linkDocumentos">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>Status:</b></label>
                 <select required 
                 class="form-control" 
@@ -41,28 +41,85 @@
                     </option>
                 </select>
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-9">
-                <label><b>Link de Documentos:</b></label>
-                <input type="text"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.linkDocumentos}}"
-                {% endif %}
-                id="linkDocumentos"
-                name="linkDocumentos">
-            </div>
             <div id="departamentoSelectContainer" class="col-sm-3">
             </div>
         </div>
         <div class="form-group row">
-            <div id="tipoAtividadeSelectContainer" class="col-sm-4">
+            <div class="col-sm-12">
+                <label><b>Descrição:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id and atividade.descricao and atividade.descricao != 'None' %}
+                value="{{atividade.descricao}}"
+                {% endif %}
+                id="descricao"
+                name="descricao">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div id="tipoAtividadeSelectContainer" class="col-sm-3">
             </div>
             <div id="membroExecucaoSelectContainer" class="col-sm-4">
             </div>
-            <div id="cidadesSelectContainer" class="col-sm-4">
+            <div id="cidadesSelectContainer" class="col-sm-3">
+            </div>
+            <div class="col-sm-2">
+                <label><b>Carga Horária:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.cargaHoraria}}"
+                {% endif %}
+                id="cargaHoraria"
+                name="cargaHoraria">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <label><b>Quantidade de Certificações:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeCertificacoes}}"
+                {% endif %}
+                id="quantidadeCertificacoes"
+                name="quantidadeCertificacoes">    
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Matrículas:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeMatriculas}}"
+                {% endif %}
+                id="quantidadeMatriculas"
+                name="quantidadeMatriculas">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Atendimentos:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeAtendimentos}}"
+                {% endif %}
+                id="quantidadeAtendimentos"
+                name="quantidadeAtendimentos">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Inscrições:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeInscricoes}}"
+                {% endif %}
+                id="quantidadeInscricoes"
+                name="quantidadeInscricoes">
             </div>
         </div>
         {% if acao %}
@@ -70,6 +127,13 @@
             <div class="col-sm-4">
                 <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
                 <span>Usar endereço da ação</span> 
+            </div>
+        </div>
+        {% elif evento %}
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
+                <span>Usar endereço do evento</span> 
             </div>
         </div>
         {% endif %}
@@ -116,11 +180,16 @@
                 class="form-control"
                 {% if atividade.id %}
                 value="{{atividade.complemento}}"
+                {% elif acao.id %}
+                value="{{acao.complemento}}"
+                {% elif evento.id %}
+                value="{{evento.complemento}}"
                 {% endif %}
                 id="complemento"
                 name="complemento">
             </div>
         </div>
+        
         {% if atividade.acao %}
         <input type="text" hidden 
         id="acao_id"
@@ -153,11 +222,20 @@
     </span>
     <span hidden id="selected-departamento">{% if atividade %}{{atividade.departamento.id}}{% endif %}</span>
     <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
+    {% if acao %}
     <span hidden id="acao-logradouro">{{acao.logradouro}}</span>
     <span hidden id="acao-cep">{{acao.cep}}</span>
     <span hidden id="acao-bairro">{{acao.bairro}}</span>
     <span hidden id="acao-complemento">{{acao.complemento}}</span>
     <span hidden id="acao-cidade">{{acao.cidade.id}}</span>
+    {% endif %}
+    {% if evento %}
+    <span hidden id="acao-logradouro">{{evento.logradouro}}</span>
+    <span hidden id="acao-cep">{{evento.cep}}</span>
+    <span hidden id="acao-bairro">{{evento.bairro}}</span>
+    <span hidden id="acao-complemento">{{evento.complemento}}</span>
+    <span hidden id="acao-cidade">{{evento.cidade.id}}</span>
+    {% endif %}
 </div>
 
 <script>
@@ -242,6 +320,7 @@
                 $("#cidadesSelectContainer select").val($("#acao-cidade").text());
             } else {
                 $("#logradouro, #bairro, #cep, #complemento").val("");
+                $("#cidadesSelectContainer select").val("");
             }
         });
     });

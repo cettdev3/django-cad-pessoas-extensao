@@ -39,14 +39,23 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             </div>
         </div>
         <div id="add-membro-execucao-btn">
-            <div class="d-flex align-items-center ">            
+            <div data-toggle="tooltip" data-placement="top" title="Adicionar Membro a Equipe de Execução"
+            class="d-flex align-items-center ">            
                 <button onclick="addMembroExecucaoModal()" 
                 class="btn btn-success">Adicionar</button>
             </div>
         </div>
         <div id="add-atividade-btn">
-            <div class="d-flex align-items-center ">            
+            <div  data-toggle="tooltip" data-placement="top" title="Adicionar Atividade"
+            class="d-flex align-items-center ">            
                 <button onclick="addAtividadeModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+        <div id="add-avaliacao-btn">
+            <div data-toggle="tooltip" data-placement="top" title="Adicionar Avaliação" 
+            class="d-flex align-items-center ">            
+                <button onclick="addAvaliacaoModal()" 
                 class="btn btn-success">Adicionar</button>
             </div>
         </div>
@@ -57,10 +66,13 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
             </li>
             <li class=" cs-tab-link active">
-                <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Equipe de Execução</a>
+                <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
             </li>
             <li class=" cs-tab-link active">
                 <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
             </li>
         </ul>
         <div class="tab-content w-100 h-100">
@@ -75,11 +87,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <div id="atividades" class="tab-pane" style="height: 100%;">
                 <div id="atividadesTableContainer"></div>
             </div>
+            <div id="avaliacao" class="tab-pane" style="height: 100%;">
+                <div id="avaliacaoLocalTableContainer"></div>
+            </div>
         </div>
     </div>
 </div>
 <div id="modalMembroExecucaoContainer"></div>
 <div id="modalAtividadeContainer"></div>
+<div id="modalAvaliacaoContainer"></div>
+<div id="modalServicoContainer"></div>
 <script>
     let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
     let buttonMenuMembrosExecucaoId = "buttonMenuMembrosExecucao"
@@ -131,6 +148,21 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             }
         });
     }
+    
+    function addAvaliacaoModal() {
+        $.ajax({
+            url: "/avaliacaoModal",
+            method: "GET",
+            data: {
+                dp_evento_id: dpEventoId
+            },
+            success: function (data) {
+                $("#modalAvaliacaoContainer").html('');
+                $("#modalAvaliacaoContainer").html(data);
+                $('#cadastrarAvaliacaoModal').modal('show');
+            }
+        });
+    }
 
     function carregarAtividades() {
 
@@ -139,6 +171,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             data: {dp_evento_id: dpEventoId},
             success: function (data) {
                 $("#atividadesTableContainer").html(data);
+            }
+        });
+    }
+
+    function carregarAvaliacaoLocal() {
+        $.ajax({
+            url: "/avaliacoesDpEventoTable",
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#avaliacaoLocalTableContainer").html(data);
             }
         });
     }
@@ -175,13 +217,20 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
         if (id == "membro-execucao-tab") {
             $("#add-membro-execucao-btn").show()
             $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
         } else if (id == "itinerarios-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
             reloadMap()
         } else if (id == "atividades-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").show()
+            $("#add-avaliacao-btn").hide()
+        } else if (id == "avaliacao-local-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").show()
         }
     }
     
@@ -202,6 +251,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
 
         carregarMembrosExecucao()
         carregarAtividades()
+        carregarAvaliacaoLocal()
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

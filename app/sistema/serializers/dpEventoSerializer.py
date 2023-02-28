@@ -28,9 +28,10 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "complemento",
             "cidade",
             "escola",
+            "acaoEnsino",
             "endereco_completo",
             "data_inicio_formatada",
             "data_fim_formatada",
             "membroexecucao_set"
         ]
-        depth = 10
+        depth = 5

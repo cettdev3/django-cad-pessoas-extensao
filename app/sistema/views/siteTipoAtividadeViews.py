@@ -43,8 +43,9 @@ def tipoAtividadeModal(request):
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarTipoAtividade(request, codigo):
-    tipoAtividade = TipoAtividade.objects.get(id=codigo)
-    tipoAtividade.delete()
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.delete('http://localhost:8000/tipos-atividades/'+str(codigo), headers=headers)
     return redirect('/gerenciarTipoAtividade')
 
 @login_required(login_url='/auth-user/login-user')

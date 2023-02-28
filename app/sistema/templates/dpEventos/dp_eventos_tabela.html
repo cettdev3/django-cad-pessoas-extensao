@@ -200,9 +200,9 @@ cellspacing="0">
                 id="hiddenMenuDpEventos{{dpEvento.id}}" 
                 class="btn-group-custom">
                     <a id="linkVisualizarDpEvento{{dpEvento.id}}" href="/visualizarDpEvento/({{dpEvento.id}})"></a>
-                    <button onclick="visualizarDpEvento({{dpEvento.id}})">Visualizar</button> 
-                    <button onclick="carregarDpEventoModalEditar({{dpEvento.id}})">Editar</button> 
-                    <button onclick="deleteDpEvento({{dpEvento.id}})" >Excluir</button>
+                    <button onclick="visualizarDpEvento('{{dpEvento.id}}')">Visualizar</button> 
+                    <button onclick="carregarDpEventoModalEditar('{{dpEvento.id}}')">Editar</button> 
+                    <button onclick="deleteDpEvento('{{dpEvento.id}}')" >Excluir</button>
                 </div>
             </td>
         </tr>

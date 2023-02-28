@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from sistema.serializers.alocacaoSerializer import AlocacaoSerializer
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from django.db.models import Prefetch, Count
@@ -24,10 +24,10 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
-    evento_id = request.GET.get('evento_id')
+    acaoEnsino_id = request.GET.get('acaoEnsino_id')
     alocacoes = Alocacao.objects
-    if evento_id:
-        alocacoes = alocacoes.filter(evento_id = evento_id)
+    if acaoEnsino_id:
+        alocacoes = alocacoes.filter(acaoEnsino_id = acaoEnsino_id)
     alocacoes = alocacoes.all()
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 
@@ -39,9 +39,9 @@ def modalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Ensino.objects.filter(~Q(status="finalizado"))
-        eventos = EventoSerializer(eventos, many=True)
-        data['eventos'] = eventos.data
+        ensinos = Ensino.objects.filter(~Q(status="finalizado"))
+        ensinos = EnsinoSerializer(ensinos, many=True)
+        data['ensinos'] = ensinos.data
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')

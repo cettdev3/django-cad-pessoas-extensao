@@ -14,9 +14,9 @@ RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev
 RUN apt-get install -y default-mysql-client libmariadb-dev-compat libmariadb-dev 
 
 RUN sed -i '/pt_BR.UTF-8/s/^#//g' /etc/locale.gen \
-    && locale-gen en_US en_US.UTF-8 pt_BR pt_BR.UTF-8 \
-    && dpkg-reconfigure locales \
-    && update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
+  && locale-gen en_US en_US.UTF-8 pt_BR pt_BR.UTF-8 \
+  && dpkg-reconfigure locales \
+  && update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
 ENV LANG pt_BR.UTF-8  
 ENV LANGUAGE pt_BR:pt  
 ENV LC_ALL pt_BR.UTF-8
@@ -35,7 +35,7 @@ RUN python -m pip install -r requirements.txt -U
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 1000 --disabled-password --gecos "" appuser && chown -R appuser /home/appuser
+RUN adduser -u 1001 --disabled-password --gecos "" appuser && chown -R appuser /home/appuser
 
 WORKDIR /home/appuser
 # COPY ./app /home/appuser

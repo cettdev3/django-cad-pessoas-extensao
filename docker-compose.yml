@@ -13,7 +13,6 @@ services:
     volumes:
       - ./logs:/var/log/mysql:rw
       - ./data:/var/lib/mysql:rw
-
   cad-pessoas-extensao:
     image: cad-pessoas-extensao
     restart: always
@@ -59,10 +58,29 @@ services:
       - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
       - MYSQL_HOST=${EXT_MYSQL_HOST}
       - MYSQL_DATABASE=${EXT_MYSQL_USER}
-    # ports:
-    #   - 8081:8000
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - CELERY_BROKER=redis://redis:6379/0
+    ports:
+      - 8081:8000
     volumes:
       - ./app:/home/appuser
+  celery:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: celery
+    command: celery -A extensao worker --loglevel=INFO
+    volumes:
+      - ./app:/home/appuser
+    depends_on:
+      - redis
+      - cad-pessoas-extensao
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - ./data:/data
 
 networks:
   default:

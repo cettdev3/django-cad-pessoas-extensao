@@ -2,10 +2,15 @@ from django.db import models
 from .cidade import Cidade
 from .escola import Escola
 from .pessoa import Pessoas
+from .ensino import Ensino
 from datetime import datetime
 
 class DpEvento(models.Model):
     EMPRESTIMO = 'emprestimo'
+    CURSO_GPS = 'curso_gps'
+    GOIAS_FEITO_A_MAO = 'goias_feito_a_mao'
+    FEIRAO  = 'feirao'
+    MUTIRAO  = 'mutirao'
 
     MAPPED_TIPOS = [
         EMPRESTIMO
@@ -28,6 +33,7 @@ class DpEvento(models.Model):
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
+    acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True, blank= True)
     
     class Meta:
         db_table = 'dp_eventos'
@@ -76,4 +82,17 @@ class DpEvento(models.Model):
     @property
     def data_fim_formatada(self):
         return self.data_fim.strftime("%d/%m/%Y")
-        
+    
+    @property
+    def tipo_formatado(self):
+        if self.tipo == self.EMPRESTIMO:
+            return "Empréstimo"
+        elif self.tipo == self.CURSO_GPS:
+            return "Curso GPS"
+        elif self.tipo == self.FEIRAO:
+            return "Feirão do Emprego"
+        elif self.tipo == self.GOIAS_FEITO_A_MAO:
+            return "Goiás Feito a Mão"
+        elif self.tipo == self.MUTIRAO:
+            return "Mutirão"
+        return "Evento não identificado"

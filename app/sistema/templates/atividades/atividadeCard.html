@@ -1,0 +1,40 @@
+<style>
+    .boxed-box {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 3px 6px;
+        font-size: 0.9rem;
+    }
+
+    .bg-purple {
+        background-color: #377058;
+        color: white;
+    }
+    
+    .bg-orange {
+        background-color: #3845bb;
+        color: white;
+    }
+
+    .bg-brown {
+        background-color: #806c56;
+        color: white;
+    }
+</style>
+<div class="d-flex flex-column">
+    <div class="d-flex">
+        <span class="boxed-box bg-purple mr-1"><strong>{{atividade.status}}</strong></span>
+        <span class="boxed-box bg-orange mr-1"><strong>{{atividade.departamento.nome}}</strong></span>
+        {% if atividade.tipoAtividade %}
+        <span class="boxed-box bg-brown mr-1"><strong>{{atividade.tipoAtividade.nome}}</strong></span>
+        {% endif %}
+        {% if atividade.responsavel %}
+        <span><strong>Responsável: </strong>{{atividade.responsavel.pessoa.nome}}</span>
+        {% endif %}
+    </div>
+    {% if atividade.descricao != 'None' and atividade.descricao %}
+    <div class="d-flex text-left"> 
+        <span>{{atividade.descricao}}</span>
+    </div>
+    {% endif %}
+</div>

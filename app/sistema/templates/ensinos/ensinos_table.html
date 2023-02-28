@@ -1,11 +1,11 @@
 <style>
-    .eventos-w-5 {
+    .ensinos-w-5 {
         width: 5%;
     }
-    .eventos-w-25 {
+    .ensinos-w-25 {
         width: 25%;
     }
-    .eventos-w-15 {
+    .ensinos-w-15 {
         width: 15%;
     }
 </style>
@@ -14,44 +14,44 @@ width="100%"
 cellspacing="0">
     <thead class="border">
         <tr class="">
-            <th class="eventos-w-20 text-left">Observação</th>
-            <th class="eventos-w-15 text-left">Status</th>
-            <th class="eventos-w-15 text-left">Inicio</th>
-            <th class="eventos-w-15 text-left">Fim</th>
-            <th class="eventos-w-15 text-left">Endereco</th>
-            <th class="eventos-w-15 text-left">Escola</th>
+            <th class="ensinos-w-20 text-left">Observação</th>
+            <th class="ensinos-w-15 text-left">Status</th>
+            <th class="ensinos-w-15 text-left">Inicio</th>
+            <th class="ensinos-w-15 text-left">Fim</th>
+            <th class="ensinos-w-15 text-left">Endereco</th>
+            <th class="ensinos-w-15 text-left">Escola</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
-        {% for evento in eventos %}
+        {% for ensino in ensinos %}
         <tr>
-            <td class="eventos-w-15 text-left">{{evento.observacao}}</td>
-            <td class="eventos-w-15 text-left">{{evento.status}}</td>
-            <td class="eventos-w-15 text-left">{{evento.data_inicio|date:"d-m-Y"}}</td>
-            <td class="eventos-w-15 text-left">{{evento.data_fim|date:"d-m-Y"}}</td>
-            <td class="eventos-w-25 text-left">
-                {% if evento.cidade %}
-                    <strong>{{evento.cidade.nome}}</strong>
+            <td class="ensinos-w-15 text-left">{{ensino.observacao}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.status}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.data_inicio|date:"d-m-Y"}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.data_fim|date:"d-m-Y"}}</td>
+            <td class="ensinos-w-25 text-left">
+                {% if ensino.cidade %}
+                    <strong>{{ensino.cidade.nome}}</strong>
                 {% else %}
-                    <strong>{{evento.endereco.cidade.nome}}</strong>
+                    <strong>{{ensino.endereco.cidade.nome}}</strong>
                 {% endif %}
-                {{evento.endereco_completo}} 
+                {{ensino.endereco_completo}} 
             </td>
-            <td class="eventos-w-15 text-left">{{evento.escola.nome}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.escola.nome}}</td>
 
             <td class="w-5 text-left" style="position: relative;">
-                <button id="buttonMenuEventos{{evento.id}}" 
+                <button id="buttonMenuEnsinos{{ensino.id}}" 
                 class="btn-circle">
                     <i class="fa-solid fa-ellipsis-vertical"></i>                        
                 </button>
                 <div style="display: none; position: absolute; z-index: 2; right: 10%" 
-                id="hiddenMenuEventos{{evento.id}}" 
+                id="hiddenMenuEnsinos{{ensino.id}}" 
                 class="btn-group-custom">
-                    <a id="linkVisualizarevento{{evento.id}}" href="/visualizarEvento/({{evento.id}})"></a>
-                    <button onclick="visualizarEvento({{evento.id}})">Visualizar</button> 
-                    <button onclick="carregarEventosModalCadastrar({{evento.id}})">Editar</button> 
-                    <button onclick="deleteEvento({{evento.id}})" >Excluir</button>
+                    <a id="linkVisualizarensino{{ensino.id}}" href="/visualizarEnsino/({{ensino.id}})"></a>
+                    <button onclick="visualizarEnsino('{{ensino.id}}')">Visualizar</button> 
+                    <button onclick="carregarEnsinosModalCadastrar('{{ensino.id}}')">Editar</button> 
+                    <button onclick="deleteEnsino('{{ensino.id}}')" >Excluir</button>
                 </div>
             </td>
         </tr>
@@ -59,8 +59,8 @@ cellspacing="0">
     </tbody>
 </table>
 <script>
-    function visualizarEvento(id) {
-        location.href = "visualizarEvento/" + id
+    function visualizarEnsino(id) {
+        location.href = "visualizarEnsino/" + id
     }
 
     $(document).ready(function () {
@@ -76,11 +76,11 @@ cellspacing="0">
         }
 
         function bindButtons() {
-            $("button[id^='"+buttonMenuEventosId+"']").each(function (i, el) {
+            $("button[id^='"+buttonMenuEnsinosId+"']").each(function (i, el) {
                 $(this).on("click", function () {
-                    let id = $(this).attr('id').split("Eventos")[1];
-                    let menuId = "#"+hiddenMenuEventosId + id
-                    $("div[id^='"+hiddenMenuEventosId+"']").each(function (i, el) {
+                    let id = $(this).attr('id').split("Ensinos")[1];
+                    let menuId = "#"+hiddenMenuEnsinosId + id
+                    $("div[id^='"+hiddenMenuEnsinosId+"']").each(function (i, el) {
                         
                         if (menuId != "#" + $(this).attr("id")) {
                             if ($(this).css('display') != 'none') {
@@ -99,7 +99,7 @@ cellspacing="0">
         }
 
         $(document).mouseup(function (e) {
-            $("div[id^='"+hiddenMenuEventosId+"']").each(function (i, el) {
+            $("div[id^='"+hiddenMenuEnsinosId+"']").each(function (i, el) {
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
                     if ($(this).css('display') != 'none') {
                         $(this).toggle()
