@@ -142,16 +142,33 @@ def visualizarDpEvento(request,codigo):
         'path_back': path_back
     })
 
-def createRelatorioGPS(doc, counter):
-    eventos = DpEvento.objects.prefetch_related(
+def createRelatorioGPS(doc, counter, filters):
+    eventos = None
+    print("filtros", filters)
+    if 'departamento_id' in filters and filters['departamento_id']:
+        eventos = DpEvento.objects.prefetch_related(
+        Prefetch(
+            'atividade_set',
+            queryset=Atividade.objects.select_related(
+                'tipoAtividade'
+            ).filter(departamento=filters['departamento_id'])
+        )).filter(tipo=DpEvento.CURSO_GPS)
+    else:
+        eventos = DpEvento.objects.prefetch_related(
         Prefetch(
             'atividade_set',
             queryset=Atividade.objects.select_related('tipoAtividade')
         )).filter(tipo=DpEvento.CURSO_GPS)
 
+    if 'data_inicio' in filters:
+        eventos = eventos.filter(data_inicio__gte=filters['data_inicio'])
+    if 'data_fim' in filters:
+        eventos = eventos.filter(data_fim__lte=filters['data_fim'])
     result = {}
 
     for evento in eventos:
+        if evento.atividade_set.count() == 0:
+            continue
         tipo = evento.tipo
         result.setdefault(tipo, {})
         
@@ -176,7 +193,6 @@ def createRelatorioGPS(doc, counter):
 
             atividades = values
             tipoAtividadeDescricao = doc.add_paragraph()
-            print(atividades)
             tipoAtividadeDescricao = tipoAtividadeDescricao.add_run(f'{atividades[0].tipoAtividade.descricao}')
 
             for atividade in atividades:
@@ -265,15 +281,37 @@ def createRelatorioGPS(doc, counter):
                 
     return doc, counter
 
-def createRelatorioOutros(doc, counter):
-    eventos = DpEvento.objects.prefetch_related(
+def createRelatorioOutros(doc, counter, filters):
+    eventos = None
+    if 'departamento_id' in filters  and filters['departamento_id']:
+        eventos = DpEvento.objects.prefetch_related(
         Prefetch(
             'atividade_set',
-            queryset=Atividade.objects.select_related('tipoAtividade')
+            queryset=Atividade.objects.select_related(
+                'tipoAtividade'
+            ).filter(
+                departamento=filters['departamento_id']
+            )
+        )).filter(~Q(tipo=DpEvento.CURSO_GPS))
+    else:
+        eventos = DpEvento.objects.prefetch_related(
+        Prefetch(
+            'atividade_set',
+            queryset=Atividade.objects.select_related(
+                'tipoAtividade'
+            )
         )).filter(~Q(tipo=DpEvento.CURSO_GPS))
     
+    if 'data_inicio' in filters:
+        eventos = eventos.filter(data_inicio__gte=filters['data_inicio'])
+    if 'data_fim' in filters:
+        eventos = eventos.filter(data_fim__lte=filters['data_fim'])
+
     atividadesCounter = counter
     for evento in eventos:
+        # if evento has no activities, skip it
+        if not evento.atividade_set.all():
+            continue
         title = doc.add_paragraph()
         title_run = title.add_run(f'{evento.tipo_formatado} - {evento.cidade.nome}')
         title_run.bold = True
@@ -398,12 +436,19 @@ def createRelatorioOutros(doc, counter):
 
 @login_required(login_url='/auth-user/login-user')
 def relatorioDpEvento(request):
-    
+    filters = {}
+    if request.GET.get('departamento_id'):
+        filters['departamento_id'] = request.GET.get('departamento_id')
+    if request.GET.get('data_inicio'):
+        filters['data_inicio'] = request.GET.get('data_inicio')
+    if request.GET.get('data_fim'):
+        filters['data_fim'] = request.GET.get('data_fim')
+
     doc = docx.Document()
-    
+
     counter = 1
-    doc, counter = createRelatorioGPS(doc, counter)
-    doc = createRelatorioOutros(doc, counter)
+    doc, counter = createRelatorioGPS(doc, counter, filters)
+    doc = createRelatorioOutros(doc, counter, filters)
     with open('dp_evento_report.docx', 'wb') as f:
         doc.save(f)
 

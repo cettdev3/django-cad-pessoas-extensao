@@ -155,6 +155,9 @@ z-index: 4
     <div class="w-100" id="dpEventoTable">
     </div>
 
+    <div class="w-100" id="modalFiltrosRelatorioEventos">
+    </div>
+
 </div>
 <script>
     var filterPrefix = "filterDpEvento"
@@ -182,36 +185,14 @@ z-index: 4
     }
     
     function emitirRelatorio() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/relatorioDpEvento', true);
-
-        xhr.addEventListener('progress', event => {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            console.log('Download progress:', percentComplete + '%');
-        }
-        });
-
-        xhr.responseType = 'blob';
-        xhr.onload = event => {
-            if (xhr.status === 200) {
-                const blob = xhr.response;
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'dp_evento_report.docx';
-                a.target = '_blank';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            } else {
-                console.error('Download failed:', xhr.statusText);
+        $.ajax({
+            url: "/filtrosRelatorioEventosModal",
+            success: function (data) {
+                $("#modalFiltrosRelatorioEventos").html("");
+                $("#modalFiltrosRelatorioEventos").html(data);
+                $("#modalRelatorioEventos").modal("toggle");
             }
-        };
-
-        xhr.send();
-
+        });
     }
     
     function carregarDpEventos(filter = null) {

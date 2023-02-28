@@ -9,3 +9,7 @@ import datetime
 @login_required(login_url='/auth-user/login-user')
 def calendario(request):
     return render(request, 'componentes/calendario/calendario.html')
+
+@login_required(login_url='/auth-user/login-user')
+def filtrosRelatorioEventosModal(request):
+    return render(request, 'componentes/filtrosRelatorioEventosModal/filtrosRelatorioEventosModal.html')
