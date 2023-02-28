@@ -190,9 +190,11 @@ def createRelatorioGPS(doc, counter, filters):
             title_run.bold = True
             title_run.underline = WD_UNDERLINE.SINGLE
             title_run.space_after = Pt(0)
-            if not atividades[0].tipoAtividade:
-                continue
+            
             atividades = values
+            if len(atividades) == 0 or not atividades[0].tipoAtividade:
+                continue
+            
             tipoAtividadeDescricao = doc.add_paragraph()
             tipoAtividadeDescricao = tipoAtividadeDescricao.add_run(f'{atividades[0].tipoAtividade.descricao}')
 
