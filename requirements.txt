@@ -6,3 +6,4 @@ fontawesomefree
 requests
 xlsxwriter
 mysqlclient
+pyyaml
