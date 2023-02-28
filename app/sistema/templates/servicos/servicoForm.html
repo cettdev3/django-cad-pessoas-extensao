@@ -110,9 +110,11 @@
         <input type="text" hidden
         id="atividade-cep"
         value="{{atividade.cep}}">
+        {% if atividade.complemento and atividade.complemento != 'None' %}
         <input type="text" hidden
         id="atividade-complemento"
         value="{{atividade.complemento}}">
+        {% endif %}
         <input type="text" hidden
         id="atividade-cidade"
         value="{{atividade.cidade.id}}">
@@ -142,6 +144,7 @@
         carregarSelectCidadesServicos()
         $("#atividade-servico-endereco").change(function() {
             if (this.checked) {
+                console.log($("#atividade-logradouro").val())
                 $("#logradouro").val($("#atividade-logradouro").val());
                 $("#bairro").val($("#atividade-bairro").val());
                 $("#cep").val($("#atividade-cep").val());

@@ -57,8 +57,8 @@ class ServicoApiView(APIView):
         
         data = {
             "nome": request.data.get("nome"),
-            "quantidadeAtendimentos": request.data.get("quantidadeAtendimentos"),
-            "quantidadeVendas": request.data.get("quantidadeVendas"),
+            "quantidadeAtendimentos": request.data.get("quantidadeAtendimentos") or None,
+            "quantidadeVendas": request.data.get("quantidadeVendas") or None,
             "atividade": atividade,
             "cidade": cidade,
             "logradouro": request.data.get("logradouro"),

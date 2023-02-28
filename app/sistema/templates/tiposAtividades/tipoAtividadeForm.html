@@ -58,7 +58,7 @@
                     selected
                     {% endif %}
                     value="mostra_tour">
-                    MOSTRA / TOUR
+                    MOSTRA
                     </option>
                     <option
                     {% if tipoAtividade.categoria == "sala_interativa" %}
@@ -68,18 +68,25 @@
                     SALA INTERATIVA
                     </option>
                     <option
-                    {% if tipoAtividade.categoria == "mostra_sala_interativa" %}
-                    selected
-                    {% endif %}
-                    value="mostra_sala_interativa">
-                    MOSTRA / SALA INTERATIVA
-                    </option>
-                    <option
                     {% if tipoAtividade.categoria == "almoco" %}
                     selected
                     {% endif %}
                     value="almoco">
                     ALMOÇO
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "venda_produtos" %}
+                    selected
+                    {% endif %}
+                    value="venda_produtos">
+                    VENDA DE PRODUTOS
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "servicos_diversos" %}
+                    selected
+                    {% endif %}
+                    value="servicos_diversos">
+                    SERVIÇOS DIVERSOS
                     </option>
                     <option
                     {% if tipoAtividade.categoria == "outro" %}

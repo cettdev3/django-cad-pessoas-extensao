@@ -1,18 +1,18 @@
 <div class="w-100">
     <form id="cadastrarAtividadeForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-8">
-                <label><b>Descrição:</b></label>
+            <div class="col-sm-6">
+                <label><b>Link de Documentos:</b></label>
                 <input type="text"
                 required
                 class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.descricao}}"
+                {% if atividade.id and atividade.linkDocumentos and atividade.linkDocumentos != 'None' %}
+                value="{{atividade.linkDocumentos}}"
                 {% endif %}
-                id="descricao"
-                name="descricao">
+                id="linkDocumentos"
+                name="linkDocumentos">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>Status:</b></label>
                 <select required 
                 class="form-control" 
@@ -41,28 +41,85 @@
                     </option>
                 </select>
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-9">
-                <label><b>Link de Documentos:</b></label>
-                <input type="text"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.linkDocumentos}}"
-                {% endif %}
-                id="linkDocumentos"
-                name="linkDocumentos">
-            </div>
             <div id="departamentoSelectContainer" class="col-sm-3">
             </div>
         </div>
         <div class="form-group row">
-            <div id="tipoAtividadeSelectContainer" class="col-sm-4">
+            <div class="col-sm-12">
+                <label><b>Descrição:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id and atividade.descricao and atividade.descricao != 'None' %}
+                value="{{atividade.descricao}}"
+                {% endif %}
+                id="descricao"
+                name="descricao">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div id="tipoAtividadeSelectContainer" class="col-sm-3">
             </div>
             <div id="membroExecucaoSelectContainer" class="col-sm-4">
             </div>
-            <div id="cidadesSelectContainer" class="col-sm-4">
+            <div id="cidadesSelectContainer" class="col-sm-3">
+            </div>
+            <div class="col-sm-2">
+                <label><b>Carga Horária:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.cargaHoraria}}"
+                {% endif %}
+                id="cargaHoraria"
+                name="cargaHoraria">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <label><b>Quantidade de Certificações:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeCertificacoes}}"
+                {% endif %}
+                id="quantidadeCertificacoes"
+                name="quantidadeCertificacoes">    
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Matrículas:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeMatriculas}}"
+                {% endif %}
+                id="quantidadeMatriculas"
+                name="quantidadeMatriculas">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Atendimentos:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeAtendimentos}}"
+                {% endif %}
+                id="quantidadeAtendimentos"
+                name="quantidadeAtendimentos">
+            </div>
+            <div class="col-sm-3">
+                <label><b>Quantidade de Inscrições:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.quantidadeInscricoes}}"
+                {% endif %}
+                id="quantidadeInscricoes"
+                name="quantidadeInscricoes">
             </div>
         </div>
         {% if acao %}
@@ -132,64 +189,6 @@
                 name="complemento">
             </div>
         </div>
-        <div class="form-group row">
-            <div class="col-sm-3">
-                <label><b>Quantidade de Certificações:</b></label>
-                <input type="number"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.quantidadeCertificacoes}}"
-                {% endif %}
-                id="quantidadeCertificacoes"
-                name="quantidadeCertificacoes">    
-            </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Matrículas:</b></label>
-                <input type="number"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.quantidadeMatriculas}}"
-                {% endif %}
-                id="quantidadeMatriculas"
-                name="quantidadeMatriculas">
-            </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Atendimentos:</b></label>
-                <input type="number"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.quantidadeAtendimentos}}"
-                {% endif %}
-                id="quantidadeAtendimentos"
-                name="quantidadeAtendimentos">
-            </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Inscrições:</b></label>
-                <input type="number"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.quantidadeInscricoes}}"
-                {% endif %}
-                id="quantidadeInscricoes"
-                name="quantidadeInscricoes">
-            </div>
-            <div class="col-sm-2">
-                <label><b>Carga Horária:</b></label>
-                <input type="number"
-                required
-                class="form-control"
-                {% if atividade.id %}
-                value="{{atividade.cargaHoraria}}"
-                {% endif %}
-                id="cargaHoraria"
-                name="cargaHoraria">
-            </div>
-        </div>
-        
         
         {% if atividade.acao %}
         <input type="text" hidden 

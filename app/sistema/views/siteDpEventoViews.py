@@ -7,11 +7,11 @@ from sistema.models.tipoAtividade import TipoAtividade
 from sistema.models.atividade import Atividade
 from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Q
 import itertools
 import requests
 from docx.enum.text import WD_UNDERLINE
-from docx.shared import Pt
+from docx.shared import Pt, RGBColor
 import json
 import os
 from django.http import HttpResponse
@@ -133,7 +133,7 @@ def visualizarDpEvento(request,codigo):
             .prefetch_related("itinerario__itinerarioitem_set")
         ),
     ).get(id=codigo)
-    page_title = dpEvento.descricao
+    page_title = dpEvento.tipo_formatado+" - "+dpEvento.cidade.nome
     path_back = "gerencia_dp_eventos"
     dpEvento = DpEventoSerializer(dpEvento).data
     return render(request,'dpEventos/visualizar_dp_evento.html',{
@@ -142,13 +142,12 @@ def visualizarDpEvento(request,codigo):
         'path_back': path_back
     })
 
-@login_required(login_url='/auth-user/login-user')
-def relatorioDpEvento(request):
+def createRelatorioGPS(doc, counter):
     eventos = DpEvento.objects.prefetch_related(
         Prefetch(
             'atividade_set',
             queryset=Atividade.objects.select_related('tipoAtividade')
-        ))
+        )).filter(tipo=DpEvento.CURSO_GPS)
 
     result = {}
 
@@ -161,21 +160,14 @@ def relatorioDpEvento(request):
             result[tipo].setdefault(tipo_atividade, [])
             result[tipo][tipo_atividade].append(atividade)
 
-
-    doc = docx.Document()
-
-    # doc.add_paragraph(f'${descricaoEvento}')
-
     for key,tipoEvento in result.items():
-        print("chave no primeiro for: ", key)
         title = doc.add_paragraph()
         title_run = title.add_run(f'{key}')
         title_run.bold = True
         title_run.underline = WD_UNDERLINE.SINGLE
         title.space_after = Pt(0)
 
-        for skey, values in tipoEvento.items():        
-            print("chave no segundo for: ", skey)
+        for skey, values in tipoEvento.items():
             title_run = doc.add_paragraph()
             title_run = title_run.add_run(f'{skey}')
             title_run.bold = True
@@ -197,7 +189,7 @@ def relatorioDpEvento(request):
                 local = ""
                 etapa = ""
                 cursos = []
-                acaoCargaHoraria = f"Ação {str(atividade.id)}: {int(atividade.cargaHoraria)}h"
+                acaoCargaHoraria = f"Ação {str(counter)}: {int(atividade.cargaHoraria)}h"
                 cidade = f"{atividade.cidade.nome}"
                 if atividade.quantidadeMatriculas:
                     matriculas = f"{atividade.quantidadeMatriculas}"
@@ -208,7 +200,6 @@ def relatorioDpEvento(request):
                 dataFim = f"{evento.data_fim.strftime('%d/%m/%Y')}"
                 local = f"{atividade.endereco_completo}"
                 if evento.acaoEnsino:
-                    print("atividades da rodada: ", atividade)
                     etapa = f"{evento.acaoEnsino.observacao}"
                     alocacoes = evento.acaoEnsino.alocacao_set.all()
                     if alocacoes:
@@ -270,9 +261,149 @@ def relatorioDpEvento(request):
                     etapaParagraphFormat = etapaParagraph.paragraph_format
                     etapaParagraphFormat.space_after = Pt(0)
                 doc.add_paragraph()
+                counter += 1
                 
+    return doc, counter
 
+def createRelatorioOutros(doc, counter):
+    eventos = DpEvento.objects.prefetch_related(
+        Prefetch(
+            'atividade_set',
+            queryset=Atividade.objects.select_related('tipoAtividade')
+        )).filter(~Q(tipo=DpEvento.CURSO_GPS))
+    
+    atividadesCounter = counter
+    for evento in eventos:
+        title = doc.add_paragraph()
+        title_run = title.add_run(f'{evento.tipo_formatado} - {evento.cidade.nome}')
+        title_run.bold = True
+        title_run.underline = WD_UNDERLINE.SINGLE
+        title.space_after = Pt(0)
+
+        atividades = evento.atividade_set.all()
+        for atividade in atividades:
+            tipo = atividade.tipoAtividade.nome
+            acaoCargaHoraria = f"Ação {atividadesCounter} - {str(int(atividade.cargaHoraria))}h"
+
+            service_cargaHoraria_title = doc.add_paragraph()
+            service_cargaHoraria_title_run = service_cargaHoraria_title.add_run(f'{acaoCargaHoraria}')
+            service_cargaHoraria_title_run.bold = True
+            service_cargaHoraria_title_run.underline = WD_UNDERLINE.SINGLE
+            service_cargaHoraria_title_format = service_cargaHoraria_title.paragraph_format
+            service_cargaHoraria_title_format.space_after = Pt(0)
             
+            cidade = f"{atividade.cidade.nome}"
+            cidadeParagraph = doc.add_paragraph()
+            cidadeParagraph.add_run(f"cidade: ").bold = True
+            cidadeParagraph.add_run(f" {cidade}")
+            cidadeParagraphFormat = cidadeParagraph.paragraph_format
+            cidadeParagraphFormat.space_after = Pt(0)
+
+            dataInicio = f"{evento.data_inicio.strftime('%d/%m/%Y')}"
+            dataFim = f"{evento.data_fim.strftime('%d/%m/%Y')}"
+            dataParagraph = doc.add_paragraph()
+            dataParagraph.add_run(f"data: ").bold = True
+            dataParagraph.add_run(f" {dataInicio} até {dataFim}")
+            dataParagraphFormat = dataParagraph.paragraph_format
+            dataParagraphFormat.space_after = Pt(0)
+
+            local = f"{evento.escola.nome}"
+            localParagraph = doc.add_paragraph()
+            localParagraph.add_run(f"local: ").bold = True
+            localParagraph.add_run(f" {local}")
+            localParagraphFormat = localParagraph.paragraph_format
+            localParagraphFormat.space_after = Pt(0)
+            
+            if not atividade.quantidadeCertificacoes:
+                servicosParagraph = doc.add_paragraph()
+                servicosParagraph.add_run(f"Serviços oferecidos: ").bold = True
+                servicosParagraphFormat = servicosParagraph.paragraph_format
+                servicosParagraphFormat.space_after = Pt(0)
+
+                servicos = atividade.tipoAtividade.nome
+                if servicos == "serviços diversos":
+                    servicos_set = atividade.servico_set.all()
+                    servicos = ""
+                    for servico in servicos_set:
+                        servicoOferecidoParagraph = doc.add_paragraph()
+                        servicoOferecidoParagraph.add_run(f" - {servico.nome}")
+                        servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
+                        servicoOferecidoParagraphFormat.space_after = Pt(0)
+                else:
+                    servicoOferecidoParagraph = doc.add_paragraph()
+                    servicoOferecidoParagraph.add_run(f" - {atividade.tipoAtividade.nome}")
+                    servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
+                    servicoOferecidoParagraphFormat.space_after = Pt(0)
+                
+                servicos = atividade.tipoAtividade.nome
+                if servicos == "serviços diversos":
+                    servicos_set = atividade.servico_set.all()
+                    servicos = ""
+                    
+                    vendasParagraph = doc.add_paragraph()
+                    vendasParagraph.add_run(f"Número de vendas: ").bold = True
+                    vendasParagraphFormat = vendasParagraph.paragraph_format
+                    vendasParagraphFormat.space_after = Pt(0)
+
+                    for servico in servicos_set:
+                        servicoOferecidoParagraph = doc.add_paragraph()
+                        servicoOferecidoParagraph.add_run(f" - {servico.nome}: {str(int(servico.quantidadeVendas))} vendas")
+                        servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
+                        servicoOferecidoParagraphFormat.space_after = Pt(0)
+
+                servicos = atividade.tipoAtividade.nome
+                qtdAtendimentos = atividade.quantidadeAtendimentos
+                if servicos == "serviços diversos":
+                    servicos_set = atividade.servico_set.all()
+                    servicos = ""
+                    servicosAtendimentosCounter = 0
+                    for servico in servicos_set:
+                        servicosAtendimentosCounter += servico.quantidadeAtendimentos if servico.quantidadeAtendimentos else 0
+                    qtdAtendimentos = atividade.quantidadeAtendimentos if atividade.quantidadeAtendimentos else servicosAtendimentosCounter
+                if qtdAtendimentos:
+                    pessoasAtendidasParagraph = doc.add_paragraph()
+                    pessoasAtendidasParagraph.add_run(f"Quantidade de Atendimentos: ").bold = True
+                    pessoasAtendidasParagraph.add_run(f" {qtdAtendimentos}")
+                    pessoasAtendidasParagraphFormat = pessoasAtendidasParagraph.paragraph_format
+                    pessoasAtendidasParagraphFormat.space_after = Pt(0)
+
+            if atividade.quantidadeCertificacoes:
+                quantidadeCertificacoes = f"{str(int(atividade.quantidadeCertificacoes))}"
+                quantidadeCertificacoesParagraph = doc.add_paragraph()
+                quantidadeCertificacoesParagraph.add_run(f"Quantidade de certificações: ").bold = True
+                quantidadeCertificacoesParagraph.add_run(f" {quantidadeCertificacoes}")
+                quantidadeCertificacoesParagraphFormat = quantidadeCertificacoesParagraph.paragraph_format
+                quantidadeCertificacoesParagraphFormat.space_after = Pt(0)
+            
+            if atividade.quantidadeMatriculas:
+                quantidadeMatriculas = f"{str(int(atividade.quantidadeMatriculas))}"
+                quantidadeMatriculasParagraph = doc.add_paragraph()
+                quantidadeMatriculasParagraph.add_run(f"Quantidade de matrículas: ").bold = True
+                quantidadeMatriculasParagraph.add_run(f" {quantidadeMatriculas}")
+                quantidadeMatriculasParagraphFormat = quantidadeMatriculasParagraph.paragraph_format
+                quantidadeMatriculasParagraphFormat.space_after = Pt(0)
+
+            if atividade.quantidadeInscricoes:
+                quantidadeInscricoes = f"{str(int(atividade.quantidadeInscricoes))}"
+                quantidadeInscricoesParagraph = doc.add_paragraph()
+                quantidadeInscricoesParagraph.add_run(f"Quantidade de inscrições: ").bold = True
+                quantidadeInscricoesParagraph.add_run(f" {quantidadeInscricoes}")
+                quantidadeInscricoesParagraphFormat = quantidadeInscricoesParagraph.paragraph_format
+                quantidadeInscricoesParagraphFormat.space_after = Pt(0)
+
+            doc.add_paragraph()
+            atividadesCounter += 1
+
+    return doc
+
+@login_required(login_url='/auth-user/login-user')
+def relatorioDpEvento(request):
+    
+    doc = docx.Document()
+    
+    counter = 1
+    doc, counter = createRelatorioGPS(doc, counter)
+    doc = createRelatorioOutros(doc, counter)
     with open('dp_evento_report.docx', 'wb') as f:
         doc.save(f)
 
@@ -282,5 +413,3 @@ def relatorioDpEvento(request):
 
     os.remove('dp_evento_report.docx')
     return response
-
-

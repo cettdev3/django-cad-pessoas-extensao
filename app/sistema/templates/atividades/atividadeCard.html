@@ -32,7 +32,9 @@
         <span><strong>Responsável: </strong>{{atividade.responsavel.pessoa.nome}}</span>
         {% endif %}
     </div>
+    {% if atividade.descricao != 'None' and atividade.descricao %}
     <div class="d-flex text-left"> 
         <span>{{atividade.descricao}}</span>
     </div>
+    {% endif %}
 </div>
