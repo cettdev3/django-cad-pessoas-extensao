@@ -190,7 +190,8 @@ def createRelatorioGPS(doc, counter, filters):
             title_run.bold = True
             title_run.underline = WD_UNDERLINE.SINGLE
             title_run.space_after = Pt(0)
-
+            if not atividades[0].tipoAtividade:
+                continue
             atividades = values
             tipoAtividadeDescricao = doc.add_paragraph()
             tipoAtividadeDescricao = tipoAtividadeDescricao.add_run(f'{atividades[0].tipoAtividade.descricao}')
@@ -320,7 +321,13 @@ def createRelatorioOutros(doc, counter, filters):
 
         atividades = evento.atividade_set.all()
         for atividade in atividades:
+            if not atividade.tipoAtividade:
+                continue
+            if atividade.cargaHoraria is None:
+                continue
+            
             tipo = atividade.tipoAtividade.nome
+            print("atividadesCounter", atividadesCounter)
             acaoCargaHoraria = f"Ação {atividadesCounter} - {str(int(atividade.cargaHoraria))}h"
 
             service_cargaHoraria_title = doc.add_paragraph()
@@ -446,7 +453,7 @@ def relatorioDpEvento(request):
 
     doc = docx.Document()
 
-    counter = 1
+    counter = int(1)
     doc, counter = createRelatorioGPS(doc, counter, filters)
     doc = createRelatorioOutros(doc, counter, filters)
     with open('dp_evento_report.docx', 'wb') as f:
