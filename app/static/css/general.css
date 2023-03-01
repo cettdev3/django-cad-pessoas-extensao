@@ -92,3 +92,10 @@
     background-color: #15865d;
     color: white;
 }
+
+
+.clickable-column:hover {
+    cursor: pointer;
+    background-color: #343a40;
+    color: white;
+}

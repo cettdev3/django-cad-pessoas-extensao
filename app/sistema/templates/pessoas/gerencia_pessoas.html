@@ -133,6 +133,7 @@ z-index: 4
             placeholder="Digite um nome" 
             class="mx-2 form-control-sm border-secondary"
             name="nome" type="text">
+            <input hidden type="text" value="nome" name="order_by" id="filterPessoa_order_by">
             <input id="filterPessoaDataInicio" 
             type="date"
             class="mx-2 form-control-sm border-secondary"
@@ -269,6 +270,7 @@ z-index: 4
 
     function carregarPessoas(filter = null) {
         let recarregarTabela = "pessoasTable"
+        console.log(filter) 
         $.ajax({
             url: recarregarTabela,
             data: filter,

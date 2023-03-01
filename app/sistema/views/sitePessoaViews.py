@@ -43,6 +43,7 @@ def pessoasTable(request):
         'data_inicio': request.GET.get('data_inicio'),
         'data_fim': request.GET.get('data_fim'),
         'is_alocated': request.GET.get('is_alocated'),
+        'order_by': request.GET.get('order_by'),
     }, headers=headers)
     pessoas = json.loads(response.content)
     return render(request,'pessoas/pessoas_table.html',{'pessoas':pessoas})

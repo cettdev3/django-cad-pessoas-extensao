@@ -7,12 +7,36 @@ cellspacing="0">
             <th class="select-row">
                 <input id="pessoaTableCheckboxAll" type="checkbox">
             </th>
-            <th class="w-10 text-left">Nome</th>
-            <th class="w-10 text-left">Email</th>
-            <th class="w-10 text-left">Telefone</th>
-            <th class="w-10 text-left">Cargo</th>
-            <th class="w-10 text-left">Tipo</th>
-            <th class="w-10 text-left">Contratações</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('nome')"
+            title="Ordenar por Nome">Nome</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('email')"
+            title="Ordenar por email">Email</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('telefone')"
+            title="Ordenar por telefone">Telefone</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('cargo')"
+            title="Ordenar por Cargo">Cargo</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('tipo')"
+            title="Ordenar por Tipo">Tipo</th>
+            <th class="w-10 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('qtd_contratacoes')"
+            title="Ordenar por Quantidade de Contratações">Contratações</th>
             <th class="w-2 text-left">Ação</th>
         </tr>
     </thead>
@@ -48,6 +72,16 @@ cellspacing="0">
 </table>
 <input hidden type="number" value="0" id="pessoasTableActiveCheckBoxes">
 <script>
+    function orderTableBy(column) {
+        let orderBy = $("#filterPessoa_order_by").val()
+        if (orderBy == column) {
+            $("#filterPessoa_order_by").val("-" + column)
+        } else {
+            $("#filterPessoa_order_by").val(column)
+        }
+        carregarPessoas(getFiltros())
+    }
+
     $(document).ready(function () {
         function isvisibleOnViewport(element) {
             var rect = element.getBoundingClientRect();
