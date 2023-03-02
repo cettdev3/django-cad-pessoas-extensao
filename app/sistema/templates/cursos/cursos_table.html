@@ -26,8 +26,8 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarcurso{{curso.id}}" href="/visualizarCurso/({{curso.id}})"></a>
                     <!-- <button onclick="visualizarCurso({{curso.id}})">Visualizar</button>  -->
-                    <button onclick="carregarCursosModalCadastrar({{curso.id}})">Editar</button> 
-                    <button onclick="deleteCurso({{curso.id}})" >Excluir</button>
+                    <button onclick="carregarCursosModalCadastrar('{{curso.id}}')">Editar</button> 
+                    <button onclick="openDeleteModal(() => deleteCurso('{{curso.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

@@ -202,7 +202,7 @@ cellspacing="0">
                     <a id="linkVisualizarAcao{{acao.id}}" href="/visualizarAcao/({{acao.id}})"></a>
                     <button onclick="visualizarAcao('{{acao.id}}')">Visualizar</button> 
                     <button onclick="carregarAcaoModalEditar('{{acao.id}}')">Editar</button> 
-                    <button onclick="deleteAcao('{{acao.id}}')" >Excluir</button>
+                    <button onclick="openDeleteModal(() => deleteAcao('{{acao.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

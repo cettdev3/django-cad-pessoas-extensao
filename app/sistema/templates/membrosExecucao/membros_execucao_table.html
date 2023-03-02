@@ -41,8 +41,8 @@
             </button>
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuMembroExecucao{{membroExecucao.id}}"
                 class="btn-group-custom">
-                <button onclick="carregarMembroExecucaoModalCadastrar({{membroExecucao.id}})">Editar</button>
-                <button onclick="deleteMembroExecucao({{membroExecucao.id}})">Excluir</button>
+                <button onclick="carregarMembroExecucaoModalCadastrar('{{membroExecucao.id}}')">Editar</button>
+                <button onclick="openDeleteModal(() => deleteMembroExecucao('{{membroExecucao.id}}'))">Excluir</button>
             </div>
         </td>
         </tr>

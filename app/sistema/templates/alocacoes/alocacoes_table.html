@@ -37,8 +37,8 @@
             </button>
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuAlocacoes{{alocacao.id}}"
                 class="btn-group-custom">
-                <button onclick="carregarAlocacoesModalCadastrar({{alocacao.id}})">Editar</button>
-                <button onclick="deleteAlocacao({{alocacao.id}})">Excluir</button>
+                <button onclick="carregarAlocacoesModalCadastrar('{{alocacao.id}}')">Editar</button>
+                <button onclick="openDeleteModal(() => deleteAlocacao('{{alocacao.id}}'))">Excluir</button>
             </div>
         </td>
         </tr>

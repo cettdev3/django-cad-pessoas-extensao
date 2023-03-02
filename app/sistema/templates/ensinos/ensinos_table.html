@@ -75,7 +75,7 @@ cellspacing="0">
                     <a id="linkVisualizarensino{{ensino.id}}" href="/visualizarEnsino/({{ensino.id}})"></a>
                     <button onclick="visualizarEnsino('{{ensino.id}}')">Visualizar</button> 
                     <button onclick="carregarEnsinosModalCadastrar('{{ensino.id}}')">Editar</button> 
-                    <button onclick="deleteEnsino('{{ensino.id}}')" >Excluir</button>
+                    <button class="delete-btn" onclick="openDeleteModal(() => deleteEnsino('{{ensino.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

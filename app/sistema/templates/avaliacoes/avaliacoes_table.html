@@ -32,7 +32,7 @@ cellspacing="0">
                     <a id="linkVisualizaravaliacao{{avaliacao.id}}" href="/visualizarAvaliacao/({{avaliacao.id}})"></a>
                     <!-- <button onclick="visualizarAvaliacao({{avaliacao.id}})">Visualizar</button>  -->
                     <!-- <button onclick="carregarAvaliacoesModalCadastrar('{{avaliacao.id}}')">Editar</button>  -->
-                    <button onclick="deleteAvaliacao('{{avaliacao.id}}')" >Excluir</button>
+                    <button onclick="openDeleteModal(() => deleteAvaliacao('{{avaliacao.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

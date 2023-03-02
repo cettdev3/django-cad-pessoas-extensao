@@ -186,8 +186,8 @@ z-index: 4
 
 <div id="calendario" class="d-flex flex-column">
 </div>
-<!-- confirmation modal -->
-<div id="confirmDeleteModalContainer"></div>
+
+
 <script>
     let pessoaModificadaEvent = {};
     let pessoaModificadaEventProxy = null
@@ -268,16 +268,6 @@ z-index: 4
         getCalendario()
     }
 
-    function carregarDeleteModal() {
-        $.ajax({
-            url: "/confirmDeleteModal",
-            type: "GET",
-            success: function (data) {
-                $("#confirmDeleteModalContainer").html(data)
-            }
-        })
-    }
-
     function carregarPessoas(filter = null, state = null) {
         let recarregarTabela = "pessoasTable"
         console.log(filter) 
@@ -324,7 +314,6 @@ z-index: 4
     }
 
     $(document).ready(function () {
-        carregarDeleteModal()
         pessoaModificadaEventProxy = new Proxy(pessoaModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;

@@ -65,8 +65,10 @@ class Ensino(models.Model):
     
     @property
     def data_inicio_formatada(self):
+        if not self.data_inicio: return None
         return self.data_inicio.date()
     
     @property
     def data_fim_formatada(self):
+        if not self.data_fim: return None
         return self.data_fim.date()

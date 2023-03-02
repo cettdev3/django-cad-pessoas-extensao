@@ -31,8 +31,8 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarturno{{turno.id}}" href="/visualizarTurno/({{turno.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="carregarTurnoModalEditar({{turno.id}})">Editar</button> 
-                    <button onclick="deleteTurno({{turno.id}})" >Excluir</button>
+                    <button onclick="carregarTurnoModalEditar('{{turno.id}}')">Editar</button> 
+                    <button onclick="openDeleteModal(() => deleteTurno('{{turno.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

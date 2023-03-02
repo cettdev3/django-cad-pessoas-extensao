@@ -36,8 +36,8 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarTipoAtividade{{TipoAtividade.id}}" href="/visualizarTipoAtividade/({{TipoAtividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="editarTipoAtividade({{TipoAtividade.id}})">Editar</button> 
-                    <button onclick="deleteTipoAtividade({{TipoAtividade.id}})" >Excluir</button>
+                    <button onclick="editarTipoAtividade('{{TipoAtividade.id}}')">Editar</button> 
+                    <button onclick="openDeleteModal(() => deleteTipoAtividade('{{TipoAtividade.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

@@ -67,7 +67,7 @@ cellspacing="0">
                         <span class="fa-stack servico-delete-btn "  
                         style="border-radius: 50%;" 
                         id="deleteServico-{{servico.id}}"
-                        onclick="deleteServico('{{servico.id}}')"
+                        onclick="openDeleteModal(() => deleteServico('{{servico.id}}'))"
                         data-toggle="tooltip" 
                         data-placement="top"
                         title="Deletar Serviço">
@@ -90,7 +90,7 @@ cellspacing="0">
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
                     <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Servico</button> 
                     <button onclick="editarAtividadeModal('{{atividade.id}}')">Editar</button> 
-                    <button onclick="deleteAtividade('{{atividade.id}}')" >Excluir</button>
+                    <button onclick="openDeleteModal(() => deleteAtividade('{{atividade.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

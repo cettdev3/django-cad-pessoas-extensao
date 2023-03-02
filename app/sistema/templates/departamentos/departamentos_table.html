@@ -27,7 +27,7 @@ cellspacing="0">
                     <a id="linkVisualizardepartamento{{departamento.id}}" href="/visualizarDepartamento/({{departamento.id}})"></a>
                     <!-- <button onclick="visualizarDepartamento({{departamento.id}})">Visualizar</button>  -->
                     <button onclick="carregarDepartamentosModalCadastrar('{{departamento.id}}')">Editar</button> 
-                    <button onclick="deleteDepartamento('{{departamento.id}}')" >Excluir</button>
+                    <button onclick="openDeleteModal(() => deleteDepartamento('{{departamento.id}}'))" >Excluir</button>
                 </div>
             </td>
         </tr>

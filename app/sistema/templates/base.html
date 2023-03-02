@@ -209,7 +209,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-
+    <div id="confirmDeleteModalContainer"></div>
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -249,6 +249,20 @@
             $('#cpf').mask("000.000.000-00");
             $('#cep').mask("00.000-000");
         }
+
+        function carregarDeleteModal() {
+            $.ajax({
+                url: "/confirmDeleteModal",
+                type: "GET",
+                success: function (data) {
+                    $("#confirmDeleteModalContainer").html(data)
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            carregarDeleteModal();
+        });
     </script>
 </body>
 
