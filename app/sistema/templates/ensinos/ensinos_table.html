@@ -14,12 +14,36 @@ width="100%"
 cellspacing="0">
     <thead class="border">
         <tr class="">
-            <th class="ensinos-w-20 text-left">Observação</th>
-            <th class="ensinos-w-15 text-left">Status</th>
-            <th class="ensinos-w-15 text-left">Inicio</th>
-            <th class="ensinos-w-15 text-left">Fim</th>
-            <th class="ensinos-w-15 text-left">Endereco</th>
-            <th class="ensinos-w-15 text-left">Escola</th>
+            <th class="ensinos-w-20 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('observacao')"
+            title="Ordenar por Observação">Observação</th>
+            <th class="ensinos-w-15 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('status')"
+            title="Ordenar por Status">Status</th>
+            <th class="ensinos-w-15 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('data_inicio')"
+            title="Ordenar por Data de inicio da Ação de Ensino">Inicio</th>
+            <th class="ensinos-w-15 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('data_fim')"
+            title="Ordenar por Data de Termino da Ação de Ensino">Fim</th>
+            <th class="ensinos-w-15 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('cidade__nome')"
+            title="Ordenar por Cidade do Endereço">Endereco</th>
+            <th class="ensinos-w-15 text-left clickable-column"
+            data-toggle="tooltip" 
+            data-placement="top"
+            onclick="orderTableBy('escola__nome')"
+            title="Ordenar por Nome da Escola">Escola</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
@@ -28,8 +52,8 @@ cellspacing="0">
         <tr>
             <td class="ensinos-w-15 text-left">{{ensino.observacao}}</td>
             <td class="ensinos-w-15 text-left">{{ensino.status}}</td>
-            <td class="ensinos-w-15 text-left">{{ensino.data_inicio|date:"d-m-Y"}}</td>
-            <td class="ensinos-w-15 text-left">{{ensino.data_fim|date:"d-m-Y"}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.data_inicio_formatada}}</td>
+            <td class="ensinos-w-15 text-left">{{ensino.data_fim_formatada}}</td>
             <td class="ensinos-w-25 text-left">
                 {% if ensino.cidade %}
                     <strong>{{ensino.cidade.nome}}</strong>
@@ -59,6 +83,16 @@ cellspacing="0">
     </tbody>
 </table>
 <script>
+    function orderTableBy(column) {
+        let orderBy = $("#filterEnsinoOrder_by").val()
+        if (orderBy == column) {
+            $("#filterEnsinoOrder_by").val("-" + column)
+        } else {
+            $("#filterEnsinoOrder_by").val(column)
+        }
+        carregarEnsinos(getFiltersEnsino())
+    }
+
     function visualizarEnsino(id) {
         location.href = "visualizarEnsino/" + id
     }

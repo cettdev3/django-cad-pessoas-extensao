@@ -96,6 +96,42 @@
 
 .clickable-column:hover {
     cursor: pointer;
-    background-color: #343a40;
-    color: white;
+}
+
+.clickable-column:hover.order-by-up i.arrow-up, 
+.clickable-column:hover.order-by-down i.arrow-down {
+    color: #858796;
+    transform: scale(1.2);
+}
+
+.clickable-column:hover.order-by-up i.arrow-up.current-order-by, 
+.clickable-column:hover.order-by-down i.arrow-down.current-order-by {
+    color: #000;
+    transform: scale(1.2);
+}
+
+.order-by-up i.arrow-up {
+    color: #858796;
+    display: inline;
+}
+
+.order-by-up i.arrow-down {
+    color: #858796;
+    display: none;
+}
+
+.order-by-down  i.arrow-up {
+    color: #858796;
+    display: none;
+}
+
+.order-by-down i.arrow-down {
+    color: #858796;
+    display: inline;
+}
+
+th.order-by-up i.current-order-by,
+th.order-by-down i.current-order-by,
+span.column-label.current-order-by  {
+    color: #000;
 }

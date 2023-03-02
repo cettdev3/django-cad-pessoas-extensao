@@ -128,13 +128,13 @@ z-index: 4
     d-flex justify-content-end align-items-center 
     px-3 py-3 my-3
     bg-white">
-        <!-- <div>
-            <input id="nomeEnsinoFilter" 
+        <div class="d-flex justify-content-start align-items-center">
+            <input id="filterEnsinoOrder_by"
+            hidden 
             placeholder="Digite um nome" 
-            class="form-control-sm border-secondary"
-            name="nome" 
-            onchange="buscarEnsinos('nomeEnsinoFilter')" type="text">
-        </div> -->
+            class="mx-2 form-control-sm border-secondary"
+            name="order_by" type="text">
+        </div>
         <div>
             <button id="adicionarPessoas" 
             onclick="carregarEnsinosModalCadastrar()"
@@ -167,6 +167,17 @@ z-index: 4
     let rotaDeletarEnsino = "eliminarEnsino"
     let rotaModalEnsino = "ensinosModalCadastrar"
     let rotaVisualizarEnsino = "visualizarEnsino"
+    let ensinoFiltersPrefix = "filterEnsino"
+
+    function getFiltersEnsino() {
+        let filter = {}
+        let filterInputs = document.querySelectorAll(`input[id^=${ensinoFiltersPrefix}]`)
+        filterInputs.forEach((input) => {
+            console.log(`${input.name} : ${input.value} `)
+            filter[input.name] = input.value
+        })
+        return filter
+    }
 
     function deleteEnsino(id) {
         deletar_url = rotaDeletarEnsino+"/" + id
@@ -177,7 +188,7 @@ z-index: 4
             success: function (data) {
                 let menuId = "#" + hiddenMenuEnsinosId + id
                 $(menuId).toggle()
-                carregarEnsinos()
+                carregarEnsinos(getFiltersEnsino())
             }
         });
     }
@@ -208,17 +219,12 @@ z-index: 4
         location.href = rotaVisualizarEnsino+"/" + id
     }
 
-    function buscarEnsinos(filter) {
-        let value = $("#" + filter).val()
-        carregarEnsinos({ nome: value })
-    }
-
     $(document).ready(function () {
         ensinoModificadaEventProxy = new Proxy(ensinoModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;
                 if (value) {
-                    carregarEnsinos()
+                    carregarEnsinos(getFiltersEnsino())
                 }
                 target[key] = false
                 return false;
@@ -235,7 +241,7 @@ z-index: 4
                 success: function (data) {
                     $('#'+cadastrarEnsinoFormId)[0].reset();
                     $("#"+dismissCadastrarEnsinoId).click()
-                    carregarEnsinos()
+                    carregarEnsinos(getFiltersEnsino())
                 }
             });
         }
@@ -250,7 +256,7 @@ z-index: 4
             })
         });
 
-        carregarEnsinos()
+        carregarEnsinos(getFiltersEnsino())
     });
 
 </script>

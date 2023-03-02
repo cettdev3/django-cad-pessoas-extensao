@@ -25,7 +25,12 @@ class EnsinoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        ensinos = Ensino.objects.all()
+        order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
+        print("order_by: ", order_by)
+        ensinos = Ensino.objects
+        if order_by:
+            ensinos = ensinos.order_by(order_by)
+        ensinos = ensinos.all()
         serializer = EnsinoSerializer(ensinos, many=True)
         return Response(serializer.data, status=str.HTTP_200_OK)
 

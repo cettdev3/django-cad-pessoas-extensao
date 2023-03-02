@@ -62,3 +62,11 @@ class Ensino(models.Model):
             return self.endereco.endereco_completo
         
         return enderecoCompleto
+    
+    @property
+    def data_inicio_formatada(self):
+        return self.data_inicio.date()
+    
+    @property
+    def data_fim_formatada(self):
+        return self.data_fim.date()

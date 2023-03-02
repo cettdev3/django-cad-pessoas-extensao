@@ -28,11 +28,13 @@ def gerencia_ensinos(request):
 
 @login_required(login_url='/auth-user/login-user')
 def ensinosTable(request):
-    nome = request.GET.get('nome')
-    ensinos = Ensino.objects
-    if nome:
-        ensinos = ensinos.filter(nome__contains = nome)
-    ensinos = ensinos.all()
+    token, created = Token.objects.get_or_create(user=request.user)
+    
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/ensino', params={
+        'order_by': request.GET.get('order_by'),
+    }, headers=headers)
+    ensinos = json.loads(response.content)
     return render(request,'ensinos/ensinos_table.html',{'ensinos':ensinos})
 
 @login_required(login_url='/auth-user/login-user')

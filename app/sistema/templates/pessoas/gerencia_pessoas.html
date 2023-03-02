@@ -268,7 +268,7 @@ z-index: 4
         getCalendario()
     }
 
-    function carregarPessoas(filter = null) {
+    function carregarPessoas(filter = null, state = null) {
         let recarregarTabela = "pessoasTable"
         console.log(filter) 
         $.ajax({
@@ -276,6 +276,7 @@ z-index: 4
             data: filter,
             success: function (data) {
                 $("#receberTabela").html(data);
+                setTabelaPessoaState(state)
             }
         });
     }
