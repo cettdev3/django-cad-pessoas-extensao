@@ -13,3 +13,7 @@ def calendario(request):
 @login_required(login_url='/auth-user/login-user')
 def filtrosRelatorioEventosModal(request):
     return render(request, 'componentes/filtrosRelatorioEventosModal/filtrosRelatorioEventosModal.html')
+
+@login_required(login_url='/auth-user/login-user')
+def confirmDeleteModal(request):
+    return render(request, 'componentes/confirmDeleteModal/confirmDeleteModal.html')

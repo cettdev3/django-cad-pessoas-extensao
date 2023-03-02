@@ -43,7 +43,7 @@ from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, visualizarAcao
 from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
-from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal
+from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
 from sistema.views.siteTicketViews import ticketModal, saveTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
@@ -251,6 +251,7 @@ urlpatterns = [
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
     path("filtrosRelatorioEventosModal",filtrosRelatorioEventosModal),
+    path("confirmDeleteModal",confirmDeleteModal),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),

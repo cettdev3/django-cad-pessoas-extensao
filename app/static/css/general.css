@@ -51,6 +51,11 @@
     background-color: #e3e6f0;
 }
 
+.btn-group-custom button.delete-btn:hover {
+    background-color: #df4759;
+    color: white;
+}
+
 .btn-circle {
     border: none;
     outline: inherit;
