@@ -125,7 +125,7 @@ z-index: 4
         {% endfor %}
     {% endif %}
     <div class="w-100 shadow
-    d-flex justify-content-end align-items-center 
+    d-flex justify-content-between align-items-center 
     px-3 py-3 my-3
     bg-white">
         <div class="d-flex justify-content-start align-items-center">
@@ -134,6 +134,27 @@ z-index: 4
             placeholder="Digite um nome" 
             class="mx-2 form-control-sm border-secondary"
             name="order_by" type="text">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                
+                <input id="filterEnsinoObservacao" 
+                placeholder="Procurar por etapa" 
+                class="mx-2 form-control-sm border-secondary"
+                name="observacao" type="text">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterEnsinoDataInicio"
+                style="line-height: 0; font-size: 0.8rem;">Data início</label>
+                <input id="filterEnsinoDataInicio"
+                placeholder="Procurar por data de início"
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_inicio">
+            </div>
+            <input id="filterEnsinoDataFim"
+            placeholder="Procurar por data de fim"
+            type="date"
+            class="mx-2 form-control-sm border-secondary"
+            name="data_fim">
         </div>
         <div>
             <button id="adicionarPessoas" 
@@ -173,10 +194,13 @@ z-index: 4
         let filter = {}
         let filterInputs = document.querySelectorAll(`input[id^=${ensinoFiltersPrefix}]`)
         filterInputs.forEach((input) => {
-            console.log(`${input.name} : ${input.value} `)
             filter[input.name] = input.value
         })
         return filter
+    }
+
+    function filtrarAcoesEnsino() {
+        carregarEnsinos(getFiltersEnsino())
     }
 
     function deleteEnsino(id) {
@@ -193,13 +217,15 @@ z-index: 4
         });
     }
 
-    function carregarEnsinos(filter = null) {
+    function carregarEnsinos(filter = null, state = null) {
         let recarregarTabela = rotaTabelaEnsinos
+        console.log(filter) 
         $.ajax({
             url: recarregarTabela,
             data: filter ? filter : {},
             success: function (data) {
                 $("#"+idTabelaEnsinos).html(data);
+                setTabelaState(state, "column-ensino", "data_inicio")
             }
         });
     }
@@ -252,6 +278,21 @@ z-index: 4
                     if ($(this).css('display') != 'none') {
                         $(this).toggle()
                     }
+                }
+            })
+
+            $("input[id^='"+ensinoFiltersPrefix+"']").each(function () {
+                let input = $(this)
+                if ($(this).attr('type') == 'text') {
+                    $(this)
+                    .keyup(debounce(function() {
+                        filtrarAcoesEnsino()
+                    }, 500))
+                } else {
+                    $(this)
+                    .change(debounce(function() {
+                        filtrarAcoesEnsino()
+                    }, 500))
                 }
             })
         });

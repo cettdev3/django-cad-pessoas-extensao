@@ -1,0 +1,143 @@
+<style>
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        width: 100%;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .dropdown-inputed-item {
+        position: relative;
+        display: inline-block;
+        padding: 2px 8px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .dropdown-inputed-item:hover {
+        background-color: #ccc;
+        cursor: pointer;
+        color: white;
+    }
+    
+    .selected-dropdown-item {
+        background-color: #ddd;
+    }
+
+</style>
+<div class="d-flex flex-column justify-content-start align-items-start" id="{{id}}">
+    <label class="filter-label" for="">
+        {{label}}
+    </label>
+    <div>
+        <input class="form-control-sm border-secondary" 
+        type="text"
+        placeholder="{{placeholder}}">
+        <div class="dropdown">
+            <div class="dropdown-content">
+                {% for item in items %}
+                <div class="dropdown-inputed-item" 
+                id="drop-down-item-1"
+                style="z-index: 1;"
+                onclick="selectDropdownItem(this, '{{item.nome}}')">
+                    <input 
+                    type="checkbox" 
+                    name="cursos" 
+                    value="1">
+                    <span>{{item.nome}}</span>
+                    <span  hidden>{{item.id}}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ items|json_script:"items-script" }}
+<script>
+    let dropDownItems = JSON.parse(document.getElementById('items-script').textContent);
+    let keepFocus = false;
+    let dropdownInputPlaceholder = "Selecione os cursos...";
+    let selectMultipleDropdownId = "{{id}}";
+
+    function filterItems(query) {
+        let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+        let items = dropdown.children();
+        items.each(function () {
+            let textContent = $(this).children("span").text();
+            if (textContent.toUpperCase().indexOf(query) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        })
+    }
+
+    function isClickInsideDropdown(event) {
+        let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+        let input = $("#"+selectMultipleDropdownId+" input");
+        let reseult = dropdown.has(event.target).length > 0 || dropdown.is(event.target);
+        reseult = reseult || input.has(event.target).length > 0 || input.is(event.target);
+        return reseult;
+    }
+
+    function selectDropdownItem(item , value) {
+        let input = $(item).find("input");
+        let currentChecked = !input.is(":checked");
+        input.prop("checked", currentChecked);
+        input.trigger("change");
+        $(item).toggleClass("selected-dropdown-item");
+    }
+
+    $(document).ready(function () {
+        let input = $("#"+selectMultipleDropdownId+" input");
+        input.focus(function () {
+            let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+            dropdown.show();
+            keepFocus = true
+        })
+
+        input.focusout(function (event) {
+            if (keepFocus) {
+                event.preventDefault();
+                event.stopPropagation();
+                $(this).focus();
+                return
+            }
+        })
+        
+        input.blur(function (event) {
+            if (keepFocus) {
+                event.preventDefault();
+                event.stopPropagation();
+                $(this).focus();
+                return
+            }
+        })
+
+        input.keyup(function () {
+            let input = $(this);
+            let query = input.val().toUpperCase();
+            filterItems(query);
+        })
+
+        $(document).click(function (event) {
+            let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+            if (isClickInsideDropdown(event)) return
+
+            let input = $("#"+selectMultipleDropdownId+" input");
+            dropdown.hide();
+            input.val("");
+            keepFocus = false
+            input.focusout();
+            filterItems("");
+            input.blur();
+        })
+    })
+</script>

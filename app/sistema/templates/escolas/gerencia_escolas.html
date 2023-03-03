@@ -225,14 +225,6 @@ z-index: 4
         carregarEscolas(filtros)
     }
 
-    function debounce(func, timeout = 300){
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => { func.apply(this, args); }, timeout);
-        };
-    }
-
     $(document).ready(function () {
         escolaModificadaEventProxy = new Proxy(escolaModificadaEvent, {
             set: function (target, key, value) {

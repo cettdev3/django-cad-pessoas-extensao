@@ -46,11 +46,11 @@
             width: 0.2em;
             background-color: #F5F5F5;
         }
-        
+
         #accordionSidebar::-webkit-scrollbar-thumb {
-           background-color: #157a74;
+            background-color: #157a74;
         }
-        
+
         #accordionSidebar::-webkit-scrollbar-track {
             background-color: #F5F5F5;
         }
@@ -63,19 +63,16 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav sidebar sidebar-dark accordion"
-            style="background-color: #0c504b; 
+        <ul class="navbar-nav sidebar sidebar-dark accordion" style="background-color: #0c504b; 
             position: sticky; 
             top: 0; 
             height: 100vh; 
             overflow-y: scroll; 
-            overflow-x: hidden;" 
-            id="accordionSidebar">
+            overflow-x: hidden;" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center"
-            style="position: sticky; top: 0; background-color: #0c504b;"
-            href="/">
+                style="position: sticky; top: 0; background-color: #0c504b;" href="/">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -155,8 +152,7 @@
         <!-- End of Sidebar -->
         <div class="d-flex flex-column w-100">
             <!-- Topbar -->
-            <nav style="position: sticky; top: 0; z-index: 4;height: 75px;"
-            class=" navbar w-100
+            <nav style="position: sticky; top: 0; z-index: 4;height: 75px;" class=" navbar w-100
             navbar-expand navbar-light
             bg-white topbar
             static-top shadow">
@@ -250,6 +246,14 @@
             $('#cep').mask("00.000-000");
         }
 
+        function debounce(func, timeout = 300){
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
         function carregarDeleteModal() {
             $.ajax({
                 url: "/confirmDeleteModal",
@@ -258,6 +262,82 @@
                     $("#confirmDeleteModalContainer").html(data)
                 }
             })
+        }
+
+        function getDropdownSelectedValues(dropDownId) {
+            let dropdown = $("#"+dropDownId+" .dropdown-content");
+            let items = dropdown.children();
+            let selectedValues = [];
+            items.each(function () {
+                let input = $(this).find("input");
+                if (input.is(":checked")) {
+                    let value = $(this).children("span")[1].textContent;
+                    selectedValues.push(value);
+                }
+            })
+            return selectedValues;
+        }
+
+        function watchDropdownChanges(dropDownId, callback) {
+            let dropdown = $("#"+dropDownId+" .dropdown-content");
+            let items = dropdown.children();
+            items.each(function () {
+                let input = $(this).find("input");
+                input.on("change", function () {
+                    callback();
+                })
+            })
+        }
+
+        function setTabelaState(state, column = "column-pessoa", defaultOrder = "nome") {
+            if (state) {
+                console.log("state", state)
+                let orderClass = state.direction == 1 ? "order-by-up" : "order-by-down"
+                $("#" + state.column).addClass(orderClass)
+                $("#" + state.column).find("i").each(function () {
+                    $(this).addClass("current-order-by")
+                })
+                $("#" + state.column).find("span").each(function () {
+                    console.log($(this))
+                    $(this).addClass("current-order-by")
+                })
+                $("th[id^='" + column + "-']").each(function (i, th) {
+                    if ($(this).attr("id") != state.column) {
+                        $(this).addClass("order-by-up")
+                    }
+                })
+            } else {
+                console.log("else state", state)
+                $("th[id^='" + column + "-']").each(function (i, th) {
+                    if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
+                        $(this).addClass("order-by-up")
+                        console.log($(this).find("i"))
+                        $(this).find("i").each(function () {
+                            $(this).addClass("current-order-by")
+                        })
+                        $(this).find("span").each(function () {
+                            console.log($(this))
+                            $(this).addClass("current-order-by")
+                        })
+                    } else {
+                        $(this).addClass("order-by-up")
+                    }
+                })
+            }
+        }
+
+        function orderTableBy(event, column, orderByInput = "filterPessoa_order_by", loadDataFn) {
+            let orderBy = $("#" + orderByInput).val()
+            let state = {}
+            state.column = $(event).attr("id")
+            if (orderBy == column) {
+                $("#" + orderByInput).val("-" + column)
+                state.direction = 1
+            } else {
+                $("#" + orderByInput).val(column)
+                state.direction = -1
+            }
+            loadDataFn(state)
         }
 
         $(document).ready(function () {

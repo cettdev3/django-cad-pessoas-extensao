@@ -129,14 +129,15 @@ z-index: 4
     px-3 py-3 my-3
     bg-white">
         <div>
-            <input id="nomeCursoFilter" placeholder="Digite um nome" class="form-control-sm border-secondary"
-                name="nome" onchange="buscarCursos('nomeCursoFilter')" type="text">
+            <input id="filterCursoNome" placeholder="Digite um nome" class="form-control-sm border-secondary"
+                name="nome" onchange="buscarCursos()" type="text">
+            <input type="text" hidden name="order_by" id="filterCursoOrder_by">
         </div>
         <div>
             <button id="adicionarPessoas" 
             onclick="carregarCursosModalCadastrar()"
             class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
-                <span> cadastrar curso</span>
+                <span>cadastrar curso</span>
             </button>
         </div>
     </div>
@@ -158,6 +159,17 @@ z-index: 4
     let idTabelaCursos = "receberTabelaCursos"
     let rotaTabelaCursos = "cursosTable"
     let modalCadastrarCursoContainerId = "modalCadastrarCursoContainer"
+    let ensinoFiltersPrefix = "filterCurso"
+
+    function getFiltersCurso() {
+        let filter = {}
+        let filterInputs = document.querySelectorAll(`input[id^=${ensinoFiltersPrefix}]`)
+        filterInputs.forEach((input) => {
+            console.log(`${input.name} : ${input.value} `)
+            filter[input.name] = input.value
+        })
+        return filter
+    }
 
     function deleteCurso(id) {
         deletar_url = "eliminarCurso/" + id
@@ -173,13 +185,14 @@ z-index: 4
         });
     }
 
-    function carregarCursos(filter = null) {
+    function carregarCursos(filter = null, state = null) {
         let recarregarTabela = rotaTabelaCursos
         $.ajax({
             url: recarregarTabela,
             data: filter ? filter : {},
             success: function (data) {
                 $("#"+idTabelaCursos).html(data);
+                setTabelaState(state, "column-curso", "nome");
             }
         });
     }
@@ -200,9 +213,8 @@ z-index: 4
         location.href = "visualizarCurso/" + id
     }
 
-    function buscarCursos(filter) {
-        let value = $("#" + filter).val()
-        carregarCursos({ nome: value })
+    function buscarCursos() {
+        carregarCursos(getFiltersCurso())
     }
 
     $(document).ready(function () {

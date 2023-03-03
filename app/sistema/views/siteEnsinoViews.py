@@ -33,6 +33,7 @@ def ensinosTable(request):
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get('http://localhost:8000/ensino', params={
         'order_by': request.GET.get('order_by'),
+        'observacao': request.GET.get('observacao'),
     }, headers=headers)
     ensinos = json.loads(response.content)
     return render(request,'ensinos/ensinos_table.html',{'ensinos':ensinos})

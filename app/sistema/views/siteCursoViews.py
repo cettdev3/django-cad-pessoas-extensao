@@ -26,11 +26,14 @@ def gerencia_cursos(request):
 
 @login_required(login_url='/auth-user/login-user')
 def cursosTable(request):
-    nome = request.GET.get('nome')
-    cursos = Curso.objects
-    if nome:
-        cursos = cursos.filter(nome__contains = nome)
-    cursos = cursos.all()
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/cursos', params={
+        'nome': request.GET.get('nome'),
+        'order_by': request.GET.get('order_by')
+    }, headers=headers)
+    cursos = json.loads(response.content)
+
     return render(request,'cursos/cursos_table.html',{'cursos':cursos})
 
 @login_required(login_url='/auth-user/login-user')

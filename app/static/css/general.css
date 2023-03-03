@@ -98,7 +98,7 @@
     color: white;
 }
 
-
+/* TABLE HEADERS */
 .clickable-column:hover {
     cursor: pointer;
 }
@@ -139,4 +139,10 @@ th.order-by-up i.current-order-by,
 th.order-by-down i.current-order-by,
 span.column-label.current-order-by  {
     color: #000;
+}
+
+/* INPUT FILTERS */
+.filter-label {
+    line-height: 0;
+    font-size: 0.8rem;
 }

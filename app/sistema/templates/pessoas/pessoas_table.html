@@ -6,7 +6,7 @@
                 <input id="pessoaTableCheckboxAll" type="checkbox">
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-nome" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'nome')" title="Ordenar por Nome">
+                data-placement="top" onclick="orderTableBy(this,'nome', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))" title="Ordenar por Nome">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
@@ -14,7 +14,7 @@
                 </div>
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-email" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'email')" title="Ordenar por email">
+                data-placement="top" onclick="orderTableBy(this,'email', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))" title="Ordenar por email">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
@@ -22,7 +22,7 @@
                 </div>
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-telefone" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'telefone')" title="Ordenar por telefone">
+                data-placement="top" onclick="orderTableBy(this,'telefone', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))" title="Ordenar por telefone">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-1-9 arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-9-1 arrow-up"></i>
@@ -30,7 +30,7 @@
                 </div>
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-cargo" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this, 'cargo')" title="Ordenar por Cargo">
+                data-placement="top" onclick="orderTableBy(this, 'cargo', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))" title="Ordenar por Cargo">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
@@ -38,7 +38,13 @@
                 </div>
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-tipo" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'tipo')" title="Ordenar por Tipo">
+                data-placement="top" onclick="orderTableBy(
+                    this,
+                    'tipo', 
+                    'filterPessoa_order_by', 
+                    (state) => carregarPessoas(getFiltros(), state)
+                )" 
+                title="Ordenar por Tipo">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
@@ -46,7 +52,7 @@
                 </div>
             </th>
             <th class="w-10 text-left clickable-column" id="column-pessoa-contratacoes" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'qtd_contratacoes')"
+                data-placement="top" onclick="orderTableBy(this,'qtd_contratacoes', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))"
                 title="Ordenar por Quantidade de Contratações">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-1-9 arrow-down"></i>
@@ -91,55 +97,6 @@
 
 <input hidden type="number" value="0" id="pessoasTableActiveCheckBoxes">
 <script>
-
-    function setTabelaPessoaState(state) {
-        if (state) {
-            let orderClass = state.direction == 1 ? "order-by-up" : "order-by-down"
-            $("#" + state.column).addClass(orderClass)
-            $("#" + state.column).find("i").each(function () {
-                $(this).addClass("current-order-by")
-            })
-            $("#" + state.column).find("span").each(function () {
-                console.log($(this))
-                $(this).addClass("current-order-by")
-            })
-            $("th[id^='column-pessoa-']").each(function (i, th) {
-                if ($(this).attr("id") != state.column) {
-                    $(this).addClass("order-by-up")
-                }
-            })
-        } else {
-            $("th[id^='column-pessoa-']").each(function (i, th) {
-                if ($(this).attr("id") == "column-pessoa-nome") {
-                    $(this).addClass("order-by-up")
-                    console.log($(this).find("i"))
-                    $(this).find("i").each(function () {
-                        $(this).addClass("current-order-by")
-                    })
-                    $(this).find("span").each(function () {
-                        console.log($(this))
-                        $(this).addClass("current-order-by")
-                    })
-                } else {
-                    $(this).addClass("order-by-up")
-                }
-            })
-        }
-    }
-
-    function orderTableBy(event, column) {
-        let orderBy = $("#filterPessoa_order_by").val()
-        let state = {}
-        state.column = $(event).attr("id")
-        if (orderBy == column) {
-            $("#filterPessoa_order_by").val("-" + column)
-            state.direction = 1
-        } else {
-            $("#filterPessoa_order_by").val(column)
-            state.direction = -1
-        }
-        carregarPessoas(getFiltros(), state)
-    }
 
     $(document).ready(function () {
         function isvisibleOnViewport(element) {

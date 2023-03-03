@@ -28,6 +28,7 @@ class PessoaApiView(APIView):
         data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
         data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
         is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
+        cursos = request.GET.getlist('cursos') if request.GET.getlist('cursos') != "None" else None
         order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
 
         pessoas = Pessoas.objects
@@ -56,7 +57,9 @@ class PessoaApiView(APIView):
             pessoas = pessoas.order_by(order_by)
         else:
             pessoas = pessoas.order_by('nome')
-            
+        if len(cursos) > 0:
+            pessoas = pessoas.filter(cursos__in=cursos).distinct()
+
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
 
