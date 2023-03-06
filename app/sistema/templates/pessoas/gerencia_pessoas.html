@@ -181,6 +181,7 @@ z-index: 4
                 <span> Horas Trabalhadas </span>
             </button>
             <button id="adicionarPessoas" 
+            type="button"
             onclick="carregarPessoasModalCadastrar()"
             class="btn-cadastrar rounded d-flex justify-content-between align-items-center ml-1">
                 <span> cadastrar pessoa</span>
@@ -468,7 +469,7 @@ z-index: 4
             })
         });
         
-        $("input[id^='"+filterPrefix+"']").each(function () {
+        $("*[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
             if ($(this).attr("id").includes("NomePessoa")) {
                 $(this)

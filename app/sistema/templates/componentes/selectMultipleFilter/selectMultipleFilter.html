@@ -1,9 +1,5 @@
 <style>
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-content {
+    .select-dropdown-content {
         display: none;
         position: absolute;
         background-color: #f9f9f9;
@@ -12,7 +8,7 @@
         z-index: 1;
     }
 
-    .dropdown-inputed-item {
+    .select-dropdown-inputed-item {
         position: relative;
         display: inline-block;
         padding: 2px 8px;
@@ -20,13 +16,13 @@
         width: 100%;
     }
 
-    .dropdown-inputed-item:hover {
+    .select-dropdown-inputed-item:hover {
         background-color: #ccc;
         cursor: pointer;
         color: white;
     }
     
-    .selected-dropdown-item {
+    .select-selected-dropdown-item {
         background-color: #ddd;
     }
 
@@ -39,10 +35,10 @@
         <input class="form-control-sm border-secondary" 
         type="text"
         placeholder="{{placeholder}}">
-        <div class="dropdown">
-            <div class="dropdown-content">
+        <div style="position:relative">
+            <div class="select-dropdown-content">
                 {% for item in items %}
-                <div class="dropdown-inputed-item" 
+                <div class="select-dropdown-inputed-item" 
                 id="drop-down-item-1"
                 style="z-index: 1;"
                 onclick="selectDropdownItem(this, '{{item.nome}}')">
@@ -68,7 +64,7 @@
     let selectMultipleDropdownId = "{{id}}";
 
     function filterItems(query) {
-        let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+        let dropdown = $("#"+selectMultipleDropdownId+" .select-dropdown-content");
         let items = dropdown.children();
         items.each(function () {
             let textContent = $(this).children("span").text();
@@ -81,7 +77,7 @@
     }
 
     function isClickInsideDropdown(event) {
-        let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+        let dropdown = $("#"+selectMultipleDropdownId+" .select-dropdown-content");
         let input = $("#"+selectMultipleDropdownId+" input");
         let reseult = dropdown.has(event.target).length > 0 || dropdown.is(event.target);
         reseult = reseult || input.has(event.target).length > 0 || input.is(event.target);
@@ -95,13 +91,13 @@
         let currentChecked = !input.is(":checked");
         input.prop("checked", currentChecked);
         input.trigger("change");
-        $(item).toggleClass("selected-dropdown-item");
+        $(item).toggleClass("select-selected-dropdown-item");
     }
 
     $(document).ready(function () {
         let input = $("#"+selectMultipleDropdownId+" input");
         input.focus(function () {
-            let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+            let dropdown = $("#"+selectMultipleDropdownId+" .select-dropdown-content");
             dropdown.show();
             keepFocus = true
         })
@@ -131,7 +127,7 @@
         })
 
         $(document).click(function (event) {
-            let dropdown = $("#"+selectMultipleDropdownId+" .dropdown-content");
+            let dropdown = $("#"+selectMultipleDropdownId+" .select-dropdown-content");
             if (isClickInsideDropdown(event)) return
 
             let input = $("#"+selectMultipleDropdownId+" input");
