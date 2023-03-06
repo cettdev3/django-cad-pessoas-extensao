@@ -307,7 +307,6 @@
                     }
                 })
             } else {
-                console.log("else state", state)
                 $("th[id^='" + column + "-']").each(function (i, th) {
                     if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
                         $(this).addClass("order-by-up")

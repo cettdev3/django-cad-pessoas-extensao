@@ -47,6 +47,7 @@
                 style="z-index: 1;"
                 onclick="selectDropdownItem(this, '{{item.nome}}')">
                     <input 
+                    onclick="selectDropdownItem(this, '{{item.nome}}')"
                     type="checkbox" 
                     name="cursos" 
                     value="1">
@@ -88,7 +89,9 @@
     }
 
     function selectDropdownItem(item , value) {
-        let input = $(item).find("input");
+        let input = $(item)
+        if ($(item).attr("type") != "checkbox") input = $(item).find("input");
+
         let currentChecked = !input.is(":checked");
         input.prop("checked", currentChecked);
         input.trigger("change");
