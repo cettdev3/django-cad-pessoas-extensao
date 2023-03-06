@@ -69,7 +69,14 @@
             <td class="select-row">
                 <input id="pessoaTableCheckboxRow-{{pessoa.id}}" type="checkbox">
             </td>
-            <td class="w-10 text-left">{{pessoa.nome}}</td>
+            <td class="w-10 text-left">
+                <span>{{pessoa.nome}}</span>
+                <div>
+                    {% for curso in pessoa.cursos %}
+                    <span class="badge badge-pill badge-secondary">{{curso.nome}}</span>
+                    {% endfor %}
+                </div>
+            </td>
             <td class="w-10 text-left">{{pessoa.email}}</td>
             <td class="w-10 text-left">{{pessoa.telefone}}</td>
             <td class="w-10 text-left">{{pessoa.cargo}}</td>
