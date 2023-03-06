@@ -34,6 +34,9 @@ def ensinosTable(request):
     response = requests.get('http://localhost:8000/ensino', params={
         'order_by': request.GET.get('order_by'),
         'observacao': request.GET.get('observacao'),
+        'data_inicio': request.GET.get('data_inicio'),
+        'data_fim': request.GET.get('data_fim'),
+        'escolas': request.GET.getlist('escolas[]'),
     }, headers=headers)
     ensinos = json.loads(response.content)
     return render(request,'ensinos/ensinos_table.html',{'ensinos':ensinos})

@@ -27,11 +27,25 @@ class EnsinoApiView(APIView):
     def get(self, request, *args, **kwargs):
         order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
         observacao = request.GET.get('observacao') if request.GET.get('observacao') != "None" else None
+        data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
+        data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
+        escolas = request.GET.getlist('escolas') if request.GET.getlist('escolas') != "None" else None
+
         ensinos = Ensino.objects
-        if order_by:
-            ensinos = ensinos.order_by(order_by)
         if observacao:
             ensinos = ensinos.filter(observacao__icontains=observacao)
+        if data_inicio:
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_inicio = datetime.combine(data_inicio, datetime.min.time())
+            ensinos = ensinos.filter(data_inicio__gte=data_inicio)
+        if data_fim:
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+            data_fim = datetime.combine(data_fim, datetime.max.time())
+            ensinos = ensinos.filter(data_fim__lte=data_fim)
+        if escolas:
+            ensinos = ensinos.filter(escola__id__in=escolas)
+        if order_by:
+            ensinos = ensinos.order_by(order_by)
         else:
             ensinos = ensinos.order_by("data_inicio")
         ensinos = ensinos.all()

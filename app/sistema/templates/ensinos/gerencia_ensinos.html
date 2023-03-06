@@ -129,32 +129,36 @@ z-index: 4
     px-3 py-3 my-3
     bg-white">
         <div class="d-flex justify-content-start align-items-center">
-            <input id="filterEnsinoOrder_by"
-            hidden 
-            placeholder="Digite um nome" 
-            class="mx-2 form-control-sm border-secondary"
+            <input id="filterEnsinoOrder_by" hidden 
             name="order_by" type="text">
             <div class="d-flex flex-column justify-content-start align-items-start mx-2">
-                
+                <label for="filterEnsinoObservacao" class="filter-label">Busca</label>
                 <input id="filterEnsinoObservacao" 
                 placeholder="Procurar por etapa" 
-                class="mx-2 form-control-sm border-secondary"
+                class="form-control-sm border-secondary"
                 name="observacao" type="text">
             </div>
             <div class="d-flex flex-column justify-content-start align-items-start mx-2">
                 <label for="filterEnsinoDataInicio"
-                style="line-height: 0; font-size: 0.8rem;">Data início</label>
+                class="filter-label">Data de início da ação</label>
                 <input id="filterEnsinoDataInicio"
                 placeholder="Procurar por data de início"
                 type="date"
                 class="form-control-sm border-secondary"
                 name="data_inicio">
             </div>
-            <input id="filterEnsinoDataFim"
-            placeholder="Procurar por data de fim"
-            type="date"
-            class="mx-2 form-control-sm border-secondary"
-            name="data_fim">
+            <div class="mx-2  d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterEnsinoDataInicio"
+                class="filter-label">Data de fim da ação</label>
+                <input id="filterEnsinoDataFim"
+                placeholder="Procurar por data de fim"
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_fim">
+            </div>
+            <div class="mx-2 d-flex justify-content-start align-items-center"
+            id="FilterSelectEscolas">
+            </div>
         </div>
         <div>
             <button id="adicionarPessoas" 
@@ -196,6 +200,7 @@ z-index: 4
         filterInputs.forEach((input) => {
             filter[input.name] = input.value
         })
+        filter['escolas'] = getDropdownSelectedValues("select-multiple-dropdown-escolas")
         return filter
     }
 
@@ -243,6 +248,23 @@ z-index: 4
         
     function visualizarEnsino(id) {
         location.href = rotaVisualizarEnsino+"/" + id
+    }
+
+    function loadFilterSelectCurso() {
+        let url = "/filterMultipleSelect" 
+        $.ajax({
+            url: url,
+            data: {
+                "label": "Escolas",
+                "placeholder": "Filtrar por escolas",
+                "route": "escolas",
+                "id": "select-multiple-dropdown-escolas",
+            },
+            success: function (data) {
+                $("#FilterSelectEscolas").html(data)
+                watchDropdownChanges("select-multiple-dropdown-escolas", filtrarAcoesEnsino)
+            }
+        });
     }
 
     $(document).ready(function () {
@@ -298,6 +320,7 @@ z-index: 4
         });
 
         carregarEnsinos(getFiltersEnsino())
+        loadFilterSelectCurso()
     });
 
 </script>
