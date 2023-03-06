@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
+from django.db.models import Q
 
 class DpEventoApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -38,6 +39,22 @@ class DpEventoApiView(APIView):
 
         if request.GET.get("tipo"):
             dp_eventos = dp_eventos.filter(tipo__icontains=request.GET.get("tipo"))
+        if request.GET.get('data_inicio') and not request.GET.get('data_fim'):
+            dp_eventos = dp_eventos.filter(data_inicio__gte=request.GET.get('data_inicio'))
+        if request.GET.get('data_fim') and not request.GET.get('data_inicio'):
+            dp_eventos = dp_eventos.filter(data_fim__lte=request.GET.get('data_fim'))
+        if request.GET.get('data_inicio') and request.GET.get('data_fim'):
+            data_fim = datetime.strptime(request.GET.get('data_fim'), '%Y-%m-%d')
+            data_fim = datetime.combine(data_fim, datetime.max.time())
+            data_inicio = datetime.strptime(request.GET.get('data_inicio'), '%Y-%m-%d')
+            data_inicio = datetime.combine(data_inicio, datetime.min.time())
+            dp_eventos = dp_eventos.filter(Q(data_inicio__range=[data_inicio, data_fim]) | 
+                                 Q(data_fim__range=[data_inicio, data_fim]))
+        if request.GET.get("order_by"):
+            dp_eventos = dp_eventos.order_by(request.GET.get("order_by"))
+        else:
+            dp_eventos = dp_eventos.order_by("-data_inicio")
+
         reset_queries()
         dp_eventos = dp_eventos.all()
         serializer = DpEventoSerializer(dp_eventos, many=True)

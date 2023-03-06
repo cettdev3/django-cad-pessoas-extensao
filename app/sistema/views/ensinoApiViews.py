@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status as str
 from rest_framework import permissions
 from django.db import transaction
+from django.db.models import Q
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.alocacao import Alocacao
@@ -34,20 +35,27 @@ class EnsinoApiView(APIView):
         ensinos = Ensino.objects
         if observacao:
             ensinos = ensinos.filter(observacao__icontains=observacao)
-        if data_inicio:
+        if data_inicio and not data_fim:
             data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
             data_inicio = datetime.combine(data_inicio, datetime.min.time())
             ensinos = ensinos.filter(data_inicio__gte=data_inicio)
-        if data_fim:
+        if data_fim and not data_inicio:
             data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
             data_fim = datetime.combine(data_fim, datetime.max.time())
             ensinos = ensinos.filter(data_fim__lte=data_fim)
+        if data_inicio and data_fim:
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+            data_fim = datetime.combine(data_fim, datetime.max.time())
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_inicio = datetime.combine(data_inicio, datetime.min.time())
+            ensinos = ensinos.filter(Q(data_inicio__range=[data_inicio, data_fim]) | 
+                                 Q(data_fim__range=[data_inicio, data_fim]))
         if escolas:
             ensinos = ensinos.filter(escola__id__in=escolas)
         if order_by:
             ensinos = ensinos.order_by(order_by)
         else:
-            ensinos = ensinos.order_by("data_inicio")
+            ensinos = ensinos.order_by("-data_inicio")
         ensinos = ensinos.all()
         serializer = EnsinoSerializer(ensinos, many=True)
         return Response(serializer.data, status=str.HTTP_200_OK)

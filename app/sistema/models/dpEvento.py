@@ -11,6 +11,7 @@ class DpEvento(models.Model):
     GOIAS_FEITO_A_MAO = 'goias_feito_a_mao'
     FEIRAO  = 'feirao'
     MUTIRAO  = 'mutirao'
+    OUTRO = 'outro'
 
     MAPPED_TIPOS = [
         EMPRESTIMO
@@ -95,4 +96,22 @@ class DpEvento(models.Model):
             return "Goiás Feito a Mão"
         elif self.tipo == self.MUTIRAO:
             return "Mutirão"
+        elif self.tipo == self.OUTRO:
+            return "Outro"
         return "Evento não identificado"
+
+    @property
+    def tipo_foramtado(self):
+        if self.tipo == self.EMPRESTIMO:
+            return "Empréstimo"
+        if self.tipo == self.CURSO_GPS:
+            return "Curso GPS"
+        if self.tipo == self.FEIRAO:
+            return "Feirão do Emprego"
+        if self.tipo == self.GOIAS_FEITO_A_MAO:
+            return "Goiás Feito a Mão"
+        if self.tipo == self.MUTIRAO:
+            return "Mutirão"
+        if self.tipo == self.OUTRO:
+            return "Outro"
+        return self.tipo.replace("_", " ").capitalize()

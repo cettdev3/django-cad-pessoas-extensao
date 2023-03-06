@@ -39,11 +39,18 @@ def gerencia_dp_eventos(request):
 @login_required(login_url='/auth-user/login-user')
 def dpEventoTable(request):
     tipo = request.GET.get('tipo')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    order_by = request.GET.get('order_by')
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = {"tipo": tipo}
 
-    dpEventoResponse = requests.get('http://localhost:8000/dp-eventos', json=body, headers=headers)
+    dpEventoResponse = requests.get('http://localhost:8000/dp-eventos', params={
+        'tipo': tipo,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'order_by': order_by
+    }, headers=headers)
     dpEventoResponseStatusCode = dpEventoResponse.status_code
     dpEventoResponse = json.loads(dpEventoResponse.content.decode())
     

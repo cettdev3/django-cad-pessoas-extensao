@@ -10,6 +10,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
     endereco_completo = serializers.CharField(read_only=True)
     data_inicio_formatada = serializers.CharField(read_only=True)
     data_inicio_formatada = serializers.CharField(read_only=True)
+    tipo_foramtado = serializers.CharField(read_only=True)
     
     class Meta:
         model = DpEvento
@@ -32,6 +33,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "endereco_completo",
             "data_inicio_formatada",
             "data_fim_formatada",
+            "tipo_foramtado",
             "membroexecucao_set"
         ]
         depth = 5

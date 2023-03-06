@@ -230,7 +230,7 @@ z-index: 4
             data: filter ? filter : {},
             success: function (data) {
                 $("#"+idTabelaEnsinos).html(data);
-                setTabelaState(state, "column-ensino", "data_inicio")
+                setTabelaState(state, "column-ensino", "-data_inicio")
             }
         });
     }

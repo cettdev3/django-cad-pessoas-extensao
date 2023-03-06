@@ -13,7 +13,18 @@ class CidadeApiView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
-        cidades = Cidade.objects.all()
+        order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
+        nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
+
+        cidades = Cidade.objects
+        if nome:
+            cidades = cidades.filter(nome__icontains=nome)
+        if order_by:
+            cidades = cidades.order_by(order_by)
+        else:
+            cidades = cidades.order_by("nome")
+            
+        cidades = cidades.all()
         serializer = CidadeSerializer(cidades, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -301,13 +301,13 @@
                     console.log($(this))
                     $(this).addClass("current-order-by")
                 })
-                $("th[id^='" + column + "-']").each(function (i, th) {
+                $("*[id^='" + column + "-']").each(function (i, th) {
                     if ($(this).attr("id") != state.column) {
                         $(this).addClass("order-by-up")
                     }
                 })
             } else {
-                $("th[id^='" + column + "-']").each(function (i, th) {
+                $("*[id^='" + column + "-']").each(function (i, th) {
                     if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
                         $(this).addClass("order-by-up")
                         console.log($(this).find("i"))

@@ -135,8 +135,8 @@
     display: inline;
 }
 
-th.order-by-up i.current-order-by,
-th.order-by-down i.current-order-by,
+*.order-by-up i.current-order-by,
+*.order-by-down i.current-order-by,
 span.column-label.current-order-by  {
     color: #000;
 }
