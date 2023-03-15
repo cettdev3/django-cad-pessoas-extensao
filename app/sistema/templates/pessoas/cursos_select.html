@@ -73,13 +73,18 @@
         display: flex;
         justify-content: start;
     }
+
+    .dropdown-inputed-container::-webkit-scrollbar {
+        height: 5px;
+        background: gray;
+    }
 </style>
 <label><b>Cursos:</b></label>
+<div id="inputedValues" class="dropdown-inputed-container" style="max-width: 300px;" hidden></div>
 <div id="dropdown-cursos">
     <div class="dropdown">
         <div class="dflex felx-row">
-            <div id="inputedValues" class="dropdown-inputed-container"></div>
-            <input id="dropdowninput" class="dropdown-input" type="text">
+            <input id="dropdowninput" class="dropdown-input" placeholder="selecione os cursos" type="text">
         </div>
         <div class="dropdown-content">
             {% for curso in cursos %}
