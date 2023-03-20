@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="cadastrarAvaliacaoModal" tabindex="-1" role="dialog"
     aria-labelledby="cadastrarAvaliacaoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -21,114 +22,172 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="w-100">
-                    <!-- <ul class="nav nav-tabs row">
-                        <li id="avaliacaoList1" class="col py-2 active-form-tab">
-                            <a id="avaliacaoMenuLink1" 
-                            style="display: none;" 
-                            href="#home">1</a>
-                            <span>Dados Gerais</span>
-                        </li>
-                    </ul> -->
-                    <form id="cadastrarAvaliacaoForm" action="/" method="POST">
-                        <div class="tab-content">
-                            <div id="home" class="tab-pane py-3 active">
-                                <div class="form-group row">
-                                    <div id="membroExecucaoSelectContainer" class="col-sm-4">
+                <ul class="nav nav-pills mb-3 custom-tab-ul" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="avaliacao-dados-gerais-tab" data-toggle="pill" href="#avaliacao-dados-gerais" role="tab" aria-controls="avaliacao-dados-gerais" aria-selected="true">Dados Gerais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="avaliacao-info-tab" data-toggle="pill" href="#avaliacao-info" role="tab" aria-controls="avaliacao-info" aria-selected="false">Informações</a>
+                    </li>
+                </ul>
+                <form id="cadastrarAvaliacaoForm" action="/" method="POST">
+                <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="avaliacao-dados-gerais" role="tabpanel" aria-labelledby="avaliacao-dados-gerais-tab">
+                    <div class="w-100">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane py-3 active">
+                                    <div class="form-group row">
+                                        <div id="membroExecucaoSelectContainer" class="col-sm-4">
+                                        </div>
                                     </div>
-                                </div>
-                                {% if acao %}
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
-                                        <span>Usar endereço da ação</span> 
+                                    {% if acao %}
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
+                                            <span>Usar endereço da ação</span> 
+                                        </div>
                                     </div>
-                                </div>
-                                {% endif %}
-                                {% if evento %}
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
-                                        <span>Usar endereço do evento</span> 
+                                    {% endif %}
+                                    {% if evento %}
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <input id="avaliacao-user-acao-endereco" type="checkbox" class="mr-1">
+                                            <span>Usar endereço do evento</span> 
+                                        </div>
                                     </div>
-                                </div>
-                                {% endif %}
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Logradouro:</b></label>
-                                        <input type="text"
-                                        required
-                                        class="form-control"
-                                        {% if avaliacao.id %}
-                                        value="{{avaliacao.logradouro}}"
-                                        {% endif %}
-                                        id="logradouro"
-                                        name="logradouro">
+                                    {% endif %}
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label><b>Logradouro:</b></label>
+                                            <input type="text"
+                                            required
+                                            class="form-control"
+                                            {% if avaliacao.id %}
+                                            value="{{avaliacao.logradouro}}"
+                                            {% endif %}
+                                            id="logradouro"
+                                            name="logradouro">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label><b>Bairro:</b></label>
+                                            <input type="text"
+                                            required
+                                            class="form-control"
+                                            {% if avaliacao.id %}
+                                            value="{{avaliacao.bairro}}"
+                                            {% endif %}
+                                            id="bairro"
+                                            name="bairro">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label><b>CEP:</b></label>
+                                            <input type="text"
+                                            required
+                                            class="form-control"
+                                            {% if avaliacao.id %}
+                                            value="{{avaliacao.cep}}"
+                                            {% endif %}
+                                            id="cep"
+                                            name="cep">
+                                        </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Bairro:</b></label>
-                                        <input type="text"
-                                        required
-                                        class="form-control"
-                                        {% if avaliacao.id %}
-                                        value="{{avaliacao.bairro}}"
-                                        {% endif %}
-                                        id="bairro"
-                                        name="bairro">
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>CEP:</b></label>
-                                        <input type="text"
-                                        required
-                                        class="form-control"
-                                        {% if avaliacao.id %}
-                                        value="{{avaliacao.cep}}"
-                                        {% endif %}
-                                        id="cep"
-                                        name="cep">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div id="cidadesSelectContainer" class="col-sm-4">
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <label><b>Complemento:</b></label>
-                                        <input type="text"
-                                        required
-                                        class="form-control"
-                                        {% if avaliacao.id %}
-                                        value="{{avaliacao.complemento}}"
-                                        {% endif %}
-                                        id="complemento"
-                                        name="complemento">
+                                    <div class="form-group row">
+                                        <div id="cidadesSelectContainer" class="col-sm-4">
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <label><b>Complemento:</b></label>
+                                            <input type="text"
+                                            required
+                                            class="form-control"
+                                            {% if avaliacao.id %}
+                                            value="{{avaliacao.complemento}}"
+                                            {% endif %}
+                                            id="complemento"
+                                            name="complemento">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        {% if avaliacao.acao %}
-                        <input type="text" hidden 
-                        id="acao_id"
-                        name="acao_id" 
-                        value="{{avaliacao.acao.id}}">
-                        {% elif acao %}
-                        <input type="text" hidden 
-                        id="acao_id"
-                        name="acao_id" 
-                        value="{{acao.id}}">
-                        {% endif %}
+                            {% if avaliacao.acao %}
+                            <input type="text" hidden 
+                            id="acao_id"
+                            name="acao_id" 
+                            value="{{avaliacao.acao.id}}">
+                            {% elif acao %}
+                            <input type="text" hidden 
+                            id="acao_id"
+                            name="acao_id" 
+                            value="{{acao.id}}">
+                            {% endif %}
 
-                        {% if avaliacao.evento %}
-                        <input type="text" hidden
-                        id="evento_id"
-                        name="evento_id"
-                        value="{{avaliacao.evento.id}}">
-                        {% elif evento %}
-                        <input type="text" hidden
-                        id="evento_id"
-                        name="evento_id"
-                        value="{{evento.id}}">
-                        {% endif %}
-                    </form>
+                            {% if avaliacao.evento %}
+                            <input type="text" hidden
+                            id="evento_id"
+                            name="evento_id"
+                            value="{{avaliacao.evento.id}}">
+                            {% elif evento %}
+                            <input type="text" hidden
+                            id="evento_id"
+                            name="evento_id"
+                            value="{{evento.id}}">
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+                <div class="tab-pane fade" 
+                id="avaliacao-info" 
+                role="tabpanel" 
+                aria-labelledby="avaliacao-info-tab">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label><b>Observações Gerais: {{avaliacao.observacaoGeralUpdatedAt}}</b></label>
+                            <textarea class="form-control" id="observacaoGeral" name="observacaoGeral" rows="3">{{avaliacao.observacaoGeral}}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label><b>Quantidade de salas: {{avaliacao.qtdSalasUpdatedAt}}</b></label>
+                            <select class="form-control" 
+                            id="qtdSalas" 
+                            name="qtdSalas">
+                                <option 
+                                {% if avaliacao.qtdSalas == 0 %} selected {% endif %}
+                                value="1">0</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 1 %} selected {% endif %}
+                                value="1">1</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 2 %} selected {% endif %}
+                                value="2">2</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 3 %} selected {% endif %}
+                                value="3">3</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 4 %} selected {% endif %}
+                                value="4">4</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 5 %} selected {% endif %}
+                                value="5">5</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 6 %} selected {% endif %}
+                                value="6">6</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 7 %} selected {% endif %}
+                                value="7">7</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 8 %} selected {% endif %}
+                                value="8">8</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 9 %} selected {% endif %}
+                                value="9">9</option>
+                                <option 
+                                {% if avaliacao.qtdSalas == 10 %} selected {% endif %}
+                                value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -166,7 +225,7 @@
 <span hidden id="acao-complemento">{{evento.complemento}}</span>
 <span hidden id="acao-cidade">{{evento.cidade.id}}</span>
 {% endif %}
-<span hidden id="selected-membro-equipe">{% if avaliacao %}{{avaliacao.responsavel.id}}{% endif %}
+<span hidden id="selected-membro-equipe">{% if avaliacao %}{{avaliacao.avaliador.id}}{% endif %}
 </span>
 <script>
     formId = "cadastrarAvaliacaoForm"
@@ -195,7 +254,7 @@
 
     function editarAvaliacao(id) {
         $.ajax({
-            url: "editarAvaliacao/"+id,
+            url: "/updateAvaliacao/"+id,
             data: JSON.stringify({"data":getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",

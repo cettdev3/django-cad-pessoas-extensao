@@ -13,6 +13,7 @@ cellspacing="0">
         <tr class="">
             <th class="avaliaceos-w-30 text-left">Avaliador</th>
             <th class="avaliaceos-w-55 text-left">Endereco</th>
+            <th class="avaliaceos-w-55 text-left">Status</th>
             <th class="w-2 text-left">Ação</th>
         </tr>
     </thead>
@@ -21,6 +22,7 @@ cellspacing="0">
         <tr>
             <td class="avaliaceos-w-30 text-left">{{avaliacao.avaliador.pessoa.nome}}</td>
             <td class="avaliaceos-w-55 text-left">{{avaliacao.endereco_completo}}</td>
+            <td class="avaliaceos-w-55 text-left">{{avaliacao.qtdSalas}} : {{avaliacao.observacaoGeral}}</td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuAvaliacoes{{avaliacao.id}}" 
                 class="btn-circle">
@@ -31,7 +33,7 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizaravaliacao{{avaliacao.id}}" href="/visualizarAvaliacao/({{avaliacao.id}})"></a>
                     <!-- <button onclick="visualizarAvaliacao({{avaliacao.id}})">Visualizar</button>  -->
-                    <!-- <button onclick="carregarAvaliacoesModalCadastrar('{{avaliacao.id}}')">Editar</button>  -->
+                    <button onclick="carregarAvaliacoesModalEditar('{{avaliacao.id}}', '{{avaliacao.evento.id}}')">Editar</button>
                     <button onclick="openDeleteModal(() => deleteAvaliacao('{{avaliacao.id}}'))" >Excluir</button>
                 </div>
             </td>
@@ -47,6 +49,25 @@ cellspacing="0">
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             success: function (data) {
                 carregarAvaliacaoLocal()
+            }
+        });
+    }
+
+    function carregarAvaliacoesModalEditar(id, dpEventoId) {
+        console.log("carregarAvaliacoesModalEditar id: ", id)
+        console.log("carregarAvaliacoesModalEditar dpEventoId: ", dpEventoId)
+        $.ajax({
+            url: "/avaliacaoModal",
+            method: "GET",
+            data: {
+                dp_evento_id: dpEventoId,
+                avaliacao_id: id
+            },
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            success: function (data) {
+                $("#modalAvaliacaoContainer").html('');
+                $("#modalAvaliacaoContainer").html(data);
+                $('#cadastrarAvaliacaoModal').modal('show');
             }
         });
     }
@@ -95,7 +116,7 @@ cellspacing="0">
                 }
             })
         });
-
+  
         bindButtons()
      })
 </script>

@@ -146,3 +146,27 @@ span.column-label.current-order-by  {
     line-height: 0;
     font-size: 0.8rem;
 }
+
+/* CUSTOM TABS */
+.custom-tab-ul {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+
+.custom-tab-ul > li {
+    flex: 1 1 0;
+}
+
+.custom-tab-ul a.nav-link {
+    background-color: #15865d;
+    color: white;
+    border-radius: 0;
+}
+
+.custom-tab-ul a.nav-link.active {
+    background-color: #1cc88a;
+    color: white;
+    border-radius: 0;
+}

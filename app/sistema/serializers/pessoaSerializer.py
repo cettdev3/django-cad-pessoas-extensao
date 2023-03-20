@@ -7,7 +7,6 @@ from ..serializers.alocacaoSerializer import AlocacaoSerializer
 class PessoaSerializer(serializers.ModelSerializer):
     count_alocacao = serializers.IntegerField(initial=0, allow_null=True)
     alocacao_set = AlocacaoSerializer(many=True, read_only=True)
-
     class Meta:
         model = Pessoas
         fields = [
@@ -46,6 +45,8 @@ class PessoaSerializer(serializers.ModelSerializer):
             "cursos",
             "alocacao_set",
             "count_alocacao",
-            "user"
+            "username",
+            "password",
+            "is_admin"
         ]
         depth = 2

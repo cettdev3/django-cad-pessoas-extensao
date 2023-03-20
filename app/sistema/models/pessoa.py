@@ -51,3 +51,21 @@ class Pessoas(models.Model):
         dateStr = dateFormt.strftime("%d-%m-%Y")
         dateFormatted = datetime.strptime(dateStr, "%d-%m-%Y")
         return dateFormatted
+    
+    @property
+    def is_admin(self):
+        if not self.user:
+            return False
+        return self.user.has_perm('auth.add_user')
+    
+    @property
+    def username(self):
+        if not self.user:
+            return ""
+        return self.user.username
+    
+    @property
+    def password(self):
+        if not self.user:
+            return ""
+        return self.user.password

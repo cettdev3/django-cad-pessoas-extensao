@@ -1,27 +1,23 @@
 # todo/todo_api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q, Exists, IntegerField, Subquery
-from rest_framework import status as st
-from rest_framework import permissions
+from django.db.models import Q, Count
+from rest_framework import status as st, viewsets
 from ..models.pessoa import Pessoas
-from ..models.alocacao import Alocacao
 from ..models.curso import Curso
 from ..serializers.pessoaSerializer import PessoaSerializer
-from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime
-from django.db import reset_queries
-from django.db import connection
-from django.db.models import Prefetch, Count
 from django.contrib.auth.models import User
+from rest_framework.decorators import action
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get(self, request, *args, **kwargs):
+        has_user = request.GET.get('has_user')
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
         nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
@@ -59,7 +55,8 @@ class PessoaApiView(APIView):
             pessoas = pessoas.order_by('nome')
         if len(cursos) > 0:
             pessoas = pessoas.filter(cursos__in=cursos).distinct()
-
+        if has_user:
+            pessoas = pessoas.filter(user__isnull=False)
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
 
@@ -279,3 +276,17 @@ class PessoaDetailApiView(APIView):
             {"res": "pessoa deletada!"},
             status=st.HTTP_200_OK
         )
+
+class PessoaViewSets(viewsets.ModelViewSet):
+    queryset = Pessoas.objects.all() # a queryset variable is mandatory
+    serializer_class = PessoaSerializer 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
+
+    @action(methods=["GET"], detail=False, url_path="logged-user")
+    def getLoggedUse(self, *args, **kwargs):
+        user = self.request.user
+        pessoa = Pessoas.objects.filter(user=user).first()
+        if not pessoa: return Response({"res": "Não existe pessoa cadastrada com o usuário informado"}, status=st.HTTP_400_BAD_REQUEST)
+        serializer = PessoaSerializer(pessoa)
+        return Response(data=serializer.data, status=st.HTTP_201_CREATED, content_type="application/json")

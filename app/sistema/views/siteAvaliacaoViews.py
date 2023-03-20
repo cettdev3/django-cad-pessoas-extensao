@@ -47,6 +47,9 @@ def avaliacaoModal(request):
     acao_id = request.GET.get('acao_id')
     evento_id = request.GET.get('dp_evento_id')
     title = request.GET.get('title')
+    modalId = request.GET.get('modalId')
+    avaliacao_id = request.GET.get('avaliacao_id')
+    print(modalId)
     data = {}
     if acao_id:
         acao = Acao.objects.get(id=acao_id)
@@ -54,6 +57,11 @@ def avaliacaoModal(request):
     if evento_id:
         evento = DpEvento.objects.get(id=evento_id)
         data['evento'] = evento
+    if modalId:
+        data['modalId'] = modalId
+    if avaliacao_id:
+        avaliacao = Avaliacao.objects.get(id=avaliacao_id)
+        data['avaliacao'] = avaliacao
     data['title'] = title
     return render(request,'avaliacoes/avaliacaoModal.html',data)
 
@@ -64,4 +72,13 @@ def saveAvaliacao(request):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     response = requests.post('http://localhost:8000/avaliacoes', json=body, headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def updateAvaliacao(request, id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)['data']
+    print("dados para update avaliacao",body)
+    response = requests.put('http://localhost:8000/avaliacoes/'+str(id), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)

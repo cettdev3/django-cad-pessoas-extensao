@@ -11,3 +11,4 @@ celery
 redis
 djangorestframework-simplejwt
 python-docx
+ntplib
