@@ -20,19 +20,26 @@
             <div class="modal-body">
                 <ul class="nav nav-pills mb-3 custom-tab-ul" id="pills-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="avaliacao-dados-gerais-tab" data-toggle="pill"
-                            href="#avaliacao-dados-gerais" role="tab" aria-controls="avaliacao-dados-gerais"
+                        <a class="nav-link active" id="avaliacao-avaliador-tab" data-toggle="pill"
+                            href="#avaliacao-avaliador" role="tab" aria-controls="avaliacao-avaliador"
                             aria-selected="true">Avaliador</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="avaliacao-info-tab" data-toggle="pill" href="#avaliacao-info" role="tab"
-                            aria-controls="avaliacao-info" aria-selected="false">Dados Gerais</a>
+                        <a class="nav-link" id="avaliacao-dados-gerais-tab" data-toggle="pill" href="#avaliacao-dados-gerais" role="tab"
+                            aria-controls="avaliacao-dados-gerais" aria-selected="false">Avaliação Gerais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="avaliacao-sala-culinaria-tab" data-toggle="pill" href="#avaliacao-sala-culinaria" role="tab"
+                            aria-controls="avaliacao-sala-culinaria" aria-selected="false">Sala de culinária</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="avaliacao-sala-beleza-tab" data-toggle="pill" href="#avaliacao-sala-beleza" role="tab"
+                            aria-controls="avaliacao-sala-beleza" aria-selected="false">Sala de serviços de beleza</a>
                     </li>
                 </ul>
                 <form id="cadastrarAvaliacaoForm" action="/" method="POST">
                     <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade show active" id="avaliacao-dados-gerais" role="tabpanel"
-                            aria-labelledby="avaliacao-dados-gerais-tab">
+                        <div class="tab-pane fade show active" id="avaliacao-avaliador" role="tabpanel" aria-labelledby="avaliacao-avaliador-tab">
                             <div class="w-100">
                                 <div class="tab-content">
                                     <div id="home" class="tab-pane py-3 active">
@@ -100,196 +107,587 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="avaliacao-dados-gerais" role="tabpanel" aria-labelledby="avaliacao-dados-gerais-tab">
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label><b>Observações Gerais:</b></label>
+                                    <textarea class="form-control" id="observacaoGeral" name="observacaoGeral"
+                                        rows="3">{{avaliacao.observacaoGeral|default_if_none:''}}</textarea>
+                                </div>
+                            </div>
+        
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <label><b>Quantidade de salas:</b></label>
+                                    <select class="form-control" id="qtdSalas" name="qtdSalas">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.qtdSalas == 0 %} selected {% endif %} value="1">0</option>
+                                        <option {% if avaliacao.qtdSalas == 1 %} selected {% endif %} value="1">1</option>
+                                        <option {% if avaliacao.qtdSalas == 2 %} selected {% endif %} value="2">2</option>
+                                        <option {% if avaliacao.qtdSalas == 3 %} selected {% endif %} value="3">3</option>
+                                        <option {% if avaliacao.qtdSalas == 4 %} selected {% endif %} value="4">4</option>
+                                        <option {% if avaliacao.qtdSalas == 5 %} selected {% endif %} value="5">5</option>
+                                        <option {% if avaliacao.qtdSalas == 6 %} selected {% endif %} value="6">6</option>
+                                        <option {% if avaliacao.qtdSalas == 7 %} selected {% endif %} value="7">7</option>
+                                        <option {% if avaliacao.qtdSalas == 8 %} selected {% endif %} value="8">8</option>
+                                        <option {% if avaliacao.qtdSalas == 9 %} selected {% endif %} value="9">9</option>
+                                        <option {% if avaliacao.qtdSalas == 10 %} selected {% endif %} value="10">10</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Tamanho do espaço (m2):</b></label>
+                                    <input type="text" required 
+                                    class="form-control" 
+                                    {% if avaliacao.id %}
+                                    value="{{avaliacao.geralTamanhoEspaco|default_if_none:''}}" 
+                                    {% endif %} 
+                                    id="geralTamanhoEspaco"
+                                    name="geralTamanhoEspaco">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="text-ellipsis"><b>Quantidade de datashow disponível:</b></label>
+                                    <select class="form-control" id="geralQuantidadeDataShow" name="geralQuantidadeDataShow">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 0 %} selected {% endif %} value="1">0
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeDataShow == 10 %} selected {% endif %} value="10">
+                                            10</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>O local tem bebedouro?</b></label>
+                                    <select class="form-control" id="geralHasBebedouro" name="geralHasBebedouro">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralHasBebedouro == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.geralHasBebedouro == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label><b>O local tem rede elétrica adequada?</b></label>
+                                    <select class="form-control" id="geralHasRedeEletrica" name="geralHasRedeEletrica">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralHasRedeEletrica == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.geralHasRedeEletrica == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><b>O local tem cadeiras? (estimativa 40 pessoas)</b></label>
+                                    <select class="form-control" id="geralHasCadeiras" name="geralHasCadeiras">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralHasCadeiras == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.geralHasCadeiras == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><b>O local tem equipe de limpeza?</b></label>
+                                    <select class="form-control" id="geralHasEquipeLimpeza" name="geralHasEquipeLimpeza">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralHasEquipeLimpeza == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.geralHasEquipeLimpeza == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label><b>O local tem iluminação adequada?</b></label>
+                                    <select class="form-control" id="geralHasIluminacao" name="geralHasIluminacao">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralHasIluminacao == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.geralHasIluminacao == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><b>Quantas janelas o local possui?</b></label>
+                                    <select class="form-control" id="geralQuantidadeJanelas" name="geralQuantidadeJanelas">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeJanelas == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><b>Quantos banheiros o local possui?</b></label>
+                                    <select class="form-control" id="geralQuantidadeBanheiros" name="geralQuantidadeBanheiros">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.geralQuantidadeBanheiros == 10 %} selected {% endif %} value="10">
+                                            10</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="avaliacao-sala-culinaria" role="tabpanel" aria-labelledby="avaliacao-sala-culinaria-tab">
+
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <!-- salaCulinariaObservacao -->
+                                    <label><b>Observações sobre a sala de culinária</b></label>
+                                    <textarea class="form-control" id="salaCulinariaObservacao" name="salaCulinariaObservacao" rows="3">{{avaliacao.salaCulinariaObservacao|default_if_none:""}}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaHasEspacoTurmas40Alunos -->
+                                    <label><b>O local possui espaço para turmas de até 40 alunos?</b></label>
+                                    <select class="form-control" 
+                                    id="salaCulinariaHasEspacoTurmas40Alunos" 
+                                    name="salaCulinariaHasEspacoTurmas40Alunos">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaHasEspacoTurmas40Alunos == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaHasEspacoTurmas40Alunos == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaHasVentilacao -->
+                                    <label><b>O local possui ventilação adequada?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaHasVentilacao"
+                                    name="salaCulinariaHasVentilacao">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaHasVentilacao == 'Sim' %} selected {% endif %} value="Sim">Sim
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaHasVentilacao == 'Não' %} selected {% endif %} value="Não">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeTomadas -->
+                                    <label><b>Quantas tomadas o local possui?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeTomadas"
+                                    name="salaCulinariaQuantidadeTomadas">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeTomadas == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeFogoesFuncionando -->
+                                    <label><b>Quantos fogões estão funcionando?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeFogoesFuncionando"
+                                    name="salaCulinariaQuantidadeFogoesFuncionando">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFogoesFuncionando == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeFornosFuncionando -->
+                                    <label><b>Quantos fornos estão funcionando?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeFornosFuncionando"
+                                    name="salaCulinariaQuantidadeFornosFuncionando">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeFornosFuncionando == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaHasIluminacaoAdequada -->
+                                    <label><b>A iluminação é adequada?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaHasIluminacaoAdequada"
+                                    name="salaCulinariaHasIluminacaoAdequada">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 1 %} selected {% endif %} value="1">Sim
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 0 %} selected {% endif %} value="0">Não
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeGeladeirasFuncionando -->
+                                    <label><b>Quantas geladeiras estão funcionando?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeGeladeirasFuncionando"
+                                    name="salaCulinariaQuantidadeGeladeirasFuncionando">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeMesasBancadas -->
+                                    <label><b>Quantas mesas e bancadas disponíveis no local?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeMesasBancadas"
+                                    name="salaCulinariaQuantidadeMesasBancadas">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeMesasBancadas == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadePiasComTorneiraFuncionando -->
+                                    <label><b>Quantas pias com torneira estão funcionando?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadePiasComTorneiraFuncionando"
+                                    name="salaCulinariaQuantidadePiasComTorneiraFuncionando">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeVasilhamesGasComGas -->
+                                    <label><b>Quantos vasilhames de gás estão com gás?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeVasilhamesGasComGas"
+                                    name="salaCulinariaQuantidadeVasilhamesGasComGas">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaCulinariaQuantidadeVasilhamesGasVazios -->
+                                    <label><b>Quantos vasilhames de gás estão vazios?</b></label>
+                                    <select class="form-control"
+                                    id="salaCulinariaQuantidadeVasilhamesGasVazios"
+                                    name="salaCulinariaQuantidadeVasilhamesGasVazios">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="avaliacao-sala-beleza" role="tabpanel" aria-labelledby="avaliacao-sala-beleza-tab">
+
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <!-- salaServicosBelezaObservacao -->
+                                    <label><b>Observações sobre a sala de serviços de beleza</b></label>
+                                    <textarea class="form-control" id="salaServicosBelezaObservacao"
+                                        name="salaServicosBelezaObservacao" rows="3">{% if avaliacao %}{{avaliacao.salaServicosBelezaObservacao|default_if_none:""}}{% endif %}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <!-- salaServicosBelezaHasPontoAguaExterno -->
+                                    <label><b>Existe ponto de água externo?</b></label>
+                                    <select class="form-control" id="salaServicosBelezaHasPontoAguaExterno"
+                                        name="salaServicosBelezaHasPontoAguaExterno">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == true %} selected {% endif %} value="true">Sim
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == false %} selected {% endif %} value="false">Não
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaServicosBelezaQuantidadePiasHigienizacao -->
+                                    <label><b>Quantas pias de higienização existem?</b></label>
+                                    <select class="form-control" id="salaServicosBelezaQuantidadePiasHigienizacao"
+                                        name="salaServicosBelezaQuantidadePiasHigienizacao">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <!-- salaServicosBelezaQuantidadeCadeirasSalao -->
+                                    <label><b>Quantas cadeiras de salão de beleza disponíveis?</b></label>
+                                    <select class="form-control" id="salaServicosBelezaQuantidadeCadeirasSalao"
+                                        name="salaServicosBelezaQuantidadeCadeirasSalao">
+                                        <option value="">Selecione uma opção</option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 0 %} selected {% endif %} value="0">0
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 1 %} selected {% endif %} value="1">1
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 2 %} selected {% endif %} value="2">2
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 3 %} selected {% endif %} value="3">3
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 4 %} selected {% endif %} value="4">4
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 5 %} selected {% endif %} value="5">5
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 6 %} selected {% endif %} value="6">6
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 7 %} selected {% endif %} value="7">7
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 8 %} selected {% endif %} value="8">8
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 9 %} selected {% endif %} value="9">9
+                                        </option>
+                                        <option {% if avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == 10 %} selected {% endif %} value="10">10
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-                <div class="tab-pane fade" id="avaliacao-info" role="tabpanel" aria-labelledby="avaliacao-info-tab">
-                    <div class="form-group row">
-                        <div class="col-sm-12">
-                            <label><b>Observações Gerais:</b></label>
-                            <textarea class="form-control" id="observacaoGeral" name="observacaoGeral"
-                                rows="3">{{avaliacao.observacaoGeral|default_if_none:''}}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-
-
-                        <div class="col-sm-3">
-                            <label><b>Quantidade de salas:</b></label>
-                            <select class="form-control" id="qtdSalas" name="qtdSalas">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.qtdSalas == 0 %} selected {% endif %} value="1">0</option>
-                                <option {% if avaliacao.qtdSalas == 1 %} selected {% endif %} value="1">1</option>
-                                <option {% if avaliacao.qtdSalas == 2 %} selected {% endif %} value="2">2</option>
-                                <option {% if avaliacao.qtdSalas == 3 %} selected {% endif %} value="3">3</option>
-                                <option {% if avaliacao.qtdSalas == 4 %} selected {% endif %} value="4">4</option>
-                                <option {% if avaliacao.qtdSalas == 5 %} selected {% endif %} value="5">5</option>
-                                <option {% if avaliacao.qtdSalas == 6 %} selected {% endif %} value="6">6</option>
-                                <option {% if avaliacao.qtdSalas == 7 %} selected {% endif %} value="7">7</option>
-                                <option {% if avaliacao.qtdSalas == 8 %} selected {% endif %} value="8">8</option>
-                                <option {% if avaliacao.qtdSalas == 9 %} selected {% endif %} value="9">9</option>
-                                <option {% if avaliacao.qtdSalas == 10 %} selected {% endif %} value="10">10</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <label><b>Tamanho do espaço (m2):</b></label>
-                            <input type="text" required class="form-control" {% if avaliacao.id %}
-                                value="{{avaliacao.geralTamanhoEspaco|default_if_none:''}}" {% endif %} id="geralTamanhoEspaco"
-                                name="geralTamanhoEspaco">
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="text-ellipsis"><b>Quantidade de datashow disponível:</b></label>
-                            <select class="form-control" id="geralQuantidadeDataShow" name="geralQuantidadeDataShow">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 0 %} selected {% endif %} value="1">0
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 1 %} selected {% endif %} value="1">1
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 2 %} selected {% endif %} value="2">2
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 3 %} selected {% endif %} value="3">3
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 4 %} selected {% endif %} value="4">4
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 5 %} selected {% endif %} value="5">5
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 6 %} selected {% endif %} value="6">6
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 7 %} selected {% endif %} value="7">7
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 8 %} selected {% endif %} value="8">8
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 9 %} selected {% endif %} value="9">9
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeDataShow == 10 %} selected {% endif %} value="10">
-                                    10</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <label><b>O local tem bebedouro?</b></label>
-                            <select class="form-control" id="geralHasBebedouro" name="geralHasBebedouro">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralHasBebedouro == 'Sim' %} selected {% endif %} value="Sim">Sim
-                                </option>
-                                <option {% if avaliacao.geralHasBebedouro == 'Não' %} selected {% endif %} value="Não">Não
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-4">
-                            <label><b>O local tem rede elétrica adequada?</b></label>
-                            <select class="form-control" id="geralHasRedeEletrica" name="geralHasRedeEletrica">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralHasRedeEletrica == 'Sim' %} selected {% endif %} value="Sim">Sim
-                                </option>
-                                <option {% if avaliacao.geralHasRedeEletrica == 'Não' %} selected {% endif %} value="Não">Não
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label><b>O local tem cadeiras? (estimativa 40 pessoas)</b></label>
-                            <select class="form-control" id="geralHasCadeiras" name="geralHasCadeiras">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralHasCadeiras == 'Sim' %} selected {% endif %} value="Sim">Sim
-                                </option>
-                                <option {% if avaliacao.geralHasCadeiras == 'Não' %} selected {% endif %} value="Não">Não
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label><b>O local tem equipe de limpeza?</b></label>
-                            <select class="form-control" id="geralHasEquipeLimpeza" name="geralHasEquipeLimpeza">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralHasEquipeLimpeza == 'Sim' %} selected {% endif %} value="Sim">Sim
-                                </option>
-                                <option {% if avaliacao.geralHasEquipeLimpeza == 'Não' %} selected {% endif %} value="Não">Não
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-4">
-                            <label><b>O local tem iluminação adequada?</b></label>
-                            <select class="form-control" id="geralHasIluminacao" name="geralHasIluminacao">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralHasIluminacao == 'Sim' %} selected {% endif %} value="Sim">Sim
-                                </option>
-                                <option {% if avaliacao.geralHasIluminacao == 'Não' %} selected {% endif %} value="Não">Não
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label><b>Quantas janelas o local possui?</b></label>
-                            <select class="form-control" id="geralQuantidadeJanelas" name="geralQuantidadeJanelas">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 0 %} selected {% endif %} value="0">0
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 1 %} selected {% endif %} value="1">1
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 2 %} selected {% endif %} value="2">2
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 3 %} selected {% endif %} value="3">3
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 4 %} selected {% endif %} value="4">4
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 5 %} selected {% endif %} value="5">5
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 6 %} selected {% endif %} value="6">6
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 7 %} selected {% endif %} value="7">7
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 8 %} selected {% endif %} value="8">8
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 9 %} selected {% endif %} value="9">9
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeJanelas == 10 %} selected {% endif %} value="10">10
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            <label><b>Quantos banheiros o local possui?</b></label>
-                            <select class="form-control" id="geralQuantidadeBanheiros" name="geralQuantidadeBanheiros">
-                                <option value="">Selecione uma opção</option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 0 %} selected {% endif %} value="0">0
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 1 %} selected {% endif %} value="1">1
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 2 %} selected {% endif %} value="2">2
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 3 %} selected {% endif %} value="3">3
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 4 %} selected {% endif %} value="4">4
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 5 %} selected {% endif %} value="5">5
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 6 %} selected {% endif %} value="6">6
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 7 %} selected {% endif %} value="7">7
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 8 %} selected {% endif %} value="8">8
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 9 %} selected {% endif %} value="9">9
-                                </option>
-                                <option {% if avaliacao.geralQuantidadeBanheiros == 10 %} selected {% endif %} value="10">
-                                    10</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...
-                </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button {% if avaliacao %} onclick="editarAvaliacao('{{avaliacao.id}}')" {% else %}
-                onclick="cadastrarAvaliacao()" {% endif %} id="finishCadastroAvaliacao" type="button"
-                class="btn btn-primary">
-                {% if avaliacao %}
-                <span>Salvar Alterações</span>
-                {% else %}
-                <span>Cadastrar</span>
-                {% endif %}
-            </button>
+            <div class="modal-footer">
+                <button {% if avaliacao %} onclick="editarAvaliacao('{{avaliacao.id}}')" {% else %}
+                    onclick="cadastrarAvaliacao()" {% endif %} id="finishCadastroAvaliacao" type="button"
+                    class="btn btn-primary">
+                    {% if avaliacao %}
+                    <span>Salvar Alterações</span>
+                    {% else %}
+                    <span>Cadastrar</span>
+                    {% endif %}
+                </button>
+            </div>
         </div>
     </div>
 </div>
