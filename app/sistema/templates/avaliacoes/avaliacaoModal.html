@@ -422,9 +422,9 @@
                                     id="salaCulinariaHasIluminacaoAdequada"
                                     name="salaCulinariaHasIluminacaoAdequada">
                                         <option value="">Selecione uma opção</option>
-                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 1 %} selected {% endif %} value="1">Sim
+                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 'Sim' %} selected {% endif %} value="Sim">Sim
                                         </option>
-                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 0 %} selected {% endif %} value="0">Não
+                                        <option {% if avaliacao.salaCulinariaHasIluminacaoAdequada == 'Não' %} selected {% endif %} value="Não">Não
                                         </option>
                                     </select>
                                 </div>
@@ -606,9 +606,9 @@
                                     <select class="form-control" id="salaServicosBelezaHasPontoAguaExterno"
                                         name="salaServicosBelezaHasPontoAguaExterno">
                                         <option value="">Selecione uma opção</option>
-                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == true %} selected {% endif %} value="true">Sim
+                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == 'Sim' %} selected {% endif %} value="Sim">Sim
                                         </option>
-                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == false %} selected {% endif %} value="false">Não
+                                        <option {% if avaliacao.salaServicosBelezaHasPontoAguaExterno == 'Não' %} selected {% endif %} value="Não">Não
                                         </option>
                                     </select>
                                 </div>
