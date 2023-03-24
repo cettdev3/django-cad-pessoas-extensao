@@ -286,7 +286,8 @@ class PessoaViewSets(viewsets.ModelViewSet):
     @action(methods=["GET"], detail=False, url_path="logged-user")
     def getLoggedUse(self, *args, **kwargs):
         user = self.request.user
-        pessoa = Pessoas.objects.filter(user=user).first()
+        pessoa = Pessoas.objects.filter(user=user).select_related('user').first()
         if not pessoa: return Response({"res": "Não existe pessoa cadastrada com o usuário informado"}, status=st.HTTP_400_BAD_REQUEST)
         serializer = PessoaSerializer(pessoa)
+        print(serializer.data)
         return Response(data=serializer.data, status=st.HTTP_201_CREATED, content_type="application/json")
