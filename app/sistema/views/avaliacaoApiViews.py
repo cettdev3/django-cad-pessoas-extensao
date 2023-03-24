@@ -32,7 +32,7 @@ class AvaliacaoApiView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         # avaliacoes = Avaliacao.objects.filter(avaliador__pessoa__user__id=user.id)
-        avaliacoes = Avaliacao.objects.all()
+        avaliacoes = Avaliacao.objects.select_related('avaliador', 'evento', 'acao').all()
         serializer = AvaliacaoSerializer(avaliacoes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -43,7 +43,6 @@ class AvaliacaoApiView(APIView):
         cidade = None
         requestHasAcao = request.data.get("acao_id") is not None
         requestHasEvento = request.data.get("evento_id") is not None
-
         if (requestHasAcao and requestHasEvento) or (
             not requestHasAcao and not requestHasEvento
         ):
@@ -85,7 +84,6 @@ class AvaliacaoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
         data = {
             "bairro": request.data.get("bairro"),
             "logradouro": request.data.get("logradouro"),
@@ -610,6 +608,22 @@ class AvaliacaoDetailApiView(APIView):
                 else:
                     avaliacao.salaServicosBelezaObservacaoUpdatedAt = current_time
 
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            avaliacao.cidade = cidade
+        if request.data.get("bairro"):
+            avaliacao.bairro = request.data.get("bairro")
+        if request.data.get("logradouro"):
+            avaliacao.logradouro = request.data.get("logradouro")
+        if request.data.get("cep"):
+            avaliacao.cep = request.data.get("cep")
+        if request.data.get("complemento"):
+            avaliacao.complemento = request.data.get("complemento")
         avaliacao.save()
         serializer = AvaliacaoSerializer(avaliacao)
         return Response(serializer.data, status=status.HTTP_200_OK)
