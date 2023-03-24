@@ -8,3 +8,9 @@ __pycache__
 /logs
 anotacoes
 **.bash_history
+*/.local
+*/.cache
+*/.bash_history
+*/.bash_logout
+*/.bashrc
+*/.profil
