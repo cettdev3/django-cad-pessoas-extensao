@@ -16,8 +16,12 @@ import io
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
 
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 
 
 @login_required(login_url="/auth-user/login-user")
@@ -25,7 +29,7 @@ def avaliacoesTable(request):
     acao_id = request.GET.get("acao_id")
     avaliacoes = Avaliacao.objects
     if acao_id:
-        avaliacoes = avaliacoes.filter(acao__id=acao_id)
+        avaliacoes = avaliacoes.filter(acao__id=acao_id) 
 
     avaliacoes = avaliacoes.all()
     print(avaliacoes)
@@ -113,57 +117,131 @@ def updateAvaliacao(request, id):
     )
     return JsonResponse(json.loads(response.content), status=response.status_code)
 
-@login_required(login_url="/auth-user/login-user")
-def avaliacaoRelatorio(request, id):
-    # Fetch data from Avaliacao model
-    avaliacoes = Avaliacao.objects.all()
-
-    # Create a file-like buffer to receive PDF data
-    buffer = io.BytesIO()
-
-    # Set up the PDF document
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
-
-    # Build the table data
-    data = [
-        ["Campo", "Valor"]
-    ]  # Add table header
-    for avaliacao in avaliacoes:
-        data.append(
-            [
-                avaliacao.id,
-                avaliacao.observacaoGeral,  # Replace 'field1' with the actual field name
-                avaliacao.salaCulinariaObservacao,
-                avaliacao.salaServicosBelezaObservacao,  # Replace 'field3' with the actual field name
-            ]
-        )
-
-    # Create the table
-    table = Table(data)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTSIZE", (0, 0), (-1, 0), 14),
-                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-            ]
-        )
+def createTableHeader(title):
+    header_style = ParagraphStyle(
+        name='header',
+        alignment=TA_CENTER,
+        textColor=colors.white,
     )
 
-    # Add the table to the PDF document
-    doc.build([table])
+    header_row = [Paragraph(f'<b>{title}</b>', header_style), '']
+    header_data = [header_row]
+    return header_data
 
-    # Get the value of the BytesIO buffer and write it to the response
-    buffer.seek(0)
-    pdf = buffer.getvalue()
-    buffer.close()
+def createTable(header_data, attributes, available_width):
+    table_data = header_data + [[desc, value] for desc, value in attributes]
+    table = Table(table_data, colWidths=[available_width * 0.3, available_width * 0.7])
 
-    # Send the response with the PDF file
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('SPAN', (0, 0), (-1, 0)),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 12),
+        ('LINEBELOW', (0, 0), (-1, -1), 1, colors.black),  # Add border line below all cells
+    ]))
+    return table
+
+def createParagraph(description):
+    styles = getSampleStyleSheet()
+    paragraph = Paragraph(f"<b>Observação: </b> {description}", styles['Normal'])
+    return paragraph
+
+def createHeader(endereco, evento_tipo, evento_data_inicio, evento_data_fim, avaliador):
+    styles = getSampleStyleSheet()
+    header = Paragraph(
+        f"<b>Endereço: </b> {endereco} <br/> <b>Tipo de evento: </b> {evento_tipo} <br/> <b>Data de início: </b> {evento_data_inicio} <br/> <b>Data de fim: </b> {evento_data_fim} <br/> <b>Avaliador: </b> {avaliador}",
+        styles['Normal'],
+    )
+    return header
+
+@login_required(login_url="/auth-user/login-user")
+def avaliacaoRelatorio(request, id):
+    avaliacao = Avaliacao.objects.get(id=id)
+
+    # Create the PDF object
+    pdf_buffer = io.BytesIO()
+    pdf_document = SimpleDocTemplate(
+        pdf_buffer,
+        pagesize=letter,
+        leftMargin=28.346 * 2,
+        rightMargin=28.346 * 2,
+        topMargin=28.346 * 2,
+        bottomMargin=28.346 * 2,
+    )
+
+    page_width, _ = letter
+    available_width = page_width - 28.346 * 4  
+
+    avaliacao_dict = vars(avaliacao)
+    description = Avaliacao.atributes_description
+
+    attributesGeral = []
+    attributesCulinaria = []
+    attributesBeleza = []
+    for attr, value in avaliacao_dict.items():
+        if not attr.startswith('_') and 'updatedat' not in attr.lower() and 'observacao' not in attr.lower():
+            if value is None:
+                value = ''
+            if attr in description:
+                print(f"atributo: {attr}")
+                if 'geral' in attr.lower() or 'qtdSalas' == attr:
+                    print(f"atributo em geral: {attr}")
+                    attributesGeral.append((description[attr], value))
+                elif 'culinaria' in attr.lower():
+                    attributesCulinaria.append((description[attr], value))
+                elif 'beleza' in attr.lower():
+                    attributesBeleza.append((description[attr], value))
+
+    # table geral
+    header_data_geral = createTableHeader("Dados Gerais do Local")
+    tableGeral = createTable(header_data_geral, attributesGeral, available_width)
+    paragraph = createParagraph(avaliacao.observacaoGeral)
+
+    # table culinaria
+    header_data_culinaria = createTableHeader("Dados da Sala de Cursos de Culinária")
+    tableCulinaria = createTable(header_data_culinaria, attributesCulinaria, available_width)
+    paragraphCulinaria = createParagraph(avaliacao.salaCulinariaObservacao)
+
+    # table beleza
+    header_data_beleza = createTableHeader("Dados da Sala de Serviços de Beleza")
+    tableBeleza = createTable(header_data_beleza, attributesBeleza, available_width)
+    paragraphBeleza = createParagraph(avaliacao.salaServicosBelezaObservacao)
+
+    space = Spacer(1, 0.25*inch)
+    header = createHeader(
+        avaliacao.endereco_completo, 
+        avaliacao.evento.tipo, 
+        avaliacao.evento.data_inicio_formatada, 
+        avaliacao.evento.data_fim_formatada,
+        avaliacao.avaliador.pessoa.nome
+    )
+
+    pdf_document.build([
+        header,
+        space,
+        tableGeral, 
+        space, 
+        paragraph, 
+        space, 
+        tableCulinaria, 
+        space, 
+        paragraphCulinaria, 
+        space, 
+        tableBeleza, 
+        space, 
+        paragraphBeleza
+    ])
+
+    pdf_buffer.seek(0)
+    pdf = pdf_buffer.getvalue()
+    pdf_buffer.close()
+
     response = FileResponse(io.BytesIO(pdf), content_type="application/pdf")
     response["Content-Disposition"] = 'inline; filename="avaliacao-relatorio.pdf"'
 
