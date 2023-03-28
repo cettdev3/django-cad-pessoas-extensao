@@ -11,10 +11,10 @@ from ..models.membroExecucao import MembroExecucao
 from ..serializers.ticketSerializer import TicketSerializer 
 from sistema.services.camunda import CamundaAPI 
 import json
-import time
+from rest_framework_simplejwt.authentication import JWTAuthentication
 class TicketApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get_object(self, fn, object_id):
         try:
@@ -23,7 +23,7 @@ class TicketApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        ticket = Ticket.objects.all()
+        ticket = Ticket.objects.select_related("membro_execucao").all()
         serializer = TicketSerializer(ticket, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 

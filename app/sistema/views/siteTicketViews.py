@@ -6,6 +6,7 @@ import json
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.models.membroExecucao import MembroExecucao
+from sistema.models.ticket import Ticket
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -26,6 +27,19 @@ def ticketModal(request):
         ticket = ticket.objects.get(id=id)
         data['ticket'] = ticket
     return render(request,'tickets/ticket_modal.html',data)
+
+@login_required(login_url='/auth-user/login-user')
+def ticket_form(request):
+    form_id = request.GET.get('form_id')
+    id = request.GET.get('id')
+    context = {}
+    if form_id:
+        context['form_id'] = form_id
+    if id:
+        ticket = Ticket.objects.get(id=id)
+        context['ticket'] = ticket
+
+    return render(request,'tickets/ticket_form.html', context)
 
 @login_required(login_url='/auth-user/login-user')
 def saveTicket(request):

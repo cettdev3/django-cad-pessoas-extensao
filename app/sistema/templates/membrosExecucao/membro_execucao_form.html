@@ -10,7 +10,7 @@
         transition: font-size 0.2s;
     }
 </style>
-<div id="pessoas_ticket_form_container_{{id_to_remove}}" class=" border pt-2 mt-3">
+<div id="pessoas_ticket_form_container_{{id_to_remove}}" class="pt-2 mt-3">
     <form id="pessoaTicketForm-{{id_to_remove}}" class="container position-relative">
         {% if state != 'control_one' %}
         <div class="w-100 position-absolute"
@@ -44,154 +44,21 @@
             </div>
         </div>
         {% endif %}
-        
         <div class="form-group row">
-            <div class="col-sm-4 position-relative">
-                <div class="position-absolute"
-                style="top: 10px; right: 20px">
-                    <div data-toggle="tooltip" 
-                    data-placement="top" 
-                    title="Selecionar Membro da Equipe como Avaliador do Local">
-                        <div class="position-relative d-flex justify-content-center align=items-center ">
-                            <input type="checkbox" 
-                            {% if membro_execucao and membro_execucao.avaliador %}
-                            checked
-                            {% endif %}
-                            name="avaliador" 
-                            id="avaliador">
-                            <span class="ml-1" for="avaliador" style="line-height: 100%;">Avaliador</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-sm-12 position-relative">
                 {% include "pessoas/pessoas_select.html" with pessoas=pessoas pessoa_id=pessoa_id id=id_to_remove %}
             </div>
-            <div class="col-sm-4">
-                <label><b>Tipo da solicitação:</b></label>
-                <select required 
-                id="tipo_solicitacao"
-                class="form-control" 
-                name="tipo">
-                    <option
-                    value="">
-                        Selecione uma opção
-                    </option>
-                    <option
-                    {% if membro_execucao and membro_execucao.tipo == 'diaria' %}
-                    selected
-                    {% endif %}
-                    value="diaria">
-                        DIÁRIA
-                    </option>
-                    <option
-                    {% if membro_execucao and membro_execucao.tipo == 'adiantamento' %}
-                    selected
-                    {% endif %}
-                    value="adiantamento">
-                        ADIANTAMENTO
-                    </option>
-                    <option
-                    {% if membro_execucao and membro_execucao.tipo == 'veiculo' %}
-                    selected
-                    {% endif %}
-                    value="veiculo">
-                        VEÍCULO
-                    </option>
-                    <option
-                    {% if membro_execucao and membro_execucao.tipo == 'nao_se_aplica' %}
-                    selected
-                    {% endif %}
-                    value="nao_se_aplica">
-                        NÃO HAVERÁ SOLICITAÇÂO
-                    </option>
-                </select>
-            </div>
-            <div class="col-sm-2">
-                <label><b>Data Início:</b></label>
-                <input 
-                type="date" 
-                name="data_inicio" 
-                class="form-control" 
-                {% if membro_execucao %}
-                value="{{membro_execucao.data_inicio}}"
-                {% endif %}>
-            </div>
-            <div class="col-sm-2">
-                <label><b>Data Fim:</b></label>
-                <input 
-                type="date" 
-                name="data_fim" 
-                class="form-control" 
-                {% if membro_execucao %}
-                value="{{membro_execucao.data_fim}}"
-                {% endif %}>
-            </div>
         </div>
-
-        <div class="form-group column">
-            {% if state != 'control_one' %}
-            <div class="collapse w-100" id="collapse_endereco_{{id_to_remove}}">
-            {% else %}
-            <div class="w-100">
-            {% endif %}
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                        {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id id=prefix_id id_complement=id_to_remove%}
-                    </div>
-                    <div class="col-sm-6">
-                        <label><b>Complemento:</b></label>
-                        <input 
-                        type="text" 
-                        id="collapse_endereco_input_{{id_to_remove}}_complemento"
-                        name="complemento" 
-                        class="form-control" 
-                        {% if membro_execucao %}
-                        value="{{membro_execucao.complemento}}"
-                        {% endif %}>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-4">
-                        <label><b>CEP:</b></label>
-                        <input 
-                        type="text" 
-                        id="collapse_endereco_input_{{id_to_remove}}_cep"
-                        name="cep" 
-                        class="form-control" 
-                        {% if membro_execucao %}
-                        value="{{membro_execucao.cep}}"
-                        {% endif %}>
-                    </div>
-                    <div class="col-sm-4">
-                        <label><b>Bairro:</b></label>
-                        <input 
-                        type="text" 
-                        name="bairro" 
-                        class="form-control" 
-                        id="collapse_endereco_input_{{id_to_remove}}_bairro"
-                        {% if membro_execucao %}
-                        value="{{membro_execucao.bairro}}"
-                        {% endif %}>
-                    </div>
-                    <div class="col-sm-4">
-                        <label><b>Logradouro:</b></label>
-                        <input 
-                        type="text" 
-                        name="logradouro" 
-                        class="form-control" 
-                        id="collapse_endereco_input_{{id_to_remove}}_logradouro"
-                        {% if membro_execucao %}
-                        value="{{membro_execucao.logradouro}}"
-                        {% endif %}>
-                    </div>
-                    {% if acao %}
-                    <input type="text" hidden name="acao_id" value="{{acao.id}}">
-                    {% endif %}
-                    {% if evento %}
-                    <input type="text" hidden name="evento_id" value="{{evento.id}}">
-                    {% endif %}
-                </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Descrição:</b></label>
+                <textarea 
+                rows="4"
+                placeholder="Descreva a função da pessoa na equipe de execução do evento, motivo pelo qual ela está sendo incluída, etc."
+                name="descricao" 
+                class="form-control">{% if membro_execucao %}{{membro_execucao.descricao|default_if_none:""}}{% endif %}</textarea>
             </div>
-        </div>            
+        </div>        
     </form>
 </div>
 <script>

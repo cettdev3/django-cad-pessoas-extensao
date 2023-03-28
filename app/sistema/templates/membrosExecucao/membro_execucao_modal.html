@@ -31,10 +31,25 @@
                             href="#home">1</a>
                             <span>Dados Gerais</span>
                         </li>
+                        <li id="membroExecucaoTabs2" class="col py-2">
+                            <a id="membrosExecucaoTabLink2" 
+                            data-toggle="tab"
+                            style="display: none;"
+                            role="tab"
+                            href="#solicitacoes">2</a>
+                            <span>Solicitações</span>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="home" class="tab-pane py-3 active">
                             {% include "membrosExecucao/membro_execucao_form.html" with membroExecucao=membro_execucao state='control_one' acao=acao evento=evento %}
+                        </div>
+                        <div id="solicitacoes" class="tab-pane py-3">
+                            <div id="ticket-form-container"></div>
+                            <button id="add-ticket-form-btn"
+                            type="button"
+                            onclick="addTicket()"
+                            class="btn btn-primary">Adicionar Ticket</button>
                         </div>
                     </div>
                 </div>
@@ -74,6 +89,7 @@
     var tabsId = "membroExecucaoTabs"
     var pessoasTicketsForm = "pessoaMembroExecucaoForm"
     var dismissCadastrarMembrosExecucaoId = "dismissCadastrarMembrosExecucao"
+    var ticketFormCounter = 1
 
     function setMembroExecucaoAddressForm(addressValues, formId = null) {
         let addressFormId = formId ? formId : "collapse_endereco_input_"
@@ -85,6 +101,26 @@
                 }
             }
         })
+    }
+
+    function addTicket(ticketId = null) {
+        let formId = ticketFormCounter++
+
+        $.ajax({
+            url: '/ticket_form',
+            data: {
+                'form_id': formId,
+                'ticket_id': ticketId
+            },
+            success: function(data) {
+                console.log("kfjads")
+                $('#ticket-form-container').append(data);
+            }
+        });
+    }
+
+    function deleteTicketForm(formId) {
+        $('#ticket-form-container').find('#ticket-form-container-'+formId).remove();
     }
 
     function clearModalForm(changedResource = null) {

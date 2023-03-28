@@ -15,10 +15,11 @@ from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class MembroExecucaoApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get_object(self, fn, object_id):
         try:
@@ -27,7 +28,7 @@ class MembroExecucaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        membrosExecucao = MembroExecucao.objects.all()
+        membrosExecucao = MembroExecucao.objects.prefetch_related("ticket_set").all()
         serializer = MembroExecucaoSerializer(membrosExecucao, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
