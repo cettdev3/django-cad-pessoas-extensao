@@ -1,0 +1,114 @@
+<div class="w-100">
+    <form id="cadastrarTipoAtividadeForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-6">
+                <label><b>Nome:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if tipoAtividade.id %}
+                value="{{tipoAtividade.nome}}"
+                {% endif %}
+                id="nome"
+                name="nome">
+            </div>
+            <div class="col-sm-6">
+                <label><b>Categoria:</b></label>
+                <select required 
+                class="form-control" 
+                id="categoria" 
+                name="categoria">
+                    <option 
+                    {% if tipoAtividade.categoria == "apresentacao" %}
+                    selected
+                    {% endif %}
+                    value="apresentacao">
+                    APRESENTAÇÃO
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "palestra" %}
+                    selected
+                    {% endif %}
+                    value="palestra">
+                    PALESTRA
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "documentos" %}
+                    selected
+                    {% endif %}
+                    value="documentos">
+                    CRIAÇÂO DE DOCUMENTOS
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "coffee_break" %}
+                    selected
+                    {% endif %}
+                    value="coffee_break">
+                    COFFEE BREAK
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "workshop" %}
+                    selected
+                    {% endif %}
+                    value="tour_pelo_cotec">
+                    TOUR PELO COTEC
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "mostra" %}
+                    selected
+                    {% endif %}
+                    value="mostra_tour">
+                    MOSTRA
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "sala_interativa" %}
+                    selected
+                    {% endif %}
+                    value="sala_interativa">
+                    SALA INTERATIVA
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "almoco" %}
+                    selected
+                    {% endif %}
+                    value="almoco">
+                    ALMOÇO
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "venda_produtos" %}
+                    selected
+                    {% endif %}
+                    value="venda_produtos">
+                    VENDA DE PRODUTOS
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "servicos_diversos" %}
+                    selected
+                    {% endif %}
+                    value="servicos_diversos">
+                    SERVIÇOS DIVERSOS
+                    </option>
+                    <option
+                    {% if tipoAtividade.categoria == "outro" %}
+                    selected
+                    {% endif %}
+                    value="outro">
+                    OUTRO
+                    </option>
+                </select>
+            </div>
+            <div class="col-sm-12">
+                <label><b>Descrição:</b></label>
+                <textarea 
+                style="white-space: pre-wrap;"
+                type="text"
+                required
+                class="form-control"
+                rows="8"
+                id="descricao"
+                name="descricao">{% if tipoAtividade.id %}{{tipoAtividade.descricao}}{% endif %}</textarea>
+            </div>
+        </div>
+    </form>
+    
+</div>

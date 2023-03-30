@@ -41,7 +41,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
         integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        #accordionSidebar::-webkit-scrollbar {
+            width: 0.2em;
+            background-color: #F5F5F5;
+        }
 
+        #accordionSidebar::-webkit-scrollbar-thumb {
+            background-color: #157a74;
+        }
+
+        #accordionSidebar::-webkit-scrollbar-track {
+            background-color: #F5F5F5;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -50,36 +63,23 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="logout-last navbar-nav sidebar sidebar-dark accordion"
-            style="background-color: #0c504b; position: sticky; top: 0; height: 100vh;" id="accordionSidebar">
+        <ul class="navbar-nav sidebar sidebar-dark accordion" style="background-color: #0c504b; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: scroll; 
+            overflow-x: hidden;" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"
+                style="position: sticky; top: 0; background-color: #0c504b;" href="/">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">EXTENSÃO<sup> :)</sup></div>
             </a>
 
-            <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <!-- {% if user.is_authenticated %}
-            <li class="nav-item">
-                <a class="nav-link" href="/">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Principal</span></a>
-            </li>
-            {% endif %} -->
-
-            <!-- Divider -->
-            <!-- <hr class="sidebar-divider"> -->
-
-            <!-- Heading -->
-            <!-- <div class="sidebar-heading">
-                Menu de Acesso
-            </div> -->
 
             {% if user.is_authenticated %}
             <li class="nav-item">
@@ -88,7 +88,7 @@
                     <span>Pessoas</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/gerenciar-eventos">
+                <a class="nav-link" href="/gerenciar-ensinos">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Ensino</span></a>
             </li>
@@ -113,34 +113,26 @@
                     <span>Turnos</span></a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="/gerenciar-departamentos">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Departamentos</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/gerenciarTipoAtividade">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Tipos de Atividades</span></a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/gerencia_acoes">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Ações</span></a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="/testeGerenciar">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Teste</span></a>
-            </li> -->
+            <li class="nav-item">
+                <a class="nav-link" href="/gerencia_dp_eventos">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Eventos</span></a>
+            </li>
             {% endif %}
-
-            <!-- {% if user.is_authenticated %} -->
-            <!-- Nav Item - Pages Collapse Menu -->
-            <!-- <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-check-square"></i>
-                    <span>Pessoas</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white collapse-inner rounded">
-                        <h6 class="collapse-header">Escolha sua opção:</h6>
-                        <a class="collapse-item" href="/gerenciar-pessoas">Gerenciar Pessoas</a>
-                        <a class="collapse-item" href="/cadastrar-pessoas">Cadastrar Pessoas</a>
-                    </div>
-                </div>
-            </li> -->
-            <!-- {% endif %} -->
 
             {% if user.is_authenticated %}
             <li class="nav-item">
@@ -156,27 +148,26 @@
             </li>
             {% endif %}
 
-
         </ul>
         <!-- End of Sidebar -->
         <div class="d-flex flex-column w-100">
             <!-- Topbar -->
-            <nav style="position: sticky; top: 0; z-index: 4;height: 75px;" 
-            class=" navbar w-100 
-            navbar-expand navbar-light 
+            <nav style="position: sticky; top: 0; z-index: 4;height: 75px;" class=" navbar w-100
+            navbar-expand navbar-light
             bg-white topbar
             static-top shadow">
                 <div class="w-100 d-flex justify-content-between align-items-center">
-                    {% if page_title %}
                     <div class="align-items-center">
                         {% if path_back %}
                         <a class="link-back" href="/{{path_back}}">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
                         {% endif %}
+
+                        {% if page_title %}
                         <span class="h4 ml-2">{{ page_title }}</span>
+                        {% endif %}
                     </div>
-                    {% endif %}
                     {% if user.is_authenticated %}
                     <span>Bem vindo {{ user.get_username }}</span>
                     {% endif %}
@@ -214,7 +205,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-
+    <div id="confirmDeleteModalContainer"></div>
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -254,6 +245,104 @@
             $('#cpf').mask("000.000.000-00");
             $('#cep').mask("00.000-000");
         }
+
+        function debounce(func, timeout = 300){
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        function carregarDeleteModal() {
+            $.ajax({
+                url: "/confirmDeleteModal",
+                type: "GET",
+                success: function (data) {
+                    $("#confirmDeleteModalContainer").html(data)
+                }
+            })
+        }
+
+        function getDropdownSelectedValues(dropDownId) {
+            console.log("teste 123")
+            let dropdown = $("#"+dropDownId+" .select-dropdown-content");
+            let items = dropdown.children();
+            let selectedValues = [];
+            items.each(function () {
+                let input = $(this).find("input");
+                if (input.is(":checked")) {
+                    let value = $(this).children("span")[1].textContent;
+                    selectedValues.push(value);
+                }
+            })
+            return selectedValues;
+        }
+
+        function watchDropdownChanges(dropDownId, callback) {
+            let dropdown = $("#"+dropDownId+" .select-dropdown-content");
+            let items = dropdown.children();
+            items.each(function () {
+                let input = $(this).find("input");
+                input.on("change", function () {
+                    callback();
+                })
+            })
+        }
+
+        function setTabelaState(state, column = "column-pessoa", defaultOrder = "nome") {
+            if (state) {
+                console.log("state", state)
+                let orderClass = state.direction == 1 ? "order-by-up" : "order-by-down"
+                $("#" + state.column).addClass(orderClass)
+                $("#" + state.column).find("i").each(function () {
+                    $(this).addClass("current-order-by")
+                })
+                $("#" + state.column).find("span").each(function () {
+                    console.log($(this))
+                    $(this).addClass("current-order-by")
+                })
+                $("*[id^='" + column + "-']").each(function (i, th) {
+                    if ($(this).attr("id") != state.column) {
+                        $(this).addClass("order-by-up")
+                    }
+                })
+            } else {
+                $("*[id^='" + column + "-']").each(function (i, th) {
+                    if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
+                        $(this).addClass("order-by-up")
+                        console.log($(this).find("i"))
+                        $(this).find("i").each(function () {
+                            $(this).addClass("current-order-by")
+                        })
+                        $(this).find("span").each(function () {
+                            console.log($(this))
+                            $(this).addClass("current-order-by")
+                        })
+                    } else {
+                        $(this).addClass("order-by-up")
+                    }
+                })
+            }
+        }
+
+        function orderTableBy(event, column, orderByInput = "filterPessoa_order_by", loadDataFn) {
+            let orderBy = $("#" + orderByInput).val()
+            let state = {}
+            state.column = $(event).attr("id")
+            if (orderBy == column) {
+                $("#" + orderByInput).val("-" + column)
+                state.direction = 1
+            } else {
+                $("#" + orderByInput).val(column)
+                state.direction = -1
+            }
+            loadDataFn(state)
+        }
+
+        $(document).ready(function () {
+            carregarDeleteModal();
+        });
     </script>
 </body>
 

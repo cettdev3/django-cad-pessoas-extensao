@@ -19,7 +19,8 @@ def ticketModal(request):
         data['nome'] = membroExecucao.pessoa.nome
         data['data_inicio'] = membroExecucao.data_inicio
         data['data_fim'] = membroExecucao.data_fim
-        data['nome_escola'] = membroExecucao.acao.escola.nome
+        fromTable = request.GET.get('from')
+        data['nome_escola'] =  membroExecucao.acao.escola.nome if fromTable == 'acao' else membroExecucao.evento.escola.nome
         data['endereco_completo'] = membroExecucao.endereco_completo
     if id:
         ticket = ticket.objects.get(id=id)

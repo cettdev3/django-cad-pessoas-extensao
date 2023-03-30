@@ -128,13 +128,15 @@ z-index: 4
     d-flex justify-content-between align-items-center 
     px-3 py-3 my-3
     bg-white">
-        <div>
-            <input id="nomeCidadeFilter" 
+        <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+            <label for="filterCidadeNome" class="filter-label">Buscar</label>
+            <input id="filterCidadeNome" 
             placeholder="Digite um nome" 
             class="form-control-sm border-secondary"
             name="nome" 
-            onchange="buscarCidades('nomeCidadeFilter')" type="text">
+            type="text">
         </div>
+        <input type="text" hidden name="order_by" id="filterCidadeOrder_by">
         <div>
             <button id="adicionarPessoas" 
             onclick="carregarCidadesModalCadastrar()"
@@ -167,6 +169,17 @@ z-index: 4
     let rotaDeletarCidade = "eliminarCidade"
     let rotaModalCidade = "cidadesModalCadastrar"
     let rotaVisualizarCidade = "visualizarCidade"
+    let cidadeFiltersPrefix = "filterCidade"
+
+    function getFiltersCidade() {
+        let filter = {}
+        let filterInputs = document.querySelectorAll(`input[id^=${cidadeFiltersPrefix}]`)
+        filterInputs.forEach((input) => {
+            console.log(`${input.name} : ${input.value} `)
+            filter[input.name] = input.value
+        })
+        return filter
+    }
 
     function deleteCidade(id) {
         deletar_url = rotaDeletarCidade+"/" + id
@@ -182,13 +195,14 @@ z-index: 4
         });
     }
 
-    function carregarCidades(filter = null) {
+    function carregarCidades(filter = null, state = null) {
         let recarregarTabela = rotaTabelaCidades
         $.ajax({
             url: recarregarTabela,
             data: filter ? filter : {},
             success: function (data) {
                 $("#"+idTabelaCidades).html(data);
+                setTabelaState(state, "column-cidade", "nome");
             }
         });
     }
@@ -209,9 +223,8 @@ z-index: 4
         location.href = rotaVisualizarCidade+"/" + id
     }
 
-    function buscarCidades(filter) {
-        let value = $("#" + filter).val()
-        carregarCidades({ nome: value })
+    function buscarCidades() {
+        carregarCidades(getFiltersCidade())
     }
 
     $(document).ready(function () {
@@ -250,6 +263,21 @@ z-index: 4
                 }
             })
         });
+
+        $("input[id^='"+cidadeFiltersPrefix+"']").each(function () {
+            let input = $(this)
+            if ($(this).attr('type') == 'text') {
+                $(this)
+                .keyup(debounce(function() {
+                    buscarCidades()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    buscarCidades()
+                }, 500))
+            }
+        })
 
         carregarCidades()
     });

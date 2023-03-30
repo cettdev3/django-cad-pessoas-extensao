@@ -3,252 +3,638 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
-
+from django.utils import timezone
 from ..serializers.avaliacaoSerializer import AvaliacaoSerializer
 from ..models.avaliacao import Avaliacao
+from ..models.acao import Acao
+from ..models.cidade import Cidade
+from ..models.dpEvento import DpEvento
+from ..models.membroExecucao import MembroExecucao
 from ..serializers.pessoaSerializer import PessoaSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from datetime import datetime
+import ntplib
+
 
 class AvaliacaoApiView(APIView):
-    # add permission to check if user is authenticated
-    permission_classes = [permissions.AllowAny]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication, JWTAuthentication]
+
+    def get_object(self, fn, object_id):
+        try:
+            return fn.objects.get(id=object_id)
+        except fn.DoesNotExist:
+            return None
 
     # 1. List all
     def get(self, request, *args, **kwargs):
-        cidade = request.GET.get('cidade')
-        todos = None
-        if cidade:
-            todos = Avaliacao.objects.filter(cidade=cidade).all()
-        else: 
-            todos = Avaliacao.objects.all()
-        serializer = AvaliacaoSerializer(todos, many=True)
+        user = request.user
+        # avaliacoes = Avaliacao.objects.filter(avaliador__pessoa__user__id=user.id)
+        avaliacoes = Avaliacao.objects.select_related('avaliador', 'evento', 'acao').all()
+        serializer = AvaliacaoSerializer(avaliacoes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        data = {
-            "nome": request.data.get("nome"),
-            "endereco": request.data.get("endereco"),
-            "curso": request.data.get("curso"),
-            "qtd_salas": request.data.get("qtd_salas"),
-            "capacidade": request.data.get("capacidade"),
-            "qtd_cadeiras": request.data.get("qtd_cadeiras"),
-            "qtd_tomadas": request.data.get("qtd_tomadas"),
-            "qtd_janelas": request.data.get("qtd_janelas"),
-            "tipo_climatizacao": request.data.get("tipo_climatizacao"),
-            "qualidade_iluminacao": request.data.get("qualidade_iluminacao"),
-            "turnos_disponiveis": request.data.get("turnos_disponiveis"),
-            "qtd_banheiros_masculino": request.data.get("qtd_banheiros_masculino"),
-            "qtd_banheiros_feminino": request.data.get("qtd_banheiros_feminino"),
-            "rede_eletrica": request.data.get("rede_eletrica"),
-            "qualidade_bebedouro": request.data.get("qualidade_bebedouro"),
-            "acessibilidade": request.data.get("acessibilidade"),
-            "internet": request.data.get("internet"),
-            "data_show": request.data.get("data_show"),
-            "limpeza": request.data.get("limpeza"),
-            "link_imagens": request.data.get("link_imagens"),
-            "parecer": request.data.get("parecer"),
-            "obs_parecer": request.data.get("obs_parecer"),
-            "possui_cozinha": request.data.get("possui_cozinha"),
-            "capacidade_cozinha": request.data.get("capacidade_cozinha"),
-            "qtd_tomadas_cozinha": request.data.get("qtd_tomadas_cozinha"),
-            "funcionalidade_fogao": request.data.get("funcionalidade_fogao"),
-            "refrigeracao": request.data.get("refrigeracao"),
-            "gas": request.data.get("gas"),
-            "bancadas_mesas": request.data.get("bancadas_mesas"),
-            "capacidade_fornos": request.data.get("capacidade_fornos"),
-            "qtd_fornos": request.data.get("qtd_fornos"),
-            "ventilacao_cozinha": request.data.get("ventilacao_cozinha"),
-            "torneiras_funcionam": request.data.get("torneiras_funcionam"),
-            "area_complementar": request.data.get("area_complementar"),
-            "observacao_cozinha": request.data.get("observacao_cozinha"),
-            "laboratorio_informatica": request.data.get("laboratorio_informatica"),
-            "qtd_computadores": request.data.get("qtd_computadores"),
-            "cabeamento_internet": request.data.get("cabeamento_internet"),
-            "qtd_computadores_wifi": request.data.get("qtd_computadores_wifi"),
-            "obs_informatica": request.data.get("obs_informatica"),
-            "lavatorio": request.data.get("lavatorio"),
-            "qtd_lavatorio_sb": request.data.get("qtd_lavatorio_sb"),
-            "cadeiras_de_sb": request.data.get("cadeiras_de_sb"),
-            "qtd_cadeiras_sb": request.data.get("qtd_cadeiras_sb"),
-            "cidade": request.data.get("cidade"),
-            "obsinfra": request.data.get("obsinfra"),
-            "cidade_realizacao": request.data.get("cidade_realizacao"),
-            "avalLocalEmailAvaliador": request.data.get("avalLocalEmailAvaliador"),
-            "tipoAvaliacao": request.data.get("tipoAvaliacao"),
-            "endereco_realizacao": request.data.get("endereco_realizacao"),
-            "observacao_beleza": request.data.get("observacao_beleza"),
-            "sevicodebeleza": request.data.get("sevicodebeleza"),
-            "confeitaria": request.data.get("confeitaria"),
-            "UsuariolAvaliador": request.data.get("UsuariolAvaliador"),
-            "avalLocalNomeAvaliador": request.data.get("avalLocalNomeAvaliador"),
-            "infomatica": request.data.get("infomatica"),
-        }
+        acao = None
+        evento = None
+        avaliador = None
+        cidade = None
+        requestHasAcao = request.data.get("acao_id") is not None
+        requestHasEvento = request.data.get("evento_id") is not None
+        if (requestHasAcao and requestHasEvento) or (
+            not requestHasAcao and not requestHasEvento
+        ):
+            return Response(
+                {"res": "Informe o id da ação ou do evento"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        serializer = AvaliacaoSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.data.get("acao_id"):
+            acao = self.get_object(Acao, request.data.get("acao_id"))
+            if not acao:
+                return Response(
+                    {"res": "Não existe ação com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("evento_id"):
+            evento = self.get_object(DpEvento, request.data.get("evento_id"))
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("membro_execucao_id"):
+            avaliador = self.get_object(
+                MembroExecucao, request.data.get("membro_execucao_id")
+            )
+            if not avaliador:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        data = {
+            "bairro": request.data.get("bairro"),
+            "logradouro": request.data.get("logradouro"),
+            "cep": request.data.get("cep"),
+            "complemento": request.data.get("complemento"),
+            "acao": acao,
+            "evento": evento,
+            "avaliador": avaliador,
+        }
+        avaliacao = Avaliacao.objects.create(**data)
+        serializer = AvaliacaoSerializer(avaliacao)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class AvaliacaoDetailApiView(APIView):
-    def get_object(self, avaliacao_id):
+    def get_object(self, fn, object_id):
         try:
-            return Avaliacao.objects.get(id=avaliacao_id)
-        except Avaliacao.DoesNotExist:
+            return fn.objects.get(id=object_id)
+        except fn.DoesNotExist:
             return None
-            
+
     # 3. Retrieve
     def get(self, request, avaliacao_id, *args, **kwargs):
-
         avaliacao = self.get_object(avaliacao_id)
         if not avaliacao:
             return Response(
                 {"res": "Não existe avaliação com o id informado"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer = AvaliacaoSerializer(avaliacao)
+        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 4. Update
     def put(self, request, avaliacao_id, *args, **kwargs):
+        print("dentro do put", avaliacao_id, request.data)
+        tmz = timezone.get_current_timezone()
+        ntp_client = ntplib.NTPClient()
+        # response = ntp_client.request("pool.ntp.br")
+        current_time = datetime.now(tz=tmz)
+        print(current_time)
 
-        avaliacao = self.get_object(avaliacao_id)
+        avaliacao = self.get_object(Avaliacao, avaliacao_id)
         if not avaliacao:
             return Response(
-                {"res": "Não existe avaliação com o id informado"}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"res": "Não existe avaliação com o id informado"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         data = {}
-        if request.data.get("nome"):
-            data["nome"] = request.data.get("nome")
-        if request.data.get("endereco"):
-            data["endereco"] = request.data.get("endereco")
-        if request.data.get("curso"):
-            data["curso"] = request.data.get("curso")
-        if request.data.get("qtd_salas"):
-            data["qtd_salas"] = request.data.get("qtd_salas")
-        if request.data.get("capacidade"):
-            data["capacidade"] = request.data.get("capacidade")
-        if request.data.get("qtd_cadeiras"):
-            data["qtd_cadeiras"] = request.data.get("qtd_cadeiras")
-        if request.data.get("qtd_tomadas"):
-            data["qtd_tomadas"] = request.data.get("qtd_tomadas")
-        if request.data.get("qtd_janelas"):
-            data["qtd_janelas"] = request.data.get("qtd_janelas")
-        if request.data.get("tipo_climatizacao"):
-            data["tipo_climatizacao"] = request.data.get("tipo_climatizacao")
-        if request.data.get("qualidade_iluminacao"):
-            data["qualidade_iluminacao"] = request.data.get("qualidade_iluminacao")
-        if request.data.get("turnos_disponiveis"):
-            data["turnos_disponiveis"] = request.data.get("turnos_disponiveis")
-        if request.data.get("qtd_banheiros_masculino"):
-            data["qtd_banheiros_masculino"] = request.data.get("qtd_banheiros_masculino")
-        if request.data.get("qtd_banheiros_feminino"):
-            data["qtd_banheiros_feminino"] = request.data.get("qtd_banheiros_feminino")
-        if request.data.get("rede_eletrica"):
-            data["rede_eletrica"] = request.data.get("rede_eletrica")
-        if request.data.get("qualidade_bebedouro"):
-            data["qualidade_bebedouro"] = request.data.get("qualidade_bebedouro")
-        if request.data.get("acessibilidade"):
-            data["acessibilidade"] = request.data.get("acessibilidade")
-        if request.data.get("internet"):
-            data["internet"] = request.data.get("internet")
-        if request.data.get("data_show"):
-            data["data_show"] = request.data.get("data_show")
-        if request.data.get("limpeza"):
-            data["limpeza"] = request.data.get("limpeza")
-        if request.data.get("link_imagens"):
-            data["link_imagens"] = request.data.get("link_imagens")
-        if request.data.get("parecer"):
-            data["parecer"] = request.data.get("parecer")
-        if request.data.get("obs_parecer"):
-            data["obs_parecer"] = request.data.get("obs_parecer")
-        if request.data.get("possui_cozinha"):
-            data["possui_cozinha"] = request.data.get("possui_cozinha")
-        if request.data.get("capacidade_cozinha"):
-            data["capacidade_cozinha"] = request.data.get("capacidade_cozinha")
-        if request.data.get("qtd_tomadas_cozinha"):
-            data["qtd_tomadas_cozinha"] = request.data.get("qtd_tomadas_cozinha")
-        if request.data.get("funcionalidade_fogao"):
-            data["funcionalidade_fogao"] = request.data.get("funcionalidade_fogao")
-        if request.data.get("refrigeracao"):
-            data["refrigeracao"] = request.data.get("refrigeracao")
-        if request.data.get("gas"):
-            data["gas"] = request.data.get("gas")
-        if request.data.get("bancadas_mesas"):
-            data["bancadas_mesas"] = request.data.get("bancadas_mesas")
-        if request.data.get("capacidade_fornos"):
-            data["capacidade_fornos"] = request.data.get("capacidade_fornos")
-        if request.data.get("qtd_fornos"):
-            data["qtd_fornos"] = request.data.get("qtd_fornos")
-        if request.data.get("ventilacao_cozinha"):
-            data["ventilacao_cozinha"] = request.data.get("ventilacao_cozinha")
-        if request.data.get("torneiras_funcionam"):
-            data["torneiras_funcionam"] = request.data.get("torneiras_funcionam")
-        if request.data.get("area_complementar"):
-            data["area_complementar"] = request.data.get("area_complementar")
-        if request.data.get("observacao_cozinha"):
-            data["observacao_cozinha"] = request.data.get("observacao_cozinha")
-        if request.data.get("laboratorio_informatica"):
-            data["laboratorio_informatica"] = request.data.get("laboratorio_informatica")
-        if request.data.get("qtd_computadores"):
-            data["qtd_computadores"] = request.data.get("qtd_computadores")
-        if request.data.get("cabeamento_internet"):
-            data["cabeamento_internet"] = request.data.get("cabeamento_internet")
-        if request.data.get("qtd_computadores_wifi"):
-            data["qtd_computadores_wifi"] = request.data.get("qtd_computadores_wifi")
-        if request.data.get("obs_informatica"):
-            data["obs_informatica"] = request.data.get("obs_informatica")
-        if request.data.get("lavatorio"):
-            data["lavatorio"] = request.data.get("lavatorio")
-        if request.data.get("qtd_lavatorio_sb"):
-            data["qtd_lavatorio_sb"] = request.data.get("qtd_lavatorio_sb")
-        if request.data.get("cadeiras_de_sb"):
-            data["cadeiras_de_sb"] = request.data.get("cadeiras_de_sb")
-        if request.data.get("qtd_cadeiras_sb"):
-            data["qtd_cadeiras_sb"] = request.data.get("qtd_cadeiras_sb")
-        if request.data.get("cidade"):
-            data["cidade"] = request.data.get("cidade")
-        if request.data.get("obsinfra"):
-            data["obsinfra"] = request.data.get("obsinfra")
-        if request.data.get("cidade_realizacao"):
-            data["cidade_realizacao"] = request.data.get("cidade_realizacao")
-        if request.data.get("avalLocalEmailAvaliador"):
-            data["avalLocalEmailAvaliador"] = request.data.get("avalLocalEmailAvaliador")
-        if request.data.get("tipoAvaliacao"):
-            data["tipoAvaliacao"] = request.data.get("tipoAvaliacao")
-        if request.data.get("endereco_realizacao"):
-            data["endereco_realizacao"] = request.data.get("endereco_realizacao")
-        if request.data.get("observacao_beleza"):
-            data["observacao_beleza"] = request.data.get("observacao_beleza")
-        if request.data.get("sevicodebeleza"):
-            data["sevicodebeleza"] = request.data.get("sevicodebeleza")
-        if request.data.get("confeitaria"):
-            data["confeitaria"] = request.data.get("confeitaria")
-        if request.data.get("UsuariolAvaliador"):
-            data["UsuariolAvaliador"] = request.data.get("UsuariolAvaliador")
-        if request.data.get("avalLocalNomeAvaliador"):
-            data["avalLocalNomeAvaliador"] = request.data.get("avalLocalNomeAvaliador")
-        if request.data.get("infomatica"):
-            data["infomatica"] = request.data.get("infomatica")
 
-        serializer = AvaliacaoSerializer(instance = avaliacao, data=data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        if request.data.get("evento_id"):
+            evento = self.get_object(DpEvento, request.data.get("evento_id"))
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            avaliacao.evento = evento
+
+        if request.data.get("acao_id"):
+            acao = self.get_object(Acao, request.data.get("acao_id"))
+            if not acao:
+                return Response(
+                    {"res": "Não existe ação com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            avaliacao.acao = acao
+
+        if request.data.get("membro_execucao_id"):
+            avaliador = self.get_object(
+                MembroExecucao, request.data.get("membro_execucao_id")
+            )
+            if not avaliador:
+                return Response(
+                    {"res": "Não existe avaliador com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            avaliacao.avaliador = avaliador
+
+        if request.data.get("qtdSalas"):
+            intQtdSalas = int(request.data.get("qtdSalas"))
+            isEquals = avaliacao.qtdSalas == intQtdSalas
+            if not isEquals:
+                avaliacao.qtdSalas = intQtdSalas
+                if request.data.get("qtdSalasUpdatedAt"):
+                    avaliacao.qtdSalasUpdatedAt = datetime.strptime(
+                        request.data.get("qtdSalasUpdatedAt"), "%Y-%m-%d %H:%M:%S.%f"
+                    )
+                else:
+                    avaliacao.qtdSalasUpdatedAt = current_time
+
+        if request.data.get("observacaoGeral"):
+            isEquals = avaliacao.observacaoGeral == request.data.get("observacaoGeral")
+            if not isEquals:
+                avaliacao.observacaoGeral = request.data.get("observacaoGeral")
+                if request.data.get("observacaoGeralUpdatedAt"):
+                    avaliacao.observacaoGeralUpdatedAt = datetime.strptime(
+                        request.data.get("observacaoGeralUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.observacaoGeralUpdatedAt = current_time
+
+        if request.data.get("geralTamanhoEspaco"):
+            isEquals = avaliacao.geralTamanhoEspaco == request.data.get(
+                "geralTamanhoEspaco"
+            )
+            if not isEquals:
+                avaliacao.geralTamanhoEspaco = request.data.get("geralTamanhoEspaco")
+                if request.data.get("geralTamanhoEspacoUpdatedAt"):
+                    avaliacao.geralTamanhoEspacoUpdatedAt = datetime.strptime(
+                        request.data.get("geralTamanhoEspacoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralTamanhoEspacoUpdatedAt = current_time
+
+        if request.data.get("geralQuantidadeDataShow"):
+            isEquals = avaliacao.geralQuantidadeDataShow == request.data.get(
+                "geralQuantidadeDataShow"
+            )
+            if not isEquals:
+                avaliacao.geralQuantidadeDataShow = request.data.get(
+                    "geralQuantidadeDataShow"
+                )
+                if request.data.get("geralQuantidadeDataShowUpdatedAt"):
+                    avaliacao.geralQuantidadeDataShowUpdatedAt = datetime.strptime(
+                        request.data.get("geralQuantidadeDataShowUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralQuantidadeDataShowUpdatedAt = current_time
+
+        if request.data.get("geralHasBebedouro"):
+            isEquals = avaliacao.geralHasBebedouro == request.data.get(
+                "geralHasBebedouro"
+            )
+            if not isEquals:
+                avaliacao.geralHasBebedouro = request.data.get(
+                    "geralHasBebedouro"
+                )
+                if request.data.get("geralHasBebedouroUpdatedAt"):
+                    avaliacao.geralHasBebedouroUpdatedAt = datetime.strptime(
+                        request.data.get("geralHasBebedouroUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralHasBebedouroUpdatedAt = current_time
+        
+        if request.data.get("geralHasRedeEletrica"):
+            isEquals = avaliacao.geralHasRedeEletrica == request.data.get(
+                "geralHasRedeEletrica"
+            )
+            if not isEquals:
+                avaliacao.geralHasRedeEletrica = request.data.get(
+                    "geralHasRedeEletrica"
+                )
+                if request.data.get("geralHasRedeEletricaUpdatedAt"):
+                    avaliacao.geralHasRedeEletricaUpdatedAt = datetime.strptime(
+                        request.data.get("geralHasRedeEletricaUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralHasRedeEletricaUpdatedAt = current_time
+        # geralHasCadeiras
+        # geralHasCadeirasUpdatedAt
+        if request.data.get("geralHasCadeiras"):
+            isEquals = avaliacao.geralHasCadeiras == request.data.get(
+                "geralHasCadeiras"
+            )
+            if not isEquals:
+                avaliacao.geralHasCadeiras = request.data.get(
+                    "geralHasCadeiras"
+                )
+                if request.data.get("geralHasCadeirasUpdatedAt"):
+                    avaliacao.geralHasCadeirasUpdatedAt = datetime.strptime(
+                        request.data.get("geralHasCadeirasUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralHasCadeirasUpdatedAt = current_time
+        # geralHasEquipeLimpeza
+        # geralHasEquipeLimpezaUpdatedAt
+        if request.data.get("geralHasEquipeLimpeza"):
+            isEquals = avaliacao.geralHasEquipeLimpeza == request.data.get(
+                "geralHasEquipeLimpeza"
+            )
+            if not isEquals:
+                avaliacao.geralHasEquipeLimpeza = request.data.get(
+                    "geralHasEquipeLimpeza"
+                )
+                if request.data.get("geralHasEquipeLimpezaUpdatedAt"):
+                    avaliacao.geralHasEquipeLimpezaUpdatedAt = datetime.strptime(
+                        request.data.get("geralHasEquipeLimpezaUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralHasEquipeLimpezaUpdatedAt = current_time
+        # geralHasIluminacao
+        # geralHasIluminacaoUpdatedAt
+        if request.data.get("geralHasIluminacao"):
+            isEquals = avaliacao.geralHasIluminacao == request.data.get(
+                "geralHasIluminacao"
+            )
+            if not isEquals:
+                avaliacao.geralHasIluminacao = request.data.get(
+                    "geralHasIluminacao"
+                )
+                if request.data.get("geralHasIluminacaoUpdatedAt"):
+                    avaliacao.geralHasIluminacaoUpdatedAt = datetime.strptime(
+                        request.data.get("geralHasIluminacaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralHasIluminacaoUpdatedAt = current_time
+        # geralQuantidadeJanelas
+        # geralQuantidadeJanelasUpdatedAt
+        if request.data.get("geralQuantidadeJanelas"):
+            isEquals = avaliacao.geralQuantidadeJanelas == request.data.get(
+                "geralQuantidadeJanelas"
+            )
+            if not isEquals:
+                avaliacao.geralQuantidadeJanelas = request.data.get(
+                    "geralQuantidadeJanelas"
+                )
+                if request.data.get("geralQuantidadeJanelasUpdatedAt"):
+                    avaliacao.geralQuantidadeJanelasUpdatedAt = datetime.strptime(
+                        request.data.get("geralQuantidadeJanelasUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralQuantidadeJanelasUpdatedAt = current_time
+        # geralQuantidadeBanheiros
+        # geralQuantidadeBanheirosUpdatedAt
+        if request.data.get("geralQuantidadeBanheiros"):
+            isEquals = avaliacao.geralQuantidadeBanheiros == request.data.get(
+                "geralQuantidadeBanheiros"
+            )
+            if not isEquals:
+                avaliacao.geralQuantidadeBanheiros = request.data.get(
+                    "geralQuantidadeBanheiros"
+                )
+                if request.data.get("geralQuantidadeBanheirosUpdatedAt"):
+                    avaliacao.geralQuantidadeBanheirosUpdatedAt = datetime.strptime(
+                        request.data.get("geralQuantidadeBanheirosUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.geralQuantidadeBanheirosUpdatedAt = current_time
+        # salaCulinariaHasEspacoTurmas40Alunos
+        # salaCulinariaHasEspacoTurmas40AlunosUpdatedAt
+        if request.data.get("salaCulinariaHasEspacoTurmas40Alunos"):
+            isEquals = avaliacao.salaCulinariaHasEspacoTurmas40Alunos == request.data.get(
+                "salaCulinariaHasEspacoTurmas40Alunos"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaHasEspacoTurmas40Alunos = request.data.get(
+                    "salaCulinariaHasEspacoTurmas40Alunos"
+                )
+                if request.data.get("salaCulinariaHasEspacoTurmas40AlunosUpdatedAt"):
+                    avaliacao.salaCulinariaHasEspacoTurmas40AlunosUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaHasEspacoTurmas40AlunosUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaHasEspacoTurmas40AlunosUpdatedAt = current_time
+        # salaCulinariaHasVentilacao
+        # salaCulinariaHasVentilacaoUpdatedAt
+        if request.data.get("salaCulinariaHasVentilacao"):
+            isEquals = avaliacao.salaCulinariaHasVentilacao == request.data.get(
+                "salaCulinariaHasVentilacao"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaHasVentilacao = request.data.get(
+                    "salaCulinariaHasVentilacao"
+                )
+                if request.data.get("salaCulinariaHasVentilacaoUpdatedAt"):
+                    avaliacao.salaCulinariaHasVentilacaoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaHasVentilacaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaHasVentilacaoUpdatedAt = current_time
+        # salaCulinariaQuantidadeTomadas
+        # salaCulinariaQuantidadeTomadasUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeTomadas"):
+            isEquals = avaliacao.salaCulinariaQuantidadeTomadas == request.data.get(
+                "salaCulinariaQuantidadeTomadas"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeTomadas = request.data.get(
+                    "salaCulinariaQuantidadeTomadas"
+                )
+                if request.data.get("salaCulinariaQuantidadeTomadasUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeTomadasUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeTomadasUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeTomadasUpdatedAt = current_time
+        # salaCulinariaQuantidadeFogoesFuncionando
+        # salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeFogoesFuncionando"):
+            isEquals = avaliacao.salaCulinariaQuantidadeFogoesFuncionando == request.data.get(
+                "salaCulinariaQuantidadeFogoesFuncionando"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeFogoesFuncionando = request.data.get(
+                    "salaCulinariaQuantidadeFogoesFuncionando"
+                )
+                if request.data.get("salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt = current_time
+        # salaCulinariaQuantidadeFornosFuncionando
+        # salaCulinariaQuantidadeFornosFuncionandoUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeFornosFuncionando"):
+            isEquals = avaliacao.salaCulinariaQuantidadeFornosFuncionando == request.data.get(
+                "salaCulinariaQuantidadeFornosFuncionando"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeFornosFuncionando = request.data.get(
+                    "salaCulinariaQuantidadeFornosFuncionando"
+                )
+                if request.data.get("salaCulinariaQuantidadeFornosFuncionandoUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeFornosFuncionandoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeFornosFuncionandoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeFornosFuncionandoUpdatedAt = current_time
+        # salaCulinariaHasIluminacaoAdequada
+        # salaCulinariaHasIluminacaoAdequadaUpdatedAt
+        if request.data.get("salaCulinariaHasIluminacaoAdequada"):
+            isEquals = avaliacao.salaCulinariaHasIluminacaoAdequada == request.data.get(
+                "salaCulinariaHasIluminacaoAdequada"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaHasIluminacaoAdequada = request.data.get(
+                    "salaCulinariaHasIluminacaoAdequada"
+                )
+                if request.data.get("salaCulinariaHasIluminacaoAdequadaUpdatedAt"):
+                    avaliacao.salaCulinariaHasIluminacaoAdequadaUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaHasIluminacaoAdequadaUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaHasIluminacaoAdequadaUpdatedAt = current_time
+        # salaCulinariaQuantidadeGeladeirasFuncionando
+        # salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeGeladeirasFuncionando"):
+            isEquals = avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando == request.data.get(
+                "salaCulinariaQuantidadeGeladeirasFuncionando"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeGeladeirasFuncionando = request.data.get(
+                    "salaCulinariaQuantidadeGeladeirasFuncionando"
+                )
+                if request.data.get("salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt = current_time
+        # salaCulinariaQuantidadeMesasBancadas
+        # salaCulinariaQuantidadeMesasBancadasUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeMesasBancadas"):
+            isEquals = avaliacao.salaCulinariaQuantidadeMesasBancadas == request.data.get(
+                "salaCulinariaQuantidadeMesasBancadas"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeMesasBancadas = request.data.get(
+                    "salaCulinariaQuantidadeMesasBancadas"
+                )
+                if request.data.get("salaCulinariaQuantidadeMesasBancadasUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeMesasBancadasUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeMesasBancadasUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeMesasBancadasUpdatedAt = current_time  
+        # salaCulinariaQuantidadePiasComTorneiraFuncionando
+        # salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt
+        if request.data.get("salaCulinariaQuantidadePiasComTorneiraFuncionando"):
+            isEquals = avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando == request.data.get(
+                "salaCulinariaQuantidadePiasComTorneiraFuncionando"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionando = request.data.get(
+                    "salaCulinariaQuantidadePiasComTorneiraFuncionando"
+                )
+                if request.data.get("salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt = current_time
+        # salaCulinariaQuantidadeVasilhamesGasComGas
+        # salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeVasilhamesGasComGas"):
+            isEquals = avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas == request.data.get(
+                "salaCulinariaQuantidadeVasilhamesGasComGas"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeVasilhamesGasComGas = request.data.get(
+                    "salaCulinariaQuantidadeVasilhamesGasComGas"
+                )
+                if request.data.get("salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt = current_time
+        # salaCulinariaQuantidadeVasilhamesGasVazios
+        # salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt
+        if request.data.get("salaCulinariaQuantidadeVasilhamesGasVazios"):
+            isEquals = avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios == request.data.get(
+                "salaCulinariaQuantidadeVasilhamesGasVazios"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaQuantidadeVasilhamesGasVazios = request.data.get(
+                    "salaCulinariaQuantidadeVasilhamesGasVazios"
+                )
+                if request.data.get("salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt"):
+                    avaliacao.salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt = current_time
+        # salaCulinariaObservacao
+        # salaCulinariaObservacaoUpdatedAt
+        if request.data.get("salaCulinariaObservacao"):
+            isEquals = avaliacao.salaCulinariaObservacao == request.data.get(
+                "salaCulinariaObservacao"
+            )
+            if not isEquals:
+                avaliacao.salaCulinariaObservacao = request.data.get(
+                    "salaCulinariaObservacao"
+                )
+                if request.data.get("salaCulinariaObservacaoUpdatedAt"):
+                    avaliacao.salaCulinariaObservacaoUpdatedAt = datetime.strptime(
+                        request.data.get("salaCulinariaObservacaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaCulinariaObservacaoUpdatedAt = current_time
+        # salaServicosBelezaHasPontoAguaExterno
+        # salaServicosBelezaHasPontoAguaExternoUpdatedAt
+        if request.data.get("salaServicosBelezaHasPontoAguaExterno"):
+            isEquals = avaliacao.salaServicosBelezaHasPontoAguaExterno == request.data.get(
+                "salaServicosBelezaHasPontoAguaExterno"
+            )
+            if not isEquals:
+                avaliacao.salaServicosBelezaHasPontoAguaExterno = request.data.get(
+                    "salaServicosBelezaHasPontoAguaExterno"
+                )
+                if request.data.get("salaServicosBelezaHasPontoAguaExternoUpdatedAt"):
+                    avaliacao.salaServicosBelezaHasPontoAguaExternoUpdatedAt = datetime.strptime(
+                        request.data.get("salaServicosBelezaHasPontoAguaExternoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaServicosBelezaHasPontoAguaExternoUpdatedAt = current_time
+        # salaServicosBelezaQuantidadePiasHigienizacao
+        # salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt
+        if request.data.get("salaServicosBelezaQuantidadePiasHigienizacao"):
+            isEquals = avaliacao.salaServicosBelezaQuantidadePiasHigienizacao == request.data.get(
+                "salaServicosBelezaQuantidadePiasHigienizacao"
+            )
+            if not isEquals:
+                avaliacao.salaServicosBelezaQuantidadePiasHigienizacao = request.data.get(
+                    "salaServicosBelezaQuantidadePiasHigienizacao"
+                )
+                if request.data.get("salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt"):
+                    avaliacao.salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt = datetime.strptime(
+                        request.data.get("salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt = current_time
+        # salaServicosBelezaQuantidadeCadeirasSalao
+        # salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt
+        if request.data.get("salaServicosBelezaQuantidadeCadeirasSalao"):
+            isEquals = avaliacao.salaServicosBelezaQuantidadeCadeirasSalao == request.data.get(
+                "salaServicosBelezaQuantidadeCadeirasSalao"
+            )
+            if not isEquals:
+                avaliacao.salaServicosBelezaQuantidadeCadeirasSalao = request.data.get(
+                    "salaServicosBelezaQuantidadeCadeirasSalao"
+                )
+                if request.data.get("salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt"):
+                    avaliacao.salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt = datetime.strptime(
+                        request.data.get("salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt = current_time
+        # salaServicosBelezaObservacao
+        # salaServicosBelezaObservacaoUpdatedAt
+        if request.data.get("salaServicosBelezaObservacao"):
+            isEquals = avaliacao.salaServicosBelezaObservacao == request.data.get(
+                "salaServicosBelezaObservacao"
+            )
+            if not isEquals:
+                avaliacao.salaServicosBelezaObservacao = request.data.get(
+                    "salaServicosBelezaObservacao"
+                )
+                if request.data.get("salaServicosBelezaObservacaoUpdatedAt"):
+                    avaliacao.salaServicosBelezaObservacaoUpdatedAt = datetime.strptime(
+                        request.data.get("salaServicosBelezaObservacaoUpdatedAt"),
+                        "%Y-%m-%d %H:%M:%S.%f",
+                    )
+                else:
+                    avaliacao.salaServicosBelezaObservacaoUpdatedAt = current_time
+
+        if request.data.get("cidade_id"):
+            cidade = self.get_object(Cidade, request.data.get("cidade_id"))
+            if not cidade:
+                return Response(
+                    {"res": "Não existe cidade com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            avaliacao.cidade = cidade
+        if request.data.get("bairro"):
+            avaliacao.bairro = request.data.get("bairro")
+        if request.data.get("logradouro"):
+            avaliacao.logradouro = request.data.get("logradouro")
+        if request.data.get("cep"):
+            avaliacao.cep = request.data.get("cep")
+        if request.data.get("complemento"):
+            avaliacao.complemento = request.data.get("complemento")
+        avaliacao.save()
+        serializer = AvaliacaoSerializer(avaliacao)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     # 5. Delete
     def delete(self, request, avaliacao_id, *args, **kwargs):
-        
         avaliacao = self.get_object(avaliacao_id)
         if not avaliacao:
             return Response(
-                {"res": "Não existe avaliação com o id informado"}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"res": "Não existe avaliação com o id informado"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         avaliacao.delete()
-        return Response(
-            {"res": "Avaliação deletada!"},
-            status=status.HTTP_200_OK
-        )
+        return Response({"res": "Avaliação deletada!"}, status=status.HTTP_200_OK)

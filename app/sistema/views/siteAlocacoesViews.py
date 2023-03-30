@@ -4,12 +4,12 @@ from django.shortcuts import render, redirect
 from sistema.serializers.alocacaoSerializer import AlocacaoSerializer
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from django.db.models import Prefetch, Count
 from sistema.models.curso import Curso
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
@@ -24,10 +24,10 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
-    evento_id = request.GET.get('evento_id')
+    acaoEnsino_id = request.GET.get('acaoEnsino_id')
     alocacoes = Alocacao.objects
-    if evento_id:
-        alocacoes = alocacoes.filter(evento_id = evento_id)
+    if acaoEnsino_id:
+        alocacoes = alocacoes.filter(acaoEnsino_id = acaoEnsino_id)
     alocacoes = alocacoes.all()
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 
@@ -39,9 +39,9 @@ def modalAlocar(request):
         pessoas = Pessoas.objects.filter(id__in=pessoaIds).all()
         pessoas = PessoaSerializer(pessoas, many = True)
         data['pessoas'] = pessoas.data
-        eventos = Evento.objects.filter(~Q(status="finalizado"))
-        eventos = EventoSerializer(eventos, many=True)
-        data['eventos'] = eventos.data
+        ensinos = Ensino.objects.filter(~Q(status="finalizado"))
+        ensinos = EnsinoSerializer(ensinos, many=True)
+        data['ensinos'] = ensinos.data
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -50,7 +50,7 @@ def alocacaoModalCadastrar(request):
     alocacao = None
     data = {}
     if id:
-        alocacao = Alocacao.objects.get(id=id)
+        alocacao = Alocacao.objects.prefetch_related("dataremovida_set").get(id=id)
         alocacao = AlocacaoSerializer(alocacao).data
         data['alocacao'] = alocacao
     return render(request,'alocacoes/modal_cadastrar_alocacao.html',data)
@@ -78,35 +78,6 @@ def eliminarAlocacao(request,codigo):
     response = requests.delete('http://localhost:8000/alocacoes/'+str(codigo), headers=headers)
     
     return HttpResponse(status=response.status_code)
- 
-def intervening_weekdays(start, end, inclusive=True, weekdays=[0, 1, 2, 3, 4, 5, 6]):
-    if isinstance(start, datetime.datetime):
-        start = start.date()               # make a date from a datetime
-
-    if isinstance(end, datetime.datetime):
-        end = end.date()                   # make a date from a datetime
-
-    if end < start:
-        # you can opt to return 0 or swap the dates around instead
-        raise ValueError("start date must be before end date")
-
-    if inclusive:
-        end += datetime.timedelta(days=1)  # correct for inclusivity
-
-    try:
-        # collapse duplicate weekdays
-        weekdays = {weekday % 7 for weekday in weekdays}
-    except TypeError:
-        weekdays = [weekdays % 7]
-
-    ref = datetime.date.today()                    # choose a reference date
-    ref -= datetime.timedelta(days=ref.weekday())  # and normalize its weekday
-
-    # sum up all selected weekdays (max 7 iterations)
-    return sum((ref_plus - start).days // 7 - (ref_plus - end).days // 7
-            for ref_plus in
-            (ref + datetime.timedelta(days=weekday) for weekday in weekdays))
-        
 
 @login_required(login_url='/auth-user/login-user')
 def horasTrabalhadas(request):
@@ -118,7 +89,7 @@ def horasTrabalhadas(request):
     if data_fim and data_inicio:
         pessoas = pessoas.prefetch_related(
             Prefetch("alocacao_set", queryset=
-                Alocacao.objects.filter(
+                Alocacao.objects.prefetch_related("dataremovida_set").filter(
                    Q(
                         Q(data_inicio__gte=data_inicio,data_inicio__lte=data_fim) |
                         Q(data_fim__gte=data_inicio,data_fim__lte=data_fim) |
@@ -148,6 +119,7 @@ def horasTrabalhadas(request):
         
         for alocacao in pessoa['alocacao_set']:
             alocacao['horas_trabalhadas'] = 0
+            datasRemovidas = [item["date"] for item in alocacao["dataremovida_set"]]
             cargaHorariaDia = 0
             for turno in alocacao['turnos']:
                 cargaHorariaDia += turno["carga_horaria"]
@@ -162,7 +134,7 @@ def horasTrabalhadas(request):
                 count_sabado = (not isSatturday) or alocacao["aulas_sabado"]
                 is_alocation_date = queryDataInicio >= alocacaoDataInicio and queryDataInicio <= alocacaoDataFim 
                 is_sunday = queryDataInicio.weekday() == 6
-                if queryDataInicio.strftime('%Y-%m-%d') not in removed_dates and count_sabado and is_alocation_date and not is_sunday:
+                if queryDataInicio.strftime('%Y-%m-%d') not in removed_dates and queryDataInicio.strftime('%Y-%m-%d') not in datasRemovidas and count_sabado and is_alocation_date and not is_sunday:
                     chave = queryDataInicio.strftime('%Y-%m-%d')
                     carga_horaria_dia[chave]["carga_horaria"] += cargaHorariaDia
                     total_horas_pessoa += cargaHorariaDia

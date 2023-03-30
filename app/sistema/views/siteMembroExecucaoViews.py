@@ -6,6 +6,7 @@ from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.pessoa import Pessoas
 from sistema.models.cidade import Cidade
 from sistema.models.acao import Acao
+from sistema.models.dpEvento import DpEvento
 from django.contrib.auth.decorators import login_required
 import requests
 from rest_framework.authtoken.models import Token
@@ -19,6 +20,15 @@ def membrosExecucaoTable(request):
     membros_execucao = MembroExecucao.objects
     if acao_id:
         membros_execucao = membros_execucao.filter(acao_id = acao_id)
+    membros_execucao = membros_execucao.all()
+    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
+
+@login_required(login_url='/auth-user/login-user')
+def membrosExecucaoDpEventoTable(request):
+    evento_id = request.GET.get('dp_evento_id')
+    membros_execucao = MembroExecucao.objects
+    if evento_id:
+        membros_execucao = membros_execucao.filter(evento_id = evento_id)
     membros_execucao = membros_execucao.all()
     return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
 
@@ -37,14 +47,21 @@ def membroExecucaoForm(request):
 def membroExecucaoModal(request):
     id = request.GET.get('id')
     acao_id = request.GET.get('acao_id')
+    evento_id = request.GET.get('evento_id')
     membro_execucao = None
+    title = request.GET.get('title')
+
     data = {}
     data["state"] = "create_one"
     data["is_edit"] = False
     data['pessoas'] = Pessoas.objects.all()
     data['cidades'] = Cidade.objects.all()
+    data['title'] = title
+
     if acao_id:
         data['acao'] = Acao.objects.get(id=acao_id)
+    if evento_id:
+        data['evento'] = DpEvento.objects.get(id=evento_id)
     if id:
         membro_execucao = MembroExecucao.objects.get(id=id)
         data["cidade_id"] = membro_execucao.cidade.id if membro_execucao.cidade else None
@@ -89,3 +106,26 @@ def eliminarMembroExecucao(request,codigo):
     response = requests.delete('http://localhost:8000/membroExecucao/'+str(codigo), headers=headers)
     
     return HttpResponse(status=response.status_code)
+
+
+@login_required(login_url='/auth-user/login-user')
+def membrosExecucaoSelect(request):
+    data = {}
+    if request.GET.get('membro_execucao_id'):
+        data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
+    acao_id = request.GET.get('acao_id')
+    evento_id = request.GET.get('evento_id')
+    print("acao id", evento_id)
+    if acao_id:
+        data["membrosExecucao"] = MembroExecucao.objects.filter(acao__id=acao_id)
+    elif evento_id:
+        data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id=evento_id)
+    else:
+        data["membrosExecucao"] = MembroExecucao.objects.all()
+    data["select_id"] = request.GET.get('select_id')
+    data['title'] = request.GET.get('title')
+    selectedId = request.GET.get('selected') if request.GET.get('selected') else ""
+    selectedId = selectedId.strip()
+    selectedId = int(selectedId) if selectedId else ""
+    data["selected_membro_execucao_id"] = selectedId
+    return render(request,'membrosExecucao/membroExecucaoSelect.html', data)

@@ -17,6 +17,7 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "cep",
             "complemento",
             "cidade",
+            "avaliador",
             "pessoa",
             "ticket",
             "itinerario"

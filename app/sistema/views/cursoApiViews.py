@@ -13,7 +13,16 @@ class CursoApiView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
-        cursos = Curso.objects.all()
+        print("dentro da rota de cursos")
+        nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
+        order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
+        cursos = Curso.objects
+        print(nome, order_by)
+        if nome:
+            cursos = cursos.filter(nome__icontains=nome)
+        if order_by:
+            cursos = cursos.order_by(order_by)
+        cursos = cursos.all()
         serializer = CursoSerializer(cursos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -21,7 +30,7 @@ class CursoApiView(APIView):
         data = {
             "nome": request.data.get("nome"),
         }
-
+        
         serializer = CursoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

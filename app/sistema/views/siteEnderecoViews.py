@@ -1,11 +1,11 @@
 from contextlib import redirect_stderr
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.models.curso import Curso
 from sistema.models.endereco import Endereco
 from sistema.models.cidade import Cidade
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests

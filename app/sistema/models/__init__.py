@@ -1,5 +1,5 @@
 from .cidade import Cidade
-from .evento import Evento 
+from .ensino import Ensino 
 from .endereco import Endereco
 from .alocacao import Alocacao
 from .avaliacao import Avaliacao
@@ -11,3 +11,9 @@ from .ticket import Ticket
 from .membroExecucao import MembroExecucao
 from .itinerario import Itinerario
 from .itinerarioItem import ItinerarioItem
+from .tipoAtividade import TipoAtividade
+from .atividade import Atividade
+from .dataRemovida import DataRemovida
+from .dpEvento import DpEvento
+from .departamento import Departamento
+from .servico import Servico

@@ -26,11 +26,13 @@ def gerencia_cidades(request):
 
 @login_required(login_url='/auth-user/login-user')
 def cidadesTable(request):
-    nome = request.GET.get('nome')
-    cidades = Cidade.objects
-    if nome:
-        cidades = cidades.filter(nome__contains = nome)
-    cidades = cidades.all()
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/cidades', params={
+        'nome': request.GET.get('nome'),
+        'order_by': request.GET.get('order_by')
+    }, headers=headers)
+    cidades = json.loads(response.content)
     return render(request,'cidades/cidades_table.html',{'cidades':cidades})
 
 @login_required(login_url='/auth-user/login-user')
@@ -73,9 +75,10 @@ def editarCidade(request, codigo):
 @login_required(login_url='/auth-user/login-user')
 def cidadesSelect(request):
     data = {}
-    print("id da cidade", request.GET)
+    if request.GET.get('selected'):
+        data['cidade_id'] = int(request.GET.get('selected')) if request.GET.get('selected').strip() else None
     if request.GET.get('cidade_id'):
-        data['cidade_id'] = int(request.GET.get('cidade_id'))
+        data['cidade_id'] = int(request.GET.get('cidade_id')) if request.GET.get('cidade_id').strip() else None
     data["cidades"] = Cidade.objects.all()
-    print('cidadesSelect',data)
+
     return render(request,'cidades/cidades_select.html', data)

@@ -1,0 +1,197 @@
+<div class="modal fade" id="cadastrarTipoAtividadeModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarTipoAtividadeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarTipoAtividadeModalLabel">
+                    {% if tipoAtividade is None %}
+                        Cadastrar Tipo de Atividade
+                        <span id="tipoAtividadeModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{tipoAtividade.nome}}
+                        <span id="tipoAtividadeModelId" hidden>{{tipoAtividade.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarTipoAtividade" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "tiposAtividades/tipoAtividadeForm.html" with tipoAtividade=tipoAtividade %}
+            </div>
+            <div class="modal-footer">
+                <button id="formTipoAtividadePrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevTipoAtividadeLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formTipoAtividadeNext" type="button" class="btn btn-primary">
+                    <span id="nextTipoAtividadeLink" class="TipoAtividadeMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if tipoAtividade %}
+                    onclick="editarTipoAtividade({{tipoAtividade.id}})" 
+                {% else %}
+                    onclick="cadastrarTipoAtividade()" 
+                {% endif %}
+                id="finishCadastroTipoAtividade" 
+                type="button"
+                class="btn btn-primary">
+                {% if tipoAtividade %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarTipoAtividadeForm"
+    var tipoAtividadeModelId = "tipoAtividadeModelId"
+    var tabsId = "tiposAtividadesTab"
+    var tipoAtividadeFormSelectCidadeId = "tipoAtividadeFormSelectCidade"
+    var selectedCidadeId = "{{tipoAtividade.cidade.id}}"
+    var cadastrarTipoAtividadeModalId = "cadastrarTipoAtividadeModal"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) carregarTiposAtividades()
+        if (changedResource) $("#"+dismissCadastrarTipoAtividadeId).click()
+    }
+
+    function cadastrarTipoAtividade() {
+        $.ajax({
+            url: "saveTipoAtividade",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarTipoAtividade(id) {
+        $.ajax({
+            url: "/editarTipoAtividade/" + id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#tipoAtividadeTabLink"+nextTab).trigger("click")
+        $("#tiposAtividadesTab"+nextTab).addClass("active-form-tab")
+        $("#tiposAtividadesTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formTipoAtividadeNext"],
+                hide: ["formTipoAtividadePrev", "finishCadastroTipoAtividade"]
+            },
+            last: {
+                show: ["formTipoAtividadePrev", "finishCadastroTipoAtividade"],
+                hide: ["formTipoAtividadeNext"]
+            },
+            middle: {
+                show: ["formTipoAtividadePrev", "formTipoAtividadeNext"],
+                hide: ["finishCadastroTipoAtividade"]
+            },
+            only: {
+                show: ["finishCadastroTipoAtividade"],
+                hide: ["formTipoAtividadePrev", "formTipoAtividadeNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarTipoAtividadeModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+tipoAtividadeModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formTipoAtividadeNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formTipoAtividadePrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        maskValues()
+    });
+</script>

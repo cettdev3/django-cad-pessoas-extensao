@@ -77,4 +77,12 @@ class Acao(models.Model):
     @property
     def data_fim_formatada(self):
         return self.data_fim.strftime("%d/%m/%Y")
+    
+    @property
+    def tipo_foramtado(self):
+        if self.tipo == "emprestimo":
+            return "Empréstimo"
+        if self.tipo == "curso_gps":
+            return "Curso GPS"
+        return self.tipo.replace("_", " ").capitalize()
         

@@ -51,6 +51,11 @@
     background-color: #e3e6f0;
 }
 
+.btn-group-custom button.delete-btn:hover {
+    background-color: #df4759;
+    color: white;
+}
+
 .btn-circle {
     border: none;
     outline: inherit;
@@ -91,4 +96,85 @@
 .active-form-tab {
     background-color: #15865d;
     color: white;
+}
+
+/* TABLE HEADERS */
+.clickable-column:hover {
+    cursor: pointer;
+}
+
+.clickable-column:hover.order-by-up i.arrow-up,
+.clickable-column:hover.order-by-down i.arrow-down {
+    color: #858796;
+    transform: scale(1.2);
+}
+
+.clickable-column:hover.order-by-up i.arrow-up.current-order-by,
+.clickable-column:hover.order-by-down i.arrow-down.current-order-by {
+    color: #000;
+    transform: scale(1.2);
+}
+
+.order-by-up i.arrow-up {
+    color: #858796;
+    display: inline;
+}
+
+.order-by-up i.arrow-down {
+    color: #858796;
+    display: none;
+}
+
+.order-by-down i.arrow-up {
+    color: #858796;
+    display: none;
+}
+
+.order-by-down i.arrow-down {
+    color: #858796;
+    display: inline;
+}
+
+*.order-by-up i.current-order-by,
+*.order-by-down i.current-order-by,
+span.column-label.current-order-by {
+    color: #000;
+}
+
+/* INPUT FILTERS */
+.filter-label {
+    line-height: 0;
+    font-size: 0.8rem;
+}
+
+/* CUSTOM TABS */
+.custom-tab-ul {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+
+.custom-tab-ul>li {
+    flex: 1 1 0;
+}
+
+.custom-tab-ul a.nav-link {
+    background-color: #15865d;
+    color: white;
+    border-radius: 0;
+}
+
+.custom-tab-ul a.nav-link.active {
+    background-color: #1cc88a;
+    color: white;
+    border-radius: 0;
+}
+
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin: 0;
 }

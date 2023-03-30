@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .br {
+        border: 2px solid red;
+    }
+
+    .w-10 {
+        width: 10%;
+    }
+
+    .w-15 {
+        width: 15%;
+    }
+
+    .w-2 {
+        width: 2%;
+    }
+
+    .justify-start {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-group-custom button {
+        background-color: #fff;
+        /* Green background */
+        border: 1px solid #e3e6f0;
+        /* Green border */
+        color: #343a40;
+        /* White text */
+        padding: 10px 24px;
+        /* Some padding */
+        cursor: pointer;
+        /* Pointer/hand icon */
+        float: left;
+        /* Float the buttons side by side */
+    }
+
+    /* Clear floats (clearfix hack) */
+    .btn-group-custom {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .btn-group-custom button:not(:last-child) {
+        border-bottom: none;
+        /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    .btn-group-custom button:hover {
+        background-color: #e3e6f0;
+    }
+
+    .btn-circle {
+        border: none;
+        outline: inherit;
+        background-color: #fff;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar {
+        border: none;
+        outline: inherit;
+        color: white;
+        background-color: #1cc88a;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar:hover {
+        background-color: #15865d;
+        transition: background-color 0.1s;
+    }
+
+    .btn-circle:active {
+        background-color: #ececec;
+        transition: background-color 0.1s;
+    }
+
+    .active-form-tab {
+        background-color: #15865d;
+        color: white;
+    }
+</style>
+<div id="loadingPessoas" 
+style="
+background-color: rgba(125,125,125,0.3); 
+display: none; 
+justify-content: center; 
+align-items: center; 
+width: 100vw; 
+height: 100vh;
+position: absolute;
+overflow: hidden;
+top: 0;
+left: 0;
+z-index: 4
+;">
+    <div class="spinner-border" style="z-index: 5;" role="status">
+        <span class="sr-only">Carregando...</span>
+    </div>
+</div>
+<div style="width: 100%;" class="">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible alert-success" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong class="text-dark">{{message}}</strong>
+        </div>
+        {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div class="d-flex justify-content-start align-items-center">
+            <input id="filterEnsinoOrder_by" hidden 
+            name="order_by" type="text">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterEnsinoObservacao" class="filter-label">Busca</label>
+                <input id="filterEnsinoObservacao" 
+                placeholder="Procurar por etapa" 
+                class="form-control-sm border-secondary"
+                name="observacao" type="text">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterEnsinoDataInicio"
+                class="filter-label">Data de início da ação</label>
+                <input id="filterEnsinoDataInicio"
+                placeholder="Procurar por data de início"
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_inicio">
+            </div>
+            <div class="mx-2  d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterEnsinoDataInicio"
+                class="filter-label">Data de fim da ação</label>
+                <input id="filterEnsinoDataFim"
+                placeholder="Procurar por data de fim"
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_fim">
+            </div>
+            <div class="mx-2 d-flex justify-content-start align-items-center"
+            id="FilterSelectEscolas">
+            </div>
+        </div>
+        <div>
+            <button id="adicionarPessoas" 
+            onclick="carregarEnsinosModalCadastrar()"
+            class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+                <span> cadastrar Ação de Ensino</span>
+            </button>
+        </div>
+    </div>
+    <div id="receberTabelaEnsinos" class="shadow bg-white w-100">
+    </div>
+</div>
+<div id="confirmDeleteModalContainer"></div>
+<!-- Modal -->
+<div id="modalCadastrarEnsinoContainer">
+</div>
+<script>
+    let buttonMenuEnsinosId = "buttonMenuEnsinos"
+    let hiddenMenuEnsinosId = "hiddenMenuEnsinos"
+    let cadastrarEnsinoModalId = "cadastrarEnsinoModal"
+    let cadastrarEnsinoFormId = "cadastrarEnsinoForm"
+    let dismissCadastrarEnsinoId = "dismissCadastrarEnsino"
+</script>
+
+<script>
+    var ensinoModificadaEvent = {};
+    var ensinoModificadaEventProxy = null
+    let modalCadastrarEnsinoContainerId = "modalCadastrarEnsinoContainer"
+    let idTabelaEnsinos = "receberTabelaEnsinos"
+    let rotaTabelaEnsinos = "ensinosTable"
+    let rotaDeletarEnsino = "eliminarEnsino"
+    let rotaModalEnsino = "ensinosModalCadastrar"
+    let rotaVisualizarEnsino = "visualizarEnsino"
+    let ensinoFiltersPrefix = "filterEnsino"
+
+    function getFiltersEnsino() {
+        let filter = {}
+        let filterInputs = document.querySelectorAll(`input[id^=${ensinoFiltersPrefix}]`)
+        filterInputs.forEach((input) => {
+            filter[input.name] = input.value
+        })
+        filter['escolas'] = getDropdownSelectedValues("select-multiple-dropdown-escolas")
+        return filter
+    }
+
+    function filtrarAcoesEnsino() {
+        carregarEnsinos(getFiltersEnsino())
+    }
+
+    function deleteEnsino(id) {
+        deletar_url = rotaDeletarEnsino+"/" + id
+
+        $.ajax({
+            url: deletar_url,
+            data: {},
+            success: function (data) {
+                let menuId = "#" + hiddenMenuEnsinosId + id
+                $(menuId).toggle()
+                carregarEnsinos(getFiltersEnsino())
+            }
+        });
+    }
+
+    function carregarEnsinos(filter = null, state = null) {
+        let recarregarTabela = rotaTabelaEnsinos
+        console.log(filter) 
+        $.ajax({
+            url: recarregarTabela,
+            data: filter ? filter : {},
+            success: function (data) {
+                $("#"+idTabelaEnsinos).html(data);
+                setTabelaState(state, "column-ensino", "-data_inicio")
+            }
+        });
+    }
+
+    function carregarEnsinosModalCadastrar(id = null) {
+        $.ajax({
+            url: "/"+rotaModalEnsino,
+            data: id ? {id: id} : {},
+            success: function (data) {
+                $("#"+modalCadastrarEnsinoContainerId).html(data);
+                $('#'+cadastrarEnsinoModalId).modal('toggle');
+            }
+        });
+    }
+        
+    function visualizarEnsino(id) {
+        location.href = rotaVisualizarEnsino+"/" + id
+    }
+
+    function loadFilterSelectCurso() {
+        let url = "/filterMultipleSelect" 
+        $.ajax({
+            url: url,
+            data: {
+                "label": "Escolas",
+                "placeholder": "Filtrar por escolas",
+                "route": "escolas",
+                "id": "select-multiple-dropdown-escolas",
+            },
+            success: function (data) {
+                $("#FilterSelectEscolas").html(data)
+                watchDropdownChanges("select-multiple-dropdown-escolas", filtrarAcoesEnsino)
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        ensinoModificadaEventProxy = new Proxy(ensinoModificadaEvent, {
+            set: function (target, key, value) {
+                target[key] = value;
+                if (value) {
+                    carregarEnsinos(getFiltersEnsino())
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        function editarEnsino(id) {
+            $.ajax({
+                url: "ensinos",
+                data: JSON.stringify(getFormData()),
+                dataType: "json",
+                contentType: 'application/json',
+                method: "POST",
+                success: function (data) {
+                    $('#'+cadastrarEnsinoFormId)[0].reset();
+                    $("#"+dismissCadastrarEnsinoId).click()
+                    carregarEnsinos(getFiltersEnsino())
+                }
+            });
+        }
+
+        $(document).mouseup(function (e) {
+            $("div[id^='"+hiddenMenuEnsinosId+"']").each(function (i, el) {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
+                    if ($(this).css('display') != 'none') {
+                        $(this).toggle()
+                    }
+                }
+            })
+
+            $("input[id^='"+ensinoFiltersPrefix+"']").each(function () {
+                let input = $(this)
+                if ($(this).attr('type') == 'text') {
+                    $(this)
+                    .keyup(debounce(function() {
+                        filtrarAcoesEnsino()
+                    }, 500))
+                } else {
+                    $(this)
+                    .change(debounce(function() {
+                        filtrarAcoesEnsino()
+                    }, 500))
+                }
+            })
+        });
+
+        carregarEnsinos(getFiltersEnsino())
+        loadFilterSelectCurso()
+    });
+
+</script>
+
+{% endblock content %}

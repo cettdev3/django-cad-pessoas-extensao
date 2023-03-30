@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .br {
+        border: 2px solid red;
+    }
+
+    .w-10 {
+        width: 10%;
+    }
+
+    .w-15 {
+        width: 15%;
+    }
+
+    .w-2 {
+        width: 2%;
+    }
+
+    .justify-start {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-group-custom button {
+        background-color: #fff;
+        /* Green background */
+        border: 1px solid #e3e6f0;
+        /* Green border */
+        color: #343a40;
+        /* White text */
+        padding: 10px 24px;
+        /* Some padding */
+        cursor: pointer;
+        /* Pointer/hand icon */
+        float: left;
+        /* Float the buttons side by side */
+    }
+
+    /* Clear floats (clearfix hack) */
+    .btn-group-custom {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .btn-group-custom button:not(:last-child) {
+        border-bottom: none;
+        /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    .btn-group-custom button:hover {
+        background-color: #e3e6f0;
+    }
+
+    .btn-circle {
+        border: none;
+        outline: inherit;
+        background-color: #fff;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar {
+        border: none;
+        outline: inherit;
+        color: white;
+        background-color: #1cc88a;
+        width: auto;
+        height: 100%;
+        padding: 13px 18px;
+        border-radius: 60px;
+        font-size: 15px;
+        text-align: center;
+        transition: background-color 0.1s;
+    }
+
+    .btn-cadastrar:hover {
+        background-color: #15865d;
+        transition: background-color 0.1s;
+    }
+
+    .btn-circle:active {
+        background-color: #ececec;
+        transition: background-color 0.1s;
+    }
+
+    .active-dpEvento-form-tab {
+        border-bottom: 5px solid #15865d;
+    }
+</style>
+<div id="spinner" style="
+background-color: rgba(125,125,125,0.3); 
+display: none; 
+justify-content: center; 
+align-items: center; 
+width: 100vw; 
+height: 100vh;
+position: absolute;
+overflow: hidden;
+top: 0;
+left: 0;
+z-index: 4
+;">
+    <div class="spinner-border" style="z-index: 5;" role="status">
+        <span class="sr-only">Carregando...</span>
+    </div>
+</div>
+<div style="width: 100%;" class="">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-dismissible alert-success" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong class="text-dark">{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div class="d-flex justify-content-start align-items-center ">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoDataInicio" class="filter-label">Data de início do evento</label>
+                <input id="filterDpEventoDataInicio" class="form-control-sm border-secondary" name="data_inicio"
+                    type="date">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoDataFim" class="filter-label">Data de Fim do evento</label>
+                <input id="filterDpEventoDataFim" class="form-control-sm border-secondary" name="data_fim" type="date">
+            </div>
+            <input type="text" hidden id="filterDpEventoTipo" name="order_by">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoTipo" class="filter-label">Tipo</label>
+                <select name="tipo" id="filterDpEventoTipo" class="form-control-sm border-secondary">
+                    <option value="">Selecione uma opção</option>
+                    <option value="emprestimo">Empréstimo</option>
+                    <option value="curso_gps">Curso GPS</option>
+                    <option value="feirao">Feirão do Emprego</option>
+                    <option value="goias_feito_a_mao">Goiás Feito à Mão</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+            <input type="text" name="order_by" id="filterDpEventoOrderBy" hidden>
+        </div>
+        <div class="d-flex">
+            <button id="relatorioDpEvento" onclick="emitirRelatorio()"
+                class="btn-cadastrar rounded d-flex justify-content-between align-items-center mr-2">
+                <span>Emitir Relatório</span>
+            </button>
+            <button id="adicionarDpEvento" onclick="carregarDpEventosModalCadastrar()"
+                class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+                <span> cadastrar Evento</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-100" id="modalDpEvento">
+    </div>
+
+    <div class="w-100" id="dpEventoTable">
+    </div>
+
+    <div class="w-100" id="modalFiltrosRelatorioEventos">
+    </div>
+
+</div>
+<script>
+    var filterPrefix = "filterDpEvento"
+    var idTabelData = "dpEventoTable"
+    var idModal = "modalDpEvento"
+    var rotaModalDpEvento = "/dpEventoModal"
+    var rotaTableDpEvento = "/dpEventoTable"
+
+    function getDpEventoFilters() {
+        let filtros = {}
+        $("*[id^='" + filterPrefix + "']").each(function () {
+            console.log($(this).attr("name"))
+
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        return filtros
+    }
+    function carregarDpEventosModalCadastrar(id = null) {
+        let data = {
+            id: id
+        }
+
+        $.ajax({
+            url: rotaModalDpEvento,
+            dataType: "html",
+            data: data,
+            contentType: "application/json",
+            type: "GET",
+            success: function (data) {
+                $("#" + idModal).html(data);
+                // $('#'+cadastrarDpEventoModalId).modal('toggle');
+            }
+        });
+    }
+
+    function emitirRelatorio() {
+        $.ajax({
+            url: "/filtrosRelatorioEventosModal",
+            success: function (data) {
+                $("#modalFiltrosRelatorioEventos").html("");
+                $("#modalFiltrosRelatorioEventos").html(data);
+                $("#modalRelatorioEventos").modal("toggle");
+            }
+        });
+    }
+
+    function carregarDpEventos(filter = null, state = null) {
+        $.ajax({
+            url: rotaTableDpEvento,
+            data: filter ? filter : {},
+            success: function (data) {
+                $("#" + idTabelData).html(data);
+                setTabelaState(state, 'column-dp-evento', "-data_inicio")
+            }
+        });
+    }
+
+    function filtrarDpEvento() {
+        carregarDpEventos(getDpEventoFilters())
+    }
+
+    function startFilterControl() {
+        $("*[id^='"+filterPrefix+"']").each(function () {
+            let input = $(this)
+            console.log(input.attr('id'))
+            if ($(this).attr('type') == 'text') {
+                $(this)
+                .keyup(debounce(function() {
+                    filtrarDpEvento()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    filtrarDpEvento()
+                }, 500))
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        startFilterControl()
+        carregarDpEventos()
+    })
+</script>
+{% endblock content %}

@@ -127,12 +127,32 @@ z-index: 4
     d-flex justify-content-between align-items-center 
     px-3 py-3 my-3
     bg-white">
-        <div>
-            <input id="filterAcaoTipo" 
-            placeholder="Digite um tipo" 
-            class="form-control-sm border-secondary"
-            name="tipo" 
-            type="text">
+        <div class="d-flex justify-content-start align-items-center ">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterAcaoDataInicio" class="filter-label">Data de Inicio da Ação</label>
+                <input id="filterAcaoDataInicio" 
+                class="form-control-sm border-secondary"
+                name="data_inicio" 
+                type="date">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterAcaoDataFim" class="filter-label">Data de Fim da Ação</label>
+                <input id="filterAcaoDataFim" 
+                class="form-control-sm border-secondary"
+                name="data_fim" 
+                type="date">
+            </div>
+            <input type="text" hidden id="filterAcaoOrderBy" name="order_by">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterAcaoOrderBy" class="filter-label">Tipo</label>
+                <select name="tipo" id="filterAcaoOrderBy"
+                class="form-control-sm border-secondary" >
+                    <option value="">Selecione uma opção</option>
+                    <option value="emprestimo">Empréstimo</option>
+                    <option value="curso_gps">Curso GPS</option>
+                    <option value="feirao">Feirão</option>
+                </select>
+            </div>
         </div>
         <div>
             <button id="adicionarAcao" 
@@ -157,6 +177,16 @@ z-index: 4
     var rotaModalAcao = "/acaoModal"
     var rotaTableAcao = "/acaoTable"
 
+    function gerAcaoFiltros() {
+        let filtros = {}
+        $("*[id^='"+filterPrefix+"']").each(function() {
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        return filtros
+    }
+
     function carregarAcoesModalCadastrar(id = null) {
         let data = {
             id: id
@@ -175,41 +205,37 @@ z-index: 4
         });
     }
     
-    function carregarAcoes(filter = null) {
+    function carregarAcoes(filter = null, state = null) {
         $.ajax({
             url: rotaTableAcao,
             data: filter ? filter : {},
             success: function (data) {
                 $("#"+idTabelData).html(data);
+                setTabelaState(state, 'column-acao', "data_inicio")
             }
         });
     }
 
-    function debounce(func, timeout = 300){
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => { func.apply(this, args); }, timeout);
-        };
-    }
-
     function filtrarAcao() {
-        let filtros = {}
-        $("input[id^='"+filterPrefix+"']").each(function() {
-            if ($(this).val()) {
-                filtros[$(this).attr("name")] = $(this).val()
-            }
-        })
-        console.log(filtros)
-        carregarAcoes(filtros)
+        carregarAcoes(gerAcaoFiltros())
     }
 
     function startFilterControl() {
-        $("input[id^='"+filterPrefix+"']").each(function () {
-            $(this)
-            .keyup(debounce(function() {
-                filtrarAcao()
-            }, 500))
+
+        $("*[id^='"+filterPrefix+"']").each(function () {
+            let input = $(this)
+            console.log(input.attr('id'))
+            if ($(this).attr('type') == 'text') {
+                $(this)
+                .keyup(debounce(function() {
+                    filtrarAcao()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    filtrarAcao()
+                }, 500))
+            }
         })
     }
 

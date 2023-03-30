@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework import permissions
 
 from ..models.acao import Acao
+from ..models.dpEvento import DpEvento
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
 from ..models.ticket import Ticket
@@ -62,9 +63,17 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe acao com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        else:
+        evento = None
+        if request.data.get("evento_id"):
+            evento = self.get_object(DpEvento, request.data.get("evento_id"))
+            if not evento:
+                return Response(
+                    {"res": "Não existe evento com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        if not acao and not evento:
             return Response(
-                {"res": "É necessário informar a ação"},
+                {"res": "É necessário informar a ação ou o evento para o membro de execução"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -76,9 +85,11 @@ class MembroExecucaoApiView(APIView):
             "cep": request.data.get("cep") if request.data.get("cep") else None,
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "tipo": request.data.get("tipo") if request.data.get("tipo") else None,
+            "avaliador": request.data.get("avaliador") if request.data.get("avaliador") else None,
             "cidade": cidade,
             "pessoa": pessoa,
             "acao": acao,
+            "evento": evento,
         }
 
         membroExecucao = MembroExecucao.objects.create(**data)
@@ -129,6 +140,11 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.cep = request.data.get("cep")
         if request.data.get("complemento"):
             membroExecucao.complemento = request.data.get("complemento")
+        if request.data.get("avaliador"):
+            membroExecucao.avaliador = request.data.get("avaliador")
+        else:
+            membroExecucao.avaliador = False
+            
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:

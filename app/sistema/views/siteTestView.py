@@ -4,11 +4,11 @@ from django.shortcuts import render, redirect
 from sistema.serializers.alocacaoSerializer import AlocacaoSerializer
 from sistema.serializers.cursoSerializer import CursoSerializer
 from sistema.serializers.pessoaSerializer import PessoaSerializer
-from sistema.serializers.eventoSerializer import EventoSerializer
+from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.models.pessoa import Pessoas
 from sistema.models.alocacao import Alocacao
 from sistema.models.curso import Curso
-from sistema.models.evento import Evento
+from sistema.models.ensino import Ensino
 from sistema.models.escola import Escola
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -47,8 +47,8 @@ def testeEdit(request):
 def testeModal(request):
     # buscar apenas 1 id para editar
     data = {}
-    eventos = Evento.objects.filter(~Q(status="finalizado"))
-    eventos = EventoSerializer(eventos, many=True)
+    eventos = Ensino.objects.filter(~Q(status="finalizado"))
+    eventos = EnsinoSerializer(eventos, many=True)
     data['eventos'] = eventos.data
 
     alocacao_id = request.GET.get('alocacao_id')

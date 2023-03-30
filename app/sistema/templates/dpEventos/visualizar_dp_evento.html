@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .cs-tab-link{
+        color: gray;
+        padding: 8px;
+    }
+    
+    .cs-tab-link .active {
+        background-color: #0c504b;
+        border-radius: 5px 5px 0px 0px;
+        padding: 8px 12px;
+        color: white;
+    }
+    
+    .cs-tab-link a{
+        text-decoration: none;
+        color: gray;
+    }
+
+    .cs-tab-link a:hover{
+        text-decoration: none;
+    }
+</style>
+<div 
+class="card shadow mb-4 w-100" 
+style="height: calc(100vh - 75px); overflow-y: hidden;">
+    <div class="d-flex justify-content-between pt-3 px-2">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-location-dot "></i>
+                <span class="ml-2"><strong>{{dpEvento.cidade.nome}},  </strong>{{dpEvento.endereco_completo}}</span>
+            </div>
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-calendar-days"></i>
+                 <span class="ml-2">de {{dpEvento.data_inicio_formatada}}  até </span>
+                <span class="ml-2">{{dpEvento.data_fim_formatada}}</span>
+            </div>
+        </div>
+        <div id="add-membro-execucao-btn">
+            <div data-toggle="tooltip" data-placement="top" title="Adicionar Membro a Equipe de Execução"
+            class="d-flex align-items-center ">            
+                <button onclick="addMembroExecucaoModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+        <div id="add-atividade-btn">
+            <div  data-toggle="tooltip" data-placement="top" title="Adicionar Atividade"
+            class="d-flex align-items-center ">            
+                <button onclick="addAtividadeModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+        <div id="add-avaliacao-btn">
+            <div data-toggle="tooltip" data-placement="top" title="Adicionar Avaliação" 
+            class="d-flex align-items-center ">            
+                <button onclick="addAvaliacaoModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body w-100">
+        <ul id="dpEvento-visualizar-tabs" class="nav nav-tabs w-100">
+            <li class=" cs-tab-link active">
+                <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
+            </li>
+        </ul>
+        <div class="tab-content w-100 h-100">
+            <div id="membrosExecucao" 
+            class="tab-pane active in h-100"
+            style="overflow-y: scroll;" >
+                <div id="receberTabelaMembrosExecucao"></div>
+            </div>
+            <div id="itinerarios" class="tab-pane" style="height: 100%;">
+                {% include "itinerarios/itinerario_input.html" with itinerario=dpEvento acao=dpEvento %}
+            </div>
+            <div id="atividades" class="tab-pane" style="height: 100%;">
+                <div id="atividadesTableContainer"></div>
+            </div>
+            <div id="avaliacao" class="tab-pane" style="height: 100%;">
+                <div id="avaliacaoLocalTableContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalMembroExecucaoContainer"></div>
+<div id="modalAtividadeContainer"></div>
+<div id="modalAvaliacaoContainer"></div>
+<div id="modalServicoContainer"></div>
+<script>
+    let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
+    let buttonMenuMembrosExecucaoId = "buttonMenuMembrosExecucao"
+    let hiddenMenuMembrosExecucaoId = "hiddenMenuMembrosExecucao"
+    let cadastrarMembroExecucaoModalId = "cadastrarMembroExecucaoModal"
+    let cadastrarMembroExecucaoFormId = "cadastrarMembroExecucaoForm"
+    let dismissCadastrarMembroExecucaoId = "dismissCadastrarMembroExecucao"
+    let rotaDeletarMembroExecucao = "eliminarMembroExecucao"
+    let rotaModalMembroExecucao = "membroExcucaoModalCadastrar"
+    let rotaVisualizarMembroExecucao = "visualizarMembroExecucao"
+</script>
+<script>
+    let membroExecucaoModificadaEvent = {};
+    let membroExecucaoModificadaEventProxy = null
+    let idTabelaMembrosExecucao = "receberTabelaMembrosExecucao"
+    let rotaTabelaMembrosExecucao = "membrosExecucaoDpEventoTable"
+    let dpEventoId = "{{dpEvento.id}}" 
+
+    function reloadMap() {
+        $('body').trigger('reloadMap')
+    }
+
+    function addMembroExecucaoModal() {
+        $.ajax({
+            url: "/membroExecucaoModal",
+            method: "GET",
+            data: {
+                evento_id: dpEventoId
+            },
+            success: function (data) {
+                $("#modalMembroExecucaoContainer").html('');
+                $("#modalMembroExecucaoContainer").html(data);
+                $('#cadastrarMembroExecucaoModal').modal('show');
+            }
+        });
+    }
+    
+    function addAtividadeModal() {
+        $.ajax({
+            url: "/atividadeModal",
+            method: "GET",
+            data: {
+                dp_evento_id: dpEventoId
+            },
+            success: function (data) {
+                $("#modalAtividadeContainer").html('');
+                $("#modalAtividadeContainer").html(data);
+                $('#cadastrarAtividadeModal').modal('show');
+            }
+        });
+    }
+    
+    function addAvaliacaoModal() {
+        $.ajax({
+            url: "/avaliacaoModal",
+            method: "GET",
+            data: {
+                dp_evento_id: dpEventoId
+            },
+            success: function (data) {
+                $("#modalAvaliacaoContainer").html('');
+                $("#modalAvaliacaoContainer").html(data);
+                $('#cadastrarAvaliacaoModal').modal('show');
+            }
+        });
+    }
+
+    function carregarAtividades() {
+
+        $.ajax({
+            url: "/atividadesDpEventoTable",
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#atividadesTableContainer").html(data);
+            }
+        });
+    }
+
+    function carregarAvaliacaoLocal() {
+        $.ajax({
+            url: "/avaliacoesDpEventoTable",
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#avaliacaoLocalTableContainer").html(data);
+            }
+        });
+    }
+
+    function deleteMembroExecucao(id) {
+        deletar_url = "/eliminarMembroExecucao/" + id
+
+        $.ajax({
+            url: deletar_url,
+            method: "DELETE",
+            data: {},
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            success: function (data) {
+                let menuId = "#"+hiddenMenuMembrosExecucaoId+ id
+                $(menuId).toggle()
+                carregarMembrosExecucao()
+            }
+        });
+    }
+
+    function carregarMembrosExecucao() {
+        $.ajax({
+            url: "/"+rotaTabelaMembrosExecucao,
+            contentType: 'application/json',
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#" + idTabelaMembrosExecucao).html(data);
+            }
+        });
+    }
+    
+    function dpEventoVisualizarTabsControl(id) {
+        console.log(id)
+        if (id == "membro-execucao-tab") {
+            $("#add-membro-execucao-btn").show()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
+        } else if (id == "itinerarios-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
+            reloadMap()
+        } else if (id == "atividades-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").show()
+            $("#add-avaliacao-btn").hide()
+        } else if (id == "avaliacao-local-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").show()
+        }
+    }
+    
+    $(document).ready(function() {
+        membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
+            set: function (target, key, value) {
+                target[key] = value;
+                if (value) {
+                    carregarMembrosExecucao()
+                    $('#cadastrarMembroExecucaoModal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                }
+                target[key] = false
+                return false;
+            }
+        });
+
+        carregarMembrosExecucao()
+        carregarAtividades()
+        carregarAvaliacaoLocal()
+        $("body").css("overflow", "hidden")
+        $("#dpEvento-visualizar-tabs a").each(function() {
+            let link = $(this)
+            link.on("click", function() {
+                dpEventoVisualizarTabsControl(link.attr("id"))
+            })
+        })
+        $("#membro-execucao-tab").trigger("click")
+    })
+</script>
+
+{% endblock content %}

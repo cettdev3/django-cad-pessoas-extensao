@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3'
 
 services:
   dbextensao:
@@ -13,13 +13,17 @@ services:
     volumes:
       - ./logs:/var/log/mysql:rw
       - ./data:/var/lib/mysql:rw
-
+  
   cad-pessoas-extensao:
     image: cad-pessoas-extensao
     restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        - USER_NAME=${APP_USER_NAME}
+        - GID=${APP_UID}
+        - UID=${APP_GID}
     labels:
       - "traefik.enable=true"
       - "traefik.constraint-label-stack=cad-pessoas-extensao"
@@ -36,6 +40,7 @@ services:
     depends_on:
       - dbextensao
     environment:
+      - TZ:"America/Sao_Paulo"
       - NODE_ENV=production
       - TOPIC=putProtocolo
       - ENG_REST_URL=${CAMUNDA_URL}
@@ -59,10 +64,35 @@ services:
       - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
       - MYSQL_HOST=${EXT_MYSQL_HOST}
       - MYSQL_DATABASE=${EXT_MYSQL_USER}
-    # ports:
-    #   - 8081:8000
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - CELERY_BROKER=redis://redis:6379/0
+    ports:
+      - 8081:8000
     volumes:
-      - ./app:/home/appuser
+      - ./app:/home/${APP_USER_NAME}
+  
+  celery:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - USER_NAME=${APP_USER_NAME}
+        - GID=${APP_UID}
+        - UID=${APP_GID}
+    container_name: celery
+    command: celery -A extensao worker --loglevel=INFO
+    volumes:
+      - ./app:/home/${APP_USER_NAME}
+    depends_on:
+      - redis
+      - cad-pessoas-extensao
+  
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - ./data:/data
 
 networks:
   default:

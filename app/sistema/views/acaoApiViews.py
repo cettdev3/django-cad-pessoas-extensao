@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
-
+from django.db.models import Q
 class AcaoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -31,7 +31,6 @@ class AcaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        print("kdsfjksahfljkashflkash")
         acoes = Acao.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
             queryset=MembroExecucao.objects.order_by('ticket__status')
@@ -39,7 +38,19 @@ class AcaoApiView(APIView):
 
         if request.GET.get("tipo"):
             acoes = acoes.filter(tipo__icontains=request.GET.get("tipo"))
-        reset_queries()
+        if request.GET.get("order_by"):
+            acoes = acoes.order_by(request.GET.get("order_by"))
+        if request.GET.get("data_inicio") and not request.GET.get("data_fim"):
+            data_inicio = request.GET.get("data_inicio")
+            acoes = acoes.filter(data_inicio__gte=data_inicio)
+        if request.GET.get("data_fim") and not request.GET.get("data_inicio"):
+            data_fim = request.GET.get("data_fim")
+            acoes = acoes.filter(data_fim__lte=data_fim)
+        if request.GET.get("data_inicio") and request.GET.get("data_fim"):
+            data_inicio = request.GET.get("data_inicio")
+            data_fim = request.GET.get("data_fim")
+            acoes = acoes.filter(Q(data_inicio__range=[data_inicio, data_fim]) | 
+                                 Q(data_fim__range=[data_inicio, data_fim]))
         acoes = acoes.all()
         serializer = AcaoSerializer(acoes, many=True)
 
@@ -123,7 +134,6 @@ class AcaoApiView(APIView):
                     print("dados vindos do post: ",postItinerarioItemData)
                     data = postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None
                     if data:
-                        # convert str '2023-01-16T10:09' to datetime
                         data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
                     itinerarioItemData = {
                         "data_hora": data,

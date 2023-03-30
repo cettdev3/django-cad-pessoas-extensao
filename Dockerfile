@@ -7,6 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
+ARG USER_NAME
+ARG UID
+ARG GID
+
 #Set the locale
 RUN apt update && apt dist-upgrade -y
 RUN apt install -y locales libc-bin locales-all
@@ -14,9 +18,9 @@ RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev
 RUN apt-get install -y default-mysql-client libmariadb-dev-compat libmariadb-dev 
 
 RUN sed -i '/pt_BR.UTF-8/s/^#//g' /etc/locale.gen \
-    && locale-gen en_US en_US.UTF-8 pt_BR pt_BR.UTF-8 \
-    && dpkg-reconfigure locales \
-    && update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
+  && locale-gen en_US en_US.UTF-8 pt_BR pt_BR.UTF-8 \
+  && dpkg-reconfigure locales \
+  && update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
 ENV LANG pt_BR.UTF-8  
 ENV LANGUAGE pt_BR:pt  
 ENV LC_ALL pt_BR.UTF-8
@@ -35,15 +39,15 @@ RUN python -m pip install -r requirements.txt -U
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 1000 --disabled-password --gecos "" appuser && chown -R appuser /home/appuser
+RUN adduser -u $UID --disabled-password --gecos "" $USER_NAME && chown -R $USER_NAME /home/$USER_NAME
 
-WORKDIR /home/appuser
-# COPY ./app /home/appuser
+WORKDIR /home/$USER_NAME
+# COPY ./app /home/$USER_NAME
 
-# RUN chown -R appuser:appuser /home/appuser
-USER appuser
-# RUN mkdir /home/appuser/templates
-# RUN mkdir /home/appuser/outputs
+# RUN chown -R $USER_NAME:$USER_NAME /home/$USER_NAME
+USER $USER_NAME
+# RUN mkdir /home/$USER_NAME/templates
+# RUN mkdir /home/$USER_NAME/outputs
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,0 +1,532 @@
+<style>
+    :root {
+        --dpEventoModalHeaderHeight: 120px;
+        --dpEventoModalFooterHeight: 50px;
+    }
+
+    .custom-modal-fade {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .custom-modal {
+        position: fixed;
+        border-radius: 5px;
+        top: 20%;
+        left: 50%;
+        max-height: 100vh;
+        max-width: 100vw;
+        overflow: hidden;
+        transform: translate(-50%, -20%);
+        background-color: #fff;
+        z-index: 1000;
+    }
+
+    .custom-modal-header {
+        position: relative;
+        width: 100%;
+        max-height: var(--dpEventoModalHeaderHeight);
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-modal-body {
+        position: relative;
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        height: var(--dpEventoModalFooterHeight);
+        background-color: #fff;
+        z-index: 1001;
+    }
+
+    .custom-close-modal {
+        height: 40px;
+        cursor: pointer;
+        background-color: #fff;
+        border:none;
+        z-index: 1002;
+    }
+
+    .custom-modal-large-content {
+        max-width: 95vw !important;
+        max-height: calc(100vh - var(--dpEventoModalFooterHeight) - var(--dpEventoModalHeaderHeight));
+    }
+
+    .custom-modal-medium-content {
+        max-width: 75vw !important;
+        max-height: calc(75vh - var(--dpEventoModalFooterHeight) - var(--dpEventoModalHeaderHeight));
+    }
+
+    .custom-modal-small-content {
+        max-width: 50vw !important;
+        max-height: calc(50vh - var(--dpEventoModalFooterHeight) - var(--dpEventoModalHeaderHeight));
+    }
+
+    .bg-red {
+        background-color: red;
+    }
+
+    .dpEvento-modal-header-title {
+        font-size: 1.5rem;
+    }
+
+    .custom-modal-body-container {
+        max-height: calc(100vh - var(--dpEventoModalFooterHeight) - var(--dpEventoModalHeaderHeight)); 
+        overflow-y: auto; 
+        overflow-x: hidden;
+    }
+
+    .w-100-perc {
+        width: 100%!important; 
+    }
+    
+    .w-75-perc {
+        width: 75%!important; 
+    }
+
+    .w-100-vw {
+        width: 100vw!important; 
+    }
+    
+    .w-75-vw {
+        width: 75vw!important; 
+    }
+
+    .dpEvento-modal-itinerario-container {
+        width: 100%; 
+        height: calc(95vh - var(--dpEventoModalFooterHeight) - var(--dpEventoModalHeaderHeight)); 
+        background-color: #fff;
+    }
+</style>
+<div id="document"></div>
+<div class="custom-modal-fade"></div>
+<div class="custom-modal">
+    <div class="custom-modal-header pl-2">
+        <div class="d-flex flex-column">
+            <div class="dpEvento-modal-header-title d-flex justify-content-between">
+                {% if not dpEvento %}
+                <span class="py-2">Cadastrar Evento</span>
+                {% else %}
+                <span class="py-2">Editar Evento</span>
+                {% endif %}
+                <button type="button" style="width: 50px; color: gray;" 
+                class="custom-close-modal d-flex justify-content-center align-items-center p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <ul class="nav nav-tabs row" style="height: 100%;">
+                <li id="dpEventoTabs1" class="col mx-2 active-dpEvento-form-tab ">
+                    <a id="dpEventosTabLink1" data-toggle="tab" style="display: none;" role="tab" href="#home">1</a>
+                    <span>1 Dados Gerais</span>
+                </li>
+                {% if not dpEvento %}
+                <li id="dpEventoTabs2" class="col mx-2">
+                    <a id="dpEventosTabLink2" data-toggle="tab" style="display: none;" role="tab" href="#pessoas">2</a>
+                    <span>2 Equipe de Execução</span>
+                </li>
+                <li id="dpEventoTabs3" class="col mx-2">
+                    <a id="dpEventosTabLink3" data-toggle="tab" style="display: none;" role="tab" href="#itinerarios">3</a>
+                    <span>3 Itinerários</span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div class="custom-modal-body custom-modal-large-content">
+        <form id="cadastrarDpEventoForm" class="custom-modal-body-container w-75-vw px-2">
+            <div id="dpEvento-tabs" class="tab-content">
+                <div id="home" class="tab-pane active">
+                    {% include "dpEventos/dp_evento_form.html" with dpEvento=dpEvento %}
+                </div>
+                {% if not dpEvento %}
+                <div id="pessoas" class="tab-pane">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h3">Adicionar Equipe de Execução</span>
+                        <div class="d-flex justify-content-end">
+                            <div class="form-group d-flex justify-content-start align-items-start">
+                                <input name="use_dpEvento_endereco"  
+                                id="use_dpEvento_endereco" 
+                                style="width: 10%; cursor: pointer" 
+                                type="checkbox">
+                                <label for="use_dpEvento_endereco" 
+                                style="line-height: 1rem;white-space: nowrap;">
+                                    <b>Usar endereço do Evento</b>
+                                </label>
+                            </div>
+                            <button id="btn-add-pessoa-0"
+                            type="button"
+                            class="btn btn-primary d-inline-flex ml-2" style="height: 50%" 
+                            onclick="addPessoa()">
+                            Adicionar Membro
+                            </button>
+                        </div>
+                    </div>
+                    <hr>
+                    {% if dpEvento %}
+                    modo edicao
+                    <div id="pessoas_tickets" class="w-100">
+                    </div>
+                    {% else %}
+                    <div id="pessoas_tickets" class="w-100">
+                    </div>
+                    {% endif %}
+                </div>
+                <div id="itinerarios" class="tab-pane">
+                    <div class="dpEvento-modal-itinerario-container">
+                        {% include "itinerarios/itinerario_input.html" %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="custom-modal-footer">      
+        <button id="formDpEventosPrev" style="display: none;" type="button" class="btn btn-secondary prev mx-2">
+            <span id="prevDpEventosLink" class=""></span>
+            <span>Anterior</span>
+        </button>
+        <button id="formDpEventosNext" type="button" class="btn btn-primary mx-2">
+            <span id="nextDpEventosLink" class="DpEventosMenuLink2">
+            </span>
+            <span>Próximo</span>
+        </button>
+        <button 
+        {% if dpEvento %}
+            onclick="editarDpEventos('{{dpEvento.id}}')" 
+        {% else %}
+            onclick="cadastrarDpEvento()" 
+        {% endif %}
+        id="finishCadastroDpEventos" 
+        type="button" 
+        class="btn btn-primary mx-2">
+        {% if dpEvento %}
+        <span>Salvar Alterações</span>
+        {% else %}
+        <span>Cadastrar</span>
+        {% endif %}
+        </button>
+    </div>
+</div>
+<script>
+    var formId = "cadastrarDpEventoForm"
+    var dpEventoModelId = "dpEventoModelId"
+    var tabsId = "dpEventoTabs"
+    var cadastrarDpEventoModalId = "cadastrarDpEventoModal"
+    var pessoasTicketsForm = "pessoaDpEventoForm"
+    var dismissCadastrarDpEventosId = "dismissCadastrarDpEventos"
+
+    function setMembroExecucaoAddressForm(addressValues, formId = null) {
+        let addressFormId = formId ? formId : "collapse_endereco_input_"
+        $("*[id^='"+addressFormId+"'").each(function(index) {
+            let form = $(this)
+            for (key in addressValues) {
+                if ($(this).attr("id").includes(key)) {
+                    $(this).val(addressValues[key])
+                }
+            }
+        })
+    }
+
+    function addPessoa() {
+        var forms = $("#pessoas_tickets").children().length
+        addMembroExecucaoForm(forms)
+        
+        if (forms >= 1) {
+            $("button[id^=btn-remove-pessoa-").each(function(index) {
+                $(this).show()
+            })
+        }
+    }
+
+    function setHideDelete() {
+        var forms = $("div[id^='pessoas_ticket_form_container']").length
+        if (forms <= 1) {
+            $("span[id^=btn-remove-pessoa-]").each(function(index) {
+                $(this).hide()
+            })
+        } else {
+            $("span[id^=btn-remove-pessoa-]").each(function(index) {
+                $(this).show()
+            })
+        }
+    }
+
+    function removePessoa(id) {
+        var forms = $("#pessoas_tickets").children().length
+
+        $("#pessoas_ticket_form_container_" + id).remove()
+        setHideDelete()
+    }
+
+    function addMembroExecucaoForm(id) {
+        $.ajax({
+            url: "/membroExecucaoForm",
+            type: "GET",
+            data: {id: id, hide_remove_button: id == 0},
+            success: function (data) {
+                $("#pessoas_tickets").append(data);
+                let formId = "collapse_endereco_input_" + id
+                if ($("#use_dpEvento_endereco").is(":checked")) {
+                    setMembroExecucaoAddressForm(getFormData(), formId)
+                } 
+
+                setHideDelete()
+            }
+        });
+    }
+
+    function clearModalForm(changedResource = null) {
+        if (changedResource) dpEventoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarDpEventosId).click()
+        $(".custom-modal-fade").trigger("click")
+    }
+
+    function cadastrarDpEvento() {
+        console.log("itinerario: ",getItinerarioData())
+        console.log("formulario: ",getFormData())
+        $.ajax({
+            url: "/saveDpEvento",
+            data: JSON.stringify({"data": getFormData(), "itinerarios": getItinerarioData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+    
+    function editarDpEventos(id) {
+        $.ajax({
+            url: "/editarDpEvento/"+id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+        var pessoa_tickets = []
+        $.map(unindexed_array, function (n, i) {
+            console.log(n['name'], n['value'])
+            values[n['name']] = n['value'];
+        });
+
+        $("form[id^='pessoaTicketForm-']").each(function(index) {
+            var pessoa_ticket = {}
+            var pessoa_ticket_unindexed_array = $(this).serializeArray();
+            $.map(pessoa_ticket_unindexed_array, function (n, i) {
+                pessoa_ticket[n['name']] = n['value'];
+            });
+            pessoa_tickets.push(pessoa_ticket)
+        });
+        values["membros_execucao"] = pessoa_tickets
+
+        return values
+    }
+
+    function closeBehavior() {
+        $('.custom-modal-fade').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+
+        $('.custom-close-modal').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+
+        $('.custom-complete-modal').click(function () {
+            $('.custom-modal-fade').fadeToggle();
+            $('.custom-modal').fadeToggle();
+            $("body").css("overflow", "auto")
+        })
+    }
+
+    function openCustomModal() {
+        $('.custom-modal-fade').fadeIn(250);
+        $('.custom-modal').fadeIn(250);
+        $("body").css("overflow", "hidden")
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='" + "dpEventoTabs" + "']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-dpEvento-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+    
+    function getTabs() {
+        let activeTabs = $("*[id^='" + "dpEventoTabs" + "']")
+        return activeTabs
+    }
+
+    function functionGetTabsQuantity() {
+        let tabs = $("*[id^='" + "dpEventoTabs" + "']")
+        return $("*[id^='" + "dpEventoTabs" + "']").length
+    }
+
+    function addEquipeMembersToItinerario() {
+        console.log("dentro de add memebros de equipe: ", getFormData().membros_execucao)
+        getFormData().membros_execucao.forEach(function (membroEquipe, index) {
+            console.log("membroEquipe: ", membroEquipe)
+            addMembroEquipeOnItinerario(membroEquipe)
+        })
+    }
+
+    function processItinerarioTab() {
+        let activeId = $("#dpEvento-tabs > div:nth-child("+getActiveTab()+")").attr("id")
+        let customModalBodyContainer = $(".custom-modal-body-container").first()
+        if (activeId == "itinerarios") {
+            if (!customModalBodyContainer.hasClass("w-100-vw")) {
+                customModalBodyContainer.removeClass("w-75-vw")
+                customModalBodyContainer.addClass("w-100-vw")
+            }
+            addEquipeMembersToItinerario()
+            $('body').trigger('reloadMap')
+        } else {
+            try {
+                removeItinerarioEquipeMembers()
+            } catch (e) {
+                console.log("Erro ao remover membros do itinerario: ", e)
+            }
+            customModalBodyContainer.removeClass("w-100-vw")
+            customModalBodyContainer.addClass("w-75-vw")
+        }
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+            $("#" + elementId).show()
+        })
+
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+
+        processItinerarioTab()
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#dpEventosTabLink" + nextTab).trigger("click")
+        $("#dpEventoTabs" + nextTab).addClass("active-dpEvento-form-tab")
+        $("#dpEventoTabs" + activeTab).removeClass("active-dpEvento-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formDpEventosNext"],
+                hide: ["formDpEventosPrev", "finishCadastroDpEventos"]
+            },
+            last: {
+                show: ["formDpEventosPrev", "finishCadastroDpEventos"],
+                hide: ["formDpEventosNext"]
+            },
+            middle: {
+                show: ["formDpEventosPrev", "formDpEventosNext"],
+                hide: ["finishCadastroDpEventos"]
+            },
+            only: {
+                show: ["finishCadastroDpEventos"],
+                hide: ["formDpEventosPrev", "formDpEventosNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        console.log("activTabFn: ", activTabFn)
+        console.log("tabsQuantity: ", tabsQuantity)
+        if (activTabFn == 1 && tabsQuantity > 1) {
+            showHideTabs(tabsControl.first)
+        } else if (tabsQuantity == 1) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    function bindEnderecosInputs() {
+        $("#logradouro").change(function() {
+            if ($("#use_dpEvento_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#bairro").change(function() {
+            if ($("#use_dpEvento_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#cep").change(function() {
+            if ($("#use_dpEvento_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#complemento").change(function() {
+            if ($("#use_dpEvento_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+        $("#cidade_id").change(function() {
+            if ($("#use_dpEvento_endereco").is(":checked")) {
+                setMembroExecucaoAddressForm(getFormData())
+            }
+        })
+    }
+    
+    $(document).ready(function () {
+        closeBehavior();
+
+        setTabsbehavior()
+        $("#formDpEventosNext").click(function (event) {
+            event.preventDefault()
+            processTabBtnClick(1)
+        })
+        $("#formDpEventosPrev").click(function (event) {
+            event.preventDefault()
+            processTabBtnClick(-1)
+        })
+        $("#use_dpEvento_endereco").change(function () {
+            if (this.checked) setMembroExecucaoAddressForm(getFormData())
+        })
+        $("body").css("overflow", "hidden")
+        bindEnderecosInputs()
+        addMembroExecucaoForm(0)
+        maskValues()
+    })
+</script>

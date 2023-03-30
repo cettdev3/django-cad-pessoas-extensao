@@ -1,4 +1,3 @@
-# todo/todo_api/views.py
 from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,13 +7,13 @@ from django.db import transaction
 from ..models.alocacao import Alocacao
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
-from ..models.evento import Evento
+from ..models.ensino import Ensino
 from ..models.curso import Curso
+from ..models.dataRemovida import DataRemovida
 from ..serializers.alocacaoSerializer import AlocacaoSerializer
-from ..serializers.pessoaSerializer import PessoaSerializer
-from ..serializers.eventoSerializer import EventoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+
 class AlocacaoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -26,12 +25,12 @@ class AlocacaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        alocacoes = Alocacao.objects.all()
+        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set").all()
         serializer = AlocacaoSerializer(alocacoes, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        evento = None
+        acaoEnsino = None
         professor = None
         curso = None
         
@@ -39,7 +38,7 @@ class AlocacaoApiView(APIView):
             alocacoesCriadas = []
             with transaction.atomic():
                 for alocacaoData in request.data:
-                    evento = None
+                    acaoEnsino = None
                     professor = None
                     curso = None
                     logradouro = None
@@ -48,7 +47,7 @@ class AlocacaoApiView(APIView):
                     cidade = None
                     cep = None
                     aulas_sabado = False
-
+                    
                     if "curso_id" in alocacaoData:
                         curso = self.get_object(Curso, alocacaoData["curso_id"])
                         if not curso:
@@ -56,13 +55,14 @@ class AlocacaoApiView(APIView):
                                 {"res": "Não existe curso com o id informado"}, 
                                 status=st.HTTP_400_BAD_REQUEST
                             )
-                    if alocacaoData["evento_id"]:
-                        evento = self.get_object(Evento, alocacaoData["evento_id"])
-                        if not evento:
+                    if alocacaoData["ensino_id"]:
+                        acaoEnsino = self.get_object(Ensino, alocacaoData["ensino_id"])
+                        if not acaoEnsino:
                             return Response(
-                                {"res": "Não existe evento com o id informado"}, 
+                                {"res": "Não existe ação de ensino com o id informado"}, 
                                 status=st.HTTP_400_BAD_REQUEST
                             )
+
                     if alocacaoData["professor_id"]:
                         professor = self.get_object(Pessoas, alocacaoData["professor_id"])
                         if not professor:
@@ -70,6 +70,7 @@ class AlocacaoApiView(APIView):
                                 {"res": "Não existe professor com o id informado"}, 
                                 status=st.HTTP_400_BAD_REQUEST
                             )
+                            
                     data_inicio = None
                     data_fim = None
                     if alocacaoData["data_inicio"]:
@@ -103,7 +104,7 @@ class AlocacaoApiView(APIView):
                         data_fim = data_fim,
                         observacao = observacao,
                         status = status,
-                        evento = evento,
+                        acaoEnsino = acaoEnsino,
                         professor = professor,
                         curso = curso,
                         logradouro = logradouro,
@@ -117,17 +118,25 @@ class AlocacaoApiView(APIView):
                     turnos = alocacaoData["turnos"]
                     if turnos:
                         alocacao.turnos.add(*turnos)
+                    
+                    datasRemovidas = alocacaoData["datas_removidas"]
+                    if datasRemovidas:
+                        for dataRemovida in datasRemovidas:
+                            DataRemovida.objects.create(
+                                date = datetime.strptime(dataRemovida, "%Y-%m-%d").date(),
+                                alocacao = alocacao
+                            )
 
                     alocacaoSerializer = AlocacaoSerializer(alocacao)
                     alocacoesCriadas.append(alocacaoSerializer.data)
             return Response(alocacoesCriadas, status=st.HTTP_201_CREATED)
         else:
             with transaction.atomic():
-                if request.data.get("evento_id"):
-                    evento = self.get_object(Evento, request.data.get("evento_id"))
-                    if not evento:
+                if request.data.get("ensino_id"):
+                    acaoEnsino = self.get_object(Ensino, request.data.get("ensino_id"))
+                    if not acaoEnsino:
                         return Response(
-                            {"res": "Não existe evento com o id informado"}, 
+                            {"res": "Não existe ação de ensino com o id informado"}, 
                             status=st.HTTP_400_BAD_REQUEST
                         )
                 if request.data.get("curso_id"):
@@ -155,7 +164,6 @@ class AlocacaoApiView(APIView):
                 aulas_sabado = False
 
                 if request.data.get("data_inicio"):
-                    print
                     data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
                 if request.data.get("data_fim"):
                     data_fim = datetime.strptime(request.data.get("data_fim"), "%Y-%m-%d").date()
@@ -187,7 +195,7 @@ class AlocacaoApiView(APIView):
                     data_fim = data_fim,
                     observacao = observacao,
                     status = status,
-                    evento = evento,
+                    acaoEnsino = acaoEnsino,
                     professor = professor,
                     curso = curso,
                     logradouro = logradouro,
@@ -201,7 +209,15 @@ class AlocacaoApiView(APIView):
                 if request.data.get("turnos"):
                     turnos = request.data.get("turnos")
                     alocacao.turnos.add(*turnos)
-
+                
+                datasRemovidas = alocacaoData["datas_removidas"]
+                if datasRemovidas:
+                    for dataRemovida in datasRemovidas:
+                        DataRemovida.objects.create(
+                            date = datetime.strptime(dataRemovida, "%Y-%m-%d").date(),
+                            alocacao = alocacao
+                        )
+                        
                 alocacaoSerializer = AlocacaoSerializer(alocacao)
             return Response(alocacaoSerializer.data, status=st.HTTP_201_CREATED)
 
@@ -246,16 +262,19 @@ class AlocacaoDetailApiView(APIView):
         else:
             alocacao.curso = None
 
-        if request.data.get("evento_id"):
-            evento = self.get_object(Evento, request.data.get("evento_id"))
-            if not evento:
+        if request.data.get("acaoEnsino_id"):
+            acaoEnsino = self.get_object(Ensino, request.data.get("acaoEnsino_id"))
+            if not acaoEnsino:
                 return Response(
-                    {"res": "Não existe evento com o id informado"}, 
+                    {"res": "Não existe ação de ensino com o id informado"}, 
                     status=st.HTTP_400_BAD_REQUEST
                 )
-            alocacao.evento = evento
+            alocacao.acaoEnsino = acaoEnsino
         else:
-            alocacao.evento = None
+            return Response(
+                {"res": "É necessário informar a ação de ensino"}, 
+                status=st.HTTP_400_BAD_REQUEST
+            )
 
         if request.data.get("professor_id"):
             professor = self.get_object(Pessoas, request.data.get("professor_id"))

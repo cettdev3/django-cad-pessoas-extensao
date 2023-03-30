@@ -38,18 +38,29 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 <span class="ml-2">{{acao.data_fim_formatada}}</span>
             </div>
         </div>
-        <div class="d-flex align-items-center ">            
-            <button onclick="addMembroExecucaoModal()" 
-            class="btn btn-success">Adicionar</button>
+        <div id="add-membro-execucao-btn">
+            <div class="d-flex align-items-center ">            
+                <button onclick="addMembroExecucaoModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+        <div id="add-atividade-btn">
+            <div class="d-flex align-items-center ">            
+                <button onclick="addAtividadeModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
         </div>
     </div>
     <div class="card-body w-100">
-        <ul class="nav nav-tabs w-100">
+        <ul id="acao-visualizar-tabs" class="nav nav-tabs w-100">
             <li class=" cs-tab-link active">
-                <a id="linkDadosGerais" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
+                <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
             </li>
             <li class=" cs-tab-link active">
-                <a onclick="reloadMap()" id="linkDadosGerais" data-toggle="tab" href="#itinerarios">Equipe de Execução</a>
+                <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerário</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
             </li>
         </ul>
         <div class="tab-content w-100 h-100">
@@ -59,12 +70,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 <div id="receberTabelaMembrosExecucao"></div>
             </div>
             <div id="itinerarios" class="tab-pane" style="height: 100%;">
-                {% include "itinerarios/itinerario_input.html" with itinerario=acao %}
+                {% include "itinerarios/itinerario_input.html" with itinerario=acao acao=acao %}
+            </div>
+            <div id="atividades" class="tab-pane" style="height: 100%;">
+                <div id="atividadesTableContainer"></div>
             </div>
         </div>
     </div>
 </div>
 <div id="modalMembroExecucaoContainer"></div>
+<div id="modalAtividadeContainer"></div>
 <script>
     let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
     let buttonMenuMembrosExecucaoId = "buttonMenuMembrosExecucao"
@@ -84,7 +99,6 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
     let acaoId = "{{acao.id}}" 
 
     function reloadMap() {
-        console.log("triggering evcent")
         $('body').trigger('reloadMap')
     }
 
@@ -99,6 +113,32 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 $("#modalMembroExecucaoContainer").html('');
                 $("#modalMembroExecucaoContainer").html(data);
                 $('#cadastrarMembroExecucaoModal').modal('show');
+            }
+        });
+    }
+    
+    function addAtividadeModal() {
+        $.ajax({
+            url: "/atividadeModal",
+            method: "GET",
+            data: {
+                acao_id: acaoId
+            },
+            success: function (data) {
+                $("#modalAtividadeContainer").html('');
+                $("#modalAtividadeContainer").html(data);
+                $('#cadastrarAtividadeModal').modal('show');
+            }
+        });
+    }
+
+    function carregarAtividades() {
+
+        $.ajax({
+            url: "/atividadesTable",
+            data: {acao_id: acaoId},
+            success: function (data) {
+                $("#atividadesTableContainer").html(data);
             }
         });
     }
@@ -120,16 +160,30 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
     }
 
     function carregarMembrosExecucao() {
-        let recarregarTabela = rotaTabelaMembrosExecucao
             $.ajax({
-                url: "/"+recarregarTabela,
+                url: "/"+rotaTabelaMembrosExecucao,
                 contentType: 'application/json',
                 data: {acao_id: acaoId},
                 success: function (data) {
                     $("#" + idTabelaMembrosExecucao).html(data);
                 }
             });
+    }
+    
+    function acaoVisualizarTabsControl(id) {
+        console.log(id)
+        if (id == "membro-execucao-tab") {
+            $("#add-membro-execucao-btn").show()
+            $("#add-atividade-btn").hide()
+        } else if (id == "itinerarios-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            reloadMap()
+        } else if (id == "atividades-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").show()
         }
+    }
     
     $(document).ready(function() {
         membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
@@ -146,9 +200,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             }
         });
 
-        $("#linkDadosGerais").trigger("click")
         carregarMembrosExecucao()
+        carregarAtividades()
         $("body").css("overflow", "hidden")
+        $("#acao-visualizar-tabs a").each(function() {
+            let link = $(this)
+            link.on("click", function() {
+                acaoVisualizarTabsControl(link.attr("id"))
+            })
+        })
+        $("#membro-execucao-tab").trigger("click")
     })
 </script>
 

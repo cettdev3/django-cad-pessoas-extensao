@@ -129,18 +129,34 @@ z-index: 4
     px-3 py-3 my-3
     bg-white">
         <div class="d-flex justify-content-start align-items-center">
-            <input id="filterPessoaNomePessoa" 
-            placeholder="Digite um nome" 
-            class="mx-2 form-control-sm border-secondary"
-            name="nome" type="text">
-            <input id="filterPessoaDataInicio" 
-            type="date"
-            class="mx-2 form-control-sm border-secondary"
-            name="data_inicio" type="text">
-            <input id="filterPessoaDataFim" 
-            type="date"
-            class="mx-2 form-control-sm border-secondary"
-            name="data_fim" type="text">
+            <div class="mx-2 d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterPessoaNomePessoa"
+                class="filter-label">Busca</label>
+                <input id="filterPessoaNomePessoa" 
+                placeholder="Digite um nome" 
+                class="form-control-sm border-secondary"
+                name="nome" type="text">
+            </div>
+            <input hidden type="text" value="nome" name="order_by" id="filterPessoa_order_by">
+            <div class="mx-2 d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterPessoaDataInicio"
+                class="filter-label">Data início da alicação</label>
+                <input id="filterPessoaDataInicio" 
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_inicio" type="text">
+            </div>
+            <div class="mx-2 d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterPessoaDataFim"
+                class="filter-label">Data fim da alocação</label>
+                <input id="filterPessoaDataFim" 
+                type="date"
+                class="form-control-sm border-secondary"
+                name="data_fim" type="text">
+            </div>
+            <div class="mx-2 d-flex justify-content-start align-items-center"
+            id="FilterSelectCursos">
+            </div>
             <div class="d-flex justify-content-start align-items-center">
                 <input id="filterPessoaIsAlocated" 
                 type="checkbox"
@@ -148,7 +164,9 @@ z-index: 4
                 id="is_alocated"
                 name="is_alocated" 
                 type="text">
-                <label for="is_alocated" class="m-0">Buscar Alocados</label>
+                <label for="is_alocated" class="m-0">
+                    Buscar Alocados 
+                </label>
             </div>
         </div>
         <div class="d-flex">
@@ -163,6 +181,7 @@ z-index: 4
                 <span> Horas Trabalhadas </span>
             </button>
             <button id="adicionarPessoas" 
+            type="button"
             onclick="carregarPessoasModalCadastrar()"
             class="btn-cadastrar rounded d-flex justify-content-between align-items-center ml-1">
                 <span> cadastrar pessoa</span>
@@ -183,6 +202,7 @@ z-index: 4
 
 <div id="calendario" class="d-flex flex-column">
 </div>
+
 
 <script>
     let pessoaModificadaEvent = {};
@@ -215,7 +235,7 @@ z-index: 4
             }
         })
         filtros["is_alocated"] = $("#"+filterPrefix+"IsAlocated").is(":checked")
-        console.log(filtros)
+        filtros['cursos'] = getDropdownSelectedValues("select-multiple-dropdown-cursos")
         return filtros
     }
 
@@ -249,7 +269,6 @@ z-index: 4
 
     function deletePessoa(id) {
         deletar_url = "eliminarPessoa/" + id
-
         $.ajax({
             url: deletar_url,
             data: {},
@@ -265,13 +284,14 @@ z-index: 4
         getCalendario()
     }
 
-    function carregarPessoas(filter = null) {
+    function carregarPessoas(filter = null, state = null) {
         let recarregarTabela = "pessoasTable"
         $.ajax({
             url: recarregarTabela,
             data: filter,
             success: function (data) {
                 $("#receberTabela").html(data);
+                setTabelaState(state)
             }
         });
     }
@@ -296,16 +316,25 @@ z-index: 4
         carregarPessoas(getFiltros())
     }
 
-    function debounce(func, timeout = 300){
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => { func.apply(this, args); }, timeout);
-        };
-    }
-
     function getCheckboxValue(id) {
         return $("#"+id).is(":checked")
+    }
+
+    function loadFilterSelectCurso() {
+        let url = "/filterMultipleSelect" 
+        $.ajax({
+            url: url,
+            data: {
+                "label": "Cursos",
+                "placeholder": "Selecione os cursos",
+                "route": "cursos",
+                "id": "select-multiple-dropdown-cursos",
+            },
+            success: function (data) {
+                $("#FilterSelectCursos").html(data)
+                watchDropdownChanges("select-multiple-dropdown-cursos", filtrarPessoas)
+            }
+        });
     }
 
     $(document).ready(function () {
@@ -440,7 +469,7 @@ z-index: 4
             })
         });
         
-        $("input[id^='"+filterPrefix+"']").each(function () {
+        $("*[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
             if ($(this).attr("id").includes("NomePessoa")) {
                 $(this)
@@ -455,6 +484,7 @@ z-index: 4
             }
         })
 
+        loadFilterSelectCurso()
         carregarPessoas()
     });
 

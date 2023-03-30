@@ -1,0 +1,18 @@
+<label><b>Tipo da Atividade :</b></label>
+<select class="form-control"
+{% if tipo_atividade_id %}
+id="tipo_atividade_select_{{tipo_atividade_id}}"
+{% else %} 
+id="tipo_atividade_select"
+{% endif %}
+name="tipo_atividade_id">
+    {% if not tipo_atividade_id %}
+    <option value="">Selecione um tipo de Atividade</option>
+    {% endif %}
+    {% for tipoAtividade in tiposAtividades %}
+        <option {% if selected_tipo_atividade_id == tipoAtividade.id %} selected {% endif %}  
+        value="{{tipoAtividade.id}}">
+            {{tipoAtividade.nome}}
+        </option>
+    {% endfor %}
+</select>

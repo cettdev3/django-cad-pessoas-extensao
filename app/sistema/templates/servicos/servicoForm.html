@@ -1,0 +1,159 @@
+<div class="w-100">
+    <form id="cadastrarServicoForm" action="/" method="POST">
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>Nome:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.nome}}"
+                {% endif %}
+                id="nome"
+                name="nome">
+            </div>
+            <div class="col-sm-4">
+                <label><b>Quantidade de Atendimentos:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.quantidadeAtendimentos}}"
+                {% endif %}
+                id="quantidadeAtendimentos"
+                name="quantidadeAtendimentos">
+            </div>
+            <div class="col-sm-4">
+                <label><b>Quantidade de Vendas:</b></label>
+                <input type="number"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.quantidadeVendas}}"
+                {% endif %}
+                id="quantidadeVendas"
+                name="quantidadeVendas">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <input id="atividade-servico-endereco" type="checkbox" class="mr-1">
+                <span>Usar endereço da atividade</span> 
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>Logradouro:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.logradouro}}"
+                {% endif %}
+                id="logradouro"
+                name="logradouro">
+            </div>
+            <div class="col-sm-4">
+                <label><b>Bairro:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.bairro}}"
+                {% endif %}
+                id="bairro"
+                name="bairro">
+            </div>
+            <div id="cidadesSelectContainerServico" class="col-sm-4">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
+                <label><b>CEP:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.cep}}"
+                {% endif %}
+                id="cep"
+                name="cep">
+            </div>
+            <div class="col-sm-8">
+                <label><b>Complemento: {{servico.cidade.id}}</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if servico.id %}
+                value="{{servico.complemento}}"
+                {% elif acao.id %}
+                value="{{acao.complemento}}"
+                {% elif evento.id %}
+                value="{{evento.complemento}}"
+                {% endif %}
+                id="complemento"
+                name="complemento">
+            </div>
+        </div>
+
+        {% if atividade %}
+        <input type="text" hidden
+        id="atividade_id"
+        name="atividade_id"
+        value="{{atividade.id}}">
+        <input type="text" hidden
+        id="atividade-bairro"
+        value="{{atividade.bairro}}">
+        <input type="text" hidden
+        id="atividade-logradouro"
+        value="{{atividade.logradouro}}">
+        <input type="text" hidden
+        id="atividade-cep"
+        value="{{atividade.cep}}">
+        {% if atividade.complemento and atividade.complemento != 'None' %}
+        <input type="text" hidden
+        id="atividade-complemento"
+        value="{{atividade.complemento}}">
+        {% endif %}
+        <input type="text" hidden
+        id="atividade-cidade"
+        value="{{atividade.cidade.id}}">
+        {% endif %}
+
+    </form>
+</div>
+
+<script>
+    var selectedCidade = "{% if servico.cidade.id %}{{servico.cidade.id}}{% endif %}"
+    function carregarSelectCidadesServicos() {
+        let data = {}
+        console.log(selectedCidade)
+        if (selectedCidade) data["selected"] = selectedCidade
+        console.log(data)
+        $.ajax({
+            url: "/cidadesSelect",
+            data: data,
+            type: "GET",
+            success: function(data) {
+                $("#cidadesSelectContainerServico").html(data);
+            }
+        });
+    } 
+
+    $(document).ready(function(){
+        carregarSelectCidadesServicos()
+        $("#atividade-servico-endereco").change(function() {
+            if (this.checked) {
+                console.log($("#atividade-logradouro").val())
+                $("#logradouro").val($("#atividade-logradouro").val());
+                $("#bairro").val($("#atividade-bairro").val());
+                $("#cep").val($("#atividade-cep").val());
+                $("#complemento").val($("#atividade-complemento").val());
+                $("#cidadesSelectContainerServico select").val($("#atividade-cidade").val().replace(" ", ""));
+            } else {
+                $("#logradouro, #bairro, #cep, #complemento").val("");
+                $("#cidadesSelectContainerServico select").val("");
+            }
+        });
+    });
+</script>

@@ -123,14 +123,14 @@
                                 <select required 
                                 onchange="setEnderecos(this, {{pessoa.id}})"
                                 class="form-control" 
-                                id="evento-{{pessoa.id}}" 
-                                name="evento_id">
+                                id="ensino-{{pessoa.id}}" 
+                                name="ensino_id">
                                     <option value="">
-                                        Selecione um evento
+                                        Selecione uma ação de ensino
                                     </option>
-                                    {% for evento in eventos %}
-                                    <option value="{{evento.id}}">
-                                        {{evento.observacao}}
+                                    {% for ensino in ensinos %}
+                                    <option value="{{ensino.id}}">
+                                        {{ensino.observacao}}
                                     </option>
                                     {% endfor %}
                                 </select>
@@ -189,6 +189,12 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label><b>Datas Removidas</b></label>
+                                {% include 'componentes/datasRemovidasInput/datasRemovidasInput.html' with id=pessoa.id %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div id="alocacaoFormSelectCidade-{{pessoa.id}}" class="col-sm-3">
                             </div>
                             <div class="col-sm-2">
@@ -244,7 +250,7 @@
     </div>
 </div>
 {{ pessoas|json_script:"pessoas-script" }}
-{{ eventos|json_script:"eventos-script" }}
+{{ ensinos|json_script:"ensinos-script" }}
 <script>
     var alocarPessoaModalId = "alocarPessoaModal"
     var dismissAlocarPessoaId = "dismissAlocarPessoa"
@@ -252,7 +258,7 @@
     var pessoaFormSelectCidadeId = "alocacaoFormSelectCidade"
     var alocacaoPessoasTurnosSelectId = "alocacaoPessoasTurnosSelect"
     var pessoas = JSON.parse(document.getElementById('pessoas-script').textContent);
-    var eventos = JSON.parse(document.getElementById('eventos-script').textContent);
+    var ensinos = JSON.parse(document.getElementById('ensinos-script').textContent);
 
     function getTurnosSelectData(id) {
         let turnosId = [] 
@@ -269,16 +275,32 @@
         return $("#aulas_sabado-"+id).is(':checked')
     }
 
+    function getRemovedDatesValues(pessoaId) {
+        const chips = $(`#removed_dates-${pessoaId} .chips .chip`);
+        const values = [];
+        chips.each((index, chip) => {
+            const chipText = $(chip).text();
+            const date = moment(chipText, "DD/MM/YYYY");
+            values.push(date.format("YYYY-MM-DD"));
+        });
+        return values;
+    }
+
     function getAlocacoesFormData() {
         let alocacoes = []
         $("form[id^='"+alocarPessoaFormId+"'").each(function() {
             let values = {}
             let unindexed_array = $(this).serializeArray();
+            let removedDates = []
             $.map(unindexed_array, function (n, i) {
                 values[n['name']] = n['value'];
+                if (n["name"] == "professor_id") {
+                    removedDates = getRemovedDatesValues(n['value'])
+                }
             });
             values['turnos'] = getTurnosSelectData($(this).attr('id').split('-')[1])
             values['aulas_sabado'] = getCheckBoxValue($(this).attr('id').split('-')[1])
+            values['datas_removidas'] = removedDates
             alocacoes.push(values) 
         })
         return alocacoes
@@ -286,7 +308,6 @@
 
     function criarAlocacoes() {
         let alocacoes = getAlocacoesFormData()
-
         $.ajax({
             url: "saveAlocacao",
             data: JSON.stringify({"data": alocacoes}),
@@ -391,10 +412,10 @@
         });
     }
 
-    function setEnderecos(evento, id) {
-        console.log(eventos)
-        let selectedEvento = eventos.find(function(element) {
-            return element.id == $(evento).val()
+    function setEnderecos(ensino, id) {
+        console.log(ensinos)
+        let selectedEvento = ensinos.find(function(element) {
+            return element.id == $(ensino).val()
         })
         if (selectedEvento) {
             let endereco = selectedEvento.endereco

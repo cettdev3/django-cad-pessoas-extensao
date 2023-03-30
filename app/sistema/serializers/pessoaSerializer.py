@@ -2,9 +2,13 @@
 from datetime import datetime
 from rest_framework import serializers
 from ..models.pessoa import Pessoas
+from ..serializers.alocacaoSerializer import AlocacaoSerializer
+from ..serializers.userSerializer import UserSerializer
 
 class PessoaSerializer(serializers.ModelSerializer):
     count_alocacao = serializers.IntegerField(initial=0, allow_null=True)
+    alocacao_set = AlocacaoSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
     class Meta:
         model = Pessoas
         fields = [
@@ -42,6 +46,10 @@ class PessoaSerializer(serializers.ModelSerializer):
             "estado",
             "cursos",
             "alocacao_set",
-            "count_alocacao"
+            "count_alocacao",
+            "username",
+            "user",
+            "password",
+            "is_admin"
         ]
         depth = 2

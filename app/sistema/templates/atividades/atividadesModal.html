@@ -1,0 +1,197 @@
+<div class="modal fade" id="cadastrarAtividadeModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarAtividadeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarAtividadeModalLabel">
+                    {% if atividade is None %}
+                        Cadastrar Atividade
+                        <span id="atividadeModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{atividade.nome}}
+                        <span id="atividadeModelId" hidden>{{atividade.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarAtividade" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "atividades/atividadeForm.html" with atividade=atividade acao=acao evento=evento %}
+            </div>
+            <div class="modal-footer">
+                <button id="formAtividadePrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevAtividadeLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formAtividadeNext" type="button" class="btn btn-primary">
+                    <span id="nextAtividadeLink" class="AtividadeMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                {% if atividade %}
+                    onclick="editarAtividade('{{atividade.id}}')" 
+                {% else %}
+                    onclick="cadastrarAtividade()" 
+                {% endif %}
+                id="finishCadastroAtividade" 
+                type="button"
+                class="btn btn-primary">
+                {% if atividade %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var formId = "cadastrarAtividadeForm"
+    var atividadeModelId = "atividadeModelId"
+    var tabsId = "atividadesTab"
+    var atividadeFormSelectCidadeId = "atividadeFormSelectCidade"
+    var selectedCidadeId = "{{atividade.cidade.id}}"
+    var cadastrarAtividadeModalId = "cadastrarAtividadeModal"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) carregarAtividades()
+        if (changedResource) $("#dismissCadastrarAtividade").click()
+    }
+
+    function cadastrarAtividade() {
+        $.ajax({
+            url: "/saveAtividade",
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarAtividade(id) {
+        $.ajax({
+            url: "/editarAtividade/" + id,
+            data: JSON.stringify({"data":getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    function getActiveTab() {
+        let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+            return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
+        })
+
+        id = $(activeTab[0]).attr("id")
+
+        if (id == undefined) return 0
+
+        id = id.charAt(id.length - 1)
+        return id
+    }
+
+    function functionGetTabsQuantity() {
+        return $("*[id^='"+tabsId+"']").length
+    }
+
+    function showHideTabs(instructions) {
+        instructions.show.forEach(function (elementId) {
+                $("#" + elementId).show()
+        })
+        instructions.hide.forEach(function (elementId) {
+            $("#" + elementId).hide()
+        })
+    }
+
+    function processTabBtnClick(direction) {
+        let activeTab = getActiveTab()
+        let nextTab = parseInt(activeTab) + direction
+        $("#atividadeTabLink"+nextTab).trigger("click")
+        $("#atividadesTab"+nextTab).addClass("active-form-tab")
+        $("#atividadesTab"+activeTab).removeClass("active-form-tab")
+        setTabsbehavior()
+    }
+
+    function setTabsbehavior() {
+        tabsControl = {
+            first: {
+                show: ["formAtividadeNext"],
+                hide: ["formAtividadePrev", "finishCadastroAtividade"]
+            },
+            last: {
+                show: ["formAtividadePrev", "finishCadastroAtividade"],
+                hide: ["formAtividadeNext"]
+            },
+            middle: {
+                show: ["formAtividadePrev", "formAtividadeNext"],
+                hide: ["finishCadastroAtividade"]
+            },
+            only: {
+                show: ["finishCadastroAtividade"],
+                hide: ["formAtividadePrev", "formAtividadeNext"]
+            }
+        }
+
+        activTabFn = getActiveTab()
+        tabsQuantity = functionGetTabsQuantity()
+        if (activTabFn == 1) {
+            showHideTabs(tabsControl.first)
+        } else if (activTabFn == 0) {
+            showHideTabs(tabsControl.only)
+        } else if (activTabFn == tabsQuantity) {
+            showHideTabs(tabsControl.last)
+        } else {
+            showHideTabs(tabsControl.middle)
+        }
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarAtividadeModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+atividadeModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+
+        setTabsbehavior()
+        $("#formAtividadeNext").click(function () {
+            processTabBtnClick(1)
+        })
+        $("#formAtividadePrev").click(function () {
+            processTabBtnClick(-1)
+        })
+
+        maskValues()
+    });
+</script>

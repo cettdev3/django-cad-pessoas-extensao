@@ -1,34 +1,32 @@
 # todo/todo_api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q, Exists, IntegerField, Subquery
-from rest_framework import status as st
-from rest_framework import permissions
+from django.db.models import Q, Count
+from rest_framework import status as st, viewsets
 from ..models.pessoa import Pessoas
-from ..models.alocacao import Alocacao
 from ..models.curso import Curso
 from ..serializers.pessoaSerializer import PessoaSerializer
-from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime
-from django.db import reset_queries
-from django.db import connection
-from django.db.models import Prefetch, Count
+from django.contrib.auth.models import User
+from rest_framework.decorators import action
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 class PessoaApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
-    # 1. List all
     def get(self, request, *args, **kwargs):
+        has_user = request.GET.get('has_user')
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
         nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
         data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
         data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
         is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
+        cursos = request.GET.getlist('cursos') if request.GET.getlist('cursos') != "None" else None
+        order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
 
-        print(f"cpf: {cpf}, user_camunda: {user_camunda}, nome: {nome}, data_inicio: {data_inicio}, data_fim: {data_fim}, is_alocated: {is_alocated}")
         pessoas = Pessoas.objects
         if cpf:
             cpfNaoFormatado = cpf.replace('.', '').replace('-','')
@@ -51,7 +49,14 @@ class PessoaApiView(APIView):
                 pessoas = pessoas.filter(count_alocacao__gt=0)
             else:
                 pessoas = pessoas.filter(count_alocacao__lte=0)
-
+        if order_by:
+            pessoas = pessoas.order_by(order_by)
+        else:
+            pessoas = pessoas.order_by('nome')
+        if len(cursos) > 0:
+            pessoas = pessoas.filter(cursos__in=cursos).distinct()
+        if has_user:
+            pessoas = pessoas.filter(user__isnull=False)
         pessoas = pessoas.all()
         serializer = PessoaSerializer(pessoas, many=True)
 
@@ -93,7 +98,10 @@ class PessoaApiView(APIView):
         tipo = request.data.get("tipo")
         qtd_contratacoes = request.data.get("qtd_contratacoes")
         user_camunda = request.data.get("user_camunda")
-
+        
+        user = None
+        if request.data.get("user_id"):
+            user = User.objects.get(id=request.data.get("user_id"))
 
         pessoa = Pessoas.objects.create(
             nome = nome,
@@ -127,12 +135,12 @@ class PessoaApiView(APIView):
             tipo = tipo,
             qtd_contratacoes = qtd_contratacoes,
             user_camunda = user_camunda,
+            user = user
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
         return Response(serializer.data, status=st.HTTP_201_CREATED)
 
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class PessoaDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -247,8 +255,9 @@ class PessoaDetailApiView(APIView):
             pessoa.numero_endereco = request.data.get("numero_endereco")
         if request.data.get("estado"):
             pessoa.estado = request.data.get("estado")
+        if request.data.get("user_id"):
+            pessoa.user = User.objects.get(id=request.data.get("user_id"))
         
-                
         pessoa.save()
         serializer = PessoaSerializer(pessoa)
         
@@ -268,11 +277,17 @@ class PessoaDetailApiView(APIView):
             status=st.HTTP_200_OK
         )
 
+class PessoaViewSets(viewsets.ModelViewSet):
+    queryset = Pessoas.objects.all() # a queryset variable is mandatory
+    serializer_class = PessoaSerializer 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
-    """
-    SELECT 
-    `alocacoes`.`id`, `alocacoes`.`evento_id`, `alocacoes`.`professor_id`, `alocacoes`.`curso_id`, `alocacoes`.`data_inicio`, `alocacoes`.`data_fim`, `alocacoes`.`status`, `alocacoes`.`observacao`, `alocacoes`.`bairro`, `alocacoes`.`logradouro`, `alocacoes`.`cep`, `alocacoes`.`complemento`, `alocacoes`.`cidade_id`, `alocacoes`.`aulas_sabado` 
-    FROM `alocacoes` 
-    WHERE (`alocacoes`.`data_inicio` BETWEEN '2022-12-03' AND '2022-12-06' 
-    OR `alocacoes`.`data_fim` BETWEEN '2022-12-03' AND '2022-12-06')"
-    """
+    @action(methods=["GET"], detail=False, url_path="logged-user")
+    def getLoggedUse(self, *args, **kwargs):
+        user = self.request.user
+        pessoa = Pessoas.objects.filter(user=user).select_related('user').first()
+        if not pessoa: return Response({"res": "Não existe pessoa cadastrada com o usuário informado"}, status=st.HTTP_400_BAD_REQUEST)
+        serializer = PessoaSerializer(pessoa)
+        print(serializer.data)
+        return Response(data=serializer.data, status=st.HTTP_201_CREATED, content_type="application/json")

@@ -333,7 +333,7 @@
             values[n['name']] = n['value'];
         });
 
-        $("form[id^='pessoaTicketAcaoForm-']").each(function(index) {
+        $("form[id^='pessoaTicketForm-']").each(function(index) {
             var pessoa_ticket = {}
             var pessoa_ticket_unindexed_array = $(this).serializeArray();
             $.map(pessoa_ticket_unindexed_array, function (n, i) {

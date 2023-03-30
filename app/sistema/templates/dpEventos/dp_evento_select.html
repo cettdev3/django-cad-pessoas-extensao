@@ -1,0 +1,9 @@
+<label><b>Evento:</b></label>
+<select class="form-control" 
+id="dp_evento_id" 
+name="dp_evento_id">
+    <option value="">Selecione um evento</option>
+    {% for dpEvento in dpEventos %}
+        <option value="{{dpEvento.id}}">{{dpEvento.nome}}</option>
+    {% endfor %}
+</select>

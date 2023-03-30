@@ -1,0 +1,139 @@
+<div class="modal fade" id="cadastrarDepartamentoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarDepartamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarDepartamentoModalLabel">
+                    {% if departamento is None %}
+                        Cadastrar Departamento
+                        <span id="departamentoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{departamento.nome}}
+                        <span id="departamentoModelId" hidden>{{departamento.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarDepartamento" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="departamentoList1" class="col py-2 active-form-tab">
+                            <a id="pessoaMenuLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarDepartamentoForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Nome do Departamento:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if departamento %}
+                                        value="{{departamento.nome}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="nome" 
+                                        name="nome" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                {% if departamento %}
+                    onclick="editarDepartamento('{{departamento.id}}')" 
+                {% else %}
+                    onclick="cadastrarDepartamento()" 
+                {% endif %}
+                id="finishCadastroDepartamento" 
+                type="button"
+                class="btn btn-primary">
+                {% if departamento %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarDepartamentoForm"
+    departamentoModelId = "departamentoModelId"
+    dismissCadastrarDepartamentoId = "dismissCadastrarDepartamento"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) departamentoModificadaEventProxy.modificado = changedResource
+        if (changedResource) $("#"+dismissCadastrarDepartamentoId).click()
+    }
+
+    function cadastrarDepartamento() {
+        $.ajax({
+            url: "saveDepartamento",
+            data: JSON.stringify({"data": getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function editarDepartamento(id) {
+        $.ajax({
+            url: "editarDepartamento/"+id,
+            data: JSON.stringify({"data": getFormData()}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    $(document).ready(function () {
+        $("#cadastrarDepartamentoModal").on('hide.bs.modal', function(){
+            let pessoaId = $("#"+departamentoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+        
+        buscarDepartamentos(departamentos)
+    });
+</script>

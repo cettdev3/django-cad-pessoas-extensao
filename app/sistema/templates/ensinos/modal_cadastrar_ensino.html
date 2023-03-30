@@ -1,0 +1,407 @@
+<div class="modal fade" id="cadastrarEnsinoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarEnsinoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarEnsinoModalLabel">
+                    {% if ensino is None %}
+                        Cadastrar Ação de Ensino
+                        <span id="ensinoModelId" hidden></span>
+                    {% else %}
+                        Editar Cadastro de: {{ensino.nome}}
+                        <span id="ensinoModelId" hidden>{{ensino.id}}</span>
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarEnsino" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="ensinoList1" class="col py-2 active-form-tab">
+                            <a id="ensinoMenuLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarEnsinoForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <div class="form-group row">
+                                    <div class="col-sm-5">
+                                        <label><b>Descrição:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if ensino %}
+                                        value="{{ensino.observacao}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="observacao" 
+                                        name="observacao" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div id="ensinoFormSelectEscola" class="col-sm-3">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Status:</b></label>
+                                        <select required class="form-control" 
+                                        id="status" name="status">
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'planejamento' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="planejamento">Planejamento</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'andamento' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="andamento">Em Andamento</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'finalizado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="finalizado">Finalizado</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'adiado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="adiado">Adiado</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'cancelado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Data de Inicio:</b></label>
+                                        <input 
+                                        type="datetime-local"
+                                        {% if ensino %}
+                                        value="{{ ensino.data_inicio}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="data_inicio"
+                                        name="data_inicio"
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Data de Fim:</b></label>
+                                        <input 
+                                        type="datetime-local"
+                                        {% if ensino %}
+                                        value="{{ ensino.data_fim}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="data_fim"
+                                        name="data_fim"
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Tipo:</b></label>
+                                        <select class="form-control"
+                                        name="tipo">
+                                            <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
+                                            value="gps">GPS</option>
+                                            <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
+                                            value="gps">Empréstimo</option>
+                                            <option {% if ensino.tipo != 'gps' %} selected {% endif %}  
+                                            value="outros">Outros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="dadosNovoEndereco form-group row">
+                                    <div id="ensinoFormSelectCidade" class="col-sm-4">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Bairro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if ensino %}
+                                            {% if ensino.bairro %}
+                                            value="{{ensino.bairro}}" 
+                                            {% else %}
+                                            value="{{ensino.endereco.bairro}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="bairro" 
+                                        name="bairro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>CEP: </b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if ensino %}
+                                            {% if ensino.cep %}
+                                            value="{{ensino.cep}}" 
+                                            {% else %}
+                                            value="{{ensino.endereco.cep}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="cep" 
+                                        name="cep" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                </div>
+                                <div class="dadosNovoEndereco form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Logradouro:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if ensino %}
+                                            {% if ensino.logradouro %}
+                                            value="{{ensino.logradouro}}" 
+                                            {% else %}
+                                            value="{{ensino.endereco.logradouro}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="logradouro" 
+                                        name="logradouro" 
+                                        placeholder=""
+                                        required>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label><b>Complemento:</b></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        {% if ensino %}
+                                            {% if ensino.complemento %}
+                                            value="{{ensino.complemento}}" 
+                                            {% else %}
+                                            value="{{ensino.endereco.complemento}}" 
+                                            {% endif %}
+                                        {% endif %}
+                                        id="complemento" 
+                                        name="complemento"
+                                        placeholder="" 
+                                        required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                {% if ensino %}
+                    onclick="processarEditarEnsino('{{ensino.id}}')" 
+                {% else %}
+                    onclick="processarCadastrarEnsino()" 
+                {% endif %}
+                id="finishCadastroEnsino" 
+                type="button"
+                class="btn btn-primary">
+                {% if ensino %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ escolas|json_script:"escolas-script" }}
+
+<script>
+    formId = "cadastrarEnsinoForm"
+    ensinoModelId = "ensinoModelId"
+    ensinoFormSelectCidadeId = "ensinoFormSelectCidade"
+    ensinoFormSelectEnderecosId = "ensinoFormSelectEnderecos"
+    selectedCidadeId = "{% if ensino.cidade %}{{ensino.cidade.id}}{% else %}{{ensino.endereco.cidade.id}}{% endif %}"
+    selectedEscolaId = "{{ensino.escola.id}}"
+    selectedEnderecoId = "{{ensino.endereco.id}}"
+    isEditing = "{{ensino.id}}"
+    var escolas = JSON.parse(document.getElementById('escolas-script').textContent);
+    ensinoFormSelectEscolaId = "ensinoFormSelectEscola"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+
+        if (changedResource) carregarEnsinos()
+        if (changedResource) $("#"+dismissCadastrarEnsinoId).click()
+    }
+
+    function cadastrarEnsino(data) {
+        $.ajax({
+            url: "saveEnsino",
+            data: JSON.stringify({"data":data}),
+            dataType: "json",
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function processarCadastrarEnsino() {
+        let formData = getFormData()
+        if (formData["endereco_id"] == "novo") {
+            $.ajax({
+                url: "saveEndereco",
+                data: JSON.stringify({"data":formData["endereco"]}),
+                dataType: "json",
+                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+                contentType: 'application/json',
+                method: "POST",
+                success: function (data) {
+                    formData["endereco_id"] = data["id"]
+                    cadastrarEnsino(formData)
+                }
+            });
+        } else {
+            cadastrarEnsino(formData)
+        }
+    }
+
+    function editarEnsino(ensinoId, formData) {
+        
+        $.ajax({
+            url: "editarEnsino/"+ensinoId,
+            data: JSON.stringify({"data":formData}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "PUT",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        enderecoFields = ["logradouro", "bairro", "cep", "complemento", "cidade_id"]
+        var values = {};
+        var endereco = {}
+        $.map(unindexed_array, function (n, i) {
+            if (enderecoFields.includes(n['name'])) {
+                endereco[n['name']] = n['value']
+            }
+            values[n['name']] = n['value'];
+        });
+        values["endereco"] = endereco
+        return values
+    }
+
+    function updateSelectedCidade() {
+        if (selectedCidadeId) {
+            let cidade = $("#cidade_id").val(selectedCidadeId);
+        }
+    }
+    
+    function updateSelectedEscola() {
+        if (selectedEscolaId.length > 0) {
+            let escola = $("#escola_id").val(selectedEscolaId);
+        } else {
+            let escola = $("#escola_id").val("");
+        }
+    }
+
+    function updateSelectedEndereco() {
+        if (selectedEnderecoId) {
+            $("#endereco_id").val(selectedEnderecoId).change();
+        }
+    }
+
+    function mostrarEndereco() {
+
+    }
+
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+ensinoFormSelectCidadeId).html(data)
+                updateSelectedCidade()
+            }
+        });
+    }
+
+    function getCheckBoxValue(checkboxId) {
+        return $("#"+checkboxId).is(":checked")
+    }
+
+    function bindEnderecoFields(escolaId) {
+        let escola = escolas.find(escola => escola.id == escolaId)
+        if (escola && getCheckBoxValue("use_select_value")) {
+            $("#logradouro").val(escola.logradouro)
+            $("#bairro").val(escola.bairro)
+            $("#cep").val(escola.cep)
+            $("#complemento").val(escola.complemento)
+            $("#cidade_id").val(escola.cidade.id)
+        }
+    } 
+    
+    function carregarSelectEscolas() {
+        $.ajax({
+            url: "escolasSelect",
+            method: "GET",
+            success: function (data) {
+                $("#"+ensinoFormSelectEscolaId).html(data)
+                $("#escola_id").change(function (val) {
+                    let selectedEscola = $(this).val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+
+                $("#use_select_value").change(function (val) {
+                    let selectedEscola = $("#escola_id").val() 
+                    bindEnderecoFields(selectedEscola)
+                })
+                updateSelectedEscola()
+            }
+        });
+    }
+    
+    function processarEditarEnsino(ensinoId) {
+        let formData = getFormData()
+        editarEnsino(ensinoId,formData)
+    }
+
+    $(document).ready(function () {
+        $("#"+cadastrarEnsinoModalId).on('hide.bs.modal', function(){
+            let pessoaId = $("#"+ensinoModelId).text()
+            if (pessoaId) {
+                clearModalForm()
+            }
+        });
+        carregarSelectCidades()
+        carregarSelectEscolas()
+        maskValues()
+    });
+</script>
