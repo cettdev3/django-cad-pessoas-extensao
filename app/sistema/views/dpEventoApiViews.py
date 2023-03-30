@@ -189,8 +189,10 @@ class DpEventoDetailApiView(APIView):
             return None
 
     def get(self, request, dp_evento_id, *args, **kwargs):
-
-        dp_evento = self.get_object(DpEvento, dp_evento_id)
+        print("dentro do fet")
+        dp_evento = DpEvento.objects.prefetch_related(
+            Prefetch('membro_execucao_set', queryset=MembroExecucao.objects.prefetch_related('ticket_set'))
+        ).get(id=dp_evento_id)
         if not dp_evento:
             return Response(
                 {"res": "Não existe ação com o id informado"},

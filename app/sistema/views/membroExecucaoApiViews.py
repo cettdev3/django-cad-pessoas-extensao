@@ -16,7 +16,7 @@ from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from django.db import transaction
 class MembroExecucaoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, JWTAuthentication]
@@ -77,7 +77,7 @@ class MembroExecucaoApiView(APIView):
                 {"res": "É necessário informar a ação ou o evento para o membro de execução"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        
         data = {
             "data_inicio": request.data.get("data_inicio") if request.data.get("data_inicio") else None,
             "data_fim": request.data.get("data_fim") if request.data.get("data_fim") else None,
@@ -92,11 +92,38 @@ class MembroExecucaoApiView(APIView):
             "acao": acao,
             "evento": evento,
         }
+        with transaction.atomic():
+            membroExecucao = MembroExecucao.objects.create(**data)
+            tickets = request.data.get("tickets")
+            if tickets:
+                for ticket in tickets:
+                    cidade = None
+                    if ticket.get("cidade_id"):
+                        cidade = self.get_object(Cidade, ticket.get("cidade_id"))
+                        if not cidade:
+                            return Response(
+                                {"res": "Não existe cidade com o id informado"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                            )
 
-        membroExecucao = MembroExecucao.objects.create(**data)
-        serializer = MembroExecucaoSerializer(membroExecucao)
+                    ticketData = {
+                        "tipo": request.data.get("tipo"),
+                        "status": "CREATED",
+                        "id_protocolo": request.data.get("id_protocolo"),
+                        "membro_execucao": membroExecucao,
+                        "data_inicio": ticket.get("data_inicio"),
+                        "data_fim": ticket.get("data_fim"),
+                        "bairro": ticket.get("bairro"),
+                        "logradouro": ticket.get("logradouro"),
+                        "cep": ticket.get("cep"),
+                        "complemento": ticket.get("complemento"),
+                        "cidade": cidade,
+                    }
+                    print("ticketData: ", ticketData)
+                    ticketData = Ticket.objects.create(**ticketData)
+            serializer = MembroExecucaoSerializer(membroExecucao)
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MembroExecucaoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]

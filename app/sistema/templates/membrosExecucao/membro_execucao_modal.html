@@ -31,6 +31,7 @@
                             href="#home">1</a>
                             <span>Dados Gerais</span>
                         </li>
+                        {% if not membro_execucao %}
                         <li id="membroExecucaoTabs2" class="col py-2">
                             <a id="membrosExecucaoTabLink2" 
                             data-toggle="tab"
@@ -39,18 +40,21 @@
                             href="#solicitacoes">2</a>
                             <span>Solicitações</span>
                         </li>
+                        {% endif %}
                     </ul>
                     <div class="tab-content">
                         <div id="home" class="tab-pane py-3 active">
                             {% include "membrosExecucao/membro_execucao_form.html" with membroExecucao=membro_execucao state='control_one' acao=acao evento=evento %}
                         </div>
+                        {% if not membro_execucao %}
                         <div id="solicitacoes" class="tab-pane py-3">
-                            <div id="ticket-form-container"></div>
+                            <div id="ticket-form-container" class="mb-2"></div>
                             <button id="add-ticket-form-btn"
                             type="button"
                             onclick="addTicket()"
                             class="btn btn-primary">Adicionar Ticket</button>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -93,7 +97,6 @@
 
     function setMembroExecucaoAddressForm(addressValues, formId = null) {
         let addressFormId = formId ? formId : "collapse_endereco_input_"
-        console.log("formId: ", addressFormId)
         $("*[id^='"+addressFormId+"'").each(function(index) {
             for (key in addressValues) {
                 if ($(this).attr("id").includes(key)) {
@@ -110,10 +113,10 @@
             url: '/ticket_form',
             data: {
                 'form_id': formId,
-                'ticket_id': ticketId
+                'ticket_id': ticketId,
+                'evento_id': '{{evento.id}}',
             },
             success: function(data) {
-                console.log("kfjads")
                 $('#ticket-form-container').append(data);
             }
         });
@@ -125,11 +128,11 @@
 
     function clearModalForm(changedResource = null) {
         if (changedResource) membroExecucaoModificadaEventProxy.modificado = changedResource
-        console.log($("#"+dismissCadastrarMembrosExecucaoId))
         // $("#"+dismissCadastrarMembrosExecucaoId).click()
     }
 
     function cadastrarMembroExecucao() {
+        console.log(getFormData())
         $.ajax({
             url: "/saveMembroExecucao",
             data: JSON.stringify({"data":getFormData()}),
@@ -152,7 +155,6 @@
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
-                console.log(data)
                 clearModalForm(data)
             }
         });
@@ -160,24 +162,24 @@
 
     function getFormData() {
         let form = $('#'+formId)
+        let ticketForms = $("*[id^='cadastrarTicketForm']")
         var unindexed_array = form.serializeArray();
         var values = {};
-        var pessoa_tickets = []
-        $.map(unindexed_array, function (n, i) {
-            // if avaliador checkbox is checked
-            if (n['name'] == "avaliador") {
-                console.log("dentro do avaliador")
-                if (n['value'] == "on") {
-                    values[n['name']] = true
-                    console.log("true", values[n['name']])
-                } else {
-                    values[n['name']] = false
-                }
-            } else {
-                values[n['name']] = n['value'];
-            }
-        });
+        var tickets = []
 
+        ticketForms.each(function(index) {
+            let ticketForm = $(this)
+            let ticketFormValues = {}
+            $.map(ticketForm.serializeArray(), function (n, i) {
+                ticketFormValues[n['name']] = n['value'];
+            });
+            tickets.push(ticketFormValues)
+        })
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+        values['tickets'] = tickets
         return values
     }
 
@@ -198,7 +200,6 @@
         let tabs = $("*[id^='"+tabsId+"']")
         tabs = $("*[id^='"+tabsId+"']")
         let length = tabs.length
-        console.log("tabs",tabs)
         return length
     }
 
@@ -242,7 +243,6 @@
 
         activTabFn = getActiveTab()
         tabsQuantity = functionGetTabsQuantity()
-        console.log(activTabFn, tabsQuantity)
         if (activTabFn == 1 && tabsQuantity > 1) {
             showHideTabs(tabsControl.first)
         } else if (tabsQuantity == 1) {
@@ -271,7 +271,6 @@
         })  
 
         $("#use_membroExecucao_endereco").change(function () {
-            console.log(getFormData())
             if (this.checked) setMembroExecucaoAddressForm(getFormData())
         })
         maskValues()

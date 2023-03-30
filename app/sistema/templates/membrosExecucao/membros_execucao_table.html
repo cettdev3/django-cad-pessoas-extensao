@@ -19,22 +19,19 @@
     <thead class="border">
         <tr class="">
             <th class="membro-execucao-w-30 text-left">Pessoa</th>
-            <th class="membro-execucao-w-25 text-left">Data de Inicio</th>
-            <th class="membro-execucao-w-25 text-left">Data de Fim</th>
-            <th class="membro-execucao-w-20 text-left">Tipo</th>
+            <th class="membro-execucao-w-25 text-left">Demandas</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
         {% for membroExecucao in membros_execucao %}
         <td class="membro-execucao-w-15 text-left">{{membroExecucao.pessoa.nome}} 
-            {% if membroExecucao.avaliador %}
-            - <strong>Avaliador</strong>
-            {% endif %}
         </td>
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_inicio|date:"d-m-Y"}}</td>
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_fim|date:"d-m-Y"}}</td>
-        <td class="membro-execucao-w-25 text-left">{{membroExecucao.tipo}}</td>
+        <td class="membro-execucao-w-15 text-left">
+            {% for demanda in membroExecucao.ticket_set %}
+            {{demanda.tipo}}
+            {% endfor %}
+        </td>
         <td class="w-5 text-left" style="position: relative;">
             <button id="buttonMenuMembroExecucao{{membroExecucao.id}}" class="btn-circle">
                 <i class="fa-solid fa-ellipsis-vertical"></i>

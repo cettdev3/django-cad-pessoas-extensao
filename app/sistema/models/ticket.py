@@ -16,6 +16,7 @@ class Ticket(models.Model):
     cep = models.CharField(null = True, max_length=100, blank= True)
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
+    observacao = models.CharField(null = True, max_length=250, blank= True)
 
     class Meta:
         db_table = 'tickets'

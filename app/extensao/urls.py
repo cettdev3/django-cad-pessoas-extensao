@@ -60,12 +60,15 @@ from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, Itinerar
 from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
+from sistema.views.migrationsApiView import MigrationsViewSets
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
 from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
+router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
+router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),
     path('token/refresh', TokenRefreshView.as_view()),

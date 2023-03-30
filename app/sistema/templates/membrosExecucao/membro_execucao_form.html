@@ -58,7 +58,9 @@
                 name="descricao" 
                 class="form-control">{% if membro_execucao %}{{membro_execucao.descricao|default_if_none:""}}{% endif %}</textarea>
             </div>
-        </div>        
+        </div>   
+        <input type="hidden" name="membro_execucao_id" value="{% if membro_execucao %}{{membro_execucao.id}}{% endif %}">     
+        <input type="hidden" name="evento_id" value="{% if evento %}{{evento.id}}{% endif %}">     
     </form>
 </div>
 <script>

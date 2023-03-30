@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.ticket import Ticket
+from sistema.models.dpEvento import DpEvento
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -32,12 +33,15 @@ def ticketModal(request):
 def ticket_form(request):
     form_id = request.GET.get('form_id')
     id = request.GET.get('id')
+    evento_id = request.GET.get('evento_id')
     context = {}
     if form_id:
         context['form_id'] = form_id
     if id:
         ticket = Ticket.objects.get(id=id)
         context['ticket'] = ticket
+    if evento_id:
+        context['evento'] = DpEvento.objects.get(id=evento_id)
 
     return render(request,'tickets/ticket_form.html', context)
 

@@ -143,6 +143,16 @@
                 </div>
             </div>
             <div class="form-group d-flex justify-content-start align-items-start">
+                <div class="col-sm-12">
+                    <label><b>Descrição:</b></label>
+                    <textarea 
+                    rows="4"
+                    placeholder="Descreva a função da pessoa na equipe de execução do evento, motivo pelo qual ela é necessario solicitar essa demanda, etc."
+                    name="descricao" 
+                    class="form-control">{% if membro_execucao %}{{membro_execucao.descricao|default_if_none:""}}{% endif %}</textarea>
+                </div>
+            </div>
+            <div class="form-group d-flex justify-content-start align-items-start">
                 <input name="use_dpEvento_endereco"  
                 id="use_dpEvento_endereco" 
                 style="cursor: pointer; margin-right: 0.5rem;" 
@@ -153,14 +163,13 @@
                 </label>
             </div>
             <div class="form-group row">
-                <div class="col-sm-2">
-                    {% include "cidades/cidades_select.html" with cidades=cidades cidade_id=cidade_id id=prefix_id id_complement=id_to_remove%}
+                <div id="select_cidade" class="col-sm-2">
                 </div>
                 <div class="col-sm-3">
                     <label><b>Complemento:</b></label>
                     <input 
                     type="text" 
-                    id="collapse_endereco_input_{{id_to_remove}}_complemento"
+                    id="complemento"
                     name="complemento" 
                     class="form-control" 
                     {% if membro_execucao %}
@@ -171,7 +180,7 @@
                     <label><b>CEP:</b></label>
                     <input 
                     type="text" 
-                    id="collapse_endereco_input_{{id_to_remove}}_cep"
+                    id="cep"
                     name="cep" 
                     class="form-control" 
                     {% if membro_execucao %}
@@ -184,7 +193,7 @@
                     type="text" 
                     name="bairro" 
                     class="form-control" 
-                    id="collapse_endereco_input_{{id_to_remove}}_bairro"
+                    id="bairro"
                     {% if membro_execucao %}
                     value="{{membro_execucao.bairro}}"
                     {% endif %}>
@@ -195,7 +204,7 @@
                     type="text" 
                     name="logradouro" 
                     class="form-control" 
-                    id="collapse_endereco_input_{{id_to_remove}}_logradouro"
+                    id="logradouro"
                     {% if membro_execucao %}
                     value="{{membro_execucao.logradouro}}"
                     {% endif %}>
@@ -205,8 +214,24 @@
       </div>
     </div>
   </div>
+  <input type="text" name="evento_bairro" id="evento_bairro" hidden value="{{evento.bairro}}">
+  <input type="text" name="evento_logradouro" id="evento_logradouro" hidden value="{{evento.logradouro}}">
+  <input type="text" name="evento_cep" id="evento_cep" hidden value="{{evento.cep}}">
+  <input type="text" name="evento_complemento" id="evento_complemento" hidden value="{{evento.complemento}}">
+  <input type="text" name="evento_cidade" id="evento_cidade" hidden value="{{evento.cidade.id}}">
 </div>
 <script>
+    // load select cidade
+    function carregarSelectCidades() {
+        $.ajax({
+            url: "/cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                $("#ticket-form-container-{{form_id}} #select_cidade").html(data)
+            }
+        });
+    }
+
     $(document).ready(function() {
         $('#ticket-form-container-{{form_id}} #tipo_solicitacao').change(function() {
             console.log("change")
@@ -215,5 +240,29 @@
             console.log(title)
             $('#ticket-form-container-{{form_id}} #form-title').html(title);
         });
+
+        $('#ticket-form-container-{{form_id}} #use_dpEvento_endereco').change(function() {
+            console.log("change {{form_id}}", this.checked)
+            if (this.checked) {
+                var bairro = $('#ticket-form-container-{{form_id}} #evento_bairro').val();
+                var logradouro = $('#ticket-form-container-{{form_id}} #evento_logradouro').val();
+                var cep = $('#ticket-form-container-{{form_id}} #evento_cep').val();
+                var complemento = $('#ticket-form-container-{{form_id}} #evento_complemento').val();
+                var cidade = $('#ticket-form-container-{{form_id}} #evento_cidade').val();
+                $('#ticket-form-container-{{form_id}} #bairro').val(bairro);
+                $('#ticket-form-container-{{form_id}} #logradouro').val(logradouro);
+                $('#ticket-form-container-{{form_id}} #cep').val(cep);
+                $('#ticket-form-container-{{form_id}} #complemento').val(complemento);
+                $('#ticket-form-container-{{form_id}} #cidade_id').val(cidade);
+            } else {
+                $('#ticket-form-container-{{form_id}} #bairro').val("");
+                $('#ticket-form-container-{{form_id}} #logradouro').val("");
+                $('#ticket-form-container-{{form_id}} #cep').val("");
+                $('#ticket-form-container-{{form_id}} #complemento').val("");
+                $('#ticket-form-container-{{form_id}} #cidade_id').val("");
+            }
+        });
+
+        carregarSelectCidades();
     });
 </script>

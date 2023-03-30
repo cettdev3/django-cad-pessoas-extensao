@@ -17,20 +17,30 @@ from django.http import JsonResponse
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoTable(request):
     acao_id = request.GET.get('acao_id')
-    membros_execucao = MembroExecucao.objects
+    membros_execucao = MembroExecucao.objects.prefetch_related('ticket_set')
     if acao_id:
         membros_execucao = membros_execucao.filter(acao_id = acao_id)
     membros_execucao = membros_execucao.all()
-    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
+    serializer = MembroExecucaoSerializer(membros_execucao, many=True)
+    print("serializer.data")
+    print(serializer.data)
+    return render(
+        request,
+        'membrosExecucao/membros_execucao_table.html',
+        {'membros_execucao':serializer.data}
+    )
 
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoDpEventoTable(request):
     evento_id = request.GET.get('dp_evento_id')
-    membros_execucao = MembroExecucao.objects
+    membros_execucao = MembroExecucao.objects.prefetch_related('ticket_set')
     if evento_id:
         membros_execucao = membros_execucao.filter(evento_id = evento_id)
     membros_execucao = membros_execucao.all()
-    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
+    serializer = MembroExecucaoSerializer(membros_execucao, many=True)
+    print("serializer.data")
+    print(serializer.data)
+    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':serializer.data})
 
 @login_required(login_url='/auth-user/login-user')
 def membroExecucaoForm(request):
@@ -86,13 +96,14 @@ def saveMembroExecucao(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
+    print("dentro da view do site", body)
     response = requests.post('http://localhost:8000/membroExecucao', json=body, headers=headers)
     return JsonResponse(json.loads(response.content.decode()),status=response.status_code, safe=False)
 
 @login_required(login_url='/auth-user/login-user')
 def editarMembroExecucao(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
+    headers = {'Authorization': 'Token ' + token.key, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     body = json.loads(request.body)['data']
     print("dentro da view do site",body)
     response = requests.put('http://localhost:8000/membroExecucao/'+str(codigo), json=body, headers=headers)
