@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3'
 
 services:
   dbextensao:
@@ -13,12 +13,17 @@ services:
     volumes:
       - ./logs:/var/log/mysql:rw
       - ./data:/var/lib/mysql:rw
+  
   cad-pessoas-extensao:
     image: cad-pessoas-extensao
     restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        - USER_NAME=${APP_USER_NAME}
+        - GID=${APP_UID}
+        - UID=${APP_GID}
     labels:
       - "traefik.enable=true"
       - "traefik.constraint-label-stack=cad-pessoas-extensao"
@@ -64,19 +69,25 @@ services:
     ports:
       - 8081:8000
     volumes:
-      - ./app:/home/appuser
+      - ./app:/home/${APP_USER_NAME}
+  
   celery:
     restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        - USER_NAME=${APP_USER_NAME}
+        - GID=${APP_UID}
+        - UID=${APP_GID}
     container_name: celery
     command: celery -A extensao worker --loglevel=INFO
     volumes:
-      - ./app:/home/appuser
+      - ./app:/home/${APP_USER_NAME}
     depends_on:
       - redis
       - cad-pessoas-extensao
+  
   redis:
     image: redis:alpine
     restart: always
