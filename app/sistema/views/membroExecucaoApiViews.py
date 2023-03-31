@@ -33,6 +33,34 @@ class MembroExecucaoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
+        # print(asfds)
+        {
+                'pessoa_id': '2', 
+            'nome': 'Alaine Tavares', 
+            'membro_execucao_id': '', 
+            'evento_id': '17', 
+            'evento_bairro': 'Oeste', 
+            'evento_logradouro': 'Av. Contorno', 
+            'evento_cep': '76.380-000', 
+            'evento_complemento': 'None', 
+            'evento_cidade': '7', 
+            'tickets': [
+                {
+                'tipo': 'adiantamento_insumo', 
+                'nsa_data_inicio': 'on', 
+                'nsa_data_fim': 'on', 
+                'id_protocolo': '', 
+                'descricao': 'descricao teste adiantamento de insumos', 
+                'use_dpEvento_endereco': 'on', 
+                'cidade_id': '7', 
+                'complemento': '', 
+                'cep': '76.380-000', 
+                'bairro': 'Oeste', 
+                'logradouro': 'Av. Contorno'
+            }
+        ]
+    }
         cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -107,9 +135,9 @@ class MembroExecucaoApiView(APIView):
                             )
 
                     ticketData = {
-                        "tipo": request.data.get("tipo"),
-                        "status": "CREATED",
-                        "id_protocolo": request.data.get("id_protocolo"),
+                        "tipo": ticket.get("tipo"),
+                        "status": "EM_DIAS",
+                        "id_protocolo": ticket.get("id_protocolo"),
                         "membro_execucao": membroExecucao,
                         "data_inicio": ticket.get("data_inicio"),
                         "data_fim": ticket.get("data_fim"),
@@ -226,8 +254,9 @@ class MembroExecucaoDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        ticket = Ticket.objects.filter(membro_execucao=membroExecucao)
-        if ticket:
+        tickets = Ticket.objects.filter(membro_execucao=membroExecucao)
+        for ticket in tickets:
+            print("deletando ticket: ", ticket.tipo)
             ticket.delete()
 
         membroExecucao.delete()

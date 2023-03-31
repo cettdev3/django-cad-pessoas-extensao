@@ -43,7 +43,7 @@ def ticket_form(request):
     if evento_id:
         context['evento'] = DpEvento.objects.get(id=evento_id)
 
-    return render(request,'tickets/ticket_form.html', context)
+    return render(request,'tickets/ticket_form_collapsable.html', context)
 
 @login_required(login_url='/auth-user/login-user')
 def saveTicket(request):

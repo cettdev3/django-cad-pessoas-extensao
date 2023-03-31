@@ -13,6 +13,10 @@ class TicketSerializer(serializers.ModelSerializer):
             "status",
             "id_protocolo",
             "membro_execucao", 
-            "meta"
+            "meta",
+            "icon",
+            "status_class",
+            "status_formatado",
+            "tipo_formatado"
         ]
         depth = 2

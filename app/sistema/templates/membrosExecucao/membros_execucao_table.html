@@ -7,12 +7,16 @@
         width: 25%;
     }
 
-    .membro-execucao-w-15 {
-        width: 15%;
+    .membro-execucao-w-25 {
+        width: 25%;
     }
     
-    .membro-execucao-w-30 {
-        width: 30%;
+    .membro-execucao-w-70 {
+        width: 70%;
+    }
+
+    .membro-execucao-w-100 {
+        width: 100%;
     }
 </style>
 <table class="table table-borderless" width="100%" cellspacing="0">
@@ -25,12 +29,14 @@
     </thead>
     <tbody>
         {% for membroExecucao in membros_execucao %}
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.pessoa.nome}} 
+        <td class="membro-execucao-w-25 text-left">{{membroExecucao.pessoa.nome}} 
         </td>
-        <td class="membro-execucao-w-15 text-left">
-            {% for demanda in membroExecucao.ticket_set %}
-            {{demanda.tipo}}
-            {% endfor %}
+        <td class="membro-execucao-w-70 text-left">
+            <div class="membro-execucao-w-100 d-flex flex-wrap">
+                {% for demanda in membroExecucao.ticket_set %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda %}
+                {% endfor %}
+            </div>
         </td>
         <td class="w-5 text-left" style="position: relative;">
             <button id="buttonMenuMembroExecucao{{membroExecucao.id}}" class="btn-circle">

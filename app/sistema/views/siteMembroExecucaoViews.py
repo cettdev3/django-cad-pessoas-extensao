@@ -22,8 +22,6 @@ def membrosExecucaoTable(request):
         membros_execucao = membros_execucao.filter(acao_id = acao_id)
     membros_execucao = membros_execucao.all()
     serializer = MembroExecucaoSerializer(membros_execucao, many=True)
-    print("serializer.data")
-    print(serializer.data)
     return render(
         request,
         'membrosExecucao/membros_execucao_table.html',
@@ -37,9 +35,11 @@ def membrosExecucaoDpEventoTable(request):
     if evento_id:
         membros_execucao = membros_execucao.filter(evento_id = evento_id)
     membros_execucao = membros_execucao.all()
+    dp_eventos = DpEvento.objects.prefetch_related('membroexecucao_set').get(id=evento_id)
+    if dp_eventos:
+        membros_execucao = dp_eventos.membroexecucao_set.all()
+
     serializer = MembroExecucaoSerializer(membros_execucao, many=True)
-    print("serializer.data")
-    print(serializer.data)
     return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':serializer.data})
 
 @login_required(login_url='/auth-user/login-user')
