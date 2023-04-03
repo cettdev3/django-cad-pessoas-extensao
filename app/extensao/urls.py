@@ -44,8 +44,8 @@ from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, ac
 from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal, filterMultipleSelect
-from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
-from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form
+from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
+from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, eliminarTicket, ticketModalEdit, editarTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
@@ -207,6 +207,7 @@ urlpatterns = [
     path("membrosExecucaoSelect",membrosExecucaoSelect),
     path("editarMembroExecucao/<codigo>",editarMembroExecucao),
     path("eliminarMembroExecucao/<codigo>",eliminarMembroExecucao),
+    path("membroExecucaoDemandasModal/<membro_execucao_id>",membroExecucaoDemandasModal),
 
     # ROTAS PARA ACOES
     path("gerencia_acoes",gerencia_acoes),
@@ -233,8 +234,11 @@ urlpatterns = [
    
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),
+    path("ticketModalEdit/<ticket_id>",ticketModalEdit),
     path("saveTicket",saveTicket),
+    path("editarTicket/<ticket_id>",editarTicket),
     path("ticket_form",ticket_form),
+    path("eliminarTicket/<ticket_id>",eliminarTicket),
     
     # ROTAS PARA SERVICOS
     path("ServicoModalCadastrar",ServicoModalCadastrar),

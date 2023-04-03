@@ -80,6 +80,15 @@ def membroExecucaoModal(request):
         data['membro_execucao'] = MembroExecucaoSerializer(membro_execucao).data 
     return render(request,'membrosExecucao/membro_execucao_modal.html',data)
 
+@login_required(login_url='/auth-user/login-user')
+def membroExecucaoDemandasModal(request, membro_execucao_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/membroExecucao/'+membro_execucao_id, headers=headers)
+    data = {}
+    data["membro_execucao"] = json.loads(response.content.decode())
+    return render(request,'membrosExecucao/membro_execucao_demandas_modal.html',data)
+
 # @login_required(login_url='/auth-user/login-user')
 # def alocacaoModalCadastrar(request):
 #     id = request.GET.get('id')

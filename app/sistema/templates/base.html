@@ -58,8 +58,12 @@
 </head>
 
 <body id="page-top">
-
     <!-- Page Wrapper -->
+    <div id="success-delete" 
+    class="alert alert-success position-absolute"
+    style="top: 0; right: 0; z-index: 9999; display: none;">
+        <strong id="message-box">Deletado com sucesso!</strong>
+    </div>
     <div id="wrapper">
 
         <!-- Sidebar -->
@@ -177,14 +181,14 @@
 
             <!-- Content Wrapper -->
             <div id="content-wrapper" class="d-flex flex-column">
-
+                
                 <!-- Main Content -->
                 <div id="content">
 
                     <!-- Begin Page Content -->
-                    <div class="w-100" style="min-height: 100vh;">
-
+                    <div class="w-100" style="min-height: 100vh; position: relative">
                         {% block content %}
+                        
 
                         {% endblock content %}
                     </div>
@@ -239,6 +243,18 @@
 
 
     <script type="text/javascript">
+        function showFloatingMessage(message, style) {
+            $("#success-delete").removeClass("alert-success");
+            $("#success-delete").removeClass("alert-danger");
+            $("#success-delete").addClass(style);
+            $("#success-delete #message-box").html(message);
+
+            $("#success-delete").show();   
+            setTimeout(function() {
+                $("#success-delete").hide();
+            }, 2000);     
+        }
+
         function maskValues() {
             $('#telefone').mask("(00)0 0000-0000");
             $('#telefone_recado').mask("(00)0 0000-0000");

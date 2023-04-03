@@ -24,6 +24,8 @@ class Ticket(models.Model):
     meta = models.JSONField(null = True)
     data_inicio = models.DateField(null = True, blank= True)
     data_fim = models.DateField(null = True, blank= True)
+    nao_se_aplica_data_inicio = models.BooleanField(default=False)
+    nao_se_aplica_data_fim = models.BooleanField(default=False)
     bairro = models.CharField(null = True, max_length=100, blank= True)
     logradouro = models.CharField(null = True, max_length=250, blank= True)
     cep = models.CharField(null = True, max_length=100, blank= True)
@@ -104,3 +106,12 @@ class Ticket(models.Model):
         elif self.status == self.STATUS_EM_DIAS:
             return "demanda não criada no protocolo"    
         return ""
+
+    @property
+    def data_inicio_formatada(self):
+        return self.data_inicio.strftime("%d/%m/%Y")
+    
+    @property
+    def data_fim_formatada(self):
+        return self.data_fim.strftime("%d/%m/%Y")
+    

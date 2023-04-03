@@ -34,33 +34,6 @@ class MembroExecucaoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         print(request.data)
-        # print(asfds)
-        {
-                'pessoa_id': '2', 
-            'nome': 'Alaine Tavares', 
-            'membro_execucao_id': '', 
-            'evento_id': '17', 
-            'evento_bairro': 'Oeste', 
-            'evento_logradouro': 'Av. Contorno', 
-            'evento_cep': '76.380-000', 
-            'evento_complemento': 'None', 
-            'evento_cidade': '7', 
-            'tickets': [
-                {
-                'tipo': 'adiantamento_insumo', 
-                'nsa_data_inicio': 'on', 
-                'nsa_data_fim': 'on', 
-                'id_protocolo': '', 
-                'descricao': 'descricao teste adiantamento de insumos', 
-                'use_dpEvento_endereco': 'on', 
-                'cidade_id': '7', 
-                'complemento': '', 
-                'cep': '76.380-000', 
-                'bairro': 'Oeste', 
-                'logradouro': 'Av. Contorno'
-            }
-        ]
-    }
         cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -133,14 +106,18 @@ class MembroExecucaoApiView(APIView):
                                 {"res": "Não existe cidade com o id informado"},
                                 status=status.HTTP_400_BAD_REQUEST,
                             )
-
+                        
+                    nsa_data_fim = ticket.get("nsa_data_fim") == 'on' or True
+                    nsa_data_inicio = ticket.get("nsa_data_inicio") == 'on' or True
                     ticketData = {
                         "tipo": ticket.get("tipo"),
                         "status": "EM_DIAS",
                         "id_protocolo": ticket.get("id_protocolo"),
                         "membro_execucao": membroExecucao,
-                        "data_inicio": ticket.get("data_inicio"),
-                        "data_fim": ticket.get("data_fim"),
+                        "data_inicio": ticket.get("data_inicio") if ticket.get("data_inicio") else None,
+                        "data_fim": ticket.get("data_fim") if ticket.get("data_fim") else None,
+                        "nao_se_aplica_data_inicio": nsa_data_inicio,
+                        "nao_se_aplica_data_fim": nsa_data_fim,
                         "bairro": ticket.get("bairro"),
                         "logradouro": ticket.get("logradouro"),
                         "cep": ticket.get("cep"),
@@ -164,7 +141,7 @@ class MembroExecucaoDetailApiView(APIView):
             return None
             
     def get(self, request, membro_execucao_id, *args, **kwargs):
-        memebroExecucao = self.get_object(MembroExecucao, membro_execucao_id)
+        memebroExecucao = MembroExecucao.objects.prefetch_related("ticket_set").select_related('evento', "pessoa").get(id=membro_execucao_id)
         if not memebroExecucao:
             return Response(
                 {"res": "Não existe membro da equipe de execução com o id informado"},

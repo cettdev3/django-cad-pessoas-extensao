@@ -45,6 +45,7 @@
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuMembroExecucao{{membroExecucao.id}}"
                 class="btn-group-custom">
                 <button onclick="carregarMembroExecucaoModalCadastrar('{{membroExecucao.id}}')">Editar</button>
+                <button onclick="criarTicket('{{membroExecucao.id}}')">Adicionar Demanda</button>
                 <button onclick="openDeleteModal(() => deleteMembroExecucao('{{membroExecucao.id}}'))">Excluir</button>
             </div>
         </td>
@@ -52,6 +53,7 @@
         {% endfor %}
     </tbody>
 </table>
+<div id="modalTicketContainer"></div>
 
 <script>
     var hiddenMenuMembroExecucaoId = "hiddenMenuMembroExecucao";
@@ -66,6 +68,42 @@
             }
         });
     }
+
+    function criarTicket(membro_execucao_id) {
+        $.ajax({
+            url: "/ticketModal",
+            data: { 
+                membro_execucao_id: membro_execucao_id, 
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
+            }
+        });
+    }
+
+    function updateTicket(ticket_id) {
+        $.ajax({
+            url: "/ticketModalEdit/"+ticket_id,
+            data: { 
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
+            }
+        });
+    }
+
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarMembrosExecucao()
+    }
+
 
     $(document).ready(function () {
         $(document).mouseup(function (e) {

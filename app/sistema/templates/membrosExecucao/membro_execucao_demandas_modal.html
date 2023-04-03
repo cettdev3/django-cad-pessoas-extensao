@@ -1,0 +1,148 @@
+<div class="modal fade" id="membroExecucaoDemandasModal" tabindex="-1" role="dialog"
+    aria-labelledby="membroExecucaoDemandasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form id="MembroExecucaoDemandasForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Demandas do membro da execução: {{membro_execucao.pessoa.nome}}
+                    </h5>
+                    <button type="button" 
+                    id="dismissCadastrarMembrosExecucao" 
+                    class="close" 
+                    data-dismiss="modal" 
+                    aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="accordion" id="accordionExample">
+                        {% for demanda in membro_execucao.ticket_set %}
+                        <div class="card">
+                          <div class="card-header" id="heading{{demanda.id}}"
+                          type="button" data-toggle="collapse" data-target="#collapse{{demanda.id}}" 
+                          aria-expanded="true" 
+                          aria-controls="collapse{{demanda.id}}">
+                            <h5 class="mb-0">
+                                {{demanda.tipo_formatado}}
+                            </h5>
+                          </div>
+                      
+                          <div id="collapse{{demanda.id}}" class="collapse {% if forloop.counter == 1 %}show{% endif %}" 
+                          aria-labelledby="heading{{demanda.id}}" 
+                          data-parent="#accordionExample">
+                            <div class="card-body">
+                                {% if demanda.nao_se_aplica_data_inicio == False %}
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Data de início:</strong></div>
+                                    <div class="col-sm-9">{{demanda.data_inicio_formatada}}</div>
+                                </div>
+                                {% endif %}
+
+                                {% if demanda.nao_se_aplica_data_fim == False %}
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Data de fim:</strong></div>
+                                    <div class="col-sm-9">{{demanda.data_fim_formatada}}</div>
+                                </div>
+                                {% endif %}
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Bairro:</strong></div>
+                                    <div class="col-sm-9">{{demanda.bairro|default_if_none:"Não informado"}}</div>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Logradouro:</strong></div>
+                                    <div class="col-sm-9">{{demanda.logradouro |default_if_none:"Não informado"}}</div>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>CEP:</strong></div>
+                                    <div class="col-sm-9">{{demanda.cep|default_if_none:"Não informado"}}</div>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Complemento:</strong></div>
+                                    <div class="col-sm-9">{{demanda.complemento|default_if_none:"Não informado"}}</div>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Cidade:</strong></div>
+                                    <div class="col-sm-9">{{demanda.cidade.nome|default_if_none:"Não informado"}}</div>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Observação:</strong></div>
+                                    <div class="col-sm-9">{{demanda.observacao|default_if_none:"Não informado"}}</div>
+                                </div> 
+                                
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>Id da demanda:</strong></div>
+                                    <div class="col-sm-9">
+                                        <input type="text" 
+                                        id="id_protocolo"
+                                        name="id_protocolo"
+                                        class="form-control" 
+                                        value="{{demanda.id_protocolo}}" >
+                                        {% comment %} salvar btn {% endcomment %}
+                                        <button onclick="updateIdProtocolo('{{demanda.id}}')" type="button" class="btn btn-primary">Salvar</button>
+                                    </div>
+                                </div> 
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+                      
+                </div>
+                <div class="modal-footer">
+                    <button
+                    data-dismiss="modal"
+                    type="button"
+                    class="btn btn-primary">
+                    <div id="loading" style="display: none">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <spna>Carregando...</span>
+                    </div>
+                    <span id="button-label">Fechar</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% comment %} json script {% endcomment %}
+{{ membro_execucao|json_script:"membro_execucao" }}
+
+<script>
+    let membroExecucao = {}
+    function updateIdProtocolo(ticketId){
+        let ticketSet = membroExecucao.ticket_set
+        console.log(ticketSet)
+        console.log(ticketId)
+        let ticket = ticketSet.find(ticket => ticket.id == ticketId)
+        ticket["id_protocolo"] = $('#id_protocolo').val()
+        console.log("ticket dentro da modal: ",ticket)
+        let loadingContainer = $('#loading')
+        let buttonLabel = $('#button-label')
+        loadingContainer.show()
+        buttonLabel.hide()
+        $.ajax({
+            url: "/editarTicket/"+ticketId,
+            data: JSON.stringify({"data": ticket}),
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json',
+            method: "POST",
+            success: function (data) {
+                showFloatingMessage("Demanda atualizada com sucesso!", "alert-success")
+                loadingContainer.hide()
+                buttonLabel.show()
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        membroExecucao = JSON.parse($('#membro_execucao').text())
+    });
+</script>

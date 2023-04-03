@@ -19,7 +19,12 @@
 </style>
 <form id="cadastrarTicketForm{{form_id}}" action="/" method="POST">
     <div class="form-group row">
-        <div class="col-sm-3">
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
             <label><b>Tipo da demanda:</b></label>
             <select required 
             id="tipo_solicitacao"
@@ -30,56 +35,56 @@
                     Selecione uma opção
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'diaria' %}
+                {% if ticket and ticket.tipo == 'diaria' %}
                 selected
                 {% endif %}
                 value="diaria">
                     DIÁRIA
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'adiantamento' %}
+                {% if ticket and ticket.tipo == 'adiantamento' %}
                 selected
                 {% endif %}
                 value="adiantamento">
                     ADIANTAMENTO
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'adiantamento_insumo' %}
+                {% if ticket and ticket.tipo == 'adiantamento_insumo' %}
                 selected
                 {% endif %}
                 value="adiantamento_insumo">
                     ADIANTAMENTO INSUMOS
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'adiantamento_combustivel' %}
+                {% if ticket and ticket.tipo == 'adiantamento_combustivel' %}
                 selected
                 {% endif %}
                 value="adiantamento_combustivel">
                     ADIANTAMENTO COMBUSTÍVEL
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'veiculo' %}
+                {% if ticket and ticket.tipo == 'veiculo' %}
                 selected
                 {% endif %}
                 value="veiculo">
                     VEÍCULO
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'passagem' %}
+                {% if ticket and ticket.tipo == 'passagem' %}
                 selected
                 {% endif %}
                 value="passagem">
                     PASSAGEM
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'rpa' %}
+                {% if ticket and ticket.tipo == 'rpa' %}
                 selected
                 {% endif %}
                 value="rpa">
                     RPA
                 </option>
                 <option
-                {% if membro_execucao and membro_execucao.tipo == 'nao_se_aplica' %}
+                {% if ticket and ticket.tipo == 'nao_se_aplica' %}
                 selected
                 {% endif %}
                 value="nao_se_aplica">
@@ -87,17 +92,25 @@
                 </option>
             </select>
         </div>
-        <div class="col-sm-3">
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
             <div class="d-flex justify-content-between align-items-center">
                 <label><b>Data Início:</b></label>
                 <div class="form-group d-flex justify-content-start align-items-start" 
                 style=" padding: 0; margin: 0">
-                    <input name="nsa_data_inicio"  
-                    id="nsa_data_inicio" 
+                    <input name="nao_se_aplica_data_inicio"  
+                    id="nao_se_aplica_data_inicio" 
                     style="cursor: pointer; margin-right: 0.5rem;" 
                     type="checkbox"
+                    {% if ticket.nao_se_aplica_data_inicio == True %}
+                    checked
+                    {% endif %}
                     onclick="disableField(this,'data_inicio')">
-                    <label for="nsa_data_inicio" 
+                    <label for="nao_se_aplica_data_inicio" 
                     style="line-height: 1rem;white-space: nowrap;">
                         <b>Não se aplica</b>
                     </label>
@@ -108,23 +121,34 @@
             name="data_inicio" 
             id="data_inicio"
             class="form-control" 
-            {% if membro_execucao %}
-            value="{{membro_execucao.data_inicio}}"
+            {% if ticket and ticket.nao_se_aplica_data_inicio == False %}
+            value="{{ticket.data_inicio|date:'Y-m-d'}}"
+            {% else %}
+            value=""
+            disabled
             {% endif %}>
         </div>
-        <div class="col-sm-3">
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
             <div class="d-flex justify-content-between align-items-center">
                 <label>
                     <b>Data Fim:</b>
                 </label>
                 <div class="form-group d-flex justify-content-start align-items-start" 
                 style=" padding: 0; margin: 0">
-                    <input name="nsa_data_fim"  
-                    id="nsa_data_fim" 
+                    <input name="nao_se_aplica_data_fim"  
+                    id="nao_se_aplica_data_fim" 
                     style="cursor: pointer; margin-right: 0.5rem;" 
                     type="checkbox"
+                    {% if ticket.nao_se_aplica_data_fim == True %}
+                    checked
+                    {% endif %}
                     onclick="disableField(this,'data_fim')">
-                    <label for="nsa_data_fim" 
+                    <label for="nao_se_aplica_data_fim" 
                     style="line-height: 1rem;white-space: nowrap;">
                         <b>Não se aplica</b>
                     </label>
@@ -136,17 +160,24 @@
             name="data_fim" 
             id="data_fim"
             class="form-control" 
-            {% if membro_execucao %}
-            value="{{membro_execucao.data_fim}}"
+            {% if ticket and ticket.nao_se_aplica_data_fim == False %}
+            value="{{ticket.data_fim|date:'Y-m-d'}}"
+            {% else %}
+            value=""
+            disabled
             {% endif %}>
-            {% comment %} checkbox nao se aplica {% endcomment %}
         </div>
-        <div class="col-sm-3">
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
             <label><b>Id da demanda:</b></label>
             <input 
             type="text" 
             {% if ticket %}
-            value="{{ ticket.ticket}}" 
+            value="{{ ticket.id_protocolo|default_if_none:''}}" 
             {% endif %}
             class="form-control" 
             name="id_protocolo">
@@ -158,8 +189,8 @@
             <textarea 
             rows="4"
             placeholder="Descreva a função da pessoa na equipe de execução do evento, motivo pelo qual ela é necessario solicitar essa demanda, etc."
-            name="descricao" 
-            class="form-control">{% if membro_execucao %}{{membro_execucao.descricao|default_if_none:""}}{% endif %}</textarea>
+            name="observacao" 
+            class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
         </div>
     </div>
     <div class="form-group d-flex justify-content-start align-items-start">
@@ -169,11 +200,16 @@
         type="checkbox">
         <label for="use_dpEvento_endereco" 
         style="line-height: 1rem;white-space: nowrap;">
-            <b>Usar endereço do Evento tste</b>
+            <b>Usar endereço do Evento</b>
         </label>
     </div>
     <div class="form-group row">
         <div id="select_cidade" class="col-sm-2">
+            <input type="text" name="selected_cidade" id="selected_cidade" 
+            {% if ticket %}
+            value="{{ticket.cidade.id}}"
+            {% endif %}
+            hidden> 
         </div>
         <div class="col-sm-3">
             <label><b>Complemento:</b></label>
@@ -182,8 +218,8 @@
             id="complemento"
             name="complemento" 
             class="form-control" 
-            {% if membro_execucao %}
-            value="{{membro_execucao.complemento}}"
+            {% if ticket %}
+            value="{{ticket.complemento|default_if_none:''}}"
             {% endif %}>
         </div>
         <div class="col-sm-2">
@@ -193,8 +229,8 @@
             id="cep"
             name="cep" 
             class="form-control" 
-            {% if membro_execucao %}
-            value="{{membro_execucao.cep}}"
+            {% if ticket %}
+            value="{{ticket.cep|default_if_none:''}}"
             {% endif %}>
         </div>
         <div class="col-sm-3">
@@ -204,8 +240,8 @@
             name="bairro" 
             class="form-control" 
             id="bairro"
-            {% if membro_execucao %}
-            value="{{membro_execucao.bairro}}"
+            {% if ticket %}
+            value="{{ticket.bairro|default_if_none:''}}"
             {% endif %}>
         </div>
         <div class="col-sm-2">
@@ -215,24 +251,28 @@
             name="logradouro" 
             class="form-control" 
             id="logradouro"
-            {% if membro_execucao %}
-            value="{{membro_execucao.logradouro}}"
+            {% if ticket %}
+            value="{{ticket.logradouro|default_if_none:''}}"
             {% endif %}>
         </div>
     </div>
+    <input type="text" name="evento_bairro" id="evento_bairro" hidden value="{{evento.bairro|default_if_none:''}}">
+    <input type="text" name="evento_logradouro" id="evento_logradouro" hidden value="{{evento.logradouro|default_if_none:''}}">
+    <input type="text" name="evento_cep" id="evento_cep" hidden value="{{evento.cep|default_if_none:''}}">
+    <input type="text" name="evento_complemento" id="evento_complemento" hidden value="{{evento.complemento|default_if_none:''}}">
+    <input type="text" name="evento_cidade" id="evento_cidade" hidden value="{{evento.cidade.id|default_if_none:''}}">
+    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{membro_execucao.id}}">
 </form>
-<input type="text" name="evento_bairro" id="evento_bairro" hidden value="{{evento.bairro|default_if_none:""}}">
-<input type="text" name="evento_logradouro" id="evento_logradouro" hidden value="{{evento.logradouro|default_if_none:""}}">
-<input type="text" name="evento_cep" id="evento_cep" hidden value="{{evento.cep|default_if_none:""}}">
-<input type="text" name="evento_complemento" id="evento_complemento" hidden value="{{evento.complemento|default_if_none:""}}">
-<input type="text" name="evento_cidade" id="evento_cidade" hidden value="{{evento.cidade.id}}">
 <script>
     function carregarSelectCidades() {
+        console.log("buscando select cidade")
         $.ajax({
             url: "/cidadesSelect",
             method: "GET",
             success: function (data) {
-                $("#ticket-form-container-{{form_id}} #select_cidade").html(data)
+                let selected = $("#cadastrarTicketForm{{form_id}} #selected_cidade").val()
+                $("#cadastrarTicketForm{{form_id}} #select_cidade").html(data)
+                $("#cadastrarTicketForm{{form_id}} #cidade_id").val(selected)
             }
         });
     }
@@ -240,41 +280,42 @@
     function disableField(event, field) {
         console.log("disableField {{form_id}}", event.checked)
         if (event.checked) {
-            $("#ticket-form-container-{{form_id}} #"+field).attr("disabled", true)
+            $("#cadastrarTicketForm{{form_id}} #"+field).attr("disabled", true)
+            $("#cadastrarTicketForm{{form_id}} #"+field).val("")
         } else {
-            $("#ticket-form-container-{{form_id}} #"+field).attr("disabled", false)
+            $("#cadastrarTicketForm{{form_id}} #"+field).attr("disabled", false)
         }
     }
 
-    $(document).ready(function() {
-        $('#ticket-form-container-{{form_id}} #use_dpEvento_endereco').change(function() {
+    $(document).ready(function() {     
+        $('#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco').change(function() {
             console.log("change {{form_id}}", this.checked)
             if (this.checked) {
-                var bairro = $('#ticket-form-container-{{form_id}} #evento_bairro').val();
-                var logradouro = $('#ticket-form-container-{{form_id}} #evento_logradouro').val();
-                var cep = $('#ticket-form-container-{{form_id}} #evento_cep').val();
-                var complemento = $('#ticket-form-container-{{form_id}} #evento_complemento').val();
+                var bairro = $('#cadastrarTicketForm{{form_id}} #evento_bairro').val();
+                var logradouro = $('#cadastrarTicketForm{{form_id}} #evento_logradouro').val();
+                var cep = $('#cadastrarTicketForm{{form_id}} #evento_cep').val();
+                var complemento = $('#cadastrarTicketForm{{form_id}} #evento_complemento').val();
                 
                 if (bairro == "None") bairro = ""
                 if (logradouro == "None") logradouro = ""
                 if (cep == "None") cep = ""
                 if (complemento == "None") complemento = ""
 
-                var cidade = $('#ticket-form-container-{{form_id}} #evento_cidade').val();
-                $('#ticket-form-container-{{form_id}} #bairro').val(bairro);
-                $('#ticket-form-container-{{form_id}} #logradouro').val(logradouro);
-                $('#ticket-form-container-{{form_id}} #cep').val(cep);
-                $('#ticket-form-container-{{form_id}} #complemento').val(complemento);
-                $('#ticket-form-container-{{form_id}} #cidade_id').val(cidade);
+                var cidade = $('#cadastrarTicketForm{{form_id}} #evento_cidade').val();
+                $('#cadastrarTicketForm{{form_id}} #bairro').val(bairro);
+                $('#cadastrarTicketForm{{form_id}} #logradouro').val(logradouro);
+                $('#cadastrarTicketForm{{form_id}} #cep').val(cep);
+                $('#cadastrarTicketForm{{form_id}} #complemento').val(complemento);
+                $('#cadastrarTicketForm{{form_id}} #cidade_id').val(cidade);
             } else {
-                $('#ticket-form-container-{{form_id}} #bairro').val("");
-                $('#ticket-form-container-{{form_id}} #logradouro').val("");
-                $('#ticket-form-container-{{form_id}} #cep').val("");
-                $('#ticket-form-container-{{form_id}} #complemento').val("");
-                $('#ticket-form-container-{{form_id}} #cidade_id').val("");
+                $('#cadastrarTicketForm{{form_id}} #bairro').val("");
+                $('#cadastrarTicketForm{{form_id}} #logradouro').val("");
+                $('#cadastrarTicketForm{{form_id}} #cep').val("");
+                $('#cadastrarTicketForm{{form_id}} #complemento').val("");
+                $('#cadastrarTicketForm{{form_id}} #cidade_id').val("");
             }
         });
-
+        
         carregarSelectCidades();
     });
 </script>

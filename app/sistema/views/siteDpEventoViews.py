@@ -132,7 +132,7 @@ def dp_eventosSelect(request):
 
 @login_required(login_url='/auth-user/login-user')
 def visualizarDpEvento(request,codigo):
-    print("dentro de visualizarDpEvento")
+    print("dentro de visualizarDpEvento", codigo)
     dpEvento = DpEvento.objects.prefetch_related(
         Prefetch(
             "membroexecucao_set", 

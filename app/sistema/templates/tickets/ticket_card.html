@@ -30,14 +30,27 @@
     .ticket-card-container:hover {
         box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
     }
+
+    .actions {
+        display: none;
+    }
+    
+    .actions:hover {
+        display: flex;
+    }
+
+    .ticket-card-container:hover .actions {
+        display: flex;
+    }
+
 </style>
-<div class="d-inline-block align-self-stretch" style="margin-right: 5px;">
+<div class="d-inline-block align-self-stretch position-relative" style="margin-right: 5px;">
     <div class="ticket-card-container">
         <div class="d-flex justify-content-start align-items-center">
             <span>
-                <span class="fa-stack {{ticket.status_class}}"  
-                style="border-radius: 50%;" 
-                data-toggle="tooltip" 
+                <span class="fa-stack {{ticket.status_class}}"
+                style="border-radius: 50%;"
+                data-toggle="tooltip"
                 data-placement="top"
                 title="{{ticket.status_formatado}}">
                     <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
@@ -49,6 +62,34 @@
                 <span>{{ demanda.tipo_formatado }}</span>
                 <strong >{{ demanda.id_protocolo }}</strong>
             </div>
+            <!-- action  -->
+            <div class="flex justify-content-start align-items-end ml-auto actions position-absolute bg-light"
+            style="top: -70%; right: 0;">
+                <!-- editar btn -->
+                <button class="btn btn-sm btn-outline-primary ml-1" 
+                onclick="updateTicket('{{demanda.id}}')">
+                    <i class="fa-solid fa-edit"></i>
+                </button>
+                <!-- deletar btn -->
+                <button class="btn btn-sm btn-outline-danger ml-1" 
+                onclick="openDeleteModal(() => deletarTicket('{{demanda.id}}'))">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+
+    function deletarTicket(id) {
+        $.ajax({
+            url: '/eliminarTicket/' + id,
+            success: function (data) {
+                console.log("Ticket eliminado com sucesso!")
+                showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
+                carregarMembrosExecucao()
+            }
+        });
+    }
+</script>
