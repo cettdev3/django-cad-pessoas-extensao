@@ -1,6 +1,7 @@
 from django.db import models
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
+from ..models.alocacao import Alocacao
 
 class Ticket(models.Model):
     STATUS_CREATED = "CREATED"
@@ -21,7 +22,9 @@ class Ticket(models.Model):
     status = models.CharField(null = True, max_length=100)
     id_protocolo = models.CharField(null = True, max_length=100)
     membro_execucao =  models.ForeignKey(MembroExecucao, on_delete=models.SET_NULL, null=True)
+    alocacao =  models.ForeignKey(Alocacao, on_delete=models.SET_NULL, null=True)
     meta = models.JSONField(null = True)
+    model = models.CharField(null = True, blank=True, max_length=100)
     data_inicio = models.DateField(null = True, blank= True)
     data_fim = models.DateField(null = True, blank= True)
     nao_se_aplica_data_inicio = models.BooleanField(default=False)

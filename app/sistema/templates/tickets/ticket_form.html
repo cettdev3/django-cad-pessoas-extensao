@@ -18,6 +18,15 @@
     }
 </style>
 <form id="cadastrarTicketForm{{form_id}}" action="/" method="POST">
+    <input type="text" hidden
+    id="model"
+    name="model"
+    {% if model == 'alocacao' %}
+    value="{{model}}"
+    {% else %}
+    value="{{membro_execucao}}"
+    {% endif %}>
+
     <div class="form-group row">
         <div 
         {% if layout == '6' %}
@@ -26,6 +35,7 @@
         class="col-sm-3"
         {% endif %}>
             <label><b>Tipo da demanda:</b></label>
+            {{entity}}
             <select required 
             id="tipo_solicitacao"
             class="form-control" 
@@ -121,7 +131,7 @@
             name="data_inicio" 
             id="data_inicio"
             class="form-control" 
-            {% if ticket and ticket.nao_se_aplica_data_inicio == False %}
+            {% if ticket and ticket.nao_se_aplica_data_inicio == False or ticket.nao_se_aplica_data_fim == None %}
             value="{{ticket.data_inicio|date:'Y-m-d'}}"
             {% else %}
             value=""
@@ -160,7 +170,7 @@
             name="data_fim" 
             id="data_fim"
             class="form-control" 
-            {% if ticket and ticket.nao_se_aplica_data_fim == False %}
+            {% if ticket and ticket.nao_se_aplica_data_fim == False or ticket.nao_se_aplica_data_fim == None %}
             value="{{ticket.data_fim|date:'Y-m-d'}}"
             {% else %}
             value=""
@@ -256,12 +266,16 @@
             {% endif %}>
         </div>
     </div>
-    <input type="text" name="evento_bairro" id="evento_bairro" hidden value="{{evento.bairro|default_if_none:''}}">
-    <input type="text" name="evento_logradouro" id="evento_logradouro" hidden value="{{evento.logradouro|default_if_none:''}}">
-    <input type="text" name="evento_cep" id="evento_cep" hidden value="{{evento.cep|default_if_none:''}}">
-    <input type="text" name="evento_complemento" id="evento_complemento" hidden value="{{evento.complemento|default_if_none:''}}">
-    <input type="text" name="evento_cidade" id="evento_cidade" hidden value="{{evento.cidade.id|default_if_none:''}}">
-    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{membro_execucao.id}}">
+    <input type="text" name="entity_bairro" id="entity_bairro" hidden value="{{evento.bairro|default_if_none:''}}">
+    <input type="text" name="entity_logradouro" id="entity_logradouro" hidden value="{{evento.logradouro|default_if_none:''}}">
+    <input type="text" name="entity_cep" id="entity_cep" hidden value="{{evento.cep|default_if_none:''}}">
+    <input type="text" name="entity_complemento" id="entity_complemento" hidden value="{{evento.complemento|default_if_none:''}}">
+    <input type="text" name="entity_cidade" id="entity_cidade" hidden value="{{evento.cidade.id|default_if_none:''}}">
+    {% if membro == 'alocacao' %}
+    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{entity.id}}">
+    {% else %}
+    <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
+    {% endif %}
 </form>
 <script>
     function carregarSelectCidades() {
@@ -291,17 +305,17 @@
         $('#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco').change(function() {
             console.log("change {{form_id}}", this.checked)
             if (this.checked) {
-                var bairro = $('#cadastrarTicketForm{{form_id}} #evento_bairro').val();
-                var logradouro = $('#cadastrarTicketForm{{form_id}} #evento_logradouro').val();
-                var cep = $('#cadastrarTicketForm{{form_id}} #evento_cep').val();
-                var complemento = $('#cadastrarTicketForm{{form_id}} #evento_complemento').val();
+                var bairro = $('#cadastrarTicketForm{{form_id}} #entity_bairro').val();
+                var logradouro = $('#cadastrarTicketForm{{form_id}} #entity_logradouro').val();
+                var cep = $('#cadastrarTicketForm{{form_id}} #entity_cep').val();
+                var complemento = $('#cadastrarTicketForm{{form_id}} #entity_complemento').val();
                 
                 if (bairro == "None") bairro = ""
                 if (logradouro == "None") logradouro = ""
                 if (cep == "None") cep = ""
                 if (complemento == "None") complemento = ""
 
-                var cidade = $('#cadastrarTicketForm{{form_id}} #evento_cidade').val();
+                var cidade = $('#cadastrarTicketForm{{form_id}} #entity_cidade').val();
                 $('#cadastrarTicketForm{{form_id}} #bairro').val(bairro);
                 $('#cadastrarTicketForm{{form_id}} #logradouro').val(logradouro);
                 $('#cadastrarTicketForm{{form_id}} #cep').val(cep);

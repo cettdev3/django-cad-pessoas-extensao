@@ -95,7 +95,6 @@
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
-        
         if (changedResource) ticketModificadaEventProxy.modificado = changedResource
         let dismissBtn = $("#"+dismissCadastrarTicketId)
         console.log(dismissBtn)
@@ -106,7 +105,8 @@
     }
 
     function cadastrarTicket() {
-        console.log("dentro de cadastrar ticket")
+        console.log("dentro de cadastrar ticket", getFormData())
+        return
         $.ajax({
             url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),

@@ -38,6 +38,7 @@
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuAlocacoes{{alocacao.id}}"
                 class="btn-group-custom">
                 <button onclick="carregarAlocacoesModalCadastrar('{{alocacao.id}}')">Editar</button>
+                <button onclick="criarTicket('{{alocacao.id}}')">Adicionar Demanda</button>
                 <button onclick="openDeleteModal(() => deleteAlocacao('{{alocacao.id}}'))">Excluir</button>
             </div>
         </td>
@@ -47,7 +48,7 @@
 </table>
 <div id="modalCadastrarAlocacaoContainer">
 </div>
-
+<div id="modalTicketContainer"></div>
 <script>
     function carregarAlocacoesModalCadastrar(id = null) {
         let recarregarTabela = rotaModalAlocacao
@@ -57,6 +58,21 @@
             success: function (data) {
                 $("#" + modalCadastrarAlocacaoContainerId).html(data);
                 $('#' + cadastrarAlocacaoModalId).modal('toggle');
+            }
+        });
+    }
+
+    function criarTicket(membro_execucao_id) {
+        $.ajax({
+            url: "/ticketModal",
+            data: { 
+                alocacao_id: alocacao_id,
+                model: "alocacao",
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
             }
         });
     }

@@ -6,12 +6,10 @@ from rest_framework import status as st
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
-from ..models.acao import Acao
+from ..models.alocacao import Alocacao
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..serializers.ticketSerializer import TicketSerializer 
-from sistema.services.camunda import CamundaAPI 
-import json
 from rest_framework_simplejwt.authentication import JWTAuthentication
 class TicketApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -29,13 +27,22 @@ class TicketApiView(APIView):
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         membro_execucao = None
+        alocacao = None
+        model = request.data.get("model")
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
-            if not membro_execucao:
+            if not membro_execucao and model == "membro_execucao":
                 return Response(
                     {"res": "Não existe membro da equipe de execução com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+
+        if request.data.get("alocacao_id"):
+            alocacao = self.get_object(Alocacao, request.data.get("alocacao_id"))
+            if not alocacao and model == "alocacao":
+                return Response(
+                    {"res": "Não existe alocação com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
             
@@ -63,6 +70,8 @@ class TicketApiView(APIView):
             "status": "CREATED" if len(id_protocolo) > 0 else "EM_DIAS",
             "id_protocolo": id_protocolo, 
             "membro_execucao":  membro_execucao,
+            "alocacao": alocacao,
+            "model": model,
             "meta": request.data.get("meta"),
             "data_inicio": dataInicio,
             "data_fim": dataFim,
