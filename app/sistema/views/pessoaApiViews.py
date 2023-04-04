@@ -165,6 +165,7 @@ class PessoaDetailApiView(APIView):
 
     def put(self, request, pessoa_id, *args, **kwargs):
         pessoa = self.get_object(Pessoas, pessoa_id)
+        print("pessoa_id", pessoa_id)
         if not pessoa:
                 return Response(
                     {"res": "Não existe pessoa cadastrada com o id informado"}, 
@@ -256,7 +257,18 @@ class PessoaDetailApiView(APIView):
         if request.data.get("estado"):
             pessoa.estado = request.data.get("estado")
         if request.data.get("user_id"):
-            pessoa.user = User.objects.get(id=request.data.get("user_id"))
+            print("dentro 1")
+            user = User.objects.get(id=request.data.get("user_id"))
+            
+            try:
+                print("dentro 2")
+                existing_pessoas = Pessoas.objects.filter(user=user)
+                if existing_pessoas.exists() and existing_pessoas.first().pk != pessoa.pk:
+                    existing_pessoa.user = None
+                    existing_pessoa.save()
+            except Pessoa.DoesNotExist:
+                pass 
+            pessoa.user = user
         
         pessoa.save()
         serializer = PessoaSerializer(pessoa)

@@ -32,8 +32,9 @@ class AvaliacaoApiView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         # avaliacoes = Avaliacao.objects.filter(avaliador__pessoa__user__id=user.id)
-        avaliacoes = Avaliacao.objects.select_related('avaliador', 'evento', 'acao').all()
+        avaliacoes = Avaliacao.objects.select_related('avaliador__pessoa__user', 'evento', 'acao').exclude(evento=None)
         serializer = AvaliacaoSerializer(avaliacoes, many=True)
+        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
