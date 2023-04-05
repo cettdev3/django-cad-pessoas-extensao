@@ -283,7 +283,6 @@
         }
 
         function getDropdownSelectedValues(dropDownId) {
-            console.log("teste 123")
             let dropdown = $("#"+dropDownId+" .select-dropdown-content");
             let items = dropdown.children();
             let selectedValues = [];
@@ -310,14 +309,12 @@
 
         function setTabelaState(state, column = "column-pessoa", defaultOrder = "nome") {
             if (state) {
-                console.log("state", state)
                 let orderClass = state.direction == 1 ? "order-by-up" : "order-by-down"
                 $("#" + state.column).addClass(orderClass)
                 $("#" + state.column).find("i").each(function () {
                     $(this).addClass("current-order-by")
                 })
                 $("#" + state.column).find("span").each(function () {
-                    console.log($(this))
                     $(this).addClass("current-order-by")
                 })
                 $("*[id^='" + column + "-']").each(function (i, th) {
@@ -329,12 +326,10 @@
                 $("*[id^='" + column + "-']").each(function (i, th) {
                     if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
                         $(this).addClass("order-by-up")
-                        console.log($(this).find("i"))
                         $(this).find("i").each(function () {
                             $(this).addClass("current-order-by")
                         })
                         $(this).find("span").each(function () {
-                            console.log($(this))
                             $(this).addClass("current-order-by")
                         })
                     } else {

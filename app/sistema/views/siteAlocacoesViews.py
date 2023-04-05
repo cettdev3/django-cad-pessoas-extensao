@@ -25,9 +25,11 @@ from django.http import HttpResponse
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
     ensino_id = request.GET.get('acaoEnsino_id')
+    order_by = request.GET.get('order_by')
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = {'ensino_id':ensino_id}
+    body = {'ensino_id':ensino_id, 'order_by':order_by}
+
     response = requests.get('http://localhost:8000/alocacoes', json=body, headers=headers)
     alocacoes = json.loads(response.content)
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
@@ -87,6 +89,7 @@ def horasTrabalhadas(request):
     data_fim = body['data_fim']
     removed_dates = body['removed_dates']
     pessoas = Pessoas.objects
+    
     if data_fim and data_inicio:
         pessoas = pessoas.prefetch_related(
             Prefetch("alocacao_set", queryset=
@@ -100,6 +103,7 @@ def horasTrabalhadas(request):
                 )
             )
         )
+
     pessoas = pessoas.filter(alocacao__isnull=False).distinct().all()
     serializer = PessoaSerializer(pessoas, many=True)
 

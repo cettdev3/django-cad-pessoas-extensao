@@ -82,13 +82,11 @@
 <script>
     $(document).ready(function () {
         (function (params) {
-            console.log(params)
             $("#ticket-card-container-" + params.id +" #ticket-card-delete-btn").on('click', function () {
                     openDeleteModal(() => {
                         $.ajax({
                         url: '/eliminarTicket/' + params.id,
                         success: function (data) {
-                            console.log("Ticket eliminado com sucesso!")
                             showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
                             if (params.model == 'membro_execucao') {
                                 carregarMembrosExecucao()
