@@ -98,6 +98,14 @@
             }
         });
     }
+
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarAlocacoes()
+    }
     
     $(document).ready(function() {
         alocacaoModificadaEventProxy = new Proxy(alocacaoModificadaEvent, {

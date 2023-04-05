@@ -14,23 +14,37 @@
     .alocacao-w-30 {
         width: 30%;
     }
+    
+    .alocacao-w-35 {
+        width: 35%;
+    }
 </style>
 <table class="table table-borderless" width="100%" cellspacing="0">
     <thead class="border">
         <tr class="">
-            <th class="alocacao-w-30 text-left">Professor</th>
-            <th class="alocacao-w-25 text-left">Data de Inicio</th>
-            <th class="alocacao-w-25 text-left">Data de Fim</th>
-            <th class="alocacao-w-20 text-left">Curso</th>
+            <th class="alocacao-w-15 text-left">Professor</th>
+            <th class="alocacao-w-15 text-left">Data de Inicio</th>
+            <th class="alocacao-w-15 text-left">Data de Fim</th>
+            <th class="alocacao-w-15 text-left">Curso</th>
+            <th class="alocacao-w-35 text-left">demandas</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
         {% for alocacao in alocacoes %}
         <td class="alocacao-w-15 text-left">{{alocacao.professor.nome}}</td>
-        <td class="alocacao-w-15 text-left">{{alocacao.data_inicio|date:"d-m-Y"}}</td>
-        <td class="alocacao-w-15 text-left">{{alocacao.data_fim|date:"d-m-Y"}}</td>
-        <td class="alocacao-w-25 text-left">{{alocacao.curso.nome}}</td>
+        <td class="alocacao-w-15 text-left">{{alocacao.data_inicio_formatada|default_if_none:""}}</td>
+        <td class="alocacao-w-15 text-left">{{alocacao.data_fim_formatada|default_if_none:""}}</td>
+        <td class="alocacao-w-15 text-left">
+            {{alocacao.curso.nome}}
+        </td>
+        <td class="alocacao-w-35 text-left">
+            <div class="membro-execucao-w-100 d-flex flex-wrap">
+                {% for demanda in alocacao.ticket_set %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model='alocacao' %}
+                {% endfor %}
+            </div>
+        </td>
         <td class="w-5 text-left" style="position: relative;">
             <button id="buttonMenuAlocacoes{{alocacao.id}}" class="btn-circle">
                 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -62,7 +76,7 @@
         });
     }
 
-    function criarTicket(membro_execucao_id) {
+    function criarTicket(alocacao_id) {
         $.ajax({
             url: "/ticketModal",
             data: { 

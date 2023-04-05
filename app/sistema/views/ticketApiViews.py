@@ -45,6 +45,10 @@ class TicketApiView(APIView):
                     {"res": "Não existe alocação com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+        
+        print("model: ", model)
+        print("membro_execucao: ", membro_execucao)
+        print("alocacao: ", alocacao)
             
         cidade = None
         if request.data.get("cidade_id"):

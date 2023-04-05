@@ -105,8 +105,6 @@
     }
 
     function cadastrarTicket() {
-        console.log("dentro de cadastrar ticket", getFormData())
-        return
         $.ajax({
             url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),

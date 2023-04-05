@@ -25,8 +25,20 @@ class AlocacaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set").all()
+        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set", "ticket_set")
+        if request.data.get("ensino_id"):
+            ensino =  Ensino.objects.get(id=request.data.get("ensino_id"))
+            if not ensino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            
+            alocacoes = alocacoes.filter(acaoEnsino=ensino)
+
+        alocacoes = alocacoes.all()
         serializer = AlocacaoSerializer(alocacoes, many=True)
+        print(serializer.data)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):

@@ -44,7 +44,7 @@
     }
 
 </style>
-<div class="d-inline-block align-self-stretch position-relative" style="margin-right: 5px;">
+<div id="ticket-card-container-{{demanda.id}}" class="d-inline-block align-self-stretch position-relative" style="margin-right: 5px;">
     <div class="ticket-card-container">
         <div class="d-flex justify-content-start align-items-center">
             <span>
@@ -67,12 +67,11 @@
             style="top: -70%; right: 0;">
                 <!-- editar btn -->
                 <button class="btn btn-sm btn-outline-primary ml-1" 
-                onclick="updateTicket('{{demanda.id}}')">
+                onclick="updateTicket('{{demanda.id}}', '{{model}}')">
                     <i class="fa-solid fa-edit"></i>
                 </button>
                 <!-- deletar btn -->
-                <button class="btn btn-sm btn-outline-danger ml-1" 
-                onclick="openDeleteModal(() => deletarTicket('{{demanda.id}}'))">
+                <button id="ticket-card-delete-btn" class="btn btn-sm btn-outline-danger ml-1" >
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
@@ -81,15 +80,25 @@
 </div>
 
 <script>
-
-    function deletarTicket(id) {
-        $.ajax({
-            url: '/eliminarTicket/' + id,
-            success: function (data) {
-                console.log("Ticket eliminado com sucesso!")
-                showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
-                carregarMembrosExecucao()
-            }
-        });
-    }
+    $(document).ready(function () {
+        (function (params) {
+            console.log(params)
+            $("#ticket-card-container-" + params.id +" #ticket-card-delete-btn").on('click', function () {
+                    openDeleteModal(() => {
+                        $.ajax({
+                        url: '/eliminarTicket/' + params.id,
+                        success: function (data) {
+                            console.log("Ticket eliminado com sucesso!")
+                            showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
+                            if (params.model == 'membro_execucao') {
+                                carregarMembrosExecucao()
+                            } else if (params.model == 'alocacao') {
+                                carregarAlocacoes()
+                            }
+                        }
+                    });
+                }); 
+            });
+        })({model: '{{model}}', id: '{{demanda.id}}'});
+    })
 </script>

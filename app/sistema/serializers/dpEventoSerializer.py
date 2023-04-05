@@ -9,7 +9,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
     membroexecucao_set = MembroExecucaoSerializer(many=True, read_only=True)
     endereco_completo = serializers.CharField(read_only=True)
     data_inicio_formatada = serializers.CharField(read_only=True)
-    data_inicio_formatada = serializers.CharField(read_only=True)
+    data_fim_formatada = serializers.CharField(read_only=True)
     tipo_foramtado = serializers.CharField(read_only=True)
     
     class Meta:

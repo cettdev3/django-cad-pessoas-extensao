@@ -19,16 +19,19 @@ def ticketModal(request):
     model = request.GET.get('model')
     ticket = None
     data = {}
-    print(request.data)
+    print("model na abertura da modal: ", model)
     if request.GET.get('membro_execucao_id') and model == 'membro_execucao':
+        print("membro_execucao_id: ", request.GET.get('membro_execucao_id'))
         membroExecucao = MembroExecucao.objects.get(id=request.GET.get('membro_execucao_id'))
-        entity = membroExecucao.evento
-        data['membro_execucao'] = membroExecucao
-        data['entity'] = entity
+        parent_entity = membroExecucao.evento
+        data['entity'] = membroExecucao
+        data['parent_entity'] = parent_entity
     if request.GET.get('alocacao_id') and model == 'alocacao':
+        print("alocacao_id: ", request.GET.get('alocacao_id'))
         alocacao = Alocacao.objects.get(id=request.GET.get('alocacao_id'))
-        entity = alocacao.acaoEnsino
-        data['entity'] = entity
+        parent_entity = alocacao.acaoEnsino
+        data['entity'] = alocacao
+        data['parent_entity'] = parent_entity
     if id:
         ticket = ticket.objects.get(id=id)
         data['ticket'] = ticket
@@ -44,9 +47,16 @@ def ticketModalEdit(request, ticket_id):
     print(request.GET)
     layout = request.GET.get('layout')
     data = {}
+    model = request.GET.get('model')
     ticket = Ticket.objects.get(id=ticket_id)
     data['ticket'] = ticket
-    data['evento'] = ticket.membro_execucao.evento
+    data['model'] = model
+    if model == 'membro_execucao':
+        data['entity'] = ticket.membro_execucao
+        data['parent_entity'] = ticket.membro_execucao.evento
+    if model == 'alocacao':
+        data['entity'] = ticket.alocacao
+        data['parent_entity'] = ticket.alocacao.acaoEnsino
     if layout:
         data['layout'] = layout
     return render(request,'tickets/ticket_modal.html',data)

@@ -34,7 +34,7 @@
         <td class="membro-execucao-w-70 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
                 {% for demanda in membroExecucao.ticket_set %}
-                    {% include "tickets/ticket_card.html" with ticket=demanda %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model='membro_execucao' %}
                 {% endfor %}
             </div>
         </td>
@@ -53,7 +53,6 @@
         {% endfor %}
     </tbody>
 </table>
-<div id="modalTicketContainer"></div>
 
 <script>
     var hiddenMenuMembroExecucaoId = "hiddenMenuMembroExecucao";
@@ -75,19 +74,6 @@
             data: { 
                 membro_execucao_id: membro_execucao_id, 
                 model: "membro_execucao",
-                layout: 6 
-            },
-            success: function (data) {
-                $("#" + "modalTicketContainer").html(data);
-                $('#' + "cadastrarTicketModal").modal('toggle');
-            }
-        });
-    }
-
-    function updateTicket(ticket_id) {
-        $.ajax({
-            url: "/ticketModalEdit/"+ticket_id,
-            data: { 
                 layout: 6 
             },
             success: function (data) {

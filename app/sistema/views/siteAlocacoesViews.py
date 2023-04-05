@@ -24,11 +24,12 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
-    acaoEnsino_id = request.GET.get('acaoEnsino_id')
-    alocacoes = Alocacao.objects
-    if acaoEnsino_id:
-        alocacoes = alocacoes.filter(acaoEnsino_id = acaoEnsino_id)
-    alocacoes = alocacoes.all()
+    ensino_id = request.GET.get('acaoEnsino_id')
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = {'ensino_id':ensino_id}
+    response = requests.get('http://localhost:8000/alocacoes', json=body, headers=headers)
+    alocacoes = json.loads(response.content)
     return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
 
 @login_required(login_url='/auth-user/login-user')
