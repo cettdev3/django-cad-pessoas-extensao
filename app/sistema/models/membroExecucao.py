@@ -39,3 +39,4 @@ class MembroExecucao(models.Model):
         if self.cep:
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
+    

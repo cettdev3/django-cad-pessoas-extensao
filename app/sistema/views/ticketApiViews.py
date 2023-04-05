@@ -22,7 +22,7 @@ class TicketApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        ticket = Ticket.objects.select_related("membro_execucao").all()
+        ticket = Ticket.objects.select_related("membro_execucao", "alocacao").all()
         serializer = TicketSerializer(ticket, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 

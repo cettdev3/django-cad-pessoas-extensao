@@ -1,10 +1,12 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from ..models.ticket import Ticket
-
+from .membroExecucaoTicketSerializer import MembroExecucaoTicketSerializer
+from .alocacaoTicketSerializer import AlocacaoTicketSerializer
 class TicketSerializer(serializers.ModelSerializer):
     meta = serializers.JSONField(allow_null=True)
-
+    membro_execucao = MembroExecucaoTicketSerializer(many=False, read_only=True)
+    alocacao = AlocacaoTicketSerializer(many=False, read_only=True)
     class Meta:
         model = Ticket
         fields = [
@@ -13,7 +15,9 @@ class TicketSerializer(serializers.ModelSerializer):
             "status",
             "id_protocolo",
             "membro_execucao",
+            "alocacao",
             "meta",
+            "model",
             "data_inicio",
             "data_fim",
             "data_inicio_formatada",

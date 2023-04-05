@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="width: 100%;" class="">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-dismissible alert-success" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong class="text-dark">{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div class="d-flex justify-content-start align-items-center ">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoDataInicio" class="filter-label">Data de início do evento</label>
+                <input id="filterDpEventoDataInicio" class="form-control-sm border-secondary" name="data_inicio"
+                    type="date">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoDataFim" class="filter-label">Data de Fim do evento</label>
+                <input id="filterDpEventoDataFim" class="form-control-sm border-secondary" name="data_fim" type="date">
+            </div>
+            <input type="text" hidden id="filterDpEventoTipo" name="order_by">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDpEventoTipo" class="filter-label">Tipo</label>
+                <select name="tipo" id="filterDpEventoTipo" class="form-control-sm border-secondary">
+                    <option value="">Selecione uma opção</option>
+                    <option value="emprestimo">Empréstimo</option>
+                    <option value="curso_gps">Curso GPS</option>
+                    <option value="feirao">Feirão do Emprego</option>
+                    <option value="goias_feito_a_mao">Goiás Feito à Mão</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+            <input type="text" name="order_by" id="filterDemandaOrderBy" hidden>
+        </div>
+        <div class="d-flex">
+
+        </div>
+    </div>
+
+    <div class="w-100" id="demandasTable">
+    </div>
+
+</div>
+<script>
+    
+    function carregarDemandas(filters= null, state = null) {
+        $.ajax({
+            url: "/demandas_tabela",
+            type: "GET",
+            data: filters,
+            success: function (data) {
+                $("#demandasTable").html(data);
+                setTabelaState(state, 'column-demanda', "-tipo")
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        carregarDemandas()
+    })
+</script>
+{% endblock content %}

@@ -53,6 +53,7 @@ from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividades
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteUserViews import usersSelect
+from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
@@ -137,6 +138,10 @@ urlpatterns = [
     path("saveEscola",saveEscola),
     path("editarEscola/<escola_id>",editarEscola),
     path("escolasSelect",escolasSelect),
+    
+    # ROTAS PARA DEMANDAS
+    path("gerencia_demandas",gerencia_demandas),
+    path("demandas_tabela",demandas_tabela),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
