@@ -218,7 +218,8 @@ def createRelatorioGPS(doc, counter, filters):
                 local = ""
                 etapa = ""
                 cursos = []
-                acaoCargaHoraria = f"Ação {str(counter)}: {int(atividade.cargaHoraria)}h"
+                atividadeCargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
+                acaoCargaHoraria = f"Ação {str(counter)}: {int(atividadeCargaHoraria)}h"
                 cidade = f"{atividade.cidade.nome}"
                 if atividade.quantidadeMatriculas:
                     matriculas = f"{atividade.quantidadeMatriculas}"
@@ -323,6 +324,8 @@ def createRelatorioOutros(doc, counter, filters):
     atividadesCounter = counter
     for evento in eventos:
         # if evento has no activities, skip it
+        print("evento.cidade.nome: ", evento.cidade.nome)
+        print("evento.cidade.nome: ", len(evento.atividade_set.all()))
         if not evento.atividade_set.all():
             continue
         title = doc.add_paragraph()
@@ -335,12 +338,11 @@ def createRelatorioOutros(doc, counter, filters):
         for atividade in atividades:
             if not atividade.tipoAtividade:
                 continue
-            if atividade.cargaHoraria is None:
-                continue
             
             tipo = atividade.tipoAtividade.nome
+            atividadeCargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
             print("atividadesCounter", atividadesCounter)
-            acaoCargaHoraria = f"Ação {atividadesCounter} - {str(int(atividade.cargaHoraria))}h"
+            acaoCargaHoraria = f"Ação {atividadesCounter} - {str(int(atividadeCargaHoraria))}h"
 
             service_cargaHoraria_title = doc.add_paragraph()
             service_cargaHoraria_title_run = service_cargaHoraria_title.add_run(f'{acaoCargaHoraria}')
