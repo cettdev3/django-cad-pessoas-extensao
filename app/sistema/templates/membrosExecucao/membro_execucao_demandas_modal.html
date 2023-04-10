@@ -114,9 +114,9 @@
 {% comment %} json script {% endcomment %}
 {{ membro_execucao|json_script:"membro_execucao" }}
 
-<script>
-    let membroExecucao = {}
+<script id="membro_execucao_data_{{membro_execucao.id}}">
     function updateIdProtocolo(ticketId){
+        let membroExecucao = JSON.parse($('#membro_execucao').text())
         let ticketSet = membroExecucao.ticket_set
         console.log(ticketSet)
         console.log(ticketId)
@@ -143,6 +143,6 @@
     }
 
     $(document).ready(function () {
-        membroExecucao = JSON.parse($('#membro_execucao').text())
+        
     });
 </script>
