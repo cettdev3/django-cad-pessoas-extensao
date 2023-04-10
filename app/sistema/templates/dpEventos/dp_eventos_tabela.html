@@ -198,6 +198,7 @@ cellspacing="0">
             success: function (data) {
                 $("#membroExecucaoDemandasModalContainer").html(data);
                 $('#membroExecucaoDemandasModal').modal('toggle');
+                $('#membro_execucao_data_'+membroId).html("")
             }
         });
     }
