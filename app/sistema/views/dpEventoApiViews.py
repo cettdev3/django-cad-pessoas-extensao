@@ -111,20 +111,6 @@ class DpEventoApiView(APIView):
         }
 
         membrosExecucaoData = []
-        if len(postDpEventoData["membros_execucao"]):
-            for membroExecucao in postDpEventoData["membros_execucao"]:
-                membroExecucaoData = {
-                    "pessoa_id": membroExecucao.get("pessoa_id") if membroExecucao.get("pessoa_id") else None,
-                    "tipo": membroExecucao.get("tipo") if membroExecucao.get("tipo") else None,
-                    "data_inicio": membroExecucao.get("data_inicio") if membroExecucao.get("data_inicio") else None,
-                    "data_fim": membroExecucao.get("data_fim") if membroExecucao.get("data_fim") else None,
-                    "cidade_id": membroExecucao.get("cidade_id") if membroExecucao.get("cidade_id") else None,
-                    "complemento": membroExecucao.get("complemento") if membroExecucao.get("complemento") else None,
-                    "cep": membroExecucao.get("cep") if membroExecucao.get("cep") else None,
-                    "bairro": membroExecucao.get("bairro") if membroExecucao.get("bairro") else None,
-                    "logradouro": membroExecucao.get("logradouro") if membroExecucao.get("logradouro") else None,
-                }
-                membrosExecucaoData.append(membroExecucaoData)
         
         with transaction.atomic():
             dp_eventoData = DpEvento.objects.create(**dp_eventoData)
