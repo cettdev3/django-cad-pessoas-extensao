@@ -11,6 +11,7 @@ class DpEvento(models.Model):
     GOIAS_FEITO_A_MAO = 'goias_feito_a_mao'
     FEIRAO  = 'feirao'
     MUTIRAO  = 'mutirao'
+    RECICLA_GOIAS  = 'recicla_goias'
     OUTRO = 'outro'
 
     MAPPED_TIPOS = [
@@ -98,4 +99,6 @@ class DpEvento(models.Model):
             return "Mutirão"
         elif self.tipo == self.OUTRO:
             return "Outro"
+        elif self.tipo == self.RECICLA_GOIAS:
+            return "Recicla Goiás"
         return "Evento não identificado"
