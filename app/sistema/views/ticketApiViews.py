@@ -2,7 +2,7 @@ from datetime import datetime
 from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework import status as st
+from rest_framework import status as st, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
@@ -11,7 +11,7 @@ from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework.decorators import action
 class TicketApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, JWTAuthentication]
@@ -70,9 +70,14 @@ class TicketApiView(APIView):
         if nsa_data_fim == "on":
             dataFim = None
 
+        status = request.data.get("status") if request.data.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
+        if len(id_protocolo) > 0:
+            status = Ticket().STATUS_CRIADO
+        
+
         ticketData = {
             "tipo": request.data.get("tipo"),
-            "status": Ticket().STATUS_CRIADO if len(id_protocolo) > 0 else Ticket().STATUS_CRIACAO_PENDENTE,
+            "status": status,
             "id_protocolo": id_protocolo, 
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
@@ -156,7 +161,9 @@ class TicketDetailApiView(APIView):
             ticket.cidade = cidade
         if request.data.get("observacao"):
             ticket.observacao = request.data.get("observacao")
-
+        if request.data.get("status"):
+            if len(ticket.id_protocolo) > 0 and request.data.get("status") != Ticket().STATUS_CRIACAO_PENDENTE and request.data.get("status") != Ticket().STATUS_ATRASADO_PARA_CRIACAO:
+                ticket.status = request.data.get("status")
 
         nsaDataInicio = request.data.get("nsa_data_inicio")
         nsaDataFim = request.data.get("nsa_data_fim")
@@ -190,3 +197,17 @@ class TicketDetailApiView(APIView):
             {"res": "ticket deletado!"},
             status=st.HTTP_200_OK
         )
+    
+class TicketViewSets(viewsets.ModelViewSet):
+    @action(methods=["POST"], detail=False, url_path="complete-prestacao-contas")
+    def migratreTickets(self, request, ticket_id, *args, **kwargs):
+        ticket = self.get_object(Ticket, ticket_id)
+        if not ticket:
+                return Response(
+                    {"res": "Não existe ticket com o id informado"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+        if request.data.get("status"):
+            ticket.status = request.data.get("status")
+        ticket.save()
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

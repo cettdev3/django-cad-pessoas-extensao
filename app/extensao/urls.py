@@ -17,7 +17,7 @@ from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
-from sistema.views.ticketApiViews import TicketApiView
+from sistema.views.ticketApiViews import TicketApiView, TicketViewSets
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
 from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
@@ -71,6 +71,7 @@ router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
 router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
 router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),

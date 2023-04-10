@@ -8,6 +8,7 @@ class TicketSerializer(serializers.ModelSerializer):
     membro_execucao = MembroExecucaoTicketSerializer(many=False, read_only=True)
     alocacao = AlocacaoTicketSerializer(many=False, read_only=True)
     status_formatado = serializers.CharField(read_only=True)
+    status_calculado = serializers.CharField(read_only=True)
 
     class Meta:
         model = Ticket
@@ -37,5 +38,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "tipo_formatado",
             "status_class",
             "status_formatado",
+            "status_calculado"
         ]
         depth = 2

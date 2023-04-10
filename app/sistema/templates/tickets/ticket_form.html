@@ -139,7 +139,7 @@
         </div>
         <div 
         {% if layout == '6' %}
-        class="col-sm-6"
+        class="col-sm-4"
         {% else %}
         class="col-sm-3"
         {% endif %}>
@@ -178,7 +178,7 @@
         </div>
         <div 
         {% if layout == '6' %}
-        class="col-sm-6"
+        class="col-sm-4"
         {% else %}
         class="col-sm-3"
         {% endif %}>
@@ -190,6 +190,64 @@
             {% endif %}
             class="form-control" 
             name="id_protocolo">
+        </div>
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-4"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <label><b>Status:</b></label>
+            <select required 
+            id="status"
+            class="form-control" 
+            name="status">
+                <option
+                value="">
+                    Selecione uma opção
+                </option>
+            <!-- CRIACAO_PENDENTE -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'CRIACAO_PENDENTE' %}
+                selected
+                {% endif %}
+                value="CRIACAO_PENDENTE">
+                    CRIAÇÂO PENDENTE
+                </option>
+                <!-- CRIADO -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'CRIADO' %}
+                selected
+                {% endif %}
+                value="CRIADO">
+                    CRIADO
+                </option>
+
+                <!-- ATRASADO_PARA_CRIACAO -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'ATRASADO_PARA_CRIACAO' %}
+                selected
+                {% endif %}
+                value="ATRASADO_PARA_CRIACAO">
+                    ATRASADO PARA CRIACAO
+                </option>
+            <!-- PENDING_PRESTACAO_CONTAS -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'PENDING_PRESTACAO_CONTAS' %}
+                selected
+                {% endif %}
+                value="PENDING_PRESTACAO_CONTAS">
+                    PRESTAÇÂO DE CONTAS PENDENTE
+                </option>
+            <!-- PRESTACAO_CONTAS_CREATED -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'PRESTACAO_CONTAS_CREATED' %}
+                selected
+                {% endif %}
+                value="PRESTACAO_CONTAS_CREATED">
+                    CONTAS PRESTADAS
+                </option>
+            </select>
         </div>
     </div>
     <div class="form-group d-flex justify-content-start align-items-start">

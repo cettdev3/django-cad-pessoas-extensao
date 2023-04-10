@@ -104,7 +104,7 @@ cellspacing="0">
             </td>
             <td  class="text-left position-relative">
                 <div class="d-flex flex-wrap ">
-                    {% include "tickets/ticket_card.html" with ticket=demanda model=demanda.model show_delete=False show_edit=False show_conclude=True %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model=demanda.model show_delete=False show_edit=True %}
                 </div>
             </td>
             {% comment %} <td class="w-2 text-left" style="position: relative;">
@@ -126,5 +126,11 @@ cellspacing="0">
     </tbody>
 </table>
 <script>
-    
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarDemandas()
+    }
 </script>

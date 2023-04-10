@@ -46,22 +46,30 @@ class Ticket(models.Model):
     def calculate_status(self):
         entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
         today = timezone.now().date()
-
-        # faltando 7 dias para o inicio da ação de ensino ou evento e o ticket ainda não foi criado
+        print(entity,  today)
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
-            delta = entity.data_inicio.date() - today
+            print("dentro do primeiro if")
+            data_inicio_evento_date = entity.data_inicio.fromisoformat(self.data_fim) if isinstance(entity.data_inicio, str) else entity.data_inicio
+            delta = data_inicio_evento_date - today
+            print( "delta", delta)
             days_until_event_start = delta.days
+            print("days_until_event_start", days_until_event_start)
             if days_until_event_start <= 7:
                 return self.STATUS_ATRASADO_PARA_CRIACAO
-
-        # demanda chegou ao fim e o ticket ainda esta no status de criado
+        print("depois do primeiro if")
         if self.status == self.STATUS_CRIADO and self.data_fim:
-            two_days_later = self.data_fim + timedelta(days=2)
+            data_fim_date = self.data_fim.fromisoformat(self.data_fim) if isinstance(self.data_fim, str) else self.data_fim
+            two_days_later = data_fim_date + timedelta(days=2)
             is_after = today > two_days_later
+            print(data_fim_date, two_days_later, today, is_after)
             if is_after:
                 return self.STATUS_PRESTACAO_CONTAS_PENDENTE
-        
+        print("status fora")
         return self.status
+    
+    @property
+    def status_calculado(self):
+        return self.calculate_status()
     
     @property
     def endereco_completo(self):
@@ -116,21 +124,27 @@ class Ticket(models.Model):
     
     @property
     def status_class(self):
+        print("statsu: ",self.status)
         if self.calculate_status() == self.STATUS_ATRASADO_PARA_CRIACAO:
+            print("dentro do if 1")
             return "criacao_atrasada"
         elif self.calculate_status() == self.STATUS_PRESTACAO_CONTAS_PENDENTE:
+            print("dentro do if 2")
             return "prestacao_pendente"
         elif self.status == self.STATUS_CRIACAO_PENDENTE:
+            print("dentro do if 3")
             return "nao_criado"
         elif self.status == self.STATUS_CRIADO:
+            print("dentro do if 4")
             return "criado"
         elif self.status == self.STATUS_PRESTACAO_CONTAS_CRIADA:
-            return "conta_prestada"    
+            print("dentro do if 5")
+            return "conta_prestada"   
+        print("dentro do if 6") 
         return ""
     
     @property
     def status_formatado(self):
-        print("calculando status", self.status)
         if self.calculate_status() == self.STATUS_ATRASADO_PARA_CRIACAO:
             return "Criação de demanda atrasada"
         elif self.calculate_status()  == self.STATUS_PRESTACAO_CONTAS_PENDENTE:
