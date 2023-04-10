@@ -65,9 +65,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <li class=" cs-tab-link active">
                 <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
             </li>
-            <li class=" cs-tab-link active">
+            {% comment %} <li class=" cs-tab-link active">
                 <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
-            </li>
+            </li> {% endcomment %}
             <li class=" cs-tab-link active">
                 <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
             </li>
@@ -81,9 +81,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             style="overflow-y: scroll;" >
                 <div id="receberTabelaMembrosExecucao"></div>
             </div>
-            <div id="itinerarios" class="tab-pane" style="height: 100%;">
+            {% comment %} <div id="itinerarios" class="tab-pane" style="height: 100%;">
                 {% include "itinerarios/itinerario_input.html" with itinerario=dpEvento acao=dpEvento %}
-            </div>
+            </div> {% endcomment %}
             <div id="atividades" class="tab-pane" style="height: 100%;">
                 <div id="atividadesTableContainer"></div>
             </div>
