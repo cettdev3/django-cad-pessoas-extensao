@@ -369,6 +369,26 @@
     object_repr: gerente.operacional
     action_flag: 1
     change_message: '[{"added": {}}]'
+- model: admin.logentry
+  pk: 38
+  fields:
+    action_time: 2023-03-31 12:42:49.244003+00:00
+    user: 2
+    content_type: 4
+    object_id: '19'
+    object_repr: ev_maria_vitoria_alves
+    action_flag: 2
+    change_message: '[{"changed": {"fields": ["password"]}}]'
+- model: admin.logentry
+  pk: 39
+  fields:
+    action_time: 2023-04-04 12:52:57.675148+00:00
+    user: 2
+    content_type: 4
+    object_id: '20'
+    object_repr: gerente.operacional
+    action_flag: 2
+    change_message: '[{"changed": {"fields": ["password"]}}]'
 - model: auth.permission
   pk: 1
   fields:
@@ -1069,7 +1089,7 @@
   pk: 1
   fields:
     password: pbkdf2_sha256$390000$If39nJxEMy1s8ZR92bsUVA$8PFePxRRh20o9IHUog/xykdiyxfIs4my+fYgpHRM/BI=
-    last_login: 2023-03-15 12:38:41.475581+00:00
+    last_login: 2023-04-05 13:31:52.267289+00:00
     is_superuser: true
     username: admin
     first_name: ''
@@ -1099,7 +1119,7 @@
   pk: 3
   fields:
     password: pbkdf2_sha256$390000$K5lyOn7JYvXCUbfDGSZPhj$y5f8+wqOOB7NpU4jEQ3UhyDhgL8JMXqJvtHUwbRFAJY=
-    last_login: 2023-03-21 19:03:56.859529+00:00
+    last_login: 2023-04-06 11:57:53.132352+00:00
     is_superuser: false
     username: brendany
     first_name: ''
@@ -1129,7 +1149,7 @@
   pk: 5
   fields:
     password: pbkdf2_sha256$390000$wLtnSMYDhQxTJw2Ea1xf8n$s9XbdNqm/PLK8uAfbs/ZpakyiHx3AP2GuqwXsjlGxx8=
-    last_login: 2023-03-28 12:33:16.094816+00:00
+    last_login: 2023-04-06 12:50:37.049283+00:00
     is_superuser: false
     username: fernanda
     first_name: ''
@@ -1174,7 +1194,7 @@
   pk: 8
   fields:
     password: pbkdf2_sha256$390000$SZqdVbG6JyrWHqiWY83dqi$oh5WyqovfweqGXsvSmY81K4Z0F3tu/GrLEVHRNHibPU=
-    last_login: 2023-02-15 12:20:02.217022+00:00
+    last_login: 2023-04-03 13:10:08.650830+00:00
     is_superuser: true
     username: ggalvao
     first_name: ''
@@ -1219,7 +1239,7 @@
   pk: 11
   fields:
     password: pbkdf2_sha256$390000$RpOeDRkNcNZXmJ7tBYPyMx$qZWxluAXZpITX4G3cVjmCRQjkM9Pjqq1sCdeU2qtX/8=
-    last_login: 2023-03-24 16:17:35.710061+00:00
+    last_login: 2023-04-10 14:27:50.525717+00:00
     is_superuser: false
     username: assistente.operacional3@cett.org.br
     first_name: ''
@@ -1338,8 +1358,8 @@
 - model: auth.user
   pk: 19
   fields:
-    password: pbkdf2_sha256$390000$WR2chiTtF3g7JQuU4ioYoE$Mh03Bzz0e7dJh4TLSXGF24vhutxXCNXC+pSWAicSgp8=
-    last_login: null
+    password: pbkdf2_sha256$390000$tbThnBgdPcQ6NpyYqZ82Mu$bLOVLF6RJ3ThDFXcdoQjT3VKYU6KPUWe3MvjBWu6dPw=
+    last_login: 2023-03-31 12:43:53.286174+00:00
     is_superuser: false
     username: ev_maria_vitoria_alves
     first_name: ''
@@ -1353,8 +1373,8 @@
 - model: auth.user
   pk: 20
   fields:
-    password: pbkdf2_sha256$390000$2HuugNsh10Hkei9aNRhbL7$Zf/WerhNLZz78mf5Gt2xn3K7jjc87zmm0srZVpMSEF4=
-    last_login: 2023-03-20 20:17:22.614784+00:00
+    password: pbkdf2_sha256$390000$lROzWPzd5UBjqTJ0maPbA3$qX2PHvco8oOMd64bQfbbKqErnLTXMzlf+vgbfBemVOk=
+    last_login: 2023-04-04 17:57:25.417680+00:00
     is_superuser: false
     username: gerente.operacional
     first_name: ''
@@ -1416,6 +1436,11 @@
     session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1p2DiD:Blma7RFJnT0vN-CDXjiL0Ey9aq_hZDY5omND2zix6N8
     expire_date: 2022-12-19 15:48:57.828963+00:00
 - model: sessions.session
+  pk: 2c00e2zu0i0m8laalf27m7j0ye6dat37
+  fields:
+    session_data: .eJxVjEEOwiAQRe_C2hA6A8Vx6b5nIMCAVA0kpV0Z765NutDtf-_9l3B-W4vbelrczOIijDj9bsHHR6o74LuvtyZjq-syB7kr8qBdTo3T83q4fwfF9_KtszqjzgxWaWbPhISJPACmAUfIYMkapZNhm4FHZICIZLQmMjnaIYj3B9FWNyk:1pkP4X:I48gytQKQuOPh30_l8ZLL7n-xRDma3HeHQAYX8CJqm0
+    expire_date: 2023-04-20 12:50:37.051649+00:00
+- model: sessions.session
   pk: 2p9oncs4t36p3rga67tcf8j93jj7sjgg
   fields:
     session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1ow75m:2ieESH7Ht_j_L1z-4NzJa_3vw_6nJU1aLvrM21px2x8
@@ -1425,6 +1450,11 @@
   fields:
     session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1pPjiB:vBoIE4Rac4_Ig0g7DF3TcWRyU0BsmjYp_bmvWnnORL4
     expire_date: 2023-02-22 12:38:07.909510+00:00
+- model: sessions.session
+  pk: 427dk246q2rg28k1hng6clmu83n40uea
+  fields:
+    session_data: .eJxVjDsOwjAQBe_iGlnrLwklPWew1t41DiBbipMKcXdkKQW0b2beWwTctxL2zmtYSFzEJE6_W8T05DoAPbDem0ytbusS5VDkQbu8NeLX9XD_Dgr2MmqKBBadzQRntt6ZSOwdGtJRJ3AAME_ZmKiYrbIaIdFsk_OaSWnI4vMF-kk4EA:1pjJwm:_qO5kBSAt8DV0yFJYTBGEdZPrNh0fgXFflyRCaW66sI
+    expire_date: 2023-04-17 13:10:08.653926+00:00
 - model: sessions.session
   pk: 4egvovdr0l0xs1re2zgnupnqll2d95zr
   fields:
@@ -1501,6 +1531,11 @@
     session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1p54Zc:7djvVD-2Uxq4MPoB6dgRfmeDhEHK9Df4erzjpVedncs
     expire_date: 2022-12-27 12:39:52.002698+00:00
 - model: sessions.session
+  pk: b0com1vkgctzqnh7x10iw2z8ydmsgber
+  fields:
+    session_data: .eJxVjMEOwiAQRP-FsyGtsBQ8evcbyLLLStXQpLQn47_bJj1o5jbvzbxVxHUpcW15jiOrizLq9NslpGeuO-AH1vukaarLPCa9K_qgTd8mzq_r4f4dFGxlW9sOM1ACNtYOJnQJgCX1bhAiMAToqffOkA1nccGjWCtJJDNs8ZzV5wvwAjjY:1pkOFV:MgqD7L1KFbJSbbyOhqFEmU1u166YLviE_ewDO9qquVE
+    expire_date: 2023-04-20 11:57:53.144495+00:00
+- model: sessions.session
   pk: b1cmjhsiyhtqrgzkbzq5lyi3006uxgis
   fields:
     session_data: .eJxVjEEOwiAQAP_C2RAXlkI9evcNZBcWqZo2Ke3J-HdD0oNeZybzVpH2rca9yRqnrC7KqNMvY0pPmbvID5rvi07LvK0T657owzZ9W7K8rkf7N6jUat9ikYB8LsiFPDGkXAgEhuQCWxxMQgAoRGOwLnlLRkYwzmIW8Tyi-nwBA1A4Uw:1p7dw0:i2QCw38SBEhYl9fctPLIMedzmmBwILPGgo6UE6UfZFY
@@ -1525,6 +1560,11 @@
   fields:
     session_data: .eJxVjDEOwyAQBP9CHSEw2EDK9H4DOri74CTCkrGrKH-PLblImi12ZvctImxriVujJU4orsKKy2-XID-pHgAfUO-zzHNdlynJQ5EnbXKckV630_07KNDKvnYWyBDSwFntwSENOaDrmQwoH4zuWVsfQHcqoeXEHRpHwBk9Yg5GfL4XuTlo:1opb4U:sf1IMd00KtDlXq3-IYl940k_dCHqPf42dcfiH1ZdXHo
     expire_date: 2022-11-14 20:07:46.190815+00:00
+- model: sessions.session
+  pk: dpav2qsl9kgbrx1xfiumrfve1g2r82uv
+  fields:
+    session_data: .eJxVjDEOwjAMRe-SGUVOSEzLyM4ZIqe2aQE1UtNOiLtDpA6wvvf-f5lE2zqmrcqSJjZn48EcfmGm4SFzM3yn-VbsUOZ1mbJtid1ttdfC8rzs7d_BSHX8rkH6oMdOWBUdY_SsGbuo0sMpKiN3IbAHYCXqnSCQy41pxAgOxbw_IQQ4cg:1pjkuL:98TFQH7Bd1UwkHo0VMP4uaU8RFFwOSNi8_xanGmMxIU
+    expire_date: 2023-04-18 17:57:25.420024+00:00
 - model: sessions.session
   pk: esiv45fj8ndu39dx1tvd077fcsgkgcl0
   fields:
@@ -1566,6 +1606,11 @@
     session_data: .eJxVjMsOwiAQRf-FtSEjz8Gle7-BAEOlaiAp7cr479KkC92ec-59Mx-2tfit58XPxC7szE6_LIb0zHUX9Aj13nhqdV3myPeEH7bzW6P8uh7t30EJvYy1lmoKwiAGgGxgklpnIiuUGMgoY2xCwKgkDogWCZyzGoGcijpJwz5ftzo2dw:1opW4J:NB0lE227R7DtC0u53Ah_JPS5LF5aNYqIPupNsNDUsB8
     expire_date: 2022-11-14 14:47:15.550843+00:00
 - model: sessions.session
+  pk: gttesh35yeuvv0nw9f0jng5g2y4ewg41
+  fields:
+    session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1piEMr:1RCncNXGnWk-5sDrzbzTE-HsCglZYKD7eGEzietK3vQ
+    expire_date: 2023-04-14 13:00:33.911015+00:00
+- model: sessions.session
   pk: h60z86taf6gk77w0q109t4n3og0h1urf
   fields:
     session_data: .eJxVjDsOwjAQBe_iGln-xR9Kes5grddrHEC2FCcV4u4QKQW0b2bei0XY1hq3QUucMzszy06_WwJ8UNtBvkO7dY69rcuc-K7wgw5-7Zmel8P9O6gw6rcWk4TgBSmwDopESD4rJU1yoLVW3pJ2ORhtBJEpUpXJJeldQilCRkT2_gDVfjfD:1phaxi:bdhKIBVuYzoHbsgYNjUOvlgItqmWDApq52e5YkJdHwE
@@ -1581,6 +1626,11 @@
     session_data: .eJxVjDsOwjAQBe_iGlnrLwklPWew1t41DiBbipMKcXdkKQW0b2beWwTctxL2zmtYSFzEJE6_W8T05DoAPbDem0ytbusS5VDkQbu8NeLX9XD_Dgr2MmqKBBadzQRntt6ZSOwdGtJRJ3AAME_ZmKiYrbIaIdFsk_OaSWnI4vMF-kk4EA:1pI71m:0YkKwLXyycoTUEZ0eniAjG76RqLrDv03_SknUKkc4Wg
     expire_date: 2023-02-01 11:54:50.126623+00:00
 - model: sessions.session
+  pk: iritjaoqbzuv2bytx0mdjpmiajty4hfd
+  fields:
+    session_data: .eJxVjDEOwjAMRe-SGUVOSEzLyM4ZIqe2aQE1UtNOiLtDpA6wvvf-f5lE2zqmrcqSJjZn48EcfmGm4SFzM3yn-VbsUOZ1mbJtid1ttdfC8rzs7d_BSHX8rkH6oMdOWBUdY_SsGbuo0sMpKiN3IbAHYCXqnSCQy41pxAgOxbw_IQQ4cg:1pjgA1:SG9cEv58azqf4gkRYMpUee5zeEXRAI-LiSbolxqyo7E
+    expire_date: 2023-04-18 12:53:17.175659+00:00
+- model: sessions.session
   pk: jii5yy6brsexynqtyxgmgzsvyysxkri1
   fields:
     session_data: .eJxVjMEOwiAQRP-FsyGtsBQ8evcbyLLLStXQpLQn47_bJj1o5jbvzbxVxHUpcW15jiOrizLq9NslpGeuO-AH1vukaarLPCa9K_qgTd8mzq_r4f4dFGxlW9sOM1ACNtYOJnQJgCX1bhAiMAToqffOkA1nccGjWCtJJDNs8ZzV5wvwAjjY:1pehH2:ooYbXMPHBGfemkhFPN1eQaq52Bz7pdcW0goMB1PNE6M
@@ -1595,6 +1645,11 @@
   fields:
     session_data: .eJxVjDkOwjAQRe_iGlke7PFCSZ8zWONlSADZUpYKcXeIlALa_977LxFpW8e4LXWOUxEXAeL0uyXKj9p2UO7Ubl3m3tZ5SnJX5EEXOfRSn9fD_TsYaRm_tbZAHgFyghzQOUajTA2gnUJTiNhUREhUmD1by4HOlVhpZUtCD0q8P9E2N8k:1pcQOv:Ftn7YX8sxJ1Y8BbRFLyaRCmKKnDX_tcYEHex2QGvin0
     expire_date: 2023-03-29 12:38:41.478020+00:00
+- model: sessions.session
+  pk: kpn4v75r3rjrncf31hbty3zbciqzx69o
+  fields:
+    session_data: .eJxVjEEOwiAQRe_C2hDGUmBcuvcMZGZAqRpISrsy3l2bdKHb_977LxVpXUpce57jlNRJAajD78gkj1w3ku5Ub01Lq8s8sd4UvdOuLy3l53l3_w4K9fKtycvAOBiikPKI7uhsCA4AwXKwV08Co5HkBDImYWR0zAGNWE_ZC6n3BwJjOG4:1plsUo:_vHj4KxT0kYxMxWcW-v591x5CZFrA6yuJF6ubTiZTSw
+    expire_date: 2023-04-24 14:27:50.528048+00:00
 - model: sessions.session
   pk: kpuqthctshogau8hftrqi2aiqk0mx10m
   fields:
@@ -1640,6 +1695,11 @@
   fields:
     session_data: .eJxVjDEOwyAQBP9CHSEw2EDK9H4DOri74CTCkrGrKH-PLblImi12ZvctImxriVujJU4orsKKy2-XID-pHgAfUO-zzHNdlynJQ5EnbXKckV630_07KNDKvnYWyBDSwFntwSENOaDrmQwoH4zuWVsfQHcqoeXEHRpHwBk9Yg5GfL4XuTlo:1oqarB:O-rt49WWthgN7XrCjys-0Gpqani1GU-6yJU_pIFsBa4
     expire_date: 2022-11-17 14:06:09.671590+00:00
+- model: sessions.session
+  pk: omtdsv3wn5prde66gdqutj6uy6m9q4tg
+  fields:
+    session_data: .eJxVjDsOwyAQBe9CHSHwmo9TpvcZ0MIuwUlkJGNXUe4eIblI2jcz7y0CHnsJR-MtLCSuQk_i8jtGTE9eO6EHrvcqU133bYmyK_KkTc6V-HU73b-Dgq30OnmI2sQEmbTKAygAsHo0ziBm4ojWTwPkKbmstPLA7BWTspBHcujF5wsPrTgw:1piE6j:GA-XQEwegi6mqPiO5H7RsXISYidWhNRT-XC7uThTbSA
+    expire_date: 2023-04-14 12:43:53.290389+00:00
 - model: sessions.session
   pk: oo88tv7zxq9xkwzbcotlw5pb6igs8xht
   fields:
@@ -1700,11 +1760,6 @@
   fields:
     session_data: .eJxVjEEOwiAQRe_C2hAGbGFcuu8ZmoEZpGpoUtqV8e7apAvd_vfef6mRtrWMW5NlnFhdFFh1-h0jpYfUnfCd6m3Waa7rMkW9K_qgTQ8zy_N6uH8HhVr51n0HjJ3nzlqBkIVJYjSW0OWQQM65FzYIwXoBwojZo3EJgmFEB96p9wcRnzfm:1pVFmP:lR6urI4S_SE5jtuJ3h9L_iR45JzdNuNGJuOKXOOGKZY
     expire_date: 2023-03-09 17:53:17.995478+00:00
-- model: sessions.session
-  pk: w292kzcjr1eq3yn93wq46l1ligjx216w
-  fields:
-    session_data: .eJxVjEEOwiAQAP_C2RAXlkI9evcNZBcWqZo2Ke3J-HdD0oNeZybzVpH2rca9yRqnrC7KqNMvY0pPmbvID5rvi07LvK0T657owzZ9W7K8rkf7N6jUat9ikYB8LsiFPDGkXAgEhuQCWxxMQgAoRGOwLnlLRkYwzmIW8Tyi-nwBA1A4Uw:1peLPd:5eKeKAe751J-17_I3ky2mRJQ6rNd39F_OiTZ5CzzJ-U
-    expire_date: 2023-04-03 19:43:21.201233+00:00
 - model: sessions.session
   pk: wiplpm40ku1vz9idxo9v1vq7ieycy9v7
   fields:
@@ -1837,6 +1892,26 @@
   pk: 28
   fields:
     nome: NOVA ROMA
+- model: sistema.cidade
+  pk: 29
+  fields:
+    nome: VALPARAÍSO DE GOIÁS
+- model: sistema.cidade
+  pk: 30
+  fields:
+    nome: MINEIROS
+- model: sistema.cidade
+  pk: 31
+  fields:
+    nome: APARECIDA DE GOIÂNIA
+- model: sistema.cidade
+  pk: 32
+  fields:
+    nome: SANTO ANTONIO DO DESCOBERTO
+- model: sistema.cidade
+  pk: 33
+  fields:
+    nome: CALDAS NOVAS
 - model: sistema.endereco
   pk: 1
   fields:
@@ -2077,6 +2152,54 @@
     cep: 75.920-000
     complemento: Nº 945
     cidade: 9
+- model: sistema.endereco
+  pk: 31
+  fields:
+    bairro: Setor Central
+    logradouro: R. 18, 81
+    cep: 74.030-040
+    complemento: nº81 antiga Faculdade Araguaia
+    cidade: 1
+- model: sistema.endereco
+  pk: 32
+  fields:
+    bairro: 'Seto Buriti Sereno '
+    logradouro: Avenida Rezende, Quadra 300 – A
+    cep: 74.980-000
+    complemento: sem numero
+    cidade: 31
+- model: sistema.endereco
+  pk: 33
+  fields:
+    bairro: 'Bairro Floresta '
+    logradouro: Rua BF-25
+    cep: 74.477-134
+    complemento: Esquina com Avenida JC-15
+    cidade: 1
+- model: sistema.endereco
+  pk: 34
+  fields:
+    bairro: Setor Central
+    logradouro: Rua 14, esquina com Rua Dom Emanuel
+    cep: 72.900-970
+    complemento: Quadra B2-B
+    cidade: 32
+- model: sistema.endereco
+  pk: 35
+  fields:
+    bairro: Parque dos Jatobás
+    logradouro: 'Rodovia GO – '
+    cep: 75.830-000
+    complemento: 341 com a Avenida Cabeceira Alta
+    cidade: 30
+- model: sistema.endereco
+  pk: 36
+  fields:
+    bairro: Praia dos Amores
+    logradouro: Rua 60
+    cep: 72.871-402
+    complemento: Quadra 5– B, s/nº
+    cidade: 10
 - model: sistema.escola
   pk: 2
   fields:
@@ -2134,7 +2257,7 @@
 - model: sistema.escola
   pk: 8
   fields:
-    nome: COTEC Agnaldo Campos Neto
+    nome: COTEC Aguinaldo Campos Neto
     bairro: Distrito Minero Industrial
     logradouro: Avenida Eixo Principal
     cep: 75.709-660
@@ -2149,15 +2272,6 @@
     cep: 75.709-160
     complemento: ''
     cidade: 6
-- model: sistema.escola
-  pk: 10
-  fields:
-    nome: COTEC Maria Sebastiana da Silva
-    bairro: Jardim Brasília
-    logradouro: 'Av. Mutunópolis '
-    cep: 76.550-000
-    complemento: ''
-    cidade: 2
 - model: sistema.escola
   pk: 11
   fields:
@@ -2179,7 +2293,7 @@
 - model: sistema.escola
   pk: 13
   fields:
-    nome: COTEC Carmen Dutra de Araújo
+    nome: COTEC Carmem Dutra de Araújo
     bairro: Parque do Lago,
     logradouro: Rua 65
     cep: 73.800-000
@@ -2239,6 +2353,60 @@
     cep: 75.920-000
     complemento: Nº 945
     cidade: 9
+- model: sistema.escola
+  pk: 20
+  fields:
+    nome: 'EFG Basileu França '
+    bairro: Setor Central
+    logradouro: R. 18, 81
+    cep: 74.030-040
+    complemento: nº81 antiga Faculdade Araguaia
+    cidade: 1
+- model: sistema.escola
+  pk: 21
+  fields:
+    nome: EFG Luíz Rassi
+    bairro: 'Seto Buriti Sereno '
+    logradouro: Avenida Rezende, Quadra 300 – A
+    cep: 74.980-000
+    complemento: sem numero
+    cidade: 31
+- model: sistema.escola
+  pk: 22
+  fields:
+    nome: 'EFG  José Luiz Bittencourt '
+    bairro: 'Bairro Floresta '
+    logradouro: Rua BF-25
+    cep: 74.477-134
+    complemento: Esquina com Avenida JC-15
+    cidade: 1
+- model: sistema.escola
+  pk: 23
+  fields:
+    nome: EGF Sarah Luisa Lemos Kubitschek de Oliveira
+    bairro: Setor Central
+    logradouro: Rua 14, esquina com Rua Dom Emanuel
+    cep: 72.900-970
+    complemento: Quadra B2-B
+    cidade: 32
+- model: sistema.escola
+  pk: 24
+  fields:
+    nome: ' EFG Raul Brandão de Castro'
+    bairro: Parque dos Jatobás
+    logradouro: 'Rodovia GO – '
+    cep: 75.830-000
+    complemento: 341 com a Avenida Cabeceira Alta
+    cidade: 30
+- model: sistema.escola
+  pk: 25
+  fields:
+    nome: 'EFG Paulo Renato de Souza '
+    bairro: Praia dos Amores
+    logradouro: Rua 60
+    cep: 72.871-402
+    complemento: Quadra 5– B, s/nº
+    cidade: 10
 - model: sistema.ensino
   pk: 3
   fields:
@@ -2260,7 +2428,7 @@
   fields:
     data_inicio: 2022-11-07 11:26:00+00:00
     data_fim: 2022-12-06 11:26:00+00:00
-    tipo: null
+    tipo: outros
     process_instance: null
     observacao: COTEC Porangatu
     status: planejamento
@@ -2269,7 +2437,7 @@
     cep: null
     complemento: null
     cidade: 2
-    escola: null
+    escola: 18
     endereco: 4
 - model: sistema.ensino
   pk: 5
@@ -3020,24 +3188,24 @@
   fields:
     email: LUCASBOTELHO663@GMAIL.COM
     nome: Lucas Eduardo de Souza Botelho
-    sexo: null
-    estado_civil: null
+    sexo: masculino
+    estado_civil: solteiro(a)
     data_nascimento: '1994-05-13'
     telefone: (62)9 9923-4535
-    telefone_recado: null
-    pis_pasep: null
+    telefone_recado: (
+    pis_pasep: None
     cpf: 749.070.181-34
     rg: '56450.30'
     data_emissao: null
     orgao_emissor: 'SSP GO '
-    nome_mae: null
-    nome_pai: null
+    nome_mae: None
+    nome_pai: None
     cargo: professor
     banco: NUBANK
     agencia: '0001'
     conta: 26900020-9
     pix: '74907018134'
-    tipo_conta: null
+    tipo_conta: corrente
     tipo: clt
     qtd_contratacoes: '0'
     user_camunda: ''
@@ -3045,10 +3213,10 @@
     bairro: Setor Loteamento Grande Retiro
     rua: RUA GR 14
     cep: 74.766-106
-    numero_endereco: null
+    numero_endereco: None
     complemento: QD 24 LT 12
-    estado: null
-    id_protocolo: null
+    estado: AC
+    id_protocolo: None
     user: null
     cursos: []
 - model: sistema.pessoas
@@ -3585,7 +3753,7 @@
     complemento: ''
     estado: AC
     id_protocolo: '530'
-    user: null
+    user: 20
     cursos: []
 - model: sistema.pessoas
   pk: 29
@@ -4877,7 +5045,7 @@
     cep: 75.132-105
     complemento: None
     cidade: 5
-    aulas_sabado: true
+    aulas_sabado: false
     turnos:
     - 1
     - 2
@@ -4896,7 +5064,7 @@
     cep: 75.132-105
     complemento: None
     cidade: 5
-    aulas_sabado: true
+    aulas_sabado: false
     turnos:
     - 1
     - 3
@@ -4915,7 +5083,7 @@
     cep: 75.132-105
     complemento: None
     cidade: 5
-    aulas_sabado: true
+    aulas_sabado: false
     turnos:
     - 2
     - 3
@@ -5159,12 +5327,12 @@
     data_fim: 2023-03-24
     status: null
     observacao: null
-    bairro: null
-    logradouro: null
-    cep: null
-    complemento: null
+    bairro: None
+    logradouro: None
+    cep: None
+    complemento: None
     cidade: 22
-    aulas_sabado: false
+    aulas_sabado: true
     turnos:
     - 1
 - model: sistema.alocacao
@@ -5374,16 +5542,16 @@
     acaoEnsino: 15
     professor: 12
     curso: 13
-    data_inicio: 2023-03-13
+    data_inicio: 2023-03-14
     data_fim: 2023-03-24
     status: null
     observacao: null
     bairro: Distrito Agro-Industrial de Anápolis
     logradouro: Viela Vp-4D
     cep: 75.132-105
-    complemento: null
+    complemento: None
     cidade: 5
-    aulas_sabado: false
+    aulas_sabado: true
     turnos:
     - 2
     - 3
@@ -5648,25 +5816,6 @@
     - 1
     - 2
 - model: sistema.alocacao
-  pk: 116
-  fields:
-    acaoEnsino: 8
-    professor: 7
-    curso: 1
-    data_inicio: 2023-03-20
-    data_fim: 2023-03-31
-    status: null
-    observacao: null
-    bairro: null
-    logradouro: COTEC GOIANÉSIA
-    cep: null
-    complemento: null
-    cidade: 7
-    aulas_sabado: false
-    turnos:
-    - 1
-    - 3
-- model: sistema.alocacao
   pk: 118
   fields:
     acaoEnsino: 11
@@ -5728,16 +5877,16 @@
     acaoEnsino: 8
     professor: 47
     curso: 1
-    data_inicio: 2023-03-28
-    data_fim: 2023-04-11
+    data_inicio: 2023-03-27
+    data_fim: 2023-04-06
     status: null
     observacao: null
-    bairro: null
+    bairro: None
     logradouro: COTEC GOIANÉSIA
-    cep: null
-    complemento: null
+    cep: None
+    complemento: None
     cidade: 7
-    aulas_sabado: false
+    aulas_sabado: true
     turnos:
     - 1
     - 2
@@ -5747,16 +5896,16 @@
     acaoEnsino: 9
     professor: 9
     curso: 23
-    data_inicio: 2023-03-22
+    data_inicio: 2023-03-23
     data_fim: 2023-04-04
     status: null
     observacao: null
-    bairro: null
+    bairro: None
     logradouro: COTEC FORMOSA
-    cep: null
-    complemento: null
+    cep: None
+    complemento: None
     cidade: 8
-    aulas_sabado: false
+    aulas_sabado: true
     turnos:
     - 1
     - 2
@@ -5888,11 +6037,11 @@
     - 1
     - 2
 - model: sistema.alocacao
-  pk: 130
+  pk: 131
   fields:
     acaoEnsino: 15
-    professor: 12
-    curso: 6
+    professor: 34
+    curso: 2
     data_inicio: 2023-04-24
     data_fim: 2023-05-05
     status: null
@@ -5905,15 +6054,127 @@
     aulas_sabado: true
     turnos:
     - 1
+    - 2
+- model: sistema.alocacao
+  pk: 132
+  fields:
+    acaoEnsino: 5
+    professor: 44
+    curso: 1
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-24
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: COTEC Cristalina
+    cep: null
+    complemento: null
+    cidade: 4
+    aulas_sabado: false
+    turnos:
+    - 2
     - 3
 - model: sistema.alocacao
-  pk: 131
+  pk: 133
+  fields:
+    acaoEnsino: 7
+    professor: 6
+    curso: 6
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-24
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: UDEPI Ipameri
+    cep: null
+    complemento: null
+    cidade: 6
+    aulas_sabado: false
+    turnos:
+    - 1
+    - 2
+- model: sistema.alocacao
+  pk: 134
+  fields:
+    acaoEnsino: 7
+    professor: 24
+    curso: 10
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-24
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: UDEPI Ipameri
+    cep: null
+    complemento: null
+    cidade: 6
+    aulas_sabado: false
+    turnos:
+    - 1
+    - 2
+- model: sistema.alocacao
+  pk: 135
+  fields:
+    acaoEnsino: 7
+    professor: 47
+    curso: 12
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-24
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: UDEPI Ipameri
+    cep: null
+    complemento: null
+    cidade: 6
+    aulas_sabado: false
+    turnos:
+    - 1
+    - 2
+- model: sistema.alocacao
+  pk: 136
+  fields:
+    acaoEnsino: 7
+    professor: 6
+    curso: 13
+    data_inicio: 2023-04-25
+    data_fim: 2023-05-09
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: UDEPI Ipameri
+    cep: null
+    complemento: null
+    cidade: 6
+    aulas_sabado: false
+    turnos:
+    - 1
+    - 2
+- model: sistema.alocacao
+  pk: 137
+  fields:
+    acaoEnsino: 7
+    professor: 47
+    curso: 12
+    data_inicio: 2023-04-25
+    data_fim: 2023-05-09
+    status: null
+    observacao: null
+    bairro: null
+    logradouro: UDEPI Ipameri
+    cep: null
+    complemento: null
+    cidade: 6
+    aulas_sabado: false
+    turnos: []
+- model: sistema.alocacao
+  pk: 138
   fields:
     acaoEnsino: 15
-    professor: 34
-    curso: 2
-    data_inicio: 2023-04-24
-    data_fim: 2023-05-05
+    professor: 44
+    curso: 1
+    data_inicio: 2023-03-21
+    data_fim: 2023-03-31
     status: null
     observacao: null
     bairro: Distrito Agro-Industrial de Anápolis
@@ -5991,7 +6252,7 @@
     cep: 76.550-000
     complemento: null
     cidade: 2
-    escola: 10
+    escola: null
 - model: sistema.acao
   pk: 35
   fields:
@@ -6195,6 +6456,56 @@
     complemento: esquina com Ruas 11/12
     cidade: 8
     escola: 13
+- model: sistema.acao
+  pk: 51
+  fields:
+    tipo: emprestimo
+    process_instance: 92f9a698-d229-11ed-b743-0242c0a8b00b
+    variaveis: null
+    status: waiting_return
+    descricao: 'Será emprestado: 01(um) kit de Barbeiro. Também, irá buscar os demais
+      insumos que lá estão, deixando apenas 02 (dois) fornos e 02 (dois) liquidificadores.'
+    data_inicio: 2023-04-24
+    data_fim: 2023-05-05
+    bairro: Distrito Agro-Industrial de Anápolis
+    logradouro: Viela Vp-4D
+    cep: 75.132-105
+    complemento: None
+    cidade: 5
+    escola: 6
+- model: sistema.acao
+  pk: 52
+  fields:
+    tipo: emprestimo
+    process_instance: daf96c7c-d24c-11ed-b743-0242c0a8b00b
+    variaveis: null
+    status: waiting_return
+    descricao: 'Serão emprestados os kits: 01 (um) kit de Massas e Molhos; 01 (um)
+      kit de Maquiagem; 01 (um) kit de Design de Sobrancelhas.'
+    data_inicio: 2023-04-10
+    data_fim: 2023-05-09
+    bairro: Distrito Minero Industrial
+    logradouro: Avenida Eixo Principal
+    cep: 75.709-660
+    complemento: Qd 2, Área 37
+    cidade: 33
+    escola: 8
+- model: sistema.acao
+  pk: 53
+  fields:
+    tipo: outro
+    process_instance: null
+    variaveis: null
+    status: null
+    descricao: O Recicla Goiás é um evento voltado para a sustentabilidade.
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    escola: 6
 - model: sistema.dpevento
   pk: 1
   fields:
@@ -6229,6 +6540,40 @@
     cidade: 25
     escola: 2
     acaoEnsino: 20
+- model: sistema.dpevento
+  pk: 3
+  fields:
+    tipo: emprestimo
+    process_instance: 4e95783e-d2e7-11ed-b743-0242c0a8b00b
+    variaveis: null
+    status: waiting_ticket
+    descricao: teste
+    data_inicio: 2023-04-04
+    data_fim: 2023-04-08
+    bairro: Parque Amazonia
+    logradouro: Av. Alexandre de Morais
+    cep: 73.780-000
+    complemento: '450'
+    cidade: 1
+    escola: 2
+    acaoEnsino: 34
+- model: sistema.dpevento
+  pk: 4
+  fields:
+    tipo: outro
+    process_instance: null
+    variaveis: null
+    status: null
+    descricao: O Recicla Goiás é um evento voltado para a sustentabilidade.
+    data_inicio: 2023-04-13
+    data_fim: 2023-04-13
+    bairro: Viviam Parque 2A Etapa
+    logradouro: ' Rod. Transbrasiliana'
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    escola: 6
+    acaoEnsino: 34
 - model: sistema.itinerario
   pk: 53
   fields:
@@ -6363,6 +6708,26 @@
     color: '#add8e6'
 - model: sistema.itinerario
   pk: 86
+  fields:
+    color: '#add8e6'
+- model: sistema.itinerario
+  pk: 87
+  fields:
+    color: '#add8e6'
+- model: sistema.itinerario
+  pk: 88
+  fields:
+    color: '#add8e6'
+- model: sistema.itinerario
+  pk: 89
+  fields:
+    color: '#add8e6'
+- model: sistema.itinerario
+  pk: 90
+  fields:
+    color: '#add8e6'
+- model: sistema.itinerario
+  pk: 91
   fields:
     color: '#add8e6'
 - model: sistema.membroexecucao
@@ -7085,194 +7450,434 @@
     evento: null
     itinerario: null
     avaliador: false
-- model: sistema.avaliacao
-  pk: 1
+- model: sistema.membroexecucao
+  pk: 109
   fields:
-    acao: null
+    data_inicio: 2023-04-11
+    data_fim: 2023-04-11
+    bairro: Distrito Agro-Industrial de Anápolis
+    tipo: diaria
+    logradouro: Viela Vp-4D
+    cep: 75.132-105
+    complemento: null
+    cidade: 5
+    pessoa: 29
+    acao: 51
     evento: null
-    avaliador: null
+    itinerario: 87
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 110
+  fields:
+    data_inicio: 2023-04-11
+    data_fim: 2023-04-11
+    bairro: Distrito Agro-Industrial de Anápolis
+    tipo: veiculo
+    logradouro: Viela Vp-4D
+    cep: 75.132-105
+    complemento: null
+    cidade: 5
+    pessoa: 29
+    acao: 51
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 111
+  fields:
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-11
+    bairro: Distrito Minero Industrial
+    tipo: diaria
+    logradouro: Avenida Eixo Principal
+    cep: 75.709-660
+    complemento: Qd 2, Área 37
+    cidade: 6
+    pessoa: 37
+    acao: 52
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 112
+  fields:
+    data_inicio: 2023-04-10
+    data_fim: 2023-04-11
+    bairro: Distrito Minero Industrial
+    tipo: veiculo
+    logradouro: Avenida Eixo Principal
+    cep: 75.709-660
+    complemento: Qd 2, Área 37
+    cidade: 6
+    pessoa: 37
+    acao: 52
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 114
+  fields:
+    data_inicio: null
+    data_fim: null
+    bairro: None
+    tipo: diaria
+    logradouro: None
+    cep: None
+    complemento: None
+    cidade: null
+    pessoa: 27
+    acao: null
+    evento: 3
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 115
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
     bairro: null
+    tipo: diaria
     logradouro: null
     cep: null
     complemento: null
-    qtdSalas: null
-    qtdSalasUpdatedAt: null
-    observacaoGeral: null
-    observacaoGeralUpdatedAt: null
-    geralTamanhoEspaco: null
-    geralTamanhoEspacoUpdatedAt: null
-    geralQuantidadeDataShow: null
-    geralQuantidadeDataShowUpdatedAt: null
-    geralHasBebedouro: null
-    geralHasBebedouroUpdatedAt: null
-    geralHasRedeEletrica: null
-    geralHasRedeEletricaUpdatedAt: null
-    geralHasCadeiras: null
-    geralHasCadeirasUpdatedAt: null
-    geralHasEquipeLimpeza: null
-    geralHasEquipeLimpezaUpdatedAt: null
-    geralHasIluminacao: null
-    geralHasIluminacaoUpdatedAt: null
-    geralQuantidadeJanelas: null
-    geralQuantidadeJanelasUpdatedAt: null
-    geralQuantidadeBanheiros: null
-    geralQuantidadeBanheirosUpdatedAt: null
-    salaCulinariaHasEspacoTurmas40Alunos: null
-    salaCulinariaHasEspacoTurmas40AlunosUpdatedAt: null
-    salaCulinariaHasVentilacao: null
-    salaCulinariaHasVentilacaoUpdatedAt: null
-    salaCulinariaQuantidadeTomadas: null
-    salaCulinariaQuantidadeTomadasUpdatedAt: null
-    salaCulinariaQuantidadeFogoesFuncionando: null
-    salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeFornosFuncionando: null
-    salaCulinariaQuantidadeFornosFuncionandoUpdatedAt: null
-    salaCulinariaHasIluminacaoAdequada: null
-    salaCulinariaHasIluminacaoAdequadaUpdatedAt: null
-    salaCulinariaQuantidadeGeladeirasFuncionando: null
-    salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeMesasBancadas: null
-    salaCulinariaQuantidadeMesasBancadasUpdatedAt: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionando: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasComGas: null
-    salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasVazios: null
-    salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt: null
-    salaCulinariaObservacao: null
-    salaCulinariaObservacaoUpdatedAt: null
-    salaServicosBelezaHasPontoAguaExterno: null
-    salaServicosBelezaHasPontoAguaExternoUpdatedAt: null
-    salaServicosBelezaQuantidadePiasHigienizacao: null
-    salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt: null
-    salaServicosBelezaQuantidadeCadeirasSalao: null
-    salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt: null
-    salaServicosBelezaObservacao: null
-    salaServicosBelezaObservacaoUpdatedAt: null
-- model: sistema.avaliacao
-  pk: 2
-  fields:
+    cidade: null
+    pessoa: 37
     acao: null
-    evento: null
-    avaliador: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 116
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
     bairro: null
+    tipo: diaria
     logradouro: null
     cep: null
     complemento: null
-    qtdSalas: null
-    qtdSalasUpdatedAt: null
-    observacaoGeral: null
-    observacaoGeralUpdatedAt: null
-    geralTamanhoEspaco: null
-    geralTamanhoEspacoUpdatedAt: null
-    geralQuantidadeDataShow: null
-    geralQuantidadeDataShowUpdatedAt: null
-    geralHasBebedouro: null
-    geralHasBebedouroUpdatedAt: null
-    geralHasRedeEletrica: null
-    geralHasRedeEletricaUpdatedAt: null
-    geralHasCadeiras: null
-    geralHasCadeirasUpdatedAt: null
-    geralHasEquipeLimpeza: null
-    geralHasEquipeLimpezaUpdatedAt: null
-    geralHasIluminacao: null
-    geralHasIluminacaoUpdatedAt: null
-    geralQuantidadeJanelas: null
-    geralQuantidadeJanelasUpdatedAt: null
-    geralQuantidadeBanheiros: null
-    geralQuantidadeBanheirosUpdatedAt: null
-    salaCulinariaHasEspacoTurmas40Alunos: null
-    salaCulinariaHasEspacoTurmas40AlunosUpdatedAt: null
-    salaCulinariaHasVentilacao: null
-    salaCulinariaHasVentilacaoUpdatedAt: null
-    salaCulinariaQuantidadeTomadas: null
-    salaCulinariaQuantidadeTomadasUpdatedAt: null
-    salaCulinariaQuantidadeFogoesFuncionando: null
-    salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeFornosFuncionando: null
-    salaCulinariaQuantidadeFornosFuncionandoUpdatedAt: null
-    salaCulinariaHasIluminacaoAdequada: null
-    salaCulinariaHasIluminacaoAdequadaUpdatedAt: null
-    salaCulinariaQuantidadeGeladeirasFuncionando: null
-    salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeMesasBancadas: null
-    salaCulinariaQuantidadeMesasBancadasUpdatedAt: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionando: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasComGas: null
-    salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasVazios: null
-    salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt: null
-    salaCulinariaObservacao: null
-    salaCulinariaObservacaoUpdatedAt: null
-    salaServicosBelezaHasPontoAguaExterno: null
-    salaServicosBelezaHasPontoAguaExternoUpdatedAt: null
-    salaServicosBelezaQuantidadePiasHigienizacao: null
-    salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt: null
-    salaServicosBelezaQuantidadeCadeirasSalao: null
-    salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt: null
-    salaServicosBelezaObservacao: null
-    salaServicosBelezaObservacaoUpdatedAt: null
-- model: sistema.avaliacao
-  pk: 3
-  fields:
+    cidade: null
+    pessoa: 29
     acao: null
-    evento: null
-    avaliador: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 117
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
     bairro: null
+    tipo: diaria
     logradouro: null
     cep: null
     complemento: null
-    qtdSalas: null
-    qtdSalasUpdatedAt: null
+    cidade: null
+    pessoa: 35
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 118
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: null
+    tipo: diaria
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    pessoa: 36
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 119
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: null
+    tipo: diaria
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    pessoa: 46
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 120
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: null
+    tipo: adiantamento
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    pessoa: 35
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 121
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: null
+    tipo: veiculo
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    pessoa: 37
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 122
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: null
+    tipo: veiculo
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    pessoa: 46
+    acao: null
+    evento: 4
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 123
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: diaria
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 37
+    acao: 53
+    evento: null
+    itinerario: 91
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 124
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: diaria
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 29
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 125
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: diaria
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 36
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 126
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: diaria
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 35
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 127
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: diaria
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 46
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 128
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: adiantamento
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 35
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 129
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: veiculo
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 46
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 130
+  fields:
+    data_inicio: 2023-04-12
+    data_fim: 2023-04-14
+    bairro: Viviam Parque 2A Etapa
+    tipo: veiculo
+    logradouro: Rod. Transbrasiliana
+    cep: 75.001-970
+    complemento: n. 208
+    cidade: 5
+    pessoa: 37
+    acao: 53
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 131
+  fields:
+    data_inicio: 2023-04-17
+    data_fim: 2023-04-19
+    bairro: None
+    tipo: diaria
+    logradouro: None
+    cep: None
+    complemento: None
+    cidade: 27
+    pessoa: 29
+    acao: 49
+    evento: null
+    itinerario: null
+    avaliador: false
+- model: sistema.membroexecucao
+  pk: 132
+  fields:
+    data_inicio: 2023-04-17
+    data_fim: 2023-04-19
+    bairro: null
+    tipo: veiculo
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: 28
+    pessoa: 29
+    acao: 49
+    evento: null
+    itinerario: null
+    avaliador: null
+- model: sistema.avaliacao
+  pk: 8
+  fields:
+    acao: null
+    evento: 3
+    avaliador: 114
+    bairro: Parque Amazonia
+    logradouro: Av. Alexandre de Morais
+    cep: 73.780-000
+    complemento: '450'
+    qtdSalas: 8
+    qtdSalasUpdatedAt: 2023-04-04 17:34:05.939170+00:00
     observacaoGeral: null
     observacaoGeralUpdatedAt: null
-    geralTamanhoEspaco: null
-    geralTamanhoEspacoUpdatedAt: null
+    geralTamanhoEspaco: 30m2
+    geralTamanhoEspacoUpdatedAt: 2023-04-04 17:34:05.940291+00:00
     geralQuantidadeDataShow: null
     geralQuantidadeDataShowUpdatedAt: null
-    geralHasBebedouro: null
-    geralHasBebedouroUpdatedAt: null
-    geralHasRedeEletrica: null
-    geralHasRedeEletricaUpdatedAt: null
-    geralHasCadeiras: null
-    geralHasCadeirasUpdatedAt: null
-    geralHasEquipeLimpeza: null
-    geralHasEquipeLimpezaUpdatedAt: null
-    geralHasIluminacao: null
-    geralHasIluminacaoUpdatedAt: null
-    geralQuantidadeJanelas: null
-    geralQuantidadeJanelasUpdatedAt: null
-    geralQuantidadeBanheiros: null
-    geralQuantidadeBanheirosUpdatedAt: null
-    salaCulinariaHasEspacoTurmas40Alunos: null
-    salaCulinariaHasEspacoTurmas40AlunosUpdatedAt: null
-    salaCulinariaHasVentilacao: null
-    salaCulinariaHasVentilacaoUpdatedAt: null
-    salaCulinariaQuantidadeTomadas: null
-    salaCulinariaQuantidadeTomadasUpdatedAt: null
-    salaCulinariaQuantidadeFogoesFuncionando: null
-    salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeFornosFuncionando: null
-    salaCulinariaQuantidadeFornosFuncionandoUpdatedAt: null
-    salaCulinariaHasIluminacaoAdequada: null
-    salaCulinariaHasIluminacaoAdequadaUpdatedAt: null
-    salaCulinariaQuantidadeGeladeirasFuncionando: null
-    salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeMesasBancadas: null
-    salaCulinariaQuantidadeMesasBancadasUpdatedAt: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionando: null
-    salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasComGas: null
-    salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt: null
-    salaCulinariaQuantidadeVasilhamesGasVazios: null
-    salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt: null
+    geralHasBebedouro: Sim
+    geralHasBebedouroUpdatedAt: 2023-04-04 17:34:05.941111+00:00
+    geralHasRedeEletrica: Sim
+    geralHasRedeEletricaUpdatedAt: 2023-04-04 17:34:05.941271+00:00
+    geralHasCadeiras: Sim
+    geralHasCadeirasUpdatedAt: 2023-04-04 17:34:05.941431+00:00
+    geralHasEquipeLimpeza: Sim
+    geralHasEquipeLimpezaUpdatedAt: 2023-04-04 17:34:05.941636+00:00
+    geralHasIluminacao: Sim
+    geralHasIluminacaoUpdatedAt: 2023-04-04 17:34:05.941818+00:00
+    geralQuantidadeJanelas: 5
+    geralQuantidadeJanelasUpdatedAt: 2023-04-04 17:34:05.942271+00:00
+    geralQuantidadeBanheiros: 4
+    geralQuantidadeBanheirosUpdatedAt: 2023-04-04 17:34:05.943001+00:00
+    salaCulinariaHasEspacoTurmas40Alunos: Sim
+    salaCulinariaHasEspacoTurmas40AlunosUpdatedAt: 2023-04-04 17:34:05.943304+00:00
+    salaCulinariaHasVentilacao: Sim
+    salaCulinariaHasVentilacaoUpdatedAt: 2023-04-04 17:34:05.943844+00:00
+    salaCulinariaQuantidadeTomadas: 6
+    salaCulinariaQuantidadeTomadasUpdatedAt: 2023-04-04 17:34:05.944767+00:00
+    salaCulinariaQuantidadeFogoesFuncionando: 4
+    salaCulinariaQuantidadeFogoesFuncionandoUpdatedAt: 2023-04-04 17:34:05.945754+00:00
+    salaCulinariaQuantidadeFornosFuncionando: 3
+    salaCulinariaQuantidadeFornosFuncionandoUpdatedAt: 2023-04-04 17:34:05.946908+00:00
+    salaCulinariaHasIluminacaoAdequada: Sim
+    salaCulinariaHasIluminacaoAdequadaUpdatedAt: 2023-04-04 17:34:05.947555+00:00
+    salaCulinariaQuantidadeGeladeirasFuncionando: 2
+    salaCulinariaQuantidadeGeladeirasFuncionandoUpdatedAt: 2023-04-04 17:34:05.948313+00:00
+    salaCulinariaQuantidadeMesasBancadas: 3
+    salaCulinariaQuantidadeMesasBancadasUpdatedAt: 2023-04-04 17:34:05.949183+00:00
+    salaCulinariaQuantidadePiasComTorneiraFuncionando: 2
+    salaCulinariaQuantidadePiasComTorneiraFuncionandoUpdatedAt: 2023-04-04 17:34:05.949942+00:00
+    salaCulinariaQuantidadeVasilhamesGasComGas: 1
+    salaCulinariaQuantidadeVasilhamesGasComGasUpdatedAt: 2023-04-04 17:34:05.950937+00:00
+    salaCulinariaQuantidadeVasilhamesGasVazios: 1
+    salaCulinariaQuantidadeVasilhamesGasVaziosUpdatedAt: 2023-04-04 17:34:05.951813+00:00
     salaCulinariaObservacao: null
     salaCulinariaObservacaoUpdatedAt: null
-    salaServicosBelezaHasPontoAguaExterno: null
-    salaServicosBelezaHasPontoAguaExternoUpdatedAt: null
-    salaServicosBelezaQuantidadePiasHigienizacao: null
-    salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt: null
+    salaServicosBelezaHasPontoAguaExterno: Sim
+    salaServicosBelezaHasPontoAguaExternoUpdatedAt: 2023-04-04 17:34:05.952238+00:00
+    salaServicosBelezaQuantidadePiasHigienizacao: 3
+    salaServicosBelezaQuantidadePiasHigienizacaoUpdatedAt: 2023-04-04 17:34:05.952987+00:00
     salaServicosBelezaQuantidadeCadeirasSalao: null
     salaServicosBelezaQuantidadeCadeirasSalaoUpdatedAt: null
     salaServicosBelezaObservacao: null
@@ -7620,6 +8225,86 @@
     status: CREATED
     id_protocolo: '2948'
     membro_execucao: 108
+    meta: null
+- model: sistema.ticket
+  pk: 48
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3709'
+    membro_execucao: 111
+    meta: null
+- model: sistema.ticket
+  pk: 49
+  fields:
+    tipo: veiculo
+    status: CREATED
+    id_protocolo: '3713'
+    membro_execucao: 112
+    meta: null
+- model: sistema.ticket
+  pk: 50
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3715'
+    membro_execucao: 109
+    meta: null
+- model: sistema.ticket
+  pk: 51
+  fields:
+    tipo: veiculo
+    status: CREATED
+    id_protocolo: '3716'
+    membro_execucao: 110
+    meta: null
+- model: sistema.ticket
+  pk: 52
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3899'
+    membro_execucao: 123
+    meta: null
+- model: sistema.ticket
+  pk: 53
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3900'
+    membro_execucao: 125
+    meta: null
+- model: sistema.ticket
+  pk: 54
+  fields:
+    tipo: veiculo
+    status: CREATED
+    id_protocolo: '3905'
+    membro_execucao: 130
+    meta: null
+- model: sistema.ticket
+  pk: 55
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3902'
+    membro_execucao: 124
+    meta: null
+- model: sistema.ticket
+  pk: 56
+  fields:
+    tipo: diaria
+    status: CREATED
+    id_protocolo: '3903'
+    membro_execucao: 126
+    meta: null
+- model: sistema.ticket
+  pk: 57
+  fields:
+    tipo: adiantamento
+    status: CREATED
+    id_protocolo: '3909'
+    membro_execucao: 128
     meta: null
 - model: sistema.itinerarioitem
   pk: 182
@@ -8279,6 +8964,90 @@
     cidade: null
     escola: null
     itinerario: 81
+- model: sistema.itinerarioitem
+  pk: 229
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-11 11:00:00+00:00
+    endereco: Goiânia
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 87
+- model: sistema.itinerarioitem
+  pk: 230
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-11 14:00:00+00:00
+    endereco: Anápolis
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 87
+- model: sistema.itinerarioitem
+  pk: 231
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-11 21:00:00+00:00
+    endereco: Goiânia
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 87
+- model: sistema.itinerarioitem
+  pk: 232
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-10 11:00:00+00:00
+    endereco: Goiânia
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 88
+- model: sistema.itinerarioitem
+  pk: 233
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-11 17:00:00+00:00
+    endereco: Goiânia
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 88
+- model: sistema.itinerarioitem
+  pk: 234
+  fields:
+    latitude: null
+    longitude: null
+    data_hora: 2023-04-10 16:00:00+00:00
+    endereco: 'Caldas Novas '
+    bairro: null
+    logradouro: null
+    cep: null
+    complemento: null
+    cidade: null
+    escola: null
+    itinerario: 88
 - model: sistema.tipoatividade
   pk: 2
   fields:
@@ -8484,12 +9253,47 @@
   pk: 9
   fields:
     date: 2023-05-01
-    alocacao: 130
+    alocacao: null
 - model: sistema.dataremovida
   pk: 10
   fields:
     date: 2023-05-01
     alocacao: 131
+- model: sistema.dataremovida
+  pk: 11
+  fields:
+    date: 2023-03-25
+    alocacao: 122
+- model: sistema.dataremovida
+  pk: 12
+  fields:
+    date: 2023-03-25
+    alocacao: 66
+- model: sistema.dataremovida
+  pk: 13
+  fields:
+    date: 2023-04-21
+    alocacao: 133
+- model: sistema.dataremovida
+  pk: 14
+  fields:
+    date: 2023-04-21
+    alocacao: 134
+- model: sistema.dataremovida
+  pk: 15
+  fields:
+    date: 2023-04-21
+    alocacao: 135
+- model: sistema.dataremovida
+  pk: 16
+  fields:
+    date: 2023-05-01
+    alocacao: 136
+- model: sistema.dataremovida
+  pk: 17
+  fields:
+    date: 2023-05-01
+    alocacao: 137
 - model: authtoken.token
   pk: 01a8abbc6aa8df44722337aaae24ebb82d1cd02d
   fields:
@@ -8540,6 +9344,11 @@
   fields:
     user: 3
     created: 2022-11-18 17:28:47.633342+00:00
+- model: authtoken.token
+  pk: ce59de888cb2cd9610f9392c788cbf78b9015ff0
+  fields:
+    user: 19
+    created: 2023-03-31 12:43:53.671710+00:00
 - model: authtoken.token
   pk: d8f578f012454140ffb54a2838645f5c768af2aa
   fields:
