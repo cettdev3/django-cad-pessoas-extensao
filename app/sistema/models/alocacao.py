@@ -25,3 +25,30 @@ class Alocacao(models.Model):
     
     class Meta:
         db_table = 'alocacoes'
+
+    @property
+    def endereco_completo(self):
+        enderecoCompleto = "" 
+        if self.cidade:
+            enderecoCompleto += self.cidade.nome + " GO, "
+        if self.logradouro:
+            enderecoCompleto += self.logradouro
+        if self.bairro:
+            enderecoCompleto += ", "+self.bairro
+        if self.complemento:
+            enderecoCompleto += ", "+self.complemento
+        if self.cep:
+            enderecoCompleto += ". "+self.cep+"."
+        return enderecoCompleto
+    
+    @property
+    def data_inicio_formatada(self):
+        if self.data_inicio:
+            return self.data_inicio.strftime("%d/%m/%Y")
+        return None
+    
+    @property
+    def data_fim_formatada(self):
+        if self.data_fim:
+            return self.data_fim.strftime("%d/%m/%Y")
+        return None

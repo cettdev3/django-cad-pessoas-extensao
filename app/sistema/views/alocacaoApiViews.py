@@ -25,7 +25,21 @@ class AlocacaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set").all()
+        order_by = request.data.get('order_by') if request.data.get('order_by') != "None" else None
+        alocacoes = Alocacao.objects.prefetch_related("dataremovida_set", "ticket_set")
+        if request.data.get("ensino_id"):
+            ensino =  Ensino.objects.get(id=request.data.get("ensino_id"))
+            if not ensino:
+                return Response(
+                    {"res": "Não existe ação de ensino com o id informado"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            
+            alocacoes = alocacoes.filter(acaoEnsino=ensino)
+        if order_by:
+            alocacoes = alocacoes.order_by(order_by)
+
+        alocacoes = alocacoes.all()
         serializer = AlocacaoSerializer(alocacoes, many=True)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
@@ -346,8 +360,6 @@ class AlocacaoDetailApiView(APIView):
         else:
             alocacao.cep = None
 
-        print("aulas_sabado", request.data.get("aulas_sabado"))
-        print("turnos", request.data.get("turnos"))
         if request.data.get("aulas_sabado") is not None:
             aulas_sabado = request.data.get("aulas_sabado")
             alocacao.aulas_sabado = aulas_sabado

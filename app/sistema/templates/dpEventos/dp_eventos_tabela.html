@@ -129,83 +129,23 @@ cellspacing="0">
             <td class="dpEvento-w-50 text-left">
                 <div class="d-flex flex-column justify-content-start align-items-start">
                     <div>
-                        <span class="px-2 py-1 boxed">{{dpEvento.tipo_foramtado}}</span>
+                        <span class="px-2 py-1 boxed">{{dpEvento.tipo_formatado}}</span>
                         <span class="font-weight-bold">de {{dpEvento.data_inicio_formatada}} até {{dpEvento.data_fim_formatada}}</span>
                     </div>
                     <span>{{dpEvento.endereco_completo}}</span>
                 </div>
                 <div><span class="font-weight-bold">{{dpEvento.descricao}}</span></div>
             </td>
-            <td  id="wrapper-container-{{dpEvento.id}}"  class="dpEvento-vw-50 text-left position-relative">
-                <div id="wrapper-overflow-{{dpEvento.id}}" 
-                class="d-flex flex-wrap border py-1 px-2" 
-                style="overflow: hidden;">
+            <td  class="dpEvento-vw-50 text-left position-relative">
+                <div class="d-flex flex-wrap py-1">
                     {% for membro in dpEvento.membroexecucao_set %}
-                    <div id="wrapped-item-container-{{membro.id}}" 
-                    {% if not membro.ticket and membro.tipo != 'nao_se_aplica' %}
-                    role="button"
-                    onclick="openTicketModal('{{membro.id}}')"
-                    class="membro-equipe-container pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
-                    {% else %}
-                    class="pr-1 py-1 mr-1 my-1 text-center border flex-item rounded d-flex justify-content-between align-items-center position-relative"
-                    {% endif %}>
-                        {% if membro.tipo == 'adiantamento' %}
-                        <span 
-                        {% if not membro.ticket %}
-                        class="membro-equipe-red"
-                        {% else %}
-                        class="membro-equipe-green"
-                        {% endif %}>
-                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ADIANTAMENTO">
-                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-                                <i style="border-radius: 50%;" class="fa-solid fa-money-bill fa-stack-1x fa-inverse "></i>
-                            </span>
+                        <span class="badge badge-pill badge-secondary mr-2 mb-1 btn btn-secondary" 
+                        data-toggle="tooltip" data-placement="top" title="Clique para visualizar as demandas"
+                        onclick="openMembroExecucaoDemandasModal('{{membro.id}}')"
+                        style="font-size: 0.9rem;">
+                            {{membro.pessoa.nome}}
                         </span>
-                        {% endif %}
-                        {% if membro.tipo == 'veiculo' %}
-                        <span {% if not membro.ticket %}
-                        class="membro-equipe-red"
-                        {% else %}
-                        class="membro-equipe-green"
-                        {% endif %}>
-                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ALUGUEL DE VEÍCULO">
-                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-                                <i style="border-radius: 50%;" class="fa-solid fa-car fa-stack-1x fa-inverse "></i>
-                            </span>
-                        </span>
-                        {% endif %}
-                        {% if membro.tipo == 'diaria' %}
-                        <span
-                        {% if not membro.ticket %}
-                        class="membro-equipe-red"
-                        {% else %}
-                        class="membro-equipe-green"
-                        {% endif %}>
-                            <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="DIÁRIA">
-                                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-                                <i style="border-radius: 50%;" class="fa-solid fa-hotel fa-stack-1x fa-inverse "></i>
-                            </span>
-                        </span>
-                        {% endif %}
-                        <div class="d-flex flex-column justify-content-start align-items-start">
-                            <span class="wrapped-item-text mx-2">{{membro.pessoa.nome}}</span>
-                            <span class=" mx-2"><strong>{{membro.ticket.id_protocolo}}</strong></span>
-                        </div>
-                    </div>
                     {% endfor %}
-                    <span id="counter-btn-{{dpEvento.id}}" onclick="changeOverflow('{{dpEvento.id}}')" 
-                    class="counter-btn" data-toggle="tooltip" data-placement="top" title="EXPANDIR">+5</span>
-                    <span
-                    id="retrieve-btn-{{dpEvento.id}}"
-                    style="color: #ffc200; position: absolute; top: 0; right: 0; display: none"
-                    class="btn-icon-dpEvento"
-                    role="button"
-                    onclick="changeOverflow('{{dpEvento.id}}')">
-                        <span class="fa-stack"  style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="ESCONDER">
-                            <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-                            <i style="border-radius: 50%;" class="fa-solid fa-stack-1x fa-inverse fa-arrow-up shadow"></i>
-                        </span>
-                    </span>
                 </div>
             </td>
             <td class="w-2 text-left" style="position: relative;">
@@ -226,7 +166,7 @@ cellspacing="0">
         {% endfor %}
     </tbody>
 </table>
-<div id="cadastrarTicketModalContainer"></div>
+<div id="membroExecucaoDemandasModalContainer"></div>
 <script>
     var buttonMenuDpEventosId = "buttonMenuDpEventos"
     var hiddenMenuDpEventosId = "hiddenMenuDpEventos"
@@ -250,14 +190,14 @@ cellspacing="0">
         location.href = "visualizarDpEvento/" + id
     }
 
-    function openTicketModal(membroId) {
+    function openMembroExecucaoDemandasModal(membroId) {
         let data = {membro_execucao_id: membroId, from: "dpEvento"}
         $.ajax({
-            url: "/ticketModal",
+            url: "/membroExecucaoDemandasModal/"+membroId,
             data: data,
             success: function (data) {
-                $("#cadastrarTicketModalContainer").html(data);
-                $('#cadastrarTicketModal').modal('toggle');
+                $("#membroExecucaoDemandasModalContainer").html(data);
+                $('#membroExecucaoDemandasModal').modal('toggle');
             }
         });
     }
@@ -321,85 +261,7 @@ cellspacing="0">
             }
         });
     }
-    
-    function getElementFullWidth(element) {
-        let width = element.innerWidth()
-        let paddingLeft = parseInt(element.css('padding-left'))
-        let paddingRight = parseInt(element.css('padding-right'))
-        let marginLeft = parseInt(element.css('margin-left'))
-        let marginRight = parseInt(element.css('margin-right'))
-        let borderLeft = parseInt(element.css('border-left-width'))
-        let borderRight = parseInt(element.css('border-right-width'))
-        return width + paddingLeft + paddingRight + marginLeft + marginRight + borderLeft + borderRight
-    }
 
-    function getElementFullHeight(element) {
-        let height = element.innerHeight()
-        let marginTop = parseInt(element.css('margin-top'))
-        let marginBottom = parseInt(element.css('margin-bottom'))
-        return height + marginTop + marginBottom
-    }
-
-    function assignRows(cards, containerId) {
-        let row = 0;
-        let startCounting = false;
-        let count = 0;
-        $(cards).each(function(i) {
-            if (i == 0) return true
-
-            let currentLeft = $(this).position().left
-            let previousLeft = $(this).prev().position().left
-            if (currentLeft <= previousLeft) {
-                row++
-                if (!startCounting) {
-                    startCounting = !startCounting
-                }
-            }
-
-            if (startCounting) count++
-        })
-        let id = "#counter-btn-"+containerId
-        if (count == 0) $(id).hide()
-        else {
-            $(id).show()
-            $(id).text("+"+count)
-        }
-    }
-
-    function changeOverflow(id) {
-        let containerId = "#wrapper-overflow-"+id
-        let scrollHeight = $(containerId).prop("scrollHeight");
-        let currentHeight = $(containerId).height();
-        let height = currentHeight <= wrappedItemHeight['wrappedItemHeight-'+id] ? scrollHeight+"px" : (wrappedItemHeight['wrappedItemHeight-'+id]+10)+"px"
-        $(containerId).animate({
-            height: height
-        }, 200);
-
-        $("#counter-btn-"+id).toggle()
-        $("#retrieve-btn-"+id).toggle()
-    }
-
-    function setupWrappersHeight() {
-        let wrappedOverflowContainer = $("div[id^='wrapper-overflow-']")
-        wrappedOverflowContainer.each(function (i, el) {
-            let id = $(this).attr('id').split("wrapper-overflow-")[1];
-            let items = $(this).find("div[id^='wrapped-item-container']")
-            wrappedItemHeight['wrappedItemHeight-'+id] = getElementFullHeight(items.first())
-            wrappedItemWidth["wrappedItemWidth-"+id] = getElementFullWidth(items.first())
-            let wrapperContainer = $("#wrapper-container-"+id)
-            wrapperContainerWidth["wrapperContainerWidth-"+id] = getElementFullWidth(wrapperContainer)
-            
-            $("#wrapper-container-"+id).children().first().height(wrappedItemHeight['wrappedItemHeight-'+id])
-            const wrappedItems = items
-            $(window).resize(function() {
-                assignRows(wrappedItems, id);
-            })
-
-            assignRows(wrappedItems, id);
-        })
-
-    }
-    
     $(document).ready(function () {
         dpEventoModificadaEventProxy = new Proxy(dpEventoModificadaEvent, {
             set: function (target, key, value) {
@@ -434,7 +296,6 @@ cellspacing="0">
             })
         });
 
-        setupWrappersHeight()
         bindButtons()
     })
 </script>

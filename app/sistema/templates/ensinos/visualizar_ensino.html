@@ -24,6 +24,7 @@
     }
 </style>
 <div class="card shadow mb-4 w-100">
+    <input type="text" name="order_by" id="filterAlocacaoOrderBy" hidden>
     <div class="d-flex justify-content-between pt-3 px-2">
         <div class="d-flex flex-column">
             <div class="d-flex align-items-center ">
@@ -88,15 +89,25 @@
         });
     }
 
-    function carregarAlocacoes() {
+    function carregarAlocacoes(filters = null, state = null) {
+        console.log("filtros no frontend: ",filters)
         $.ajax({
             url: "/"+rotaTabelaAlocacoes,
             contentType: 'application/json',
-            data: {acaoEnsino_id: acaoEnsinoId},
+            data: {acaoEnsino_id: acaoEnsinoId, ...filters},
             success: function (data) {
                 $("#" + idTabelaAlocacoes).html(data);
+                setTabelaState(state, 'column-alocacao', 'pessoa__nome')
             }
         });
+    }
+
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarAlocacoes()
     }
     
     $(document).ready(function() {

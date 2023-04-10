@@ -132,17 +132,20 @@ def dp_eventosSelect(request):
 
 @login_required(login_url='/auth-user/login-user')
 def visualizarDpEvento(request,codigo):
+    print("dentro de visualizarDpEvento", codigo)
     dpEvento = DpEvento.objects.prefetch_related(
         Prefetch(
             "membroexecucao_set", 
             queryset=MembroExecucao.objects
             .select_related("itinerario")
+            .prefetch_related("ticket_set")
             .prefetch_related("itinerario__itinerarioitem_set")
         ),
     ).get(id=codigo)
     page_title = dpEvento.tipo_formatado+" - "+dpEvento.cidade.nome
     path_back = "gerencia_dp_eventos"
     dpEvento = DpEventoSerializer(dpEvento).data
+
     return render(request,'dpEventos/visualizar_dp_evento.html',{
         'dpEvento':dpEvento, 
         'page_title': page_title,

@@ -20,6 +20,7 @@ class MembroExecucao(models.Model):
     evento = models.ForeignKey(DpEvento, on_delete=models.SET_NULL, null=True, blank= True)
     itinerario = models.ForeignKey(Itinerario, on_delete=models.SET_NULL, null=True, blank= True)
     avaliador = models.BooleanField(default=False, null = True, blank= True)
+    observacao = models.CharField(null = True, max_length=250, blank= True)
 
     class Meta:
         db_table = 'membros_execucao'
@@ -38,3 +39,4 @@ class MembroExecucao(models.Model):
         if self.cep:
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
+    

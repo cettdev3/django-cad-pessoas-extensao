@@ -1,0 +1,17 @@
+.table-column-w-50 {
+    max-width: 30vw;
+    width: 30vw;
+    min-width: 30vw;
+}
+.table-column-w-20 {
+    width: 20%;
+}
+.table-column-w-10 {
+    width: 10%;
+}
+.table-column-w-50 {
+    width: 50%;
+}
+.table-column-w-15 {
+    width: 15%;
+}

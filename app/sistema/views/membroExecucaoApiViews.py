@@ -15,10 +15,11 @@ from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db import transaction
 class MembroExecucaoApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get_object(self, fn, object_id):
         try:
@@ -27,11 +28,12 @@ class MembroExecucaoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        membrosExecucao = MembroExecucao.objects.all()
+        membrosExecucao = MembroExecucao.objects.prefetch_related("ticket_set").all()
         serializer = MembroExecucaoSerializer(membrosExecucao, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -76,7 +78,7 @@ class MembroExecucaoApiView(APIView):
                 {"res": "É necessário informar a ação ou o evento para o membro de execução"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        
         data = {
             "data_inicio": request.data.get("data_inicio") if request.data.get("data_inicio") else None,
             "data_fim": request.data.get("data_fim") if request.data.get("data_fim") else None,
@@ -91,11 +93,42 @@ class MembroExecucaoApiView(APIView):
             "acao": acao,
             "evento": evento,
         }
-
-        membroExecucao = MembroExecucao.objects.create(**data)
-        serializer = MembroExecucaoSerializer(membroExecucao)
+        with transaction.atomic():
+            membroExecucao = MembroExecucao.objects.create(**data)
+            tickets = request.data.get("tickets")
+            if tickets:
+                for ticket in tickets:
+                    cidade = None
+                    if ticket.get("cidade_id"):
+                        cidade = self.get_object(Cidade, ticket.get("cidade_id"))
+                        if not cidade:
+                            return Response(
+                                {"res": "Não existe cidade com o id informado"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                            )
+                        
+                    nsa_data_fim = ticket.get("nsa_data_fim") == 'on' or True
+                    nsa_data_inicio = ticket.get("nsa_data_inicio") == 'on' or True
+                    ticketData = {
+                        "tipo": ticket.get("tipo"),
+                        "status": "EM_DIAS",
+                        "id_protocolo": ticket.get("id_protocolo"),
+                        "membro_execucao": membroExecucao,
+                        "data_inicio": ticket.get("data_inicio") if ticket.get("data_inicio") else None,
+                        "data_fim": ticket.get("data_fim") if ticket.get("data_fim") else None,
+                        "nao_se_aplica_data_inicio": nsa_data_inicio,
+                        "nao_se_aplica_data_fim": nsa_data_fim,
+                        "bairro": ticket.get("bairro"),
+                        "logradouro": ticket.get("logradouro"),
+                        "cep": ticket.get("cep"),
+                        "complemento": ticket.get("complemento"),
+                        "cidade": cidade,
+                    }
+                    print("ticketData: ", ticketData)
+                    ticketData = Ticket.objects.create(**ticketData)
+            serializer = MembroExecucaoSerializer(membroExecucao)
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MembroExecucaoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -108,7 +141,7 @@ class MembroExecucaoDetailApiView(APIView):
             return None
             
     def get(self, request, membro_execucao_id, *args, **kwargs):
-        memebroExecucao = self.get_object(MembroExecucao, membro_execucao_id)
+        memebroExecucao = MembroExecucao.objects.prefetch_related("ticket_set").select_related('evento', "pessoa").get(id=membro_execucao_id)
         if not memebroExecucao:
             return Response(
                 {"res": "Não existe membro da equipe de execução com o id informado"},
@@ -198,8 +231,9 @@ class MembroExecucaoDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        ticket = Ticket.objects.filter(membro_execucao=membroExecucao)
-        if ticket:
+        tickets = Ticket.objects.filter(membro_execucao=membroExecucao)
+        for ticket in tickets:
+            print("deletando ticket: ", ticket.tipo)
             ticket.delete()
 
         membroExecucao.delete()

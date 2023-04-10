@@ -1,16 +1,399 @@
-<div class="w-100">
-    <form id="cadastrarTicketForm" action="/" method="POST">
-        <div class="form-group row">
-            <div class="col-sm-12">
-                <label><b>Id protocolo:</b></label>
-                <input 
-                type="text" 
-                {% if ticket %}
-                value="{{ ticket.ticket}}" 
+<style>
+    .btn-delete {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        background-color: white;
+    }
+
+    .btn-delete i {
+        font-size: 18px;
+        color: #dc3545;
+    }
+    
+    .btn-delete:hover i {
+        font-size: 18px;
+        color: white;
+    }
+</style>
+<form id="cadastrarTicketForm{{form_id}}" action="/" method="POST">
+    <input type="text" hidden
+    id="model"
+    name="model"
+    {% if model == 'alocacao' %}
+    value="{{model}}"
+    {% else %}
+    value="{{membro_execucao}}"
+    {% endif %}>
+
+    <div class="form-group row">
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <label><b>Tipo da demanda:</b></label>
+            <select required 
+            id="tipo_solicitacao"
+            class="form-control" 
+            name="tipo">
+                <option
+                value="">
+                    Selecione uma opção
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'diaria' %}
+                selected
                 {% endif %}
-                class="form-control" 
-                name="id_protocolo">
-            </div>
+                value="diaria">
+                    DIÁRIA
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'adiantamento' %}
+                selected
+                {% endif %}
+                value="adiantamento">
+                    ADIANTAMENTO
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'adiantamento_insumo' %}
+                selected
+                {% endif %}
+                value="adiantamento_insumo">
+                    ADIANTAMENTO INSUMOS
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'adiantamento_combustivel' %}
+                selected
+                {% endif %}
+                value="adiantamento_combustivel">
+                    ADIANTAMENTO COMBUSTÍVEL
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'veiculo' %}
+                selected
+                {% endif %}
+                value="veiculo">
+                    VEÍCULO
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'passagem' %}
+                selected
+                {% endif %}
+                value="passagem">
+                    PASSAGEM
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'rpa' %}
+                selected
+                {% endif %}
+                value="rpa">
+                    RPA
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'nao_se_aplica' %}
+                selected
+                {% endif %}
+                value="nao_se_aplica">
+                    NÃO HAVERÁ SOLICITAÇÂO
+                </option>
+            </select>
         </div>
-    </form>
-</div>
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-6"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <div class="d-flex justify-content-between align-items-center">
+                <label><b>Data Início:</b></label>
+                <div class="form-group d-flex justify-content-start align-items-start" 
+                style=" padding: 0; margin: 0">
+                    <input name="nao_se_aplica_data_inicio"  
+                    id="nao_se_aplica_data_inicio" 
+                    style="cursor: pointer; margin-right: 0.5rem;" 
+                    type="checkbox"
+                    {% if ticket.nao_se_aplica_data_inicio == True %}
+                    checked
+                    {% endif %}
+                    onclick="disableField(this,'data_inicio')">
+                    <label for="nao_se_aplica_data_inicio" 
+                    style="line-height: 1rem;white-space: nowrap;">
+                        <b>Não se aplica</b>
+                    </label>
+                </div>
+            </div>
+            <input 
+            type="date" 
+            name="data_inicio" 
+            id="data_inicio"
+            class="form-control" 
+            {% if ticket and ticket.nao_se_aplica_data_inicio == False or ticket.nao_se_aplica_data_fim == None %}
+            value="{{ticket.data_inicio|date:'Y-m-d'}}"
+            {% else %}
+            value=""
+            disabled
+            {% endif %}>
+        </div>
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-4"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <div class="d-flex justify-content-between align-items-center">
+                <label>
+                    <b>Data Fim:</b>
+                </label>
+                <div class="form-group d-flex justify-content-start align-items-start" 
+                style=" padding: 0; margin: 0">
+                    <input name="nao_se_aplica_data_fim"  
+                    id="nao_se_aplica_data_fim" 
+                    style="cursor: pointer; margin-right: 0.5rem;" 
+                    type="checkbox"
+                    {% if ticket.nao_se_aplica_data_fim == True %}
+                    checked
+                    {% endif %}
+                    onclick="disableField(this,'data_fim')">
+                    <label for="nao_se_aplica_data_fim" 
+                    style="line-height: 1rem;white-space: nowrap;">
+                        <b>Não se aplica</b>
+                    </label>
+                </div>
+            </div>
+
+            <input 
+            type="date" 
+            name="data_fim" 
+            id="data_fim"
+            class="form-control" 
+            {% if ticket and ticket.nao_se_aplica_data_fim == False or ticket.nao_se_aplica_data_fim == None %}
+            value="{{ticket.data_fim|date:'Y-m-d'}}"
+            {% else %}
+            value=""
+            disabled
+            {% endif %}>
+        </div>
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-4"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <label><b>Id da demanda:</b></label>
+            <input 
+            type="text" 
+            {% if ticket %}
+            value="{{ ticket.id_protocolo|default_if_none:''}}" 
+            {% endif %}
+            class="form-control" 
+            name="id_protocolo">
+        </div>
+        <div 
+        {% if layout == '6' %}
+        class="col-sm-4"
+        {% else %}
+        class="col-sm-3"
+        {% endif %}>
+            <label><b>Status:</b></label>
+            <select required 
+            id="status"
+            class="form-control" 
+            name="status">
+                <option
+                value="">
+                    Selecione uma opção
+                </option>
+            <!-- CRIACAO_PENDENTE -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'CRIACAO_PENDENTE' %}
+                selected
+                {% endif %}
+                value="CRIACAO_PENDENTE">
+                    CRIAÇÂO PENDENTE
+                </option>
+                <!-- CRIADO -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'CRIADO' %}
+                selected
+                {% endif %}
+                value="CRIADO">
+                    CRIADO
+                </option>
+
+                <!-- ATRASADO_PARA_CRIACAO -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'ATRASADO_PARA_CRIACAO' %}
+                selected
+                {% endif %}
+                value="ATRASADO_PARA_CRIACAO">
+                    ATRASADO PARA CRIACAO
+                </option>
+            <!-- PENDING_PRESTACAO_CONTAS -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'PENDING_PRESTACAO_CONTAS' %}
+                selected
+                {% endif %}
+                value="PENDING_PRESTACAO_CONTAS">
+                    PRESTAÇÂO DE CONTAS PENDENTE
+                </option>
+            <!-- PRESTACAO_CONTAS_CREATED -->
+                <option 
+                {% if ticket and ticket.status_calculado == 'PRESTACAO_CONTAS_CREATED' %}
+                selected
+                {% endif %}
+                value="PRESTACAO_CONTAS_CREATED">
+                    CONTAS PRESTADAS
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group d-flex justify-content-start align-items-start">
+        <div class="col-sm-12">
+            <label><b>Descrição:</b></label>
+            <textarea 
+            rows="4"
+            placeholder="Descreva a função da pessoa na equipe de execução do evento, motivo pelo qual ela é necessario solicitar essa demanda, etc."
+            name="observacao" 
+            class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
+        </div>
+    </div>
+    <div class="form-group d-flex justify-content-start align-items-start">
+        <input name="use_dpEvento_endereco"  
+        id="use_dpEvento_endereco" 
+        style="cursor: pointer; margin-right: 0.5rem;" 
+        type="checkbox">
+        <label for="use_dpEvento_endereco" 
+        style="line-height: 1rem;white-space: nowrap;">
+            <b>Usar endereço 
+                {% if model == 'alocacao' %}
+                da ação de ensino
+                {% elif model == 'membro_execucao' %}
+                do evento
+                {% endif %}
+            </b>
+        </label>
+    </div>
+    <div class="form-group row">
+        <div id="select_cidade" class="col-sm-2">
+            <input type="text" name="selected_cidade" id="selected_cidade" 
+            {% if ticket %}
+            value="{{ticket.cidade.id}}"
+            {% endif %}
+            hidden> 
+        </div>
+        <div class="col-sm-3">
+            <label><b>Complemento:</b></label>
+            <input 
+            type="text" 
+            id="complemento"
+            name="complemento" 
+            class="form-control" 
+            {% if ticket %}
+            value="{{ticket.complemento|default_if_none:''}}"
+            {% endif %}>
+        </div>
+        <div class="col-sm-2">
+            <label><b>CEP:</b></label>
+            <input 
+            type="text" 
+            id="cep"
+            name="cep" 
+            class="form-control" 
+            {% if ticket %}
+            value="{{ticket.cep|default_if_none:''}}"
+            {% endif %}>
+        </div>
+        <div class="col-sm-3">
+            <label><b>Bairro:</b></label>
+            <input 
+            type="text" 
+            name="bairro" 
+            class="form-control" 
+            id="bairro"
+            {% if ticket %}
+            value="{{ticket.bairro|default_if_none:''}}"
+            {% endif %}>
+        </div>
+        <div class="col-sm-2">
+            <label><b>Logradouro:</b></label>
+            <input 
+            type="text" 
+            name="logradouro" 
+            class="form-control" 
+            id="logradouro"
+            {% if ticket %}
+            value="{{ticket.logradouro|default_if_none:''}}"
+            {% endif %}>
+        </div>
+    </div>
+    <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
+    <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
+    <input type="text" name="parent_entity_cep" id="parent_entity_cep" hidden value="{{parent_entity.cep|default_if_none:''}}">
+    <input type="text" name="parent_entity_complemento" id="parent_entity_complemento" hidden value="{{parent_entity.complemento|default_if_none:''}}">
+    <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}">
+    {% if model == 'membro_execucao' %}
+    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{entity.id}}">
+    {% elif model == 'alocacao'  %}
+    <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
+    {% endif %}
+</form>
+<script>
+    function carregarSelectCidades() {
+        console.log("buscando select cidade")
+        $.ajax({
+            url: "/cidadesSelect",
+            method: "GET",
+            success: function (data) {
+                let selected = $("#cadastrarTicketForm{{form_id}} #selected_cidade").val()
+                $("#cadastrarTicketForm{{form_id}} #select_cidade").html(data)
+                $("#cadastrarTicketForm{{form_id}} #cidade_id").val(selected)
+            }
+        });
+    }
+
+    function disableField(event, field) {
+        console.log("disableField {{form_id}}", event.checked)
+        if (event.checked) {
+            $("#cadastrarTicketForm{{form_id}} #"+field).attr("disabled", true)
+            $("#cadastrarTicketForm{{form_id}} #"+field).val("")
+        } else {
+            $("#cadastrarTicketForm{{form_id}} #"+field).attr("disabled", false)
+        }
+    }
+
+    $(document).ready(function() {     
+        $('#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco').change(function() {
+            console.log("change {{form_id}}", this.checked)
+            if (this.checked) {
+                var bairro = $('#cadastrarTicketForm{{form_id}} #parent_entity_bairro').val();
+                var logradouro = $('#cadastrarTicketForm{{form_id}} #parent_entity_logradouro').val();
+                var cep = $('#cadastrarTicketForm{{form_id}} #parent_entity_cep').val();
+                var complemento = $('#cadastrarTicketForm{{form_id}} #parent_entity_complemento').val();
+                
+                if (bairro == "None") bairro = ""
+                if (logradouro == "None") logradouro = ""
+                if (cep == "None") cep = ""
+                if (complemento == "None") complemento = ""
+                
+                var cidade = $('#cadastrarTicketForm{{form_id}} #parent_entity_cidade').val();
+                console.log(`bairro ${bairro} logradouro ${logradouro} cep ${cep} complemento ${complemento} cidade ${cidade}`)
+                $('#cadastrarTicketForm{{form_id}} #bairro').val(bairro);
+                $('#cadastrarTicketForm{{form_id}} #logradouro').val(logradouro);
+                $('#cadastrarTicketForm{{form_id}} #cep').val(cep);
+                $('#cadastrarTicketForm{{form_id}} #complemento').val(complemento);
+                $('#cadastrarTicketForm{{form_id}} #cidade_id').val(cidade);
+            } else {
+                $('#cadastrarTicketForm{{form_id}} #bairro').val("");
+                $('#cadastrarTicketForm{{form_id}} #logradouro').val("");
+                $('#cadastrarTicketForm{{form_id}} #cep').val("");
+                $('#cadastrarTicketForm{{form_id}} #complemento').val("");
+                $('#cadastrarTicketForm{{form_id}} #cidade_id').val("");
+            }
+        });
+        
+        carregarSelectCidades();
+    });
+</script>

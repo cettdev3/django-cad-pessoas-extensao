@@ -1,0 +1,127 @@
+<style>
+    .nao_criado {
+        /* green */
+        color: #FFA500 ;
+    }
+
+    .criado {
+        /* amber */
+        color: #32CD32 ;
+    }
+
+    .criacao_atrasada {
+        /* red */
+        color: #FF4500 ;
+    }
+
+    .prestacao_pendente {
+        /* red */
+        color: #FFD700  ;
+    }
+
+    .conta_prestada {
+        /* red */
+        color: #008000;
+    }
+
+    .ticket-card-text {
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .ticket-card-container {
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        transition: box-shadow 0.2s;
+        padding: 4px 6px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .ticket-card-container:hover {
+        box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .actions {
+        display: none;
+    }
+    
+    .actions:hover {
+        display: flex;
+    }
+
+    .ticket-card-container:hover .actions {
+        display: flex;
+    }
+
+</style>
+<div id="ticket-card-container-{{demanda.id}}" class="d-inline-block align-self-stretch position-relative" style="margin-right: 5px;">
+    <div class="ticket-card-container">
+        <div class="d-flex justify-content-start align-items-center">
+            <span>
+                <span class="fa-stack {{ticket.status_class}}"
+                style="border-radius: 50%;"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{ticket.status_formatado}}">
+                    <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                    <i style="border-radius: 50%;" class="fa-solid {{ticket.icon}} fa-stack-1x fa-inverse "></i>
+                </span>
+            </span>
+
+            <div class="d-flex flex-column justify-content-start align-items-start ticket-card-text ml-1">
+                <span>{{ demanda.tipo_formatado }}</span>
+                <strong >{{ demanda.id_protocolo }}</strong>
+            </div>
+            <!-- action  -->
+            <div class="flex justify-content-start align-items-end ml-auto actions position-absolute bg-light"
+            style="top: -70%; right: 0;">
+                {% if show_edit %}
+                <!-- editar btn -->
+                <button class="btn btn-sm btn-outline-primary ml-1" 
+                onclick="updateTicket('{{demanda.id}}', '{{model}}')">
+                    <i class="fa-solid fa-edit"></i>
+                </button>
+                {% endif %}
+
+                {% if show_delete %}
+                <!-- deletar btn -->
+                <button id="ticket-card-delete-btn" class="btn btn-sm btn-outline-danger ml-1" >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                {% endif %}
+                <!-- concluded btn -->
+                {% if show_conclude %}
+                <button class="btn btn-sm btn-outline-success ml-1"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Concluir Prestação de Contas"
+                onclick="concludeTicket('{{demanda.id}}', '{{model}}')">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            $("#ticket-card-container-" + params.id +" #ticket-card-delete-btn").on('click', function () {
+                    openDeleteModal(() => {
+                        $.ajax({
+                        url: '/eliminarTicket/' + params.id,
+                        success: function (data) {
+                            showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
+                            if (params.model == 'membro_execucao') {
+                                carregarMembrosExecucao()
+                            } else if (params.model == 'alocacao') {
+                                carregarAlocacoes()
+                            }
+                        }
+                    });
+                }); 
+            });
+        })({model: '{{model}}', id: '{{demanda.id}}'});
+    })
+</script>

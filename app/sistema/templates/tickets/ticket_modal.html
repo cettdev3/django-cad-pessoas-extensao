@@ -1,9 +1,24 @@
 <div class="modal fade" id="cadastrarTicketModal" tabindex="-1" role="dialog"
     aria-labelledby="cadastrarTicketModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="d-flex flex-column">
+                <div 
+                class="d-flex justify-content-between align-items-center" 
+                style="width: 100%;">
+                    <div class="modal-title" id="cadastrarTicketModalLabel">
+                        {% if ticket.membro_execucao %}
+                            Editar Demanda para: {{ticket.membro_execucao.pessoa.nome}}
+                        {% elif ticket.alocacao %}
+                            Editar Demanda para: {{ticket.alocacao.professor.nome}}
+                        {% else %}
+                            {% if model == 'alocacao' %}
+                            Cadastrar Demanda para: {{entity.professor.nome}}
+                            {% elif model == 'membro_execucao' %}
+                            Cadastrar Demanda para: {{entity.pessoa.nome}}
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     <button type="button" 
                     id="dismissCadastrarTicket" 
                     class="close" 
@@ -11,71 +26,38 @@
                     aria-label="Close">
                         <span>&times;</span>
                     </button>
-                    <div class="modal-title" id="cadastrarTicketModalLabel">
-                        {% if ticket is None %}
-                            <div class="d-flex justify-content-between">
-                                <span> <strong>Nome:</strong> </span> <span>{{nome}}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span> <strong>Tipo:</strong> </span> <span>{{tipo}}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span> <strong>Inicio:</strong> </span> <span>{{data_inicio}}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Fim:</strong> </span> <span>{{data_fim}}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Escola:</strong> </span> <span>{{nome_escola}}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Endereco:</strong> </span> <span style="text-align: right;">{{endereco_completo}}</span>
-                            </div> 
-                            <span id="ticketModelId" hidden></span>
-                        {% else %}
-                            Editar Cadastro do ticket: {{tipo}}
-                            <span id="ticketModelId" hidden>{{ticket.id}}</span>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
+            {% if ticket and False %}
+                <div class="d-flex justify-content-between">
+                    <span> <strong>Nome:</strong> </span> <span>{{membro_execucao.pessoa.nome}}</span>
+                </div> 
+                <div class="d-flex justify-content-between">
+                    <span> <strong>Tipo:</strong> </span> <span>{{ticket.tipo|default_if_none:"Não definido"}}</span>
+                </div> 
+                <div class="d-flex justify-content-between">
+                    <span> <strong>Inicio:</strong> </span> <span>{{ticket.data_inicio|date:"d/m/Y"}}</span>
+                </div> 
+                <div class="d-flex justify-content-between">
+                    <span><strong>Fim:</strong> </span> <span>{{ticket.data_fim|date:"d/m/Y"}}</span>
+                </div> 
+                <div class="d-flex justify-content-between">
+                    <span><strong>Escola:</strong> </span> <span>{{evento.escola.nome|default_if_none:"Não definido"}}</span>
+                </div> 
+                <div class="d-flex justify-content-between">
+                    <span><strong>Endereco:</strong> </span> <span style="text-align: right;">{{endereco_completo}}</span>
+                </div> 
+                <span id="ticketModelId" hidden></span>
+            {% endif %}
             <div class="modal-body">
                 <div class="w-100">
-                    <!-- <ul class="nav nav-tabs row"> -->
-                        <!-- <li id="escolasTab1" class="col py-2 active-form-tab">
-                            <a id="escolaTabLink1" 
-                            data-toggle="tab"
-                            style="display: none;"
-                            role="tab"
-                            href="#home">1</a>
-                            <span>Dados Gerais</span>
-                        </li> -->
-                        <!-- <li id="escolasTab2" class="col py-2">
-                            <a id="escolaTabLink2" 
-                            data-toggle="tab"
-                            style="display: none;"
-                            role="tab"
-                            href="#endereco">2</a>
-                            <span>Endereco</span>
-                        </li> -->
-                    <!-- </ul> -->
-                    <form id="cadastrarTicketForm" action="/" method="POST">
+                    <div>
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 {% include "tickets/ticket_form.html" with ticket=ticket %}
-                                <input 
-                                type="text" 
-                                hidden 
-                                name="membro_execucao_id" 
-                                value="{{membro_execucao_id}}">
-                                <input 
-                                type="text" 
-                                hidden 
-                                name="tipo" 
-                                value="{{tipo}}">
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -118,7 +100,6 @@
 
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
-        
         if (changedResource) ticketModificadaEventProxy.modificado = changedResource
         let dismissBtn = $("#"+dismissCadastrarTicketId)
         console.log(dismissBtn)
@@ -130,28 +111,30 @@
 
     function cadastrarTicket() {
         $.ajax({
-            url: "saveTicket",
+            url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
-                clearModalForm(data)
+                showFloatingMessage("Demanda criada com sucesso!", "alert-success")
+                clearModalFormTicket()
             }
         });
     }
     
     function editarTicket(id) {
         $.ajax({
-            url: "editarTicket/"+id,
+            url: "/editarTicket/"+id,
             data: JSON.stringify({"data":getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
-                clearModalForm(data)
+                showFloatingMessage("Demanda atualizada com sucesso!", "alert-success")
+                clearModalFormTicket(data)
             }
         });
     }

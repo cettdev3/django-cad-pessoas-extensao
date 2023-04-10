@@ -14,6 +14,7 @@ from ..models.ensino import Ensino
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
+from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.db import reset_queries
@@ -32,11 +33,14 @@ class DpEventoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
+        print("dentro do get de dpEvento")
         dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
-            queryset=MembroExecucao.objects.order_by('ticket__status')
+            queryset=MembroExecucao.objects.order_by('ticket__status').distinct()
         ))
-
+        for dp_evento in dp_eventos:
+            membros_execucao = dp_evento.membroexecucao_set.all()
+            print("dentro do if 2", len(membros_execucao))
         if request.GET.get("tipo"):
             dp_eventos = dp_eventos.filter(tipo__icontains=request.GET.get("tipo"))
         if request.GET.get('data_inicio') and not request.GET.get('data_fim'):
@@ -189,8 +193,10 @@ class DpEventoDetailApiView(APIView):
             return None
 
     def get(self, request, dp_evento_id, *args, **kwargs):
-
-        dp_evento = self.get_object(DpEvento, dp_evento_id)
+        print("dentro do fet")
+        dp_evento = DpEvento.objects.prefetch_related(
+            Prefetch('membro_execucao_set', queryset=MembroExecucao.objects.prefetch_related('ticket_set'))
+        ).get(id=dp_evento_id)
         if not dp_evento:
             return Response(
                 {"res": "Não existe ação com o id informado"},

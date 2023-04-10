@@ -17,20 +17,30 @@ from django.http import JsonResponse
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoTable(request):
     acao_id = request.GET.get('acao_id')
-    membros_execucao = MembroExecucao.objects
+    membros_execucao = MembroExecucao.objects.prefetch_related('ticket_set')
     if acao_id:
         membros_execucao = membros_execucao.filter(acao_id = acao_id)
     membros_execucao = membros_execucao.all()
-    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
+    serializer = MembroExecucaoSerializer(membros_execucao, many=True)
+    return render(
+        request,
+        'membrosExecucao/membros_execucao_table.html',
+        {'membros_execucao':serializer.data}
+    )
 
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoDpEventoTable(request):
     evento_id = request.GET.get('dp_evento_id')
-    membros_execucao = MembroExecucao.objects
+    membros_execucao = MembroExecucao.objects.prefetch_related('ticket_set')
     if evento_id:
         membros_execucao = membros_execucao.filter(evento_id = evento_id)
     membros_execucao = membros_execucao.all()
-    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':membros_execucao})
+    dp_eventos = DpEvento.objects.prefetch_related('membroexecucao_set').get(id=evento_id)
+    if dp_eventos:
+        membros_execucao = dp_eventos.membroexecucao_set.all()
+
+    serializer = MembroExecucaoSerializer(membros_execucao, many=True)
+    return render(request,'membrosExecucao/membros_execucao_table.html',{'membros_execucao':serializer.data})
 
 @login_required(login_url='/auth-user/login-user')
 def membroExecucaoForm(request):
@@ -70,6 +80,15 @@ def membroExecucaoModal(request):
         data['membro_execucao'] = MembroExecucaoSerializer(membro_execucao).data 
     return render(request,'membrosExecucao/membro_execucao_modal.html',data)
 
+@login_required(login_url='/auth-user/login-user')
+def membroExecucaoDemandasModal(request, membro_execucao_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/membroExecucao/'+membro_execucao_id, headers=headers)
+    data = {}
+    data["membro_execucao"] = json.loads(response.content.decode())
+    return render(request,'membrosExecucao/membro_execucao_demandas_modal.html',data)
+
 # @login_required(login_url='/auth-user/login-user')
 # def alocacaoModalCadastrar(request):
 #     id = request.GET.get('id')
@@ -86,13 +105,14 @@ def saveMembroExecucao(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
+    print("dentro da view do site", body)
     response = requests.post('http://localhost:8000/membroExecucao', json=body, headers=headers)
     return JsonResponse(json.loads(response.content.decode()),status=response.status_code, safe=False)
 
 @login_required(login_url='/auth-user/login-user')
 def editarMembroExecucao(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
+    headers = {'Authorization': 'Token ' + token.key, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     body = json.loads(request.body)['data']
     print("dentro da view do site",body)
     response = requests.put('http://localhost:8000/membroExecucao/'+str(codigo), json=body, headers=headers)
