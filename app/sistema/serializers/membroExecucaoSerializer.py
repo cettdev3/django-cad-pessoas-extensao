@@ -3,7 +3,7 @@ from rest_framework import serializers
 from ..models.membroExecucao import MembroExecucao
 from ..models.ticket import Ticket
 from .itinerarioSerializer import ItinerarioSerializer
-from .ticketSerializer import TicketSerializer
+from .ticketSerializers.ticketSerializer import TicketSerializer
 
 class MembroExecucaoSerializer(serializers.ModelSerializer):
     itinerario = ItinerarioSerializer(many=False, read_only=True)

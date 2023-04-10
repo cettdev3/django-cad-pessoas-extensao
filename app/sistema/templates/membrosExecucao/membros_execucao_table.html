@@ -34,7 +34,7 @@
         <td class="membro-execucao-w-70 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
                 {% for demanda in membroExecucao.ticket_set %}
-                    {% include "tickets/ticket_card.html" with ticket=demanda model='membro_execucao' %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model='membro_execucao' show_delete=True show_edit=True show_conclude=False %}
                 {% endfor %}
             </div>
         </td>

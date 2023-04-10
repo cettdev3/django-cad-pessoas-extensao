@@ -105,7 +105,7 @@
         <td class="alocacao-w-35 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
                 {% for demanda in alocacao.ticket_set %}
-                    {% include "tickets/ticket_card.html" with ticket=demanda model='alocacao' %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model='alocacao' show_delete=True show_edit=True %}
                 {% endfor %}
             </div>
         </td>

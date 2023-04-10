@@ -114,6 +114,22 @@ class MigrationsViewSets(viewsets.ModelViewSet):
             create_dp_evento(acao)
         return Response(data={}, status=st.HTTP_201_CREATED, content_type="application/json")
     
+    
+    @action(methods=["POST"], detail=False, url_path="migrate-tickets")
+    def migratreTickets(self, *args, **kwargs):
+        print("migratreTickets")
+        for ticket in Ticket.objects.all():
+            print("ticket status: ", ticket.status)
+            if ticket.status == "EM_DIAS":
+                print("ticket status if 1: ", ticket.status)
+                ticket.status = ticket.STATUS_CRIACAO_PENDENTE
+            if ticket.status == "CREATED":
+                print("ticket status if 2: ", ticket.status)
+                ticket.status = ticket.STATUS_CRIADO
+            ticket.save()
+
+        return Response(data={}, status=st.HTTP_201_CREATED, content_type="application/json")
+    
     @action(methods=["POST"], detail=False, url_path="migrate-membro-execucao")
     def migratreMembroExecucao(self, *args, **kwargs):
         print("migratreMembroExecucao")

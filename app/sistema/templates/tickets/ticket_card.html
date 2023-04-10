@@ -1,17 +1,27 @@
 <style>
-    .created {
+    .nao_criado {
         /* green */
-        color: #28a745;
+        color: #FFA500 ;
     }
 
-    .in_progress {
+    .criado {
         /* amber */
-        color: #ffc107;
+        color: #32CD32 ;
     }
 
-    .late {
+    .criacao_atrasada {
         /* red */
-        color: #dc3545;
+        color: #FF4500 ;
+    }
+
+    .prestacao_pendente {
+        /* red */
+        color: #FFD700  ;
+    }
+
+    .conta_prestada {
+        /* red */
+        color: #008000;
     }
 
     .ticket-card-text {
@@ -65,15 +75,30 @@
             <!-- action  -->
             <div class="flex justify-content-start align-items-end ml-auto actions position-absolute bg-light"
             style="top: -70%; right: 0;">
+                {% if show_edit %}
                 <!-- editar btn -->
                 <button class="btn btn-sm btn-outline-primary ml-1" 
                 onclick="updateTicket('{{demanda.id}}', '{{model}}')">
                     <i class="fa-solid fa-edit"></i>
                 </button>
+                {% endif %}
+
+                {% if show_delete %}
                 <!-- deletar btn -->
                 <button id="ticket-card-delete-btn" class="btn btn-sm btn-outline-danger ml-1" >
                     <i class="fa-solid fa-trash"></i>
                 </button>
+                {% endif %}
+                <!-- concluded btn -->
+                {% if show_conclude %}
+                <button class="btn btn-sm btn-outline-success ml-1"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Concluir Prestação de Contas"
+                onclick="concludeTicket('{{demanda.id}}', '{{model}}')">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                {% endif %}
             </div>
         </div>
     </div>

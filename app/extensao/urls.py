@@ -70,6 +70,8 @@ router = routers.DefaultRouter()
 router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
 router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
+router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),
     path('token/refresh', TokenRefreshView.as_view()),

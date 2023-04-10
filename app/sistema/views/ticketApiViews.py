@@ -9,8 +9,9 @@ from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
-from ..serializers.ticketSerializer import TicketSerializer 
+from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer 
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 class TicketApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, JWTAuthentication]
@@ -71,7 +72,7 @@ class TicketApiView(APIView):
 
         ticketData = {
             "tipo": request.data.get("tipo"),
-            "status": "CREATED" if len(id_protocolo) > 0 else "EM_DIAS",
+            "status": Ticket().STATUS_CRIADO if len(id_protocolo) > 0 else Ticket().STATUS_CRIACAO_PENDENTE,
             "id_protocolo": id_protocolo, 
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
@@ -129,7 +130,7 @@ class TicketDetailApiView(APIView):
         if request.data.get("id_protocolo"):
             id_protocolo = request.data.get("id_protocolo")
             if len(id_protocolo) > 0:
-                ticket.status = "CREATED"
+                ticket.status = Ticket().STATUS_CRIADO
             ticket.id_protocolo = request.data.get("id_protocolo")
         if request.data.get("meta"):
             ticket.meta = request.data.get("meta")

@@ -1,6 +1,6 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
-from ..models.membroExecucao import MembroExecucao
+from ...models.membroExecucao import MembroExecucao
 from .dpEventoTicketSerializer import DpEventoTicketSerializer
 
 class MembroExecucaoTicketSerializer(serializers.ModelSerializer):

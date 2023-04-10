@@ -2,11 +2,15 @@ from django.db import models
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 class Ticket(models.Model):
-    STATUS_CREATED = "CREATED"
-    STATUS_ATRASADO = "ATRASADO"
-    STATUS_EM_DIAS = "EM_DIAS"
+    STATUS_CRIACAO_PENDENTE = "CRIACAO_PENDENTE"
+    STATUS_CRIADO = "CRIADO"
+    STATUS_ATRASADO_PARA_CRIACAO = "ATRASADO_PARA_CRIACAO"
+    STATUS_PRESTACAO_CONTAS_PENDENTE = "PENDING_PRESTACAO_CONTAS"
+    STATUS_PRESTACAO_CONTAS_CRIADA = "PRESTACAO_CONTAS_CREATED"
 
     TIPO_DIARIA = "diaria"
     TIPO_ADIANTAMENTO = "adiantamento"
@@ -39,6 +43,26 @@ class Ticket(models.Model):
     class Meta:
         db_table = 'tickets'
 
+    def calculate_status(self):
+        entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
+        today = timezone.now().date()
+
+        # faltando 7 dias para o inicio da ação de ensino ou evento e o ticket ainda não foi criado
+        if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
+            delta = entity.data_inicio.date() - today
+            days_until_event_start = delta.days
+            if days_until_event_start <= 7:
+                return self.STATUS_ATRASADO_PARA_CRIACAO
+
+        # demanda chegou ao fim e o ticket ainda esta no status de criado
+        if self.status == self.STATUS_CRIADO and self.data_fim:
+            two_days_later = self.data_fim + timedelta(days=2)
+            is_after = today > two_days_later
+            if is_after:
+                return self.STATUS_PRESTACAO_CONTAS_PENDENTE
+        
+        return self.status
+    
     @property
     def endereco_completo(self):
         enderecoCompleto = "" 
@@ -92,23 +116,32 @@ class Ticket(models.Model):
     
     @property
     def status_class(self):
-        if self.status == self.STATUS_CREATED:
-            return "created"
-        elif self.status == self.STATUS_ATRASADO:
-            return "late"
-        elif self.status == self.STATUS_EM_DIAS:
-            return "in_progress"    
+        if self.calculate_status() == self.STATUS_ATRASADO_PARA_CRIACAO:
+            return "criacao_atrasada"
+        elif self.calculate_status() == self.STATUS_PRESTACAO_CONTAS_PENDENTE:
+            return "prestacao_pendente"
+        elif self.status == self.STATUS_CRIACAO_PENDENTE:
+            return "nao_criado"
+        elif self.status == self.STATUS_CRIADO:
+            return "criado"
+        elif self.status == self.STATUS_PRESTACAO_CONTAS_CRIADA:
+            return "conta_prestada"    
         return ""
     
     @property
     def status_formatado(self):
-        if self.status == self.STATUS_CREATED:
-            return "demanda criada no protocolo"
-        elif self.status == self.STATUS_ATRASADO:
-            return "demanda em atraso"
-        elif self.status == self.STATUS_EM_DIAS:
+        print("calculando status", self.status)
+        if self.calculate_status() == self.STATUS_ATRASADO_PARA_CRIACAO:
+            return "Criação de demanda atrasada"
+        elif self.calculate_status()  == self.STATUS_PRESTACAO_CONTAS_PENDENTE:
+            return "prestação de contas atrasada"
+        elif self.status == self.STATUS_PRESTACAO_CONTAS_CRIADA:
+            return "Contas prestadas"
+        elif self.status == self.STATUS_CRIACAO_PENDENTE:
             return "demanda não criada no protocolo"    
-        return ""
+        elif self.status == self.STATUS_CRIADO:
+            return "demanda criada no protocolo"
+        return "Status não identificado"
 
     @property
     def data_inicio_formatada(self):

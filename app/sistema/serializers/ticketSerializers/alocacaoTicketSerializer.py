@@ -1,25 +1,26 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
-from ..models.dpEvento import DpEvento
+from ...models.alocacao import Alocacao
+from ...serializers.ensinoSerializer import EnsinoSerializer
 
-class DpEventoTicketSerializer(serializers.ModelSerializer):
+class AlocacaoTicketSerializer(serializers.ModelSerializer):
     endereco_completo = serializers.CharField(read_only=True)
     data_inicio_formatada = serializers.CharField(read_only=True)
     data_fim_formatada = serializers.CharField(read_only=True)
-    tipo_formatado = serializers.CharField(read_only=True)
-    
+    acaoEnsino = EnsinoSerializer(many=False, read_only=True)
+
     class Meta:
-        model = DpEvento
+        model = Alocacao
         fields = [
             "id",
-            "tipo",
-            "status",
+            "acaoEnsino",
+            "professor",
             "data_inicio",
             "data_fim",
-            "cidade",
-            "endereco_completo",
             "data_inicio_formatada",
             "data_fim_formatada",
-            "tipo_formatado",
+            "endereco_completo",
+            "status",
+            "cidade",
         ]
-        depth = 5
+        depth = 2
