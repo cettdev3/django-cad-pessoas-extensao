@@ -109,9 +109,14 @@ class MembroExecucaoApiView(APIView):
                         
                     nsa_data_fim = ticket.get("nsa_data_fim") == 'on' or True
                     nsa_data_inicio = ticket.get("nsa_data_inicio") == 'on' or True
+                    ticketStatus = ticket.get("status") if ticket.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
+                    id_protocolo = ticket.get("id_protocolo")
+                    if len(id_protocolo) > 0:
+                        ticketStatus = Ticket().STATUS_CRIADO
+
                     ticketData = {
                         "tipo": ticket.get("tipo"),
-                        "status": "EM_DIAS",
+                        "status": ticketStatus,
                         "id_protocolo": ticket.get("id_protocolo"),
                         "membro_execucao": membroExecucao,
                         "data_inicio": ticket.get("data_inicio") if ticket.get("data_inicio") else None,
