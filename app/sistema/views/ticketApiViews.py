@@ -1,6 +1,6 @@
 from datetime import datetime
 from rest_framework.views import APIView
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, CharField
 from rest_framework.response import Response
 from rest_framework import status as st, viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -23,9 +23,37 @@ class TicketApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        ticket = Ticket.objects.select_related("membro_execucao", "alocacao").all()
-        serializer = TicketSerializer(ticket, many=True)
-        return Response(serializer.data, status=st.HTTP_200_OK)
+        status = request.GET.get("status")
+        favorecido = request.GET.get("favorecido")
+        escola = request.GET.get("escola")
+        order_by = request.GET.get("order_by")
+
+        tickets = Ticket.objects.select_related("membro_execucao", "alocacao")
+        if favorecido:
+            tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido))
+        if escola:
+            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola))
+        
+        if order_by and order_by == "favorecido":
+            tickets = tickets.annotate(
+                pessoa_name=Case(
+                    When(alocacao__isnull=False, then='alocacao__professor__nome'),
+                    When(membro_execucao__isnull=False, then='membro_execucao__pessoa__nome'),
+                    default=Value(''),
+                    output_field=CharField(),
+                ),
+            ).order_by(order_by)
+
+        tickets = tickets.all()
+        serializer = TicketSerializer(tickets, many=True)
+        serialized_data = serializer.data
+
+        if status:
+            serialized_data = [item for item in serializer.data if item['status_calculado'] == status]
+        if order_by and order_by == "status":
+            serialized_data = sorted(serialized_data, key=lambda k: k['status_calculado'])
+        
+        return Response(serialized_data, status=st.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         membro_execucao = None
@@ -46,10 +74,6 @@ class TicketApiView(APIView):
                     {"res": "Não existe alocação com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
-        
-        print("model: ", model)
-        print("membro_execucao: ", membro_execucao)
-        print("alocacao: ", alocacao)
             
         cidade = None
         if request.data.get("cidade_id"):

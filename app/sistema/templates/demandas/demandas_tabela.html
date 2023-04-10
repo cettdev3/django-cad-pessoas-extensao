@@ -18,23 +18,25 @@ cellspacing="0">
                     <span class="column-label ml-1">Favorecido</span>
                 </div>
             </th>
+            <th class="text-left">
+                <span class="column-label ml-1">Evento/Ação de Ensino</span>
+            </th>
+            <th class="text-left">Escola</th>
             <th class="text-left clickable-column" 
-            id="column-demanda-data_inicio" data-toggle="tooltip"
+            id="column-demanda-status" data-toggle="tooltip"
             data-placement="top" onclick="orderTableBy(
                 this,
-                'evento_ensino', 
+                'status', 
                 'filterDemandaOrderBy',
                 (state) => carregarDemandas(getDemandaFilters(), state)
             )" 
-            title="Ordenar por Data de início">
+            title="Ordenar por Status">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
-                    <span class="column-label ml-1">Evento/Ação de Ensino</span>
+                    <span class="column-label ml-1">Demanda</span>
                 </div>
             </th>
-            <th class="text-left">Escola</th>
-            <th class="text-left">Demanda</th>
         </tr>
     </thead>
     <tbody>

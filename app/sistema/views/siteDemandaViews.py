@@ -36,8 +36,18 @@ def gerencia_demandas(request):
 def demandas_tabela(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = {}
-    response = requests.get('http://localhost:8000/tickets', json=body, headers=headers)
+    status = request.GET.get('status')
+    favorecido = request.GET.get('favorecido')
+    escola = request.GET.get('escola')
+    order_by = request.GET.get('order_by')
+
+    response = requests.get('http://localhost:8000/tickets', 
+    headers=headers, params={
+        'status':status,
+        'favorecido':favorecido,
+        'escola':escola,
+        'order_by':order_by
+    })
     demandas = json.loads(response.content)
     return render(request,'demandas/demandas_tabela.html',
     {'demandas':demandas})

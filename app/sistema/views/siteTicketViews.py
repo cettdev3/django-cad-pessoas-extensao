@@ -43,8 +43,6 @@ def ticketModal(request):
     return render(request,'tickets/ticket_modal.html',data)
 
 def ticketModalEdit(request, ticket_id):
-    print("ticket_form")
-    print(request.GET)
     layout = request.GET.get('layout')
     data = {}
     model = request.GET.get('model')
