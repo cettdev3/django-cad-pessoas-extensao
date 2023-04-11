@@ -21,9 +21,9 @@ services:
       context: .
       dockerfile: ./Dockerfile
       args:
-        - USER_NAME=${APP_USER_NAME}
-        - GID=${APP_UID}
-        - UID=${APP_GID}
+        - APP_USER_NAME=${APP_USER_NAME}
+        - APP_GID=${APP_UID}
+        - APP_UID=${APP_GID}
     labels:
       - "traefik.enable=true"
       - "traefik.constraint-label-stack=cad-pessoas-extensao"
@@ -77,9 +77,9 @@ services:
       context: .
       dockerfile: ./Dockerfile
       args:
-        - USER_NAME=${APP_USER_NAME}
-        - GID=${APP_UID}
-        - UID=${APP_GID}
+        - APP_USER_NAME=${APP_USER_NAME}
+        - APP_GID=${APP_UID}
+        - APP_UID=${APP_GID}
     container_name: celery
     command: celery -A extensao worker --loglevel=INFO
     volumes:
