@@ -7,34 +7,37 @@
         width: 25%;
     }
 
-    .membro-execucao-w-15 {
-        width: 15%;
+    .membro-execucao-w-25 {
+        width: 25%;
     }
     
-    .membro-execucao-w-30 {
-        width: 30%;
+    .membro-execucao-w-70 {
+        width: 70%;
+    }
+
+    .membro-execucao-w-100 {
+        width: 100%;
     }
 </style>
 <table class="table table-borderless" width="100%" cellspacing="0">
     <thead class="border">
         <tr class="">
             <th class="membro-execucao-w-30 text-left">Pessoa</th>
-            <th class="membro-execucao-w-25 text-left">Data de Inicio</th>
-            <th class="membro-execucao-w-25 text-left">Data de Fim</th>
-            <th class="membro-execucao-w-20 text-left">Tipo</th>
+            <th class="membro-execucao-w-25 text-left">Demandas</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
     <tbody>
         {% for membroExecucao in membros_execucao %}
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.pessoa.nome}} 
-            {% if membroExecucao.avaliador %}
-            - <strong>Avaliador</strong>
-            {% endif %}
+        <td class="membro-execucao-w-25 text-left">{{membroExecucao.pessoa.nome}} 
         </td>
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_inicio|date:"d-m-Y"}}</td>
-        <td class="membro-execucao-w-15 text-left">{{membroExecucao.data_fim|date:"d-m-Y"}}</td>
-        <td class="membro-execucao-w-25 text-left">{{membroExecucao.tipo}}</td>
+        <td class="membro-execucao-w-70 text-left">
+            <div class="membro-execucao-w-100 d-flex flex-wrap">
+                {% for demanda in membroExecucao.ticket_set %}
+                    {% include "tickets/ticket_card.html" with ticket=demanda model='membro_execucao' show_delete=True show_edit=True show_conclude=False %}
+                {% endfor %}
+            </div>
+        </td>
         <td class="w-5 text-left" style="position: relative;">
             <button id="buttonMenuMembroExecucao{{membroExecucao.id}}" class="btn-circle">
                 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -42,6 +45,7 @@
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuMembroExecucao{{membroExecucao.id}}"
                 class="btn-group-custom">
                 <button onclick="carregarMembroExecucaoModalCadastrar('{{membroExecucao.id}}')">Editar</button>
+                <button onclick="criarTicket('{{membroExecucao.id}}')">Adicionar Demanda</button>
                 <button onclick="openDeleteModal(() => deleteMembroExecucao('{{membroExecucao.id}}'))">Excluir</button>
             </div>
         </td>
@@ -63,6 +67,30 @@
             }
         });
     }
+
+    function criarTicket(membro_execucao_id) {
+        $.ajax({
+            url: "/ticketModal",
+            data: { 
+                membro_execucao_id: membro_execucao_id, 
+                model: "membro_execucao",
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
+            }
+        });
+    }
+
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarMembrosExecucao()
+    }
+
 
     $(document).ready(function () {
         $(document).mouseup(function (e) {

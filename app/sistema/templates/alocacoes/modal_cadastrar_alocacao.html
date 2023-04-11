@@ -85,7 +85,7 @@
                                 <input 
                                 type="text" 
                                 {% if alocacao %}
-                                value="{{ alocacao.logradouro}}" 
+                                value="{{ alocacao.logradouro|default_if_none:""}}" 
                                 {% endif %}
                                 class="form-control" 
                                 id="logradouro-{{pessoa.id}}"
@@ -96,7 +96,7 @@
                                 <input 
                                 type="text" 
                                 {% if alocacao %}
-                                value="{{ alocacao.bairro}}" 
+                                value="{{ alocacao.bairro|default_if_none:""}}" 
                                 {% endif %}
                                 class="form-control" 
                                 id="bairro-{{pessoa.id}}"
@@ -107,7 +107,7 @@
                                 <input 
                                 type="text" 
                                 {% if alocacao %}
-                                value="{{ alocacao.complemento}}" 
+                                value="{{ alocacao.complemento|default_if_none:""}}" 
                                 {% endif %} 
                                 class="form-control" 
                                 id="complemento-{{pessoa.id}}"
@@ -118,7 +118,7 @@
                                 <input 
                                 type="text"
                                 {% if alocacao %}
-                                value="{{ alocacao.cep}}" 
+                                value="{{ alocacao.cep|default_if_none:""}}" 
                                 {% endif %} 
                                 class="form-control" 
                                 id="cep-{{pessoa.id}}"

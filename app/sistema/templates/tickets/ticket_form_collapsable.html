@@ -1,0 +1,59 @@
+<style>
+    .btn-delete {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        background-color: white;
+    }
+
+    .btn-delete i {
+        font-size: 18px;
+        color: #dc3545;
+    }
+    
+    .btn-delete:hover i {
+        font-size: 18px;
+        color: white;
+    }
+</style>
+<div class="accordion" id="ticket-form-container-{{form_id}}">
+  <div class="card">
+    <div class="card-header" 
+    data-toggle="collapse"
+    data-target="#form-section-{{form_id}}" 
+    aria-expanded="false"
+    aria-controls="form-section-{{form_id}}"
+    style="cursor: pointer">
+        <div class="d-flex justify-content-start align-items-center">
+            <button 
+            type="button" 
+            class="btn btn-danger btn-delete" 
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Excluir ticket"
+            onclick="deleteTicketForm('{{form_id}}')">
+                <i class="fas fa-trash"></i>
+            </button>
+            <h5 class="mb-0 ml-2" id="form-title"></h5>
+        </div>
+    </div>
+
+    <div id="form-section-{{form_id}}" class="collapse show" aria-labelledby="heading-1" data-parent=".accordion">
+      <div class="card-body">
+        {% include 'tickets/ticket_form.html' with evento=evento form_id=form_id %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#ticket-form-container-{{form_id}} #tipo_solicitacao').change(function() {
+            console.log("change")
+            var selectedOption = $(this).find('option:selected');
+            var title = selectedOption.text().trim();
+            console.log(title)
+            $('#ticket-form-container-{{form_id}} #form-title').html(title);
+        });
+    });
+</script>

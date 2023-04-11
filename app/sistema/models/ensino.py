@@ -9,6 +9,10 @@ class Ensino(models.Model):
     STATUS_FINALIZADO = "finalizado"
     STATUS_ADIADO = "adiado"
     STATUS_CANCELADO = "cancelado"
+
+    EMPRESTIMO = 'emprestimo'
+    OUTROS = 'outros'
+    GPS = 'GPS'
     
     STATUS_COLORS = {
         STATUS_PLANNEJADO: "evt-status-blue",
@@ -65,10 +69,20 @@ class Ensino(models.Model):
     
     @property
     def data_inicio_formatada(self):
-        if not self.data_inicio: return None
+        if not self.data_inicio: return "Data de início não definida"
         return self.data_inicio.date()
     
     @property
     def data_fim_formatada(self):
-        if not self.data_fim: return None
+        if not self.data_fim: return "Data de fim não definida"
         return self.data_fim.date()
+
+    @property
+    def tipo_formatado(self):
+        if self.tipo == self.EMPRESTIMO:
+            return "Empréstimo"
+        elif self.tipo == self.OUTROS:
+            return "Outros"
+        elif self.tipo == self.GPS:
+            return "GPS"
+        return "Não definido"

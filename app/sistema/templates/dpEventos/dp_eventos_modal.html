@@ -130,9 +130,9 @@
             <ul class="nav nav-tabs row" style="height: 100%;">
                 <li id="dpEventoTabs1" class="col mx-2 active-dpEvento-form-tab ">
                     <a id="dpEventosTabLink1" data-toggle="tab" style="display: none;" role="tab" href="#home">1</a>
-                    <span>1 Dados Gerais</span>
+                    {% comment %} <span>1 Dados Gerais</span> {% endcomment %}
                 </li>
-                {% if not dpEvento %}
+                {% comment %} {% if not dpEvento %}
                 <li id="dpEventoTabs2" class="col mx-2">
                     <a id="dpEventosTabLink2" data-toggle="tab" style="display: none;" role="tab" href="#pessoas">2</a>
                     <span>2 Equipe de Execução</span>
@@ -141,7 +141,7 @@
                     <a id="dpEventosTabLink3" data-toggle="tab" style="display: none;" role="tab" href="#itinerarios">3</a>
                     <span>3 Itinerários</span>
                 </li>
-                {% endif %}
+                {% endif %} {% endcomment %}
             </ul>
         </div>
     </div>

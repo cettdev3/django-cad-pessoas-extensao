@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="width: 100%;" class="">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-dismissible alert-success" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong class="text-dark">{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="w-100 shadow
+    d-flex justify-content-between align-items-center 
+    px-3 py-3 my-3
+    bg-white">
+        <div class="d-flex justify-content-start align-items-center ">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDemandaFavorecido" class="filter-label">Favorecido</label>
+                <input id="filterDemandaFavorecido" class="form-control-sm border-secondary" name="favorecido"
+                    type="text">
+            </div>
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDemandaEscola" class="filter-label">Escola</label>
+                <input id="filterDemandaEscola" class="form-control-sm border-secondary"
+                name="escola" type="text">
+            </div>
+            <input type="text" hidden id="filterDemandaStatus" name="order_by">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterDemandaStatus" class="filter-label">Status</label>
+                <select name="status" id="filterDemandaStatus" class="form-control-sm border-secondary">
+                    <option value="">Selecione uma opção</option>
+                    <option value="CRIACAO_PENDENTE">CRIACãO PENDENTE</option>
+                    <option value="CRIADO">CRIADO</option>
+                    <option value="ATRASADO_PARA_CRIACAO">ATRASADO PARA CRIACAO</option>
+                    <option value="PENDING_PRESTACAO_CONTAS">PRESTACAO DE CONTAS PENDENTE</option>
+                    <option value="PRESTACAO_CONTAS_CREATED">PRESTADO CONTAS</option>
+                </select>
+            </div>
+            <input type="text" name="order_by" id="filterDemandaOrderBy" hidden>
+        </div>
+        <div class="d-flex">
+
+        </div>
+    </div>
+
+    <div class="w-100" id="demandasTable">
+    </div>
+
+</div>
+<script>
+    function getDemandaFilters() {
+        let filtros = {}
+        $("*[id^='filterDemanda']").each(function () {
+            console.log($(this).attr("name"))
+
+            if ($(this).val()) {
+                filtros[$(this).attr("name")] = $(this).val()
+            }
+        })
+        return filtros
+    }
+    
+    function carregarDemandas(filters= null, state = null) {
+        $.ajax({
+            url: "/demandas_tabela",
+            type: "GET",
+            data: filters,
+            success: function (data) {
+                $("#demandasTable").html(data);
+                setTabelaState(state, 'column-demanda', "-tipo")
+            }
+        });
+    }
+
+    function startFilterControl() {
+        $("*[id^='filterDemanda']").each(function () {
+            let input = $(this)
+            console.log(input.attr('id'))
+            if ($(this).attr('type') == 'text') {
+                $(this)
+                .keyup(debounce(function() {
+                    carregarDemandas(getDemandaFilters())
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    carregarDemandas(getDemandaFilters())
+                }, 500))
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        carregarDemandas()
+        startFilterControl()
+    })
+</script>
+{% endblock content %}

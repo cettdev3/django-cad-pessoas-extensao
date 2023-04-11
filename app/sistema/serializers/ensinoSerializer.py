@@ -11,7 +11,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
     data_fim = serializers.DateTimeField(format='%Y-%m-%dT%H:%M')
     data_inicio_formatada = serializers.DateField(format='%d/%m/%Y')
     data_fim_formatada = serializers.DateField(format='%d/%m/%Y')
-
+    tipo_formatado = serializers.CharField(read_only=True)
     class Meta:
         model = Ensino
         fields = [
@@ -32,6 +32,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "escola",
             "data_inicio_formatada",
             "data_fim_formatada",
+            "tipo_formatado",
         ]
         depth = 2
         

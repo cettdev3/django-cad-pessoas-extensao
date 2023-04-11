@@ -38,6 +38,11 @@
                         MUTIRÃO
                     </option>
                     <option 
+                    {% if dpEvento and dpEvento.tipo == "recicla_goias" %} selected {% endif %} 
+                    value="recicla_goias">
+                        RECICLA GOIÁS
+                    </option>
+                    <option 
                     {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
                     value="outro">
                         OUTRO

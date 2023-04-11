@@ -32,15 +32,20 @@
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
-
-    <!-- LEAFLET MAP -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" /> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
         integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- LEAFLET MAP -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+   
+
+    <!-- TABLE STYLE -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/table.css' %}">
+
     <style>
         #accordionSidebar::-webkit-scrollbar {
             width: 0.2em;
@@ -58,8 +63,12 @@
 </head>
 
 <body id="page-top">
-
     <!-- Page Wrapper -->
+    <div id="success-delete" 
+    class="alert alert-success position-absolute"
+    style="top: 0; right: 0; z-index: 9999; display: none;">
+        <strong id="message-box">Deletado com sucesso!</strong>
+    </div>
     <div id="wrapper">
 
         <!-- Sidebar -->
@@ -122,15 +131,20 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Tipos de Atividades</span></a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link" href="/gerencia_acoes">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Ações</span></a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link" href="/gerencia_dp_eventos">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Eventos</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/gerencia_demandas">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Demandas</span></a>
             </li>
             {% endif %}
 
@@ -177,14 +191,14 @@
 
             <!-- Content Wrapper -->
             <div id="content-wrapper" class="d-flex flex-column">
-
+                
                 <!-- Main Content -->
                 <div id="content">
 
                     <!-- Begin Page Content -->
-                    <div class="w-100" style="min-height: 100vh;">
-
+                    <div class="w-100" style="min-height: 100vh; position: relative">
                         {% block content %}
+                        
 
                         {% endblock content %}
                     </div>
@@ -198,6 +212,7 @@
         </div>
 
     </div>
+    <div id="modalTicketContainer"></div>
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
@@ -220,7 +235,10 @@
     <script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
 
+    <!-- Custom static js -->
     <script src="{% static 'js/gestao-pessoas.js' %}"></script>
+    <script src="{% static 'js/table.js' %}"></script>
+
     <!-- Page level custom scripts -->
     <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
 
@@ -236,9 +254,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
         integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script type="text/javascript" src="{% static 'js/ticket.js' %}"></script>
 
     <script type="text/javascript">
+        function showFloatingMessage(message, style) {
+            $("#success-delete").removeClass("alert-success");
+            $("#success-delete").removeClass("alert-danger");
+            $("#success-delete").addClass(style);
+            $("#success-delete #message-box").html(message);
+
+            $("#success-delete").show();   
+            setTimeout(function() {
+                $("#success-delete").hide();
+            }, 2000);     
+        }
+
         function maskValues() {
             $('#telefone').mask("(00)0 0000-0000");
             $('#telefone_recado').mask("(00)0 0000-0000");
@@ -265,7 +295,6 @@
         }
 
         function getDropdownSelectedValues(dropDownId) {
-            console.log("teste 123")
             let dropdown = $("#"+dropDownId+" .select-dropdown-content");
             let items = dropdown.children();
             let selectedValues = [];
@@ -292,14 +321,12 @@
 
         function setTabelaState(state, column = "column-pessoa", defaultOrder = "nome") {
             if (state) {
-                console.log("state", state)
                 let orderClass = state.direction == 1 ? "order-by-up" : "order-by-down"
                 $("#" + state.column).addClass(orderClass)
                 $("#" + state.column).find("i").each(function () {
                     $(this).addClass("current-order-by")
                 })
                 $("#" + state.column).find("span").each(function () {
-                    console.log($(this))
                     $(this).addClass("current-order-by")
                 })
                 $("*[id^='" + column + "-']").each(function (i, th) {
@@ -311,12 +338,10 @@
                 $("*[id^='" + column + "-']").each(function (i, th) {
                     if ($(this).attr("id") == "" + column + "-" + defaultOrder) {
                         $(this).addClass("order-by-up")
-                        console.log($(this).find("i"))
                         $(this).find("i").each(function () {
                             $(this).addClass("current-order-by")
                         })
                         $(this).find("span").each(function () {
-                            console.log($(this))
                             $(this).addClass("current-order-by")
                         })
                     } else {

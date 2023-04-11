@@ -17,7 +17,7 @@ from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
-from sistema.views.ticketApiViews import TicketApiView
+from sistema.views.ticketApiViews import TicketApiView, TicketViewSets
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
 from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
@@ -44,8 +44,8 @@ from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, ac
 from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal, filterMultipleSelect
-from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect
-from sistema.views.siteTicketViews import ticketModal, saveTicket
+from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
+from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, eliminarTicket, ticketModalEdit, editarTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
@@ -53,6 +53,7 @@ from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividades
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteUserViews import usersSelect
+from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
@@ -60,12 +61,18 @@ from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, Itinerar
 from sistema.views.tipoAtividadeApiViews import TipoAtividadeApiView, TipoAtividadeDetailApiView
 from sistema.views.atividadeApiViews import AtividadeApiView, AtividadeDetailApiView
 from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
+from sistema.views.migrationsApiView import MigrationsViewSets
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
 from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
+router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
+router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
+router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
+
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),
     path('token/refresh', TokenRefreshView.as_view()),
@@ -134,6 +141,10 @@ urlpatterns = [
     path("saveEscola",saveEscola),
     path("editarEscola/<escola_id>",editarEscola),
     path("escolasSelect",escolasSelect),
+    
+    # ROTAS PARA DEMANDAS
+    path("gerencia_demandas",gerencia_demandas),
+    path("demandas_tabela",demandas_tabela),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
@@ -204,6 +215,7 @@ urlpatterns = [
     path("membrosExecucaoSelect",membrosExecucaoSelect),
     path("editarMembroExecucao/<codigo>",editarMembroExecucao),
     path("eliminarMembroExecucao/<codigo>",eliminarMembroExecucao),
+    path("membroExecucaoDemandasModal/<membro_execucao_id>",membroExecucaoDemandasModal),
 
     # ROTAS PARA ACOES
     path("gerencia_acoes",gerencia_acoes),
@@ -230,7 +242,11 @@ urlpatterns = [
    
     # ROTAS PARA TICKETS
     path("ticketModal",ticketModal),
+    path("ticketModalEdit/<ticket_id>",ticketModalEdit),
     path("saveTicket",saveTicket),
+    path("editarTicket/<ticket_id>",editarTicket),
+    path("ticket_form",ticket_form),
+    path("eliminarTicket/<ticket_id>",eliminarTicket),
     
     # ROTAS PARA SERVICOS
     path("ServicoModalCadastrar",ServicoModalCadastrar),
