@@ -1,0 +1,140 @@
+<div class="modal fade" id="cadastrarServicoContratadoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarServicoContratadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarServicoContratadoModalLabel">
+                    {% if servicoContratado is None %}
+                        Cadastrar Serviço
+                    {% else %}
+                        Editar Serviço
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarServicoContratado" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <ul class="nav nav-tabs row">
+                        <li id="servicoContratadoList1" class="col py-2 active-form-tab">
+                            <a id="servicoContratadoLink1" 
+                            style="display: none;" 
+                            href="#home">1</a>
+                            <span>Dados Gerais</span>
+                        </li>
+                    </ul>
+                    <form id="cadastrarServicoContratadoForm" action="/" method="POST">
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <input type="text" 
+                                {% if servicoContratado %}
+                                    value="{{servicoContratado.id}}"
+                                {% endif %}
+                                name="servico_contratado_id" 
+                                id="servico_contratado_id"
+                                hidden>
+                                <div class="form-group row">
+                                    <div class="col-sm-12">
+                                        <label><b>Descriçao:</b></label>
+                                        <textarea
+                                        class="form-control"
+                                        name="descricao"
+                                        placeholder="Digite uma descrição do serviço a ser contratado..."
+                                        id="descricao"
+                                        rows="2">{% if servicoContratado %}{{servicoContratado.descricao}}{% endif %}</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <label><b>Valor Pago pelo Serviço:</b></label>
+                                        <input type="number"
+                                        step="0.01" 
+                                        {% if servicoContratado %}
+                                            value="{{servicoContratado.valor}}"
+                                        {% endif %}
+                                        name="valor" 
+                                        id="valor"
+                                        class="form-control">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label><b>Data Limite Para Solicitação:</b></label>
+                                        <input type="date" 
+                                        {% if servicoContratado %}
+                                            value="{{servicoContratado.data_limite}}"
+                                        {% endif %}
+                                        name="data_limite" 
+                                        id="data_limite"
+                                        class="form-control">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                onclick="saveServicoContratado({{servicoContratado.id}})" 
+                id="finishCadastroServicoContratado" 
+                type="button"
+                class="btn btn-primary">
+                {% if servicoContratado %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    formId = "cadastrarServicoContratadoForm"
+    dismissCadastrarServicoContratadoId = "dismissCadastrarServicoContratado"
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        $("#"+dismissCadastrarServicoContratadoId).click()
+        carregarServicosContratados()
+    }
+
+    function saveServicoContratado(servico_contratado_id) {
+        const formData = JSON.stringify({
+            servico_contratado_id: servico_contratado_id, 
+            ...getFormData()
+        })
+        $.ajax({
+            url: "/saveServicoContratado",
+            data: formData,
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#'+formId)
+        var unindexed_array = form.serializeArray();
+        var values = {};
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        return values
+    }
+
+    $(document).ready(function () {
+    });
+</script>
