@@ -48,7 +48,7 @@ class Ticket(models.Model):
         today = timezone.now().date()
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
             data_inicio_evento_date = entity.data_inicio.fromisoformat(self.data_fim) if isinstance(entity.data_inicio, str) else entity.data_inicio
-            delta = data_inicio_evento_date - today
+            delta = data_inicio_evento_date.date() - today if isinstance(data_inicio_evento_date, datetime) else data_inicio_evento_date - today
             days_until_event_start = delta.days
             if days_until_event_start <= 7:
                 return self.STATUS_ATRASADO_PARA_CRIACAO

@@ -1,115 +1,87 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-success">Dados do Cadastrado | Usuário Camunda: {{pessoa.user_camunda}}</h6>
-    </div>
-    <div class="card-body">
-        <form class="user">
-            <div class="form-group row">
-                <div class="col-sm-2">
-                    <label><b>Nome Completo:</b></label><br>
-                    {{pessoa.nome}}
-                </div>
-                <div class="col-sm-2">
-                    <label><b>Email:</b></label><br>
-                    {{pessoa.email}}
-                   
-                </div>
-                <div class="col-sm-2">
-                    <label><b>Data de Nascimento:</b></label><br>
-                    {{pessoa.data_nascimento}}
-                    
-                </div>
-                <div class="col-sm-2">
-                    <label><b>Telefone:</b></label><br>
-                    {{pessoa.telefone}}
-                </div>
-
-                <div class="col-sm-2">
-                    <label><b>CPF:</b></label><br>
-                    {{pessoa.cpf}}
-                </div>
-
-                <div class="col-sm-2">
-                    <label><b>RG:</b></label><br>
-                    {{pessoa.rg}}
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="form-group row">
-                <div class="col-sm-2">
-                    <label><b>Órgão Emissor:</b></label><br>
-                    {{pessoa.orgao_emissor}}
-                </div>
-                <div class="col-sm-2">
-                    <label><b>Endereço:</b></label><br>
-                    {{pessoa.endereco}}
-                </div>
-
-                <div class="col-sm-2">
-                    <label><b>CEP:</b></label><br>
-                    {{pessoa.cep}}
-                </div>
-                
-                <div class="col-sm-2">
-                    <label><b>Cargo:</b></label><br>
-                    {{pessoa.cargo}}
-                </div>
-
-                <div class="col-sm-2">
-                    <label><b>Tipo:</b></label><br>
-                    {{pessoa.tipo}}
-                </div>
-
-                <div class="col-sm-2">
-                    <label><b>Contratações:</b></label><br>
-                    {{pessoa.qtd_contratacoes}}
-                </div>
-
-            </div>
-            <div class="form-group row">
-
-            </div>
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-success">Informações Financeiras</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-group row">
-                        <div class="col-sm-2">
-                            <label><b>Banco:</b></label><br>
-                            {{pessoa.banco}}
-                        </div>
-
-                        <div class="col-sm-2">
-                            <label><b>Tipo:</b></label><br>
-                            {{pessoa.agencia}}
-                        </div>
-                        
-                        <div class="col-sm-2">
-                            <label><b>Conta:</b></label><br>
-                            {{pessoa.conta}}
-                        </div>
-                        
-                        <div class="col-sm-2">
-                            <label><b>Pix:</b></label><br>
-                            {{pessoa.pix}}
-                        </div>
-                      
-                    </div>
-                </div>
-            </div>
-            <a href="/gerenciar-pessoas" class="btn btn-success btn-user btn-block" >VOLTAR</a>
- 
-        </form>
-
+<style>
+    .cs-tab-link{
+        color: gray;
+        padding: 8px;
+    }
     
+    .cs-tab-link .active {
+        background-color: #0c504b;
+        border-radius: 5px 5px 0px 0px;
+        padding: 8px 12px;
+        color: white;
+    }
+    
+    .cs-tab-link a{
+        text-decoration: none;
+        color: gray;
+    }
+
+    .cs-tab-link a:hover{
+        text-decoration: none;
+    }
+</style>
+<div class="card shadow mb-4 w-100">
+    <input type="text" name="order_by" id="filterAlocacaoOrderBy" hidden>
+    <div class="d-flex justify-content-between pt-3 px-2">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-location-dot "></i>
+                <span class="ml-2"><strong>{{pessoa.nome}}  </strong></span>
+            </div>
+            <div class="d-flex align-items-center ">
+                <i class="fa-solid fa-address-book"></i>
+                <span class="ml-2">{{pessoa.email}}</span>
+                <span class="ml-2">{{pessoa.telefone}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body w-100">
+        <ul class="nav nav-tabs w-100">
+            <li class=" cs-tab-link active">
+                <a id="linkAlocacoes" data-toggle="tab" href="#alocacoes">Alocações</a>
+            </li>
+        </ul>
+        <div class="tab-content w-100">
+            <div id="alocacoes" class="tab-pane active in">
+                <div id="receberTabelaAlocacoes"></div>
+            </div>
+        </div>
     </div>
 </div>
+<script>
+    let pessoaId = "{% if pessoa %}{{pessoa.id}}{% endif %}"
+    
+    function clearModalFormTicket() {
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        carregarAlocacoes()
+    }
 
+    function carregarAlocacoes(filters = null, state = null) {
+        $.ajax({
+            url: "/alocacoesTable",
+            contentType: 'application/json',
+            data: {
+                pessoa_id: pessoaId, 
+                show_column_professor: false,
+                show_column_escola: true, 
+                ...filters
+            },
+            success: function (data) {
+                $("#receberTabelaAlocacoes").html(data);
+                setTabelaState(state, 'column-alocacao', 'pessoa__nome')
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $("#linkAlocacoes").trigger("click")
+        carregarAlocacoes()
+    })
+</script>
 {% endblock content %}
