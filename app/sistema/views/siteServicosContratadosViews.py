@@ -47,19 +47,12 @@ def servicoContratadoTable(request):
 
 @login_required(login_url='/auth-user/login-user')
 def saveServicoContratado(request):
-    try:
-        print(request.body)
-        payload = json.loads(request.body)
-
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 400, 'message': 'Invalid JSON payload'})
-
+    payload = json.loads(request.body)
     servico_contratado_id = payload.pop('servico_contratado_id', None)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/servicos-contratados/' + str(servico_contratado_id) if servico_contratado_id else 'http://localhost:8000/servicos-contratados'
     body = payload
-    print("servico_contratado_id", servico_contratado_id)
     response = None
     if servico_contratado_id:
         response = requests.put(url,json=body,headers=headers)

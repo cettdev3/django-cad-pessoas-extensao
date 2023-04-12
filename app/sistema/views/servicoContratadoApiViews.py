@@ -19,19 +19,20 @@ class ServicoContratadoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print("dentro da rota de servicos contratados", request.data)
+        valor = request.data.get("valor")
+        if valor:
+            valor = float(valor)
+        else:
+            valor = None
+            
         data = {
             "descricao": request.data.get("descricao"),
-            "valor": request.data.get("valor"),
-            "data_limite": request.data.get("data_limite"),
+            "valor": valor,
+            "data_limite": request.data.get("data_limite") if request.data.get("data_limite") else None,
         }
-        
-        serializer = ServicoContratadoSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            print("dados salvos com sucesso", serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        servicoContratado = ServicoContratado.objects.create(**data)
+        serializer = ServicoContratadoSerializer(servicoContratado)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ServicoContratadoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
