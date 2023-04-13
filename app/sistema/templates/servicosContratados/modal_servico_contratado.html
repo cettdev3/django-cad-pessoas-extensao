@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="cadastrarServicoContratadoModalLabel">
-                    {% if servicoContratado is None %}
+                    {% if not servicoContratado.id %}
                         Cadastrar Serviço
                     {% else %}
                         Editar Serviço
@@ -29,6 +29,12 @@
                         </li>
                     </ul>
                     <form id="cadastrarServicoContratadoForm" action="/" method="POST">
+                        <input type="text" 
+                        value="{{dp_evento_id}}"
+                        name="dp_evento_id"
+                        id="dp_evento_id"
+                        hidden>
+
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 <input type="text" 

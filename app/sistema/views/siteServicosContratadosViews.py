@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 @login_required(login_url='/auth-user/login-user')
 def servicoContratadoModal(request):
     servico_contratado_id = request.GET.get('servico_contratado_id')
+    dp_evento_id = request.GET.get('dp_evento_id')
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/servicos-contratados/' + str(servico_contratado_id) if servico_contratado_id else 'http://localhost:8000/servicos-contratados'
@@ -24,7 +25,7 @@ def servicoContratadoModal(request):
     return render(
         request,
         'servicosContratados/modal_servico_contratado.html',
-        {'servicoContratado':servicoContratado}
+        {'servicoContratado':servicoContratado, 'dp_evento_id':dp_evento_id}
     )
 
 @login_required(login_url='/auth-user/login-user')
@@ -34,7 +35,9 @@ def servicoContratadoTable(request):
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get(
         'http://localhost:8000/servicos-contratados', 
-        params={}, 
+        params={
+            'dp_evento_id': dp_evento_id
+        }, 
         headers=headers
     )
 
