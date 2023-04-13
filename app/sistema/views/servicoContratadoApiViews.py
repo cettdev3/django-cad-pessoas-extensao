@@ -7,6 +7,7 @@ from ..serializers.servicoContratadoSerializer import ServicoContratadoSerialize
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.dpEvento import DpEvento
+from ..models.membroExecucao import MembroExecucao
 
 class ServicoContratadoApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -36,6 +37,8 @@ class ServicoContratadoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         evento = None
+        membro_execucao = None
+        
         valor = request.data.get("valor")
         if valor:
             valor = float(valor)
@@ -49,12 +52,31 @@ class ServicoContratadoApiView(APIView):
                     {"res": "Não existe evento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+        else:
+            return Response(
+                {"res": "É necessário informar o id do evento"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if request.data.get("membro_execucao_id"):
+            membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+            if not membro_execucao:
+                return Response(
+                    {"res": "Não existe membro de execução com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"res": "É necessário informar o id do membro de execução"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         data = {
             "descricao": request.data.get("descricao"),
             "valor": valor,
             "data_limite": request.data.get("data_limite") if request.data.get("data_limite") else None,
-            "evento": evento
+            "evento": evento,
+            "responsavel": membro_execucao,
         }
 
         servicoContratado = ServicoContratado.objects.create(**data)
@@ -109,6 +131,16 @@ class ServicoContratadoDetailApiView(APIView):
                 {"res": "É necessário informar o id do evento"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        if request.data.get("membro_execucao_id"):
+            membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+            if not membro_execucao:
+                return Response(
+                    {"res": "Não existe membro de execução com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            servico_contratado.responsavel = membro_execucao
 
         servico_contratado.save()
         serializer = ServicoContratadoSerializer(servico_contratado)

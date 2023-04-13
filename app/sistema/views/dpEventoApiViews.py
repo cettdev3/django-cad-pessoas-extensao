@@ -40,7 +40,6 @@ class DpEventoApiView(APIView):
         ))
         for dp_evento in dp_eventos:
             membros_execucao = dp_evento.membroexecucao_set.all()
-            print("dentro do if 2", len(membros_execucao))
         if request.GET.get("tipo"):
             dp_eventos = dp_eventos.filter(tipo__icontains=request.GET.get("tipo"))
         if request.GET.get('data_inicio') and not request.GET.get('data_fim'):

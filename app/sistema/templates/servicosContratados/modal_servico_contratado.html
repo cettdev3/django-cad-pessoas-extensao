@@ -56,7 +56,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <label><b>Valor Pago pelo Serviço:</b></label>
                                         <input type="number"
                                         step="0.01" 
@@ -67,7 +67,7 @@
                                         id="valor"
                                         class="form-control">
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <label><b>Data Limite Para Solicitação:</b></label>
                                         <input type="date" 
                                         {% if servicoContratado %}
@@ -76,6 +76,15 @@
                                         name="data_limite" 
                                         id="data_limite"
                                         class="form-control">
+                                    </div>
+                                    <input type="text" 
+                                    {% if servicoContratado %}
+                                        value="{{servicoContratado.responsavel.id}}"
+                                    {% endif %}
+                                    name="membro_execucao_id"
+                                    id="membro_execucao_id"
+                                    hidden>
+                                    <div id="membroExecucaoSelectContainer" class="col-sm-4">
                                     </div>
                                 </div>
 
@@ -129,6 +138,17 @@
         });
     }
 
+    function carregarSelectMembroExecucao() {
+        $.ajax({
+            url: "/membrosExecucaoSelect",
+            data: getFormData(),
+            type: "GET",
+            success: function(data) {
+                $("#cadastrarServicoContratadoForm #membroExecucaoSelectContainer").html(data);
+            }
+        });
+    }
+
     function getFormData() {
         let form = $('#'+formId)
         var unindexed_array = form.serializeArray();
@@ -142,5 +162,6 @@
     }
 
     $(document).ready(function () {
+        carregarSelectMembroExecucao()
     });
 </script>
