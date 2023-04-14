@@ -15,5 +15,7 @@ class ServicoSerializer(serializers.ModelSerializer):
             "bairro",
             "cep",
             "complemento",
+            "status",
+            "descricao"
     ]
     depth = 2
