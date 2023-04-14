@@ -21,6 +21,7 @@ from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
 from django.db.models import Q
+from ..services.alfrescoApi import AlfrescoAPI
 
 class DpEventoApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -61,7 +62,6 @@ class DpEventoApiView(APIView):
         reset_queries()
         dp_eventos = dp_eventos.all()
         serializer = DpEventoSerializer(dp_eventos, many=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
