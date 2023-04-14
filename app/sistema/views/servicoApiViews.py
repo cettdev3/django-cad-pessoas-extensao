@@ -49,11 +49,6 @@ class ServicoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        else:
-            return Response(
-                {"res": "O campo cidade_id é obrigatório"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         data = {
             "nome": request.data.get("nome"),

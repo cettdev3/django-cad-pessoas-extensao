@@ -1,11 +1,11 @@
-let tabsId = "servicoContratadoList"
+let customTabsId = "servicoContratadoList"
 let tabsLinkId = "servicoContratadoLink"
 let prevBtn = "formMembrosExecucaoPrev"
 let nextBtn ="formMembrosExecucaoNext"
 let finishBtn = "finishCadastroServicoContratado"
 
 function getActiveTab() {
-    let activeTab = $("*[id^='"+tabsId+"']").filter(function (i, el) {
+    let activeTab = $("*[id^='"+customTabsId+"']").filter(function (i, el) {
         return $(el).hasClass("active") || $(el).hasClass("active-form-tab")
     })
 
@@ -18,8 +18,8 @@ function getActiveTab() {
 }
 
 function functionGetTabsQuantity() {
-    let tabs = $("*[id^='"+tabsId+"']")
-    tabs = $("*[id^='"+tabsId+"']")
+    let tabs = $("*[id^='"+customTabsId+"']")
+    tabs = $("*[id^='"+customTabsId+"']")
     let length = tabs.length
     return length
 }
@@ -37,8 +37,8 @@ function processTabBtnClick(direction) {
     let activeTab = getActiveTab()
     let nextTab = parseInt(activeTab) + direction
     $("#"+tabsLinkId+nextTab).trigger("click")
-    $("#"+tabsId+nextTab).addClass("active-form-tab")
-    $("#"+tabsId+activeTab).removeClass("active-form-tab")
+    $("#"+customTabsId+nextTab).addClass("active-form-tab")
+    $("#"+customTabsId+activeTab).removeClass("active-form-tab")
     setTabsbehavior()
 }
 

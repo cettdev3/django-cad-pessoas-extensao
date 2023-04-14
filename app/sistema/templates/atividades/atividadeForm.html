@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastrarAtividadeForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-6">
+            <div class="col-sm-9">
                 <label><b>Link de Documentos:</b></label>
                 <input type="text"
                 required
@@ -41,8 +41,6 @@
                     </option>
                 </select>
             </div>
-            <div id="departamentoSelectContainer" class="col-sm-3">
-            </div>
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
@@ -62,7 +60,7 @@
             </div>
             <div id="membroExecucaoSelectContainer" class="col-sm-4">
             </div>
-            <div id="cidadesSelectContainer" class="col-sm-3">
+            <div id="departamentoSelectContainer" class="col-sm-3">
             </div>
             <div class="col-sm-2">
                 <label><b>Carga Horária:</b></label>
@@ -77,8 +75,8 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-sm-3">
-                <label><b>Quantidade de Certificações:</b></label>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Quantidade de Certificações:</b></label>
                 <input type="number"
                 required
                 class="form-control"
@@ -88,8 +86,8 @@
                 id="quantidadeCertificacoes"
                 name="quantidadeCertificacoes">    
             </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Matrículas:</b></label>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Quantidade de Matrículas:</b></label>
                 <input type="number"
                 required
                 class="form-control"
@@ -99,8 +97,8 @@
                 id="quantidadeMatriculas"
                 name="quantidadeMatriculas">
             </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Atendimentos:</b></label>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Quantidade de Atendimentos:</b></label>
                 <input type="number"
                 required
                 class="form-control"
@@ -110,8 +108,8 @@
                 id="quantidadeAtendimentos"
                 name="quantidadeAtendimentos">
             </div>
-            <div class="col-sm-3">
-                <label><b>Quantidade de Inscrições:</b></label>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Quantidade de Inscrições:</b></label>
                 <input type="number"
                 required
                 class="form-control"
@@ -120,6 +118,29 @@
                 {% endif %}
                 id="quantidadeInscricoes"
                 name="quantidadeInscricoes">
+            </div>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Id edu CETT:</b></label>
+                <input type="text"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.id_protocolo}}"
+                {% endif %}
+                id="id_protocolo"
+                name="id_protocolo">
+            </div>
+            <div class="col-sm-2">
+                <label class="custom-small-label"><b>Valor:</b></label>
+                <input type="float"
+                step="0.01"
+                required
+                class="form-control"
+                {% if atividade.id %}
+                value="{{atividade.valor}}"
+                {% endif %}
+                id="valor"
+                name="valor">
             </div>
         </div>
         {% if acao %}
@@ -138,35 +159,37 @@
         </div>
         {% endif %}
         <div class="form-group row">
-            <div class="col-sm-4">
+            <div id="cidadesSelectContainer" class="col-sm-3">
+            </div>
+            <div class="col-sm-3">
                 <label><b>Logradouro:</b></label>
                 <input type="text"
                 required
                 class="form-control"
                 {% if atividade.id %}
-                value="{{atividade.logradouro}}"
+                value="{{atividade.logradouro|default_if_none:""}}"
                 {% endif %}
                 id="logradouro"
                 name="logradouro">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>Bairro:</b></label>
                 <input type="text"
                 required
                 class="form-control"
                 {% if atividade.id %}
-                value="{{atividade.bairro}}"
+                value="{{atividade.bairro|default_if_none:""}}"
                 {% endif %}
                 id="bairro"
                 name="bairro">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>CEP:</b></label>
                 <input type="text"
                 required
                 class="form-control"
                 {% if atividade.id %}
-                value="{{atividade.cep}}"
+                value="{{atividade.cep|default_if_none:""}}"
                 {% endif %}
                 id="cep"
                 name="cep">
@@ -179,11 +202,7 @@
                 required
                 class="form-control"
                 {% if atividade.id %}
-                value="{{atividade.complemento}}"
-                {% elif acao.id %}
-                value="{{acao.complemento}}"
-                {% elif evento.id %}
-                value="{{evento.complemento}}"
+                value="{{atividade.complemento|default_if_none:""}}"
                 {% endif %}
                 id="complemento"
                 name="complemento">
@@ -223,18 +242,18 @@
     <span hidden id="selected-departamento">{% if atividade %}{{atividade.departamento.id}}{% endif %}</span>
     <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
     {% if acao %}
-    <span hidden id="acao-logradouro">{{acao.logradouro}}</span>
-    <span hidden id="acao-cep">{{acao.cep}}</span>
-    <span hidden id="acao-bairro">{{acao.bairro}}</span>
-    <span hidden id="acao-complemento">{{acao.complemento}}</span>
-    <span hidden id="acao-cidade">{{acao.cidade.id}}</span>
+    <span hidden id="acao-logradouro">{{acao.logradouro|default_if_none:""}}</span>
+    <span hidden id="acao-cep">{{acao.cep|default_if_none:""}}</span>
+    <span hidden id="acao-bairro">{{acao.bairro|default_if_none:""}}</span>
+    <span hidden id="acao-complemento">{{acao.complemento|default_if_none:""}}</span>
+    <span hidden id="acao-cidade">{{acao.cidade.id|default_if_none:""}}</span>
     {% endif %}
     {% if evento %}
-    <span hidden id="acao-logradouro">{{evento.logradouro}}</span>
-    <span hidden id="acao-cep">{{evento.cep}}</span>
-    <span hidden id="acao-bairro">{{evento.bairro}}</span>
-    <span hidden id="acao-complemento">{{evento.complemento}}</span>
-    <span hidden id="acao-cidade">{{evento.cidade.id}}</span>
+    <span hidden id="acao-logradouro">{{evento.logradouro|default_if_none:""}}</span>
+    <span hidden id="acao-cep">{{evento.cep|default_if_none:""}}</span>
+    <span hidden id="acao-bairro">{{evento.bairro|default_if_none:""}}</span>
+    <span hidden id="acao-complemento">{{evento.complemento|default_if_none:""}}</span>
+    <span hidden id="acao-cidade">{{evento.cidade.id|default_if_none:""}}</span>
     {% endif %}
 </div>
 

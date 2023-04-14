@@ -118,6 +118,8 @@ class AtividadeApiView(APIView):
             "bairro": data["bairro"] if data["bairro"] else None,
             "cep": data["cep"] if data["cep"] else None,
             "complemento": data["complemento"] if data["complemento"] else None,
+            "id_protocolo": data["id_protocolo"] if data["id_protocolo"] else None,
+            "valor": float(data["valor"]) if data["valor"] else None,
         }
 
         atividade = Atividade.objects.create(**atividadeData)
@@ -233,6 +235,10 @@ class AtividadeDetailApiView(APIView):
             atividade.quantidadeInscricoes = data["quantidadeInscricoes"]
         if data["cargaHoraria"]:
             atividade.cargaHoraria = data["cargaHoraria"]
+        if data["id_protocolo"]:
+            atividade.id_protocolo = data["id_protocolo"]
+        if data["valor"]:
+            atividade.valor = data["valor"]
 
         atividade.save()
         serializer = AtividadeSerializer(atividade)

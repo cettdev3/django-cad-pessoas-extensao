@@ -147,6 +147,10 @@ span.column-label.current-order-by {
     font-size: 0.8rem;
 }
 
+.custom-small-label {
+    font-size: 0.7rem;
+}
+
 /* CUSTOM TABS */
 .custom-tab-ul {
     background-color: white;
