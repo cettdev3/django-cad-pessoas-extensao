@@ -81,9 +81,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <li class=" cs-tab-link active">
                 <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
             </li>
-            <li class=" cs-tab-link active">
+            {% comment %} <li class=" cs-tab-link active">
                 <a id="servico-contratado-tab" data-toggle="tab" href="#servicoContratado">Serviços</a>
-            </li>
+            </li> {% endcomment %}
         </ul>
         <div class="tab-content w-100 h-100">
             <div id="membrosExecucao" 
@@ -100,10 +100,10 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <div id="avaliacao" class="tab-pane" style="height: 100%;">
                 <div id="avaliacaoLocalTableContainer"></div>
             </div>
-            <div id="servicoContratado"  class="tab-pane active in h-100"
+            {% comment %} <div id="servicoContratado"  class="tab-pane active in h-100"
             style="overflow-y: scroll;">
                 <div id="servicoContratadoTableContainer"></div>
-            </div>
+            </div> {% endcomment %}
         </div>
     </div>
 </div>
@@ -176,6 +176,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 $("#modalServicoContratadoContainer").html('');
                 $("#modalServicoContratadoContainer").html(data);
                 $('#cadastrarServicoContratadoModal').modal('show');
+                setModalBehaviour(function () {
+                    carregarSelectMembroExecucao();
+                });
             }
         });
     }

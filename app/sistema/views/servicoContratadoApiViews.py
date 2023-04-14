@@ -8,6 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.dpEvento import DpEvento
 from ..models.membroExecucao import MembroExecucao
+from ..factories import create_ticket
 
 class ServicoContratadoApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -80,6 +81,11 @@ class ServicoContratadoApiView(APIView):
         }
 
         servicoContratado = ServicoContratado.objects.create(**data)
+        if "tickets" in request.data:
+            for ticket_data in request.data["tickets"]:
+                ticket_data["model"] = "servico_contratado"
+                create_ticket(**ticket_data)
+
         serializer = ServicoContratadoSerializer(servicoContratado)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

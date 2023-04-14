@@ -63,7 +63,8 @@ def ticketModalEdit(request, ticket_id):
 def ticket_form(request):
     form_id = request.GET.get('form_id')
     id = request.GET.get('id')
-    evento_id = request.GET.get('evento_id')
+    evento_id = request.GET.get('evento_id') if request.GET.get('evento_id') else request.GET.get('dp_evento_id')
+    model = request.GET.get('model')
     context = {}
     if form_id:
         context['form_id'] = form_id
@@ -72,6 +73,9 @@ def ticket_form(request):
         context['ticket'] = ticket
     if evento_id:
         context['evento'] = DpEvento.objects.get(id=evento_id)
+        context['parent_entity'] = DpEvento.objects.get(id=evento_id)
+    if model:
+        context['model'] = model
 
     return render(request,'tickets/ticket_form_collapsable.html', context)
 

@@ -61,7 +61,7 @@ def saveServicoContratado(request):
         response = requests.put(url,json=body,headers=headers)
     else:
         response = requests.post(url,json=body,headers=headers)
-    
+    print(fasfs)
     return JsonResponse({'status': response.status_code, 'message': response.content.decode()})
 
 @login_required(login_url='/auth-user/login-user')

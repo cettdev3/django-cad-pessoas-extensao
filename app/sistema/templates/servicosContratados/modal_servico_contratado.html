@@ -20,21 +20,36 @@
             </div>
             <div class="modal-body">
                 <div class="w-100">
-                    <ul class="nav nav-tabs row">
-                        <li id="servicoContratadoList1" class="col py-2 active-form-tab">
-                            <a id="servicoContratadoLink1" 
-                            style="display: none;" 
-                            href="#home">1</a>
-                            <span>Dados Gerais</span>
-                        </li>
-                    </ul>
                     <form id="cadastrarServicoContratadoForm" action="/" method="POST">
                         <input type="text" 
                         value="{{dp_evento_id}}"
                         name="dp_evento_id"
                         id="dp_evento_id"
                         hidden>
+                        <input type="text" 
+                        value="servico_contratado"
+                        name="model"
+                        id="model"
+                        hidden>
 
+                        <ul class="nav nav-tabs row">
+                            <li id="servicoContratadoList1" class="col py-2 active-form-tab">
+                                <a id="servicoContratadoLink1" 
+                                data-toggle="tab"
+                                style="display: none;"
+                                role="tab"
+                                href="#home">1</a>
+                                <span>Dados Gerais</span>
+                            </li>
+                            <li id="servicoContratadoList2" class="col py-2 ">
+                                <a id="servicoContratadoLink2" 
+                                data-toggle="tab"
+                                style="display: none;"
+                                role="tab"
+                                href="#demandas">2</a>
+                                <span>Demandas</span>
+                            </li>
+                        </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 <input type="text" 
@@ -89,11 +104,27 @@
                                 </div>
 
                             </div>
+                            <div id="demandas" class="tab-pane py-3">
+                                <div id="ticket-form-container" class="mb-2"></div>
+                                <button id="add-ticket-form-btn"
+                                type="button"
+                                onclick="addDemandaServicoContratado()"
+                                class="btn btn-primary">Adicionar Demanda</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
+                <button id="formMembrosExecucaoPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevMembrosExecucaoLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formMembrosExecucaoNext" type="button" class="btn btn-primary">
+                    <span id="nextMembrosExecucaoLink" class="MembrosExecucaoMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
                 <button
                 onclick="saveServicoContratado({{servicoContratado.id}})" 
                 id="finishCadastroServicoContratado" 
@@ -111,12 +142,9 @@
 </div>
 
 <script>
-    formId = "cadastrarServicoContratadoForm"
-    dismissCadastrarServicoContratadoId = "dismissCadastrarServicoContratado"
-
     function clearModalForm(changedResource = null) {
-        document.getElementById(formId).reset();
-        $("#"+dismissCadastrarServicoContratadoId).click()
+        document.getElementById("cadastrarServicoContratadoForm").reset();
+        $("#dismissCadastrarServicoContratado").click()
         carregarServicosContratados()
     }
 
@@ -138,6 +166,24 @@
         });
     }
 
+    function addDemandaServicoContratado(ticketId = null) {
+        let formId = $('#cadastrarServicoContratadoForm #ticket-form-container').children().length + 1
+        let dp_evento_id = $('#cadastrarServicoContratadoForm #dp_evento_id').val()
+
+        $.ajax({
+            url: '/ticket_form',
+            data: {
+                'form_id': formId,
+                'ticket_id': ticketId,
+                'model': 'servico_contratado',
+                'evento_id': dp_evento_id,
+            },
+            success: function(data) {
+                $('#cadastrarServicoContratadoForm #ticket-form-container').append(data);
+            }
+        });
+    }
+
     function carregarSelectMembroExecucao() {
         $.ajax({
             url: "/membrosExecucaoSelect",
@@ -150,18 +196,33 @@
     }
 
     function getFormData() {
-        let form = $('#'+formId)
+        let form = $('#cadastrarServicoContratadoForm')
         var unindexed_array = form.serializeArray();
         var values = {};
+        let ticketForms = $("#cadastrarServicoContratadoForm *[id^='cadastrarTicketForm']")
+        var tickets = []
+        
+        ticketForms.each(function(index) {
+            let ticketForm = $(this)
+            let ticketFormValues = {}
+            $.map(ticketForm.serializeArray(), function (n, i) {
+                ticketFormValues[n['name']] = n['value'];
+            });
+            tickets.push(ticketFormValues)
+        })
 
         $.map(unindexed_array, function (n, i) {
             values[n['name']] = n['value'];
         });
 
+        values['tickets'] = tickets
         return values
     }
 
+    function deleteTicketForm(formId) {
+        $('#cadastrarServicoContratadoForm #ticket-form-container').find('#ticket-form-container-'+formId).remove();
+    }
+
     $(document).ready(function () {
-        carregarSelectMembroExecucao()
     });
 </script>
