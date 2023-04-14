@@ -247,6 +247,13 @@
                 value="PRESTACAO_CONTAS_CREATED">
                     CONTAS PRESTADAS
                 </option>
+                <option 
+                {% if ticket and ticket.status_calculado == 'CANCELADO' %}
+                selected
+                {% endif %}
+                value="CANCELADO">
+                    CANCELADO
+                </option>
             </select>
         </div>
     </div>

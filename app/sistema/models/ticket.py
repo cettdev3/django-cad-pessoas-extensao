@@ -12,6 +12,7 @@ class Ticket(models.Model):
     STATUS_ATRASADO_PARA_CRIACAO = "ATRASADO_PARA_CRIACAO"
     STATUS_PRESTACAO_CONTAS_PENDENTE = "PENDING_PRESTACAO_CONTAS"
     STATUS_PRESTACAO_CONTAS_CRIADA = "PRESTACAO_CONTAS_CREATED"
+    STATUS_CANCELADO = "CANCELADO"
 
     TIPO_DIARIA = "diaria"
     TIPO_ADIANTAMENTO = "adiantamento"
@@ -46,6 +47,8 @@ class Ticket(models.Model):
         db_table = 'tickets'
 
     def calculate_status(self):
+        if self.status == self.STATUS_CANCELADO:
+            return self.status
         entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
         today = timezone.now().date()
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
@@ -128,7 +131,9 @@ class Ticket(models.Model):
         elif self.status == self.STATUS_CRIADO:
             return "criado"
         elif self.status == self.STATUS_PRESTACAO_CONTAS_CRIADA:
-            return "conta_prestada"   
+            return "conta_prestada"  
+        elif self.status == self.STATUS_CANCELADO:
+            return "cancelado" 
         return ""
     
     @property
@@ -143,6 +148,8 @@ class Ticket(models.Model):
             return "demanda não criada no protocolo"    
         elif self.status == self.STATUS_CRIADO:
             return "demanda criada no protocolo"
+        elif self.status == self.STATUS_CANCELADO:
+            return "demanda cancelada"
         return "Status não identificado"
 
     @property
