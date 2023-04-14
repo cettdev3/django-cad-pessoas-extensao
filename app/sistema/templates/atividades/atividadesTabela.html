@@ -19,6 +19,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        max-width: 200px;
+        text-align: left;
+        white-space: wrap;
     }
     
     .servico-btn:hover {
@@ -70,7 +73,7 @@ cellspacing="0">
                         onclick="openDeleteModal(() => deleteServico('{{servico.id}}'))"
                         data-toggle="tooltip" 
                         data-placement="top"
-                        title="Deletar Serviço">
+                        title="Deletar Atividade Relacionada">
                             <i style="border-radius: 50%; color: #df4759;" class="fas fa-circle-thin fa-stack-2x"></i>
                             <i style="border-radius: 50%;" class="fa-solid fa-trash fa-stack-1x fa-inverse "></i>
                         </span>
