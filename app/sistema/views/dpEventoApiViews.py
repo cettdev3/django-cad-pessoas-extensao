@@ -21,6 +21,7 @@ from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
 from django.db.models import Q
+import requests
 from ..services.alfrescoApi import AlfrescoAPI
 
 class DpEventoApiView(APIView):
@@ -34,6 +35,7 @@ class DpEventoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
+
         print("dentro do get de dpEvento")
         dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',

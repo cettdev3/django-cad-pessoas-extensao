@@ -1,7 +1,7 @@
 import json
 import requests
 from decouple import config
-
+from ..models.alfrescoNode import AlfrescoNode
 class AlfrescoAPI:
     def __init__(self):
         self.__auth_url = config("AUTH_URL")
@@ -40,7 +40,8 @@ class AlfrescoAPI:
         url = self.__base_url+"nodes/"+self.__rootFolder+"/children?alf_ticket="+self.__alf_ticket
         response = requests.post(url, files=body, data=params)
         if response.status_code == 200 or response.status_code == 201:
-            return json.loads(response.content)
+            # replace this by alfrescoNode class
+            return AlfrescoNode.createAlfrescoNodeFromResponse(response.content)
         else: 
             print("Houve um erro com a requisição",response.status_code, response.content)
             return ""

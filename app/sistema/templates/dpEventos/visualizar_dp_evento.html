@@ -66,6 +66,14 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 class="btn btn-success">Adicionar</button>
             </div>
         </div>
+        {% comment %} add galeria button {% endcomment %}
+        <div id="add-galeria-btn">
+            <div data-toggle="tooltip" data-placement="top" title="Adicionar Galeria" 
+            class="d-flex align-items-center ">            
+                <button onclick="openGaleriaModal()" 
+                class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
     </div>
     <div class="card-body w-100">
         <ul id="dpEvento-visualizar-tabs" class="nav nav-tabs w-100">
@@ -80,6 +88,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             </li>
             <li class=" cs-tab-link active">
                 <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
+            </li>
+            <li class=" cs-tab-link active">
+                <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
             </li>
             {% comment %} <li class=" cs-tab-link active">
                 <a id="servico-contratado-tab" data-toggle="tab" href="#servicoContratado">Serviços</a>
@@ -100,6 +111,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <div id="avaliacao" class="tab-pane" style="height: 100%;">
                 <div id="avaliacaoLocalTableContainer"></div>
             </div>
+            <div id="galerias" class="tab-pane" style="height: 100%;">
+                <div id="galeriasTableContainer"></div>
+            </div>
             {% comment %} <div id="servicoContratado"  class="tab-pane active in h-100"
             style="overflow-y: scroll;">
                 <div id="servicoContratadoTableContainer"></div>
@@ -112,6 +126,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
 <div id="modalAvaliacaoContainer"></div>
 <div id="modalServicoContainer"></div>
 <div id="modalServicoContratadoContainer"></div>
+<div id="modalGaleriaContainer"></div>
 
 <script>
     let modalCadastrarMembroExecucaoContainerId = "modalCadastrarMembroExecucaoContainer"
@@ -183,6 +198,21 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
         });
     }
     
+    function openGaleriaModal() {
+        $.ajax({
+            url: "/galeriaModal",
+            method: "GET",
+            data: {
+                dp_evento_id: dpEventoId
+            },
+            success: function (data) {
+                $("#modalGaleriaContainer").html('');
+                $("#modalGaleriaContainer").html(data);
+                $('#cadastrarGaleriaModal').modal('show');
+            }
+        });
+    }
+    
     function addAvaliacaoModal() {
         $.ajax({
             url: "/avaliacaoModal",
@@ -215,6 +245,16 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             data: {dp_evento_id: dpEventoId},
             success: function (data) {
                 $("#servicoContratadoTableContainer").html(data);
+            }
+        });
+    }
+    
+    function carregarGalerias() {
+        $.ajax({
+            url: "/galeriaTable",
+            data: {dp_evento_id: dpEventoId},
+            success: function (data) {
+                $("#galeriasTableContainer").html(data);
             }
         });
     }
@@ -276,27 +316,38 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             $("#add-membro-execucao-btn").show()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
         } else if (id == "itinerarios-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
             reloadMap()
         } else if (id == "atividades-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").show()
             $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
         } else if (id == "avaliacao-local-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").show()
+            $("#add-galeria-btn").hide()
+            $("#add-servico-contratado-btn").hide()
+        } else if (id == "galerias-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").show()
             $("#add-servico-contratado-btn").hide()
         } else {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
         }
     }
