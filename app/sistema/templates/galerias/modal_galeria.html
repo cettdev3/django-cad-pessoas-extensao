@@ -1,0 +1,105 @@
+<div class="modal fade" id="cadastrarGaleriaModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarGaleriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarGaleriaModalLabel">
+                    Cadastrar galeria de imagens
+                </h5>
+                <button type="button" id="dismissCadastrarGaleria" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <form id="cadastrarGaleriaForm" action="/" method="POST">
+                        <input type="text" value="{{dp_evento_id}}" name="dp_evento_id" id="dp_evento_id" hidden>
+                        <input type="text" value="galeria" name="model" id="model" hidden>
+
+                        <div class="mb-3">
+                            <label for="galeria_nome" class="form-label">Nome da Galeria:</label>
+                            <input type="text" class="form-control" id="galeria_nome" name="galeria_nome" required>
+                        </div>
+
+                        <div class="mb-3">
+                            {% include "componentes/imagesInput/imageInput.html" %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveGaleria('{{galeria.id}}')" type="button" class="btn btn-primary">
+                    {% if galeria %}
+                    <span>Salvar Alterações</span>
+                    {% else %}
+                    <span>Cadastrar</span>
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var galleryImages = [];
+    var galleryImagesFiles = [];
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById("cadastrarGaleriaForm").reset();
+        $("#dismissCadastrarGaleria").click()
+        carregarGalerias()
+    }
+
+    function saveGaleria(galeria_id) {
+        $.ajax({
+            type: "POST",
+            url: "/saveGaleria",
+            data: JSON.stringify(getFormData()),
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
+
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                clearModalForm(response)
+            },
+            error: function (error) {
+                console.log(error);
+            },
+        });
+    }
+
+    function getFormData() {
+        const images = [];
+        const galleryName = $("#galeria_nome").val();
+        const dpEventoId = $("#dp_evento_id").val();
+        const model = $("#model").val();
+
+        $(".col-md-4").each(function () {
+            const imageUuid = $(this).data("uuid");
+            const imageDataUrl = $(this).find("img").attr("src");
+            const imageDescription = $(`textarea[data-uuid="${imageUuid}"]`).val();
+
+            images.push({
+                uuid: imageUuid,
+                dataUrl: imageDataUrl,
+                description: imageDescription,
+            });
+        });
+
+        const galeriaData = {
+            name: galleryName,
+            dp_evento_id: dpEventoId,
+            model: model,
+            images: images,
+        };
+
+        // You can now use galeriaData to send data to your server or process it further.
+        // For example, you can log the data to the console:
+        return galeriaData;
+    }
+
+    $(document).ready(function () {
+
+    });
+</script>

@@ -49,11 +49,6 @@ class ServicoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        else:
-            return Response(
-                {"res": "O campo cidade_id é obrigatório"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         data = {
             "nome": request.data.get("nome"),
@@ -65,6 +60,8 @@ class ServicoApiView(APIView):
             "bairro": request.data.get("bairro"),
             "cep": request.data.get("cep"),
             "complemento": request.data.get("complemento"),
+            "status": request.data.get("status"),
+            "descricao": request.data.get("descricao")
         }
         
         servico = Servico.objects.create(**data)
@@ -132,6 +129,10 @@ class ServicoDetailApiView(APIView):
             servico.cep = request.data.get("cep")
         if request.data.get("complemento"):
             servico.complemento = request.data.get("complemento")
+        if request.data.get("status"):
+            servico.status = request.data.get("status")
+        if request.data.get("descricao"):
+            servico.descricao = request.data.get("descricao")
 
         servico.save()
 

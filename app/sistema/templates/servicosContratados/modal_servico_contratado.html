@@ -1,0 +1,228 @@
+<div class="modal fade" id="cadastrarServicoContratadoModal" tabindex="-1" role="dialog"
+    aria-labelledby="cadastrarServicoContratadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarServicoContratadoModalLabel">
+                    {% if not servicoContratado.id %}
+                        Cadastrar Serviço
+                    {% else %}
+                        Editar Serviço
+                    {% endif %}
+                </h5>
+                <button type="button" 
+                id="dismissCadastrarServicoContratado" 
+                class="close" 
+                data-dismiss="modal" 
+                aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <form id="cadastrarServicoContratadoForm" action="/" method="POST">
+                        <input type="text" 
+                        value="{{dp_evento_id}}"
+                        name="dp_evento_id"
+                        id="dp_evento_id"
+                        hidden>
+                        <input type="text" 
+                        value="servico_contratado"
+                        name="model"
+                        id="model"
+                        hidden>
+
+                        <ul class="nav nav-tabs row">
+                            <li id="servicoContratadoList1" class="col py-2 active-form-tab">
+                                <a id="servicoContratadoLink1" 
+                                data-toggle="tab"
+                                style="display: none;"
+                                role="tab"
+                                href="#home">1</a>
+                                <span>Dados Gerais</span>
+                            </li>
+                            <li id="servicoContratadoList2" class="col py-2 ">
+                                <a id="servicoContratadoLink2" 
+                                data-toggle="tab"
+                                style="display: none;"
+                                role="tab"
+                                href="#demandas">2</a>
+                                <span>Demandas</span>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane py-3 active">
+                                <input type="text" 
+                                {% if servicoContratado %}
+                                    value="{{servicoContratado.id}}"
+                                {% endif %}
+                                name="servico_contratado_id" 
+                                id="servico_contratado_id"
+                                hidden>
+                                <div class="form-group row">
+                                    <div class="col-sm-12">
+                                        <label><b>Descriçao:</b></label>
+                                        <textarea
+                                        class="form-control"
+                                        name="descricao"
+                                        placeholder="Digite uma descrição do serviço a ser contratado..."
+                                        id="descricao"
+                                        rows="2">{% if servicoContratado %}{{servicoContratado.descricao}}{% endif %}</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label><b>Valor Pago pelo Serviço:</b></label>
+                                        <input type="number"
+                                        step="0.01" 
+                                        {% if servicoContratado %}
+                                            value="{{servicoContratado.valor}}"
+                                        {% endif %}
+                                        name="valor" 
+                                        id="valor"
+                                        class="form-control">
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label><b>Data Limite Para Solicitação:</b></label>
+                                        <input type="date" 
+                                        {% if servicoContratado %}
+                                            value="{{servicoContratado.data_limite}}"
+                                        {% endif %}
+                                        name="data_limite" 
+                                        id="data_limite"
+                                        class="form-control">
+                                    </div>
+                                    <input type="text" 
+                                    {% if servicoContratado %}
+                                        value="{{servicoContratado.responsavel.id}}"
+                                    {% endif %}
+                                    name="membro_execucao_id"
+                                    id="membro_execucao_id"
+                                    hidden>
+                                    <div id="membroExecucaoSelectContainer" class="col-sm-4">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div id="demandas" class="tab-pane py-3">
+                                <div id="ticket-form-container" class="mb-2"></div>
+                                <button id="add-ticket-form-btn"
+                                type="button"
+                                onclick="addDemandaServicoContratado()"
+                                class="btn btn-primary">Adicionar Demanda</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="formMembrosExecucaoPrev" style="display: none;" type="button" class="btn btn-secondary prev">
+                    <span id="prevMembrosExecucaoLink" class=""></span>
+                    <span>Anterior</span>
+                </button>
+                <button id="formMembrosExecucaoNext" type="button" class="btn btn-primary">
+                    <span id="nextMembrosExecucaoLink" class="MembrosExecucaoMenuLink2">
+                    </span>
+                    <span>Próximo</span>
+                </button>
+                <button
+                onclick="saveServicoContratado({{servicoContratado.id}})" 
+                id="finishCadastroServicoContratado" 
+                type="button"
+                class="btn btn-primary">
+                {% if servicoContratado %}
+                    <span>Salvar Alterações</span>
+                {% else %}
+                    <span>Cadastrar</span>
+                {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearModalForm(changedResource = null) {
+        document.getElementById("cadastrarServicoContratadoForm").reset();
+        $("#dismissCadastrarServicoContratado").click()
+        carregarServicosContratados()
+    }
+
+    function saveServicoContratado(servico_contratado_id) {
+        const formData = JSON.stringify({
+            servico_contratado_id: servico_contratado_id, 
+            ...getFormData()
+        })
+        $.ajax({
+            url: "/saveServicoContratado",
+            data: formData,
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            method: "POST",
+            success: function (data) {
+                clearModalForm(data)
+            }
+        });
+    }
+
+    function addDemandaServicoContratado(ticketId = null) {
+        let formId = $('#cadastrarServicoContratadoForm #ticket-form-container').children().length + 1
+        let dp_evento_id = $('#cadastrarServicoContratadoForm #dp_evento_id').val()
+
+        $.ajax({
+            url: '/ticket_form',
+            data: {
+                'form_id': formId,
+                'ticket_id': ticketId,
+                'model': 'servico_contratado',
+                'evento_id': dp_evento_id,
+            },
+            success: function(data) {
+                $('#cadastrarServicoContratadoForm #ticket-form-container').append(data);
+            }
+        });
+    }
+
+    function carregarSelectMembroExecucao() {
+        $.ajax({
+            url: "/membrosExecucaoSelect",
+            data: getFormData(),
+            type: "GET",
+            success: function(data) {
+                $("#cadastrarServicoContratadoForm #membroExecucaoSelectContainer").html(data);
+            }
+        });
+    }
+
+    function getFormData() {
+        let form = $('#cadastrarServicoContratadoForm')
+        var unindexed_array = form.serializeArray();
+        var values = {};
+        let ticketForms = $("#cadastrarServicoContratadoForm *[id^='cadastrarTicketForm']")
+        var tickets = []
+        
+        ticketForms.each(function(index) {
+            let ticketForm = $(this)
+            let ticketFormValues = {}
+            $.map(ticketForm.serializeArray(), function (n, i) {
+                ticketFormValues[n['name']] = n['value'];
+            });
+            tickets.push(ticketFormValues)
+        })
+
+        $.map(unindexed_array, function (n, i) {
+            values[n['name']] = n['value'];
+        });
+
+        values['tickets'] = tickets
+        return values
+    }
+
+    function deleteTicketForm(formId) {
+        $('#cadastrarServicoContratadoForm #ticket-form-container').find('#ticket-form-container-'+formId).remove();
+    }
+
+    $(document).ready(function () {
+    });
+</script>

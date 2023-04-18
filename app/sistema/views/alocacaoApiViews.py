@@ -36,6 +36,17 @@ class AlocacaoApiView(APIView):
                 )
             
             alocacoes = alocacoes.filter(acaoEnsino=ensino)
+            
+        if request.data.get("pessoa_id"):
+            pessoa = Pessoas.objects.get(id=request.data.get("pessoa_id"))
+            if not pessoa:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            
+            alocacoes = alocacoes.filter(professor=pessoa)
+
         if order_by:
             alocacoes = alocacoes.order_by(order_by)
 

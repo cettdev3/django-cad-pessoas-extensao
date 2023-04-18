@@ -21,6 +21,8 @@ from django.db import reset_queries
 from datetime import datetime
 from django.db import connection
 from django.db.models import Q
+import requests
+from ..services.alfrescoApi import AlfrescoAPI
 
 class DpEventoApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -33,6 +35,7 @@ class DpEventoApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
+
         print("dentro do get de dpEvento")
         dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
@@ -40,7 +43,6 @@ class DpEventoApiView(APIView):
         ))
         for dp_evento in dp_eventos:
             membros_execucao = dp_evento.membroexecucao_set.all()
-            print("dentro do if 2", len(membros_execucao))
         if request.GET.get("tipo"):
             dp_eventos = dp_eventos.filter(tipo__icontains=request.GET.get("tipo"))
         if request.GET.get('data_inicio') and not request.GET.get('data_fim'):
@@ -62,7 +64,6 @@ class DpEventoApiView(APIView):
         reset_queries()
         dp_eventos = dp_eventos.all()
         serializer = DpEventoSerializer(dp_eventos, many=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):

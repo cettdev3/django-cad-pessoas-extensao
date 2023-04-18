@@ -26,7 +26,9 @@ class Atividade(models.Model):
     quantidadeAtendimentos = models.IntegerField(null = True, blank=True)
     quantidadeInscricoes = models.IntegerField(null = True, blank=True)
     cargaHoraria = models.FloatField(null = True, blank=True)
-
+    id_protocolo = models.CharField(null = True, blank=True, max_length=100)
+    valor = models.FloatField(null = True, blank=True)
+    
     class Meta:
         db_table = 'atividades'
     

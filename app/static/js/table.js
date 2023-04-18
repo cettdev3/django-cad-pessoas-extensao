@@ -1,26 +1,28 @@
 let showHiddenMenuBtnId = "showHiddenMenuTable"
 let hiddenMenuContainerId = "hiddenMenuContainer"
 let idSeparator = "MenuTable"
-function bindButtons() {
-    $("button[id^='"+showHiddenMenuBtnId+"']").each(function (i, el) {
-        $(this).on("click", function () {
-            let id = $(this).attr('id').split(idSeparator)[1];
-            let menuId = "#"+hiddenMenuContainerId + id
-            $("div[id^='"+hiddenMenuContainerId+"']").each(function (i, el) {
-                
-                if (menuId != "#" + $(this).attr("id")) {
-                    if ($(this).css('display') != 'none') {
-                        $(this).toggle()
-                    }
+function customTableBindButtons() {
+    $(document).off("click.customTableBindButtons").on("click.customTableBindButtons", "button[id^='" + showHiddenMenuBtnId + "']", function () {
+        console.log("click");
+        let id = $(this).attr('id').split(idSeparator)[1];
+        let menuId = "#" + hiddenMenuContainerId + id;
+
+        $("div[id^='" + hiddenMenuContainerId + "']").each(function (i, el) {
+            if (menuId != "#" + $(this).attr("id")) {
+                if ($(this).css('display') != 'none') {
+                    $(this).toggle();
                 }
-            })
-            let hiddenMenu = $(menuId).parent()
-            let isVisible = isvisibleOnViewport(hiddenMenu[0])
-            if (!isVisible) {
-                $(menuId).css("bottom", "40px")
-            } 
-            $(menuId).toggle()
+            }
         });
+
+        let hiddenMenu = $(menuId).parent();
+        let isVisible = isvisibleOnViewport(hiddenMenu[0]);
+
+        if (!isVisible) {
+            $(menuId).css("bottom", "40px");
+        }
+
+        $(menuId).toggle();
     });
 }
 
@@ -36,7 +38,7 @@ function isvisibleOnViewport(element) {
 }
 
 $(document).ready(function () {
-
+    console.log("ready")
     $(document).mouseup(function (e) {
         $("div[id^='"+hiddenMenuContainerId+"']").each(function (i, el) {
             if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {
@@ -50,8 +52,7 @@ $(document).ready(function () {
     let interval = setInterval(function () {
         let buttonsLength = $("button[id^='"+showHiddenMenuBtnId+"']").length
         if (buttonsLength > 0) {
-            console.log("bindButtons")
-            bindButtons()
+            customTableBindButtons()
             clearInterval(interval)
         }
     }, 500)

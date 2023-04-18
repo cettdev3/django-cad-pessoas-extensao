@@ -24,15 +24,19 @@ from django.http import HttpResponse
 
 @login_required(login_url='/auth-user/login-user')
 def alocacoesTable(request):
+    show_column_professor = request.GET.get('show_column_professor', 'true').lower() == 'true'
+    show_column_escola = request.GET.get('show_column_escola', 'false').lower() == 'true'
+    
     ensino_id = request.GET.get('acaoEnsino_id')
+    pessoa_id = request.GET.get('pessoa_id')
     order_by = request.GET.get('order_by')
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = {'ensino_id':ensino_id, 'order_by':order_by}
+    body = {'ensino_id':ensino_id, 'order_by':order_by, 'pessoa_id': pessoa_id}
 
     response = requests.get('http://localhost:8000/alocacoes', json=body, headers=headers)
     alocacoes = json.loads(response.content)
-    return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes})
+    return render(request,'alocacoes/alocacoes_table.html',{'alocacoes':alocacoes, 'show_column_professor':show_column_professor, 'show_column_escola':show_column_escola})
 
 @login_required(login_url='/auth-user/login-user')
 def modalAlocar(request):

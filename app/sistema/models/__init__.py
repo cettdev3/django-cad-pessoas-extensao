@@ -17,3 +17,6 @@ from .dataRemovida import DataRemovida
 from .dpEvento import DpEvento
 from .departamento import Departamento
 from .servico import Servico
+from .servicoContratado import ServicoContratado
+from .galeria import Galeria
+from .imagem import Imagem

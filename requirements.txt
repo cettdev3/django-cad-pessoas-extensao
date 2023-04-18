@@ -13,3 +13,4 @@ djangorestframework-simplejwt
 python-docx
 ntplib
 reportlab
+python-decouple

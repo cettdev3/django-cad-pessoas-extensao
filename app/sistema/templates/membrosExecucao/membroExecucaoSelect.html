@@ -16,7 +16,7 @@ name="membro_execucao_id">
     {% for membroExecucao in membrosExecucao %}
     <option {% if selected_membro_execucao_id == membroExecucao.id %} selected {% endif %} 
     value="{{membroExecucao.id}}">
-        {{membroExecucao.pessoa.nome}} - {{membroExecucao.tipo}}
+        {{membroExecucao.pessoa.nome}}
     </option>
     {% endfor %}
 </select>

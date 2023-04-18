@@ -2,6 +2,7 @@ from django.db import models
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
+from ..models.servicoContratado import ServicoContratado
 from datetime import datetime, timedelta
 from django.utils import timezone
 
@@ -11,6 +12,7 @@ class Ticket(models.Model):
     STATUS_ATRASADO_PARA_CRIACAO = "ATRASADO_PARA_CRIACAO"
     STATUS_PRESTACAO_CONTAS_PENDENTE = "PENDING_PRESTACAO_CONTAS"
     STATUS_PRESTACAO_CONTAS_CRIADA = "PRESTACAO_CONTAS_CREATED"
+    STATUS_CANCELADO = "CANCELADO"
 
     TIPO_DIARIA = "diaria"
     TIPO_ADIANTAMENTO = "adiantamento"
@@ -27,6 +29,7 @@ class Ticket(models.Model):
     id_protocolo = models.CharField(null = True, max_length=100)
     membro_execucao =  models.ForeignKey(MembroExecucao, on_delete=models.SET_NULL, null=True)
     alocacao =  models.ForeignKey(Alocacao, on_delete=models.SET_NULL, null=True)
+    servico_contratado = models.ForeignKey(ServicoContratado, on_delete=models.SET_NULL, null=True)
     meta = models.JSONField(null = True)
     model = models.CharField(null = True, blank=True, max_length=100)
     data_inicio = models.DateField(null = True, blank= True)
@@ -44,11 +47,13 @@ class Ticket(models.Model):
         db_table = 'tickets'
 
     def calculate_status(self):
+        if self.status == self.STATUS_CANCELADO:
+            return self.status
         entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
         today = timezone.now().date()
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
             data_inicio_evento_date = entity.data_inicio.fromisoformat(self.data_fim) if isinstance(entity.data_inicio, str) else entity.data_inicio
-            delta = data_inicio_evento_date - today
+            delta = data_inicio_evento_date.date() - today if isinstance(data_inicio_evento_date, datetime) else data_inicio_evento_date - today
             days_until_event_start = delta.days
             if days_until_event_start <= 7:
                 return self.STATUS_ATRASADO_PARA_CRIACAO
@@ -126,7 +131,9 @@ class Ticket(models.Model):
         elif self.status == self.STATUS_CRIADO:
             return "criado"
         elif self.status == self.STATUS_PRESTACAO_CONTAS_CRIADA:
-            return "conta_prestada"   
+            return "conta_prestada"  
+        elif self.status == self.STATUS_CANCELADO:
+            return "cancelado" 
         return ""
     
     @property
@@ -141,6 +148,8 @@ class Ticket(models.Model):
             return "demanda não criada no protocolo"    
         elif self.status == self.STATUS_CRIADO:
             return "demanda criada no protocolo"
+        elif self.status == self.STATUS_CANCELADO:
+            return "demanda cancelada"
         return "Status não identificado"
 
     @property

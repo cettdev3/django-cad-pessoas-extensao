@@ -23,11 +23,13 @@ from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiVie
 from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
 from sistema.views.membroExecucaoApiViews import MembroExecucaoApiView, MembroExecucaoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView, PessoaViewSets
+from sistema.views.galeriaApiViews import GaleriaApiView, GaleriaDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.acaoApiViews import AcaoApiView, AcaoDetailApiView
 from sistema.views.escolaApiViews import EscolaApiView, EscolaDetailApiView
 from sistema.views.alocacaoApiViews import AlocacaoApiView, AlocacaoDetailApiView
 from sistema.views.cursoApiViews import CursoApiView, CursoDetailApiView
+from sistema.views.servicoContratadoApiViews import ServicoContratadoApiView, ServicoContratadoDetailApiView
 from sistema.views.turnoApiViews import TurnoApiView, TurnoDetailApiView
 from sistema.views.departamentoApiViews import DepartamentoApiView, DepartamentoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
@@ -52,9 +54,16 @@ from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAt
 from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
+from sistema.views.siteServicosContratadosViews import servicoContratadoModal, servicoContratadoTable, saveServicoContratado, deleteServicoContratado
 from sistema.views.siteUserViews import usersSelect
 from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
+from sistema.views.siteGaleriaViews import (
+    galeriaModal,
+    galeriaTable,
+    saveGaleria,
+    deleteGaleria
+)
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -279,11 +288,26 @@ urlpatterns = [
     path("confirmDeleteModal",confirmDeleteModal),
     path("filterMultipleSelect", filterMultipleSelect),
 
+    # ROTAS PARA SERVICOS CONTRATADOS
+    path("servicoContratadoModal",servicoContratadoModal),
+    path("servicoContratadoTable",servicoContratadoTable),
+    path("saveServicoContratado",saveServicoContratado),
+    path("deleteServicoContratado/<servico_contratado_id>",deleteServicoContratado),
+
+    # ROTAS PARA GALERIAS
+    path("galeriaModal", galeriaModal),
+    path("galeriaTable", galeriaTable),
+    path("saveGaleria", saveGaleria),
+    path("deleteGaleri", deleteGaleria),
+
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     
     path("pessoas", PessoaApiView.as_view()),
     path("pessoas/<int:pessoa_id>", PessoaDetailApiView.as_view()),
+
+    path("galerias", GaleriaApiView.as_view()),
+    path("galerias/<int:galeria_id>", GaleriaDetailApiView.as_view()),
     
     path("enderecos", EnderecoApiView.as_view()),
     path('enderecos/<int:endereco_id>', EnderecoDetailApiView.as_view()),
@@ -340,6 +364,9 @@ urlpatterns = [
     path('servicos/<int:servico_id>', ServicoDetailApiView.as_view()),
     
     path("datas-removidas", DataRemovidaApiView.as_view()),
+
+    path("servicos-contratados", ServicoContratadoApiView.as_view()),
+    path('servicos-contratados/<int:servico_contratado_id>', ServicoContratadoDetailApiView.as_view()),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

@@ -134,17 +134,17 @@ def membrosExecucaoSelect(request):
     if request.GET.get('membro_execucao_id'):
         data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
     acao_id = request.GET.get('acao_id')
-    evento_id = request.GET.get('evento_id')
-    print("acao id", evento_id)
+    evento_id = request.GET.get('evento_id') if request.GET.get('evento_id') else request.GET.get('dp_evento_id')
     if acao_id:
         data["membrosExecucao"] = MembroExecucao.objects.filter(acao__id=acao_id)
     elif evento_id:
         data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id=evento_id)
     else:
         data["membrosExecucao"] = MembroExecucao.objects.all()
+
     data["select_id"] = request.GET.get('select_id')
     data['title'] = request.GET.get('title')
-    selectedId = request.GET.get('selected') if request.GET.get('selected') else ""
+    selectedId = request.GET.get('selected') if request.GET.get('selected') else request.GET.get('membro_execucao_id')
     selectedId = selectedId.strip()
     selectedId = int(selectedId) if selectedId else ""
     data["selected_membro_execucao_id"] = selectedId

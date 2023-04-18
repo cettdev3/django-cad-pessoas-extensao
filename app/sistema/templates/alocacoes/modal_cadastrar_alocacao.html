@@ -242,8 +242,17 @@
     function clearModalForm(changedResource = null) {
         document.getElementById(formId).reset();
 
-        if (changedResource) alocacaoModificadaEventProxy.modificado = changedResource
-        if (changedResource) $("#"+dismissCadastrarAlocacaoId).click()
+        if (changedResource) {
+            if (typeof alocacaoModificadaEventProxy !== "undefined") {
+                alocacaoModificadaEventProxy.modificado = changedResource
+            } else {
+                carregarAlocacoes()
+                $('#cadastrarAlocacaoModal').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        }
+        if (changedResource) $("#dismissCadastrarAlocacao").click()
     }
 
     function cadastrarAlocacao(data) {
@@ -296,7 +305,8 @@
     }
 
     $(document).ready(function () {
-        $("#"+cadastrarAlocacaoModalId).on('hide.bs.modal', function(){
+        $("#cadastrarAlocacaoModal").on('hide.bs.modal', function(){
+            console.log()
             let pessoaId = $("#"+alocacaoModelId).text()
             if (pessoaId) {
                 clearModalForm()
