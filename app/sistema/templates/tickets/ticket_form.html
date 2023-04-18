@@ -247,6 +247,13 @@
                 value="PRESTACAO_CONTAS_CREATED">
                     CONTAS PRESTADAS
                 </option>
+                <option 
+                {% if ticket and ticket.status_calculado == 'CANCELADO' %}
+                selected
+                {% endif %}
+                value="CANCELADO">
+                    CANCELADO
+                </option>
             </select>
         </div>
     </div>
@@ -267,10 +274,10 @@
         type="checkbox">
         <label for="use_dpEvento_endereco" 
         style="line-height: 1rem;white-space: nowrap;">
-            <b>Usar endereço 
+            <b>Usar endereço
                 {% if model == 'alocacao' %}
                 da ação de ensino
-                {% elif model == 'membro_execucao' %}
+                {% elif model == 'membro_execucao' or model == 'servico_contratado' %}
                 do evento
                 {% endif %}
             </b>

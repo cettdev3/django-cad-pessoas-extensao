@@ -40,6 +40,8 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "quantidadeAtendimentos",
             "quantidadeInscricoes",
             "cargaHoraria",
-            "servico_set"
+            "servico_set",
+            "id_protocolo",
+            "valor",
         ]
         depth = 2

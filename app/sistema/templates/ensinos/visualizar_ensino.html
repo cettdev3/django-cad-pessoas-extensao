@@ -82,7 +82,7 @@
             data: {},
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             success: function (data) {
-                let menuId = "#"+hiddenMenuAlocacoesId+ id
+                let menuId = "#hiddenMenuAlocacoes"+ id
                 $(menuId).toggle()
                 carregarAlocacoes()
             }

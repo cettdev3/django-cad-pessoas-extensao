@@ -38,6 +38,7 @@ def saveServico(request):
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
     response = requests.post('http://localhost:8000/servicos', json=body, headers=headers)
+
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')

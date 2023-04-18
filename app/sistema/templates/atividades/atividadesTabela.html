@@ -19,6 +19,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        max-width: 200px;
+        text-align: left;
+        white-space: wrap;
     }
     
     .servico-btn:hover {
@@ -45,7 +48,7 @@ cellspacing="0">
             <th class="text-left">Descricao</th>
             <!-- <th class="text-left">Departamento</th> -->
             <!-- <th class="text-left">Status</th> -->
-            <th class="text-left">Serviços</th>
+            <th class="text-left">Atividades relacionadas</th>
             <!-- <th class="w-2 text-left">Tipo</th> -->
         </tr>
     </thead>
@@ -62,7 +65,7 @@ cellspacing="0">
                     class="d-flex justify-content-center align-items-center border rounded mx-1 my-1">
                         <span class="servico-btn mr-1" 
                         onclick="openServicoDialog('{{atividade.id}}', '{{servico.id}}')">
-                        <strong>{{servico.nome}}</strong>
+                        <strong>{{servico.descricao}}</strong>
                         </span>
                         <span class="fa-stack servico-delete-btn "  
                         style="border-radius: 50%;" 
@@ -70,7 +73,7 @@ cellspacing="0">
                         onclick="openDeleteModal(() => deleteServico('{{servico.id}}'))"
                         data-toggle="tooltip" 
                         data-placement="top"
-                        title="Deletar Serviço">
+                        title="Deletar Atividade Relacionada">
                             <i style="border-radius: 50%; color: #df4759;" class="fas fa-circle-thin fa-stack-2x"></i>
                             <i style="border-radius: 50%;" class="fa-solid fa-trash fa-stack-1x fa-inverse "></i>
                         </span>
@@ -88,7 +91,7 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarAtividade{{atividade.id}}" href="/visualizarAtividade/({{atividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Servico</button> 
+                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Atividade Relacionada</button> 
                     <button onclick="editarAtividadeModal('{{atividade.id}}')">Editar</button> 
                     <button onclick="openDeleteModal(() => deleteAtividade('{{atividade.id}}'))" >Excluir</button>
                 </div>

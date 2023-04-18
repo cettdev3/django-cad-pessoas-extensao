@@ -1,1 +1,2 @@
 from .membroExecucaoSerializer import MembroExecucaoSerializer
+from .galeriaSerializer import GaleriaSerializer

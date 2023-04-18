@@ -1,0 +1,173 @@
+<div class="d-flex justify-content-between">
+    <label for="galeria_images">Imagens:</label>
+    <span class="fa-stack custom-add-img-button my-1" id="add-image-button" data-toggle="tooltip" data-placement="top"
+        title="adicionar imagem">
+        <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+        <i style="border-radius: 50%;" class="fa-solid fas fa-plus fa-stack-1x fa-inverse "></i>
+    </span>
+</div>
+<div class="drop-zone text-center border rounded" id="drop-zone" data-toggle="tooltip" data-placement="top"
+    title="arraste suas imagens para esta área">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input type="file" class="form-control d-none" id="galeria_images" name="galeria_images[]" multiple
+                        required>
+                </div>
+                <i id="dropzone-icon" class="fas fa-cloud-upload-alt drop-icon"></i>
+                <p id="dropzone-text">Você pode arrastar suas imagens para esta área</p>
+
+                <div class="row mt-3" id="thumbnails-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customModalGallery" class="custom-img-modal">
+    <div class="custom-img-modal-content">
+        <img class="non-selectable" src="" alt="Image">
+        <i class="custom-img-modal-close fas fa-times"></i>
+    </div>
+    <div class="nav-button-container left">
+        <i class="left-arrow fas fa-chevron-left"></i>
+    </div>
+
+    <div class="nav-button-container right">
+        <i class="right-arrow fas fa-chevron-right"></i>
+    </div>
+</div>
+
+<!-- Thumbnail template -->
+<template id="thumbnail-template">
+    <div class="col-md-4 mt-4" data-uuid="">
+        <div class="custom-image-thumbnail">
+            <img src="" class="non-selectable" alt="Image custom-image-Thumbnail">
+            <span class="fa-stack custom-remove-img-button" data-toggle="tooltip" data-placement="top"
+                title="remover imagem">
+                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+                <i style="border-radius: 50%;" class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
+            </span>
+        </div>
+        <div class="container position-relative">
+            <span class="fa-stack custom-prepend-descricao" data-toggle="tooltip" data-placement="top"
+                title="Descrição da imagem">
+                <i style="border-radius: 50%;" class="fa-solid fa-edit fa-stack-1x "></i>
+            </span>
+            <textarea class="image-descricao-input" id="descricao" name="descricao" value="" rows="3" data-uuid=""
+                placeholder="digite uma descrição para a imagem..."></textarea>
+        </div>
+    </div>
+</template>
+
+<script>
+    function toggleDropZoneText(files) {
+        if (files.length > 0) {
+            $('#dropzone-icon').addClass('d-none');
+            $('#dropzone-text').addClass('d-none');
+        } else {
+            $('#dropzone-icon').removeClass('d-none');
+            $('#dropzone-text').removeClass('d-none');
+        }
+    }
+
+
+    function handleFiles(files) {
+        const thumbnailsContainer = $('#thumbnails-container');
+
+        // Loop through the selected files
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            // When the image is loaded, create the thumbnail element and add the image to galleryImages
+            reader.onload = function (e) {
+                const uuid = generateUUID();
+                const thumbnailTemplate = $("#thumbnail-template")[0].content;
+                const thumbnail = $(thumbnailTemplate).clone();
+
+                thumbnail.find(".col-md-4").attr("data-uuid", uuid);
+                thumbnail.find("img").attr("src", e.target.result);
+                thumbnail.find("textarea")
+                    .attr("id", `descricao_${i}`)
+                    .attr("name", `descricao_${i}`)
+                    .attr("data-uuid", uuid);
+
+                // Append the thumbnail to the container using jQuery
+                thumbnailsContainer.append(thumbnail);
+
+                // Add the image data URL to the galleryImages array
+                galleryImages.push(e.target.result);
+                galleryImagesFiles.push(file);
+                toggleDropZoneText(galleryImagesFiles);
+
+                // Create a hidden input to save the image
+                const hiddenImageInput = $(`<input type="hidden" name="gallery_image_${i}">`);
+                hiddenImageInput.val(e.target.result);
+                $("#agenda-form").append(hiddenImageInput);
+            };
+
+            // Read the image as a data URL
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    var galleryImages = [];
+    $(document).ready(function () {
+        const $dropZone = $('#drop-zone');
+        const $addImageButton = $('#add-image-button');
+        const $inputElement = $('#galeria_images');
+        const $thumbnailsContainer = $('#thumbnails-container');
+
+        $addImageButton.on('click', () => $inputElement.click());
+
+        $inputElement.on('change', (event) => {
+            handleFiles(event.target.files);
+        });
+
+        $dropZone.on('dragover', (event) => {
+            event.preventDefault();
+            event.originalEvent.dataTransfer.dropEffect = 'copy';
+            $dropZone.addClass('drop-zone-active');
+        });
+
+        $dropZone.on('dragleave', () => {
+            $dropZone.removeClass('drop-zone-active');
+        });
+
+        $dropZone.on('drop', (event) => {
+            event.preventDefault();
+            $dropZone.removeClass('drop-zone-active');
+            handleFiles(event.originalEvent.dataTransfer.files);
+        });
+
+        $(document).on('click', '.custom-remove-img-button', function (event) {
+            // Prevent the click event from bubbling up to parent elements
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            const thumbnail = $(this).closest('.col-md-4');
+            const index = thumbnail.index('.col-md-4');
+
+            // Remove the thumbnail element
+            thumbnail.remove();
+
+            // Remove the corresponding image from the galleryImages array
+            galleryImages.splice(index, 1);
+            galleryImagesFiles.splice(index, 1);
+
+            // If there are no images left, show the drop zone text
+            toggleDropZoneText(galleryImagesFiles);
+        });
+
+    });
+</script>
