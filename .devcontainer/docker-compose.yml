@@ -1,8 +1,8 @@
 version: '3'
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
-  
-  app:
+
+  cad-pessoas-extensao:
     # If you want add a non-root user to your Dockerfile, you can use the "remoteUser"
     # property in devcontainer.json to cause VS Code its sub-processes (terminals, tasks, 
     # debugging) to execute as the user. Uncomment the next line if you want the entire 
@@ -28,15 +28,14 @@ services:
 
     volumes:
       # Update this to wherever you want VS Code to mount the folder of your project
-      # - .:/home/${APP_USER_NAME}/${APP_NAME}:cached
+      - .:/home/${APP_USER_NAME}/${APP_NAME}:cached
       # - ~/.gitconfig:~/.gitconfig:ro
 
       # Uncomment the next line to use Docker from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker-compose for details.
-      - /var/run/docker.sock:/var/run/docker.sock 
+      - /var/run/docker.sock:/var/run/docker.sock
 
     environment:
       DJANGO_DEBUG: True
-    
     # Uncomment the next four lines if you will use a ptrace-based debugger like C++, Go, and Rust.
     # cap_add:
     #   - SYS_PTRACE

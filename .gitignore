@@ -2,6 +2,7 @@
 *.env
 /data
 /logs
+/.venv
 __pycache__
 __pycache__
 /data
@@ -14,3 +15,8 @@ anotacoes
 */.bash_logout
 */.bashrc
 */.profil
+*/.vscode-server
+*/.ssh
+*/.config
+*/.gnupg
+*/.dotnet

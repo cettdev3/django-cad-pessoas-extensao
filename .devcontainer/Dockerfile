@@ -24,6 +24,9 @@ RUN sed -i '/pt_BR.UTF-8/s/^#//g' /etc/locale.gen \
     && dpkg-reconfigure --frontend noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8 LANGUAGE=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
 
+RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev python3-dev
+RUN apt-get install -y default-mysql-client libmariadb-dev-compat libmariadb-dev 
+
 ENV PIPENV_VENV_IN_PROJECT=True
 ENV PIPENV_SITE_PACKAGES=True
 ENV PATH="/home/$APP_USER_NAME/$APP_NAME/.venv/bin:$PATH"

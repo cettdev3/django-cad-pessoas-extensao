@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+envconfiguration = "*"
+fontawesomefree = "*"
+requests = "*"
+xlsxwriter = "*"
+pyyaml = "*"
+celery = "*"
+redis = "*"
+djangorestframework-simplejwt = "*"
+python-docx = "*"
+ntplib = "*"
+reportlab = "*"
+mysqlclient = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
