@@ -12,6 +12,7 @@ from ..models.cidade import Cidade
 from ..models.atividade import Atividade
 from ..models.departamento import Departamento
 from ..models.dpEvento import DpEvento
+from ..models.galeria import Galeria
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.atividadeSerializer import AtividadeSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -98,6 +99,8 @@ class AtividadeApiView(APIView):
                     {"res": "Não existe departamento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            
+        galeria = Galeria.objects.create(nome="galeria: "+tipoAtividade.nome, evento=evento)
         
         atividadeData = {
             "descricao": data["descricao"] if data["descricao"] else None,
@@ -114,6 +117,7 @@ class AtividadeApiView(APIView):
             "responsavel": responsavel,
             "departamento": departamento,
             "cidade": cidade,
+            "galeria": galeria,
             "logradouro": data["logradouro"] if data["logradouro"] else None,
             "bairro": data["bairro"] if data["bairro"] else None,
             "cep": data["cep"] if data["cep"] else None,

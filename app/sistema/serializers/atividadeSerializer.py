@@ -9,6 +9,7 @@ from ..serializers.departamentoSerializer import DepartamentoSerializer
 from ..serializers.cidadeSerializer import CidadeSerializer
 from ..serializers.dpEventoSerializer import DpEventoSerializer
 from ..serializers.servicoSerializer import ServicoSerializer
+from ..serializers.galeriaSerializer import GaleriaSerializer
 
 class AtividadeSerializer(serializers.ModelSerializer):
     acao = AcaoSerializer(many=False, read_only=True)   
@@ -18,6 +19,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
     departamento = DepartamentoSerializer(many=False, read_only=True)
     cidade = CidadeSerializer(many=False, read_only=True) 
     servico_set = ServicoSerializer(many=True, read_only=True)
+    galeria = GaleriaSerializer(many=False, read_only=True)
     class Meta:
         model = Atividade
         fields = [
@@ -35,6 +37,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "bairro",
             "cep",
             "complemento",
+            "galeria",
             "quantidadeCertificacoes",
             "quantidadeMatriculas",
             "quantidadeAtendimentos",

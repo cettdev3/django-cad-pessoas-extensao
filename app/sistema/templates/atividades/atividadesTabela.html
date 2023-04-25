@@ -91,8 +91,9 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarAtividade{{atividade.id}}" href="/visualizarAtividade/({{atividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
-                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Atividade Relacionada</button> 
                     <button onclick="editarAtividadeModal('{{atividade.id}}')">Editar</button> 
+                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Atividade Relacionada</button> 
+                    <button onclick="openGaleriaModal({{atividade.galeria.id}})">Imagens</button>
                     <button onclick="openDeleteModal(() => deleteAtividade('{{atividade.id}}'))" >Excluir</button>
                 </div>
             </td>
