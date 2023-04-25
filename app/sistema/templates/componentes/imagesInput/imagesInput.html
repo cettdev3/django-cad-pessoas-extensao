@@ -6,64 +6,47 @@
         <i style="border-radius: 50%;" class="fa-solid fas fa-plus fa-stack-1x fa-inverse "></i>
     </span>
 </div>
+
 <div class="drop-zone text-center border rounded" id="drop-zone" data-toggle="tooltip" data-placement="top"
     title="arraste suas imagens para esta área">
     <div class="container">
         <div class="row">
-
             <div class="col-md-12">
                 <div class="form-group">
                     <input type="file" class="form-control d-none" id="galeria_images" name="galeria_images[]" multiple
                         required>
                 </div>
-                <i id="dropzone-icon" class="fas fa-cloud-upload-alt drop-icon"></i>
-                <p id="dropzone-text">Você pode arrastar suas imagens para esta área</p>
-
-                <div class="row mt-3" id="thumbnails-container"></div>
+                <i id="dropzone-icon" 
+                {% if imagens %}
+                class="fas fa-cloud-upload-alt drop-icon d-none"
+                {% else %}
+                class="fas fa-cloud-upload-alt drop-icon"
+                {% endif %}
+                ></i>
+                <p id="dropzone-text"
+                {% if imagens %}
+                class="d-none"
+                {% endif %}
+                >Você pode arrastar suas imagens para esta área</p>
+                <div class="row mt-3" id="thumbnails-container">
+                    {% for imagem in imagens %}
+                        {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="customModalGallery" class="custom-img-modal">
-    <div class="custom-img-modal-content">
-        <img class="non-selectable" src="" alt="Image">
-        <i class="custom-img-modal-close fas fa-times"></i>
-    </div>
-    <div class="nav-button-container left">
-        <i class="left-arrow fas fa-chevron-left"></i>
-    </div>
+{% include "componentes/imagesInput/galleryModal.html" %}
 
-    <div class="nav-button-container right">
-        <i class="right-arrow fas fa-chevron-right"></i>
-    </div>
-</div>
-
-<!-- Thumbnail template -->
 <template id="thumbnail-template">
-    <div class="col-md-4 mt-4" data-uuid="">
-        <div class="custom-image-thumbnail">
-            <img src="" class="non-selectable" alt="Image custom-image-Thumbnail">
-            <span class="fa-stack custom-remove-img-button" data-toggle="tooltip" data-placement="top"
-                title="remover imagem">
-                <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-                <i style="border-radius: 50%;" class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
-            </span>
-        </div>
-        <div class="container position-relative">
-            <span class="fa-stack custom-prepend-descricao" data-toggle="tooltip" data-placement="top"
-                title="Descrição da imagem">
-                <i style="border-radius: 50%;" class="fa-solid fa-edit fa-stack-1x "></i>
-            </span>
-            <textarea class="image-descricao-input" id="descricao" name="descricao" value="" rows="3" data-uuid=""
-                placeholder="digite uma descrição para a imagem..."></textarea>
-        </div>
-    </div>
+{% include "componentes/imagesInput/thumbnail.html" %}
 </template>
-
 <script>
     function toggleDropZoneText(files) {
-        if (files.length > 0) {
+        let thumbsLenght = $('#thumbnails-container').children().length;
+        if (thumbsLenght > 0) {
             $('#dropzone-icon').addClass('d-none');
             $('#dropzone-text').addClass('d-none');
         } else {
@@ -93,6 +76,7 @@
                     .attr("id", `descricao_${i}`)
                     .attr("name", `descricao_${i}`)
                     .attr("data-uuid", uuid);
+                thumbnail.find("#galeria_id").val({{galeria_id}});
 
                 // Append the thumbnail to the container using jQuery
                 thumbnailsContainer.append(thumbnail);
@@ -118,6 +102,18 @@
             var r = Math.random() * 16 | 0,
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
+        });
+    }
+
+    async function deleteImagem(imagemId) {
+        console.log("imagem contem id = " + imagemId + " e será deletada");
+        return await $.ajax({
+            url: `/deleteImagem/${imagemId}`,
+            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            type: 'DELETE',
+            success: function (result) {
+                console.log("sucesso ao deletar", result);
+            }
         });
     }
 
@@ -150,13 +146,34 @@
             handleFiles(event.originalEvent.dataTransfer.files);
         });
 
-        $(document).on('click', '.custom-remove-img-button', function (event) {
+        $(document).on('click', '.custom-remove-img-button', async function (event) {
             // Prevent the click event from bubbling up to parent elements
             event.stopPropagation();
             event.stopImmediatePropagation();
 
             const thumbnail = $(this).closest('.col-md-4');
+            const idToDelete = $(this).attr('id');
             const index = thumbnail.index('.col-md-4');
+            // verify if tmbnail contains a image_id input
+            const imageId = thumbnail.find('input[name^="image_id_"]').val();
+
+            if (idToDelete) {
+                try {
+                    response = await deleteImagem(idToDelete);
+                    if (response.status == 200 || response.status == 204 || response.status == 201) {
+                        showFloatingMessage("Imagem deletada com sucesso", "alert-success");
+                    } else {
+                        showFloatingMessage("Erro ao deletar imagem", "alert-danger");
+                        return
+                    }
+                } catch (error) {
+                    showFloatingMessage("Erro ao deletar imagem", "error")
+                    console.log(error);
+                    return
+                }
+            } else {
+                console.log("thumbnail não contem id de imagem")
+            }
 
             // Remove the thumbnail element
             thumbnail.remove();
