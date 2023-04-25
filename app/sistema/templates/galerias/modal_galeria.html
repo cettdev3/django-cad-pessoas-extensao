@@ -4,7 +4,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="cadastrarGaleriaModalLabel">
+                    {% if galeria.id %}
+                    Editar galeria de imagens
+                    {% else %}
                     Cadastrar galeria de imagens
+                    {% endif %}
                 </h5>
                 <button type="button" id="dismissCadastrarGaleria" class="close" data-dismiss="modal"
                     aria-label="Close">
@@ -16,21 +20,30 @@
                     <form id="cadastrarGaleriaForm" action="/" method="POST">
                         <input type="text" value="{{dp_evento_id}}" name="dp_evento_id" id="dp_evento_id" hidden>
                         <input type="text" value="galeria" name="model" id="model" hidden>
+                        <input type="text" value="{{galeria.id}}" name="galeria_id" id="galeria_id" hidden>
 
                         <div class="mb-3">
-                            <label for="galeria_nome" class="form-label">Nome da Galeria:</label>
-                            <input type="text" class="form-control" id="galeria_nome" name="galeria_nome" required>
+                            <label for="nome" class="form-label">Nome da Galeria:</label>
+                            <input type="text" class="form-control" id="nome" name="nome" 
+                            {% if galeria %}
+                            value="{{galeria.nome|default_if_none:''}}"
+                            {% endif %}
+                            required>
                         </div>
 
                         <div class="mb-3">
-                            {% include "componentes/imagesInput/imageInput.html" %}
+                            {% if galeria %}
+                            {% include "componentes/imagesInput/imagesInput.html" with imagens=galeria.imagem_set galeria_id=galeria.id %}
+                            {% else %}
+                            {% include "componentes/imagesInput/imagesInput.html" %}
+                            {% endif %} 
                         </div>
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
                 <button onclick="saveGaleria('{{galeria.id}}')" type="button" class="btn btn-primary">
-                    {% if galeria %}
+                    {% if galeria.id %}
                     <span>Salvar Alterações</span>
                     {% else %}
                     <span>Cadastrar</span>
@@ -52,12 +65,12 @@
     }
 
     function saveGaleria(galeria_id) {
+        console.log(getFormData())
         $.ajax({
             type: "POST",
             url: "/saveGaleria",
             data: JSON.stringify(getFormData()),
             headers: { "X-CSRFToken": '{{ csrf_token }}' },
-
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
@@ -71,31 +84,34 @@
 
     function getFormData() {
         const images = [];
-        const galleryName = $("#galeria_nome").val();
+        const galleryName = $("#nome").val();
         const dpEventoId = $("#dp_evento_id").val();
         const model = $("#model").val();
+        const galeriaId = $("#galeria_id").val();
 
-        $(".col-md-4").each(function () {
+        $(".thumbnail-template-container").each(function () {
+            const imagemId = $(this).find("input[name='imagem_id']").val();
             const imageUuid = $(this).data("uuid");
             const imageDataUrl = $(this).find("img").attr("src");
             const imageDescription = $(`textarea[data-uuid="${imageUuid}"]`).val();
 
             images.push({
+                imagemId: imagemId,
                 uuid: imageUuid,
                 dataUrl: imageDataUrl,
-                description: imageDescription,
+                descricao: imageDescription,
             });
         });
 
         const galeriaData = {
-            name: galleryName,
+            galeria_id: galeriaId,
+            nome: galleryName,
             dp_evento_id: dpEventoId,
             model: model,
-            images: images,
         };
 
-        // You can now use galeriaData to send data to your server or process it further.
-        // For example, you can log the data to the console:
+        if (!galeriaId) galeriaData.imagens = images;
+
         return galeriaData;
     }
 

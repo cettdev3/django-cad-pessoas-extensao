@@ -22,6 +22,15 @@
     .cs-tab-link a:hover{
         text-decoration: none;
     }
+
+    #galerias::-webkit-scrollbar {
+        width: 5px;
+      }
+      
+      /* Changes the scrollbar color */
+      #galerias::-webkit-scrollbar-thumb {
+        background-color: #ddd;
+      }
 </style>
 <div 
 class="card shadow mb-4 w-100" 
@@ -100,7 +109,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <div id="membrosExecucao" 
             class="tab-pane active in h-100"
             style="overflow-y: scroll;" >
-                <div id="receberTabelaMembrosExecucao"></div>
+                <div id="receberTabelaMembrosExecucao" ></div>
             </div>
             {% comment %} <div id="itinerarios" class="tab-pane" style="height: 100%;">
                 {% include "itinerarios/itinerario_input.html" with itinerario=dpEvento acao=dpEvento %}
@@ -111,8 +120,9 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             <div id="avaliacao" class="tab-pane" style="height: 100%;">
                 <div id="avaliacaoLocalTableContainer"></div>
             </div>
-            <div id="galerias" class="tab-pane" style="height: 100%;">
-                <div id="galeriasTableContainer"></div>
+            <div id="galerias" class="tab-pane h-100 scroll-custom"
+            style="overflow-y: scroll;" >
+                <div id="galeriasTableContainer" class="mb-3" ></div>
             </div>
             {% comment %} <div id="servicoContratado"  class="tab-pane active in h-100"
             style="overflow-y: scroll;">
@@ -194,21 +204,6 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
                 setModalBehaviour(function () {
                     carregarSelectMembroExecucao();
                 });
-            }
-        });
-    }
-    
-    function openGaleriaModal() {
-        $.ajax({
-            url: "/galeriaModal",
-            method: "GET",
-            data: {
-                dp_evento_id: dpEventoId
-            },
-            success: function (data) {
-                $("#modalGaleriaContainer").html('');
-                $("#modalGaleriaContainer").html(data);
-                $('#cadastrarGaleriaModal').modal('show');
             }
         });
     }
@@ -371,6 +366,7 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
         carregarAtividades()
         carregarAvaliacaoLocal()
         carregarServicosContratados()
+        carregarGalerias()
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

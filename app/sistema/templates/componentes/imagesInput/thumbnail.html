@@ -1,0 +1,129 @@
+<div 
+{% if imagem %}
+id="thumbnail-{{imagem.id}}" 
+{% else %}
+id="thumbnail"
+{% endif %}
+class="col-md-4 mt-4 thumbnail-template-container"
+{% if imagem %}
+data-uuid="{{imagem.id}}"
+{% else %}
+data-uuid=""
+{% endif %}>
+    <div class="custom-image-thumbnail ">
+        {% if imagem %}
+        <input type="text" id="imagem_id" name="imagem_id" 
+        value="{{ imagem.id }}"
+        hidden>
+        {% endif %}
+        <input type="text" id="galeria_id" name="galeria_id" 
+        {% if galeria_id %}
+        value="{{galeria_id}}"
+        {% else %}
+        value=""
+        {% endif %}
+        hidden>
+        <div class="image-container">
+            <img
+                {% if imagem %}
+                    src="{{ imagem.shared_link }}"
+                {% else %}
+                    src=""
+                {% endif %}
+                src="" 
+                class="non-selectable" 
+                alt="Image custom-image-Thumbnail"
+            >
+            <div class="spinner"></div>
+        </div>
+        <span 
+        {% if imagem %}
+            id="{{imagem.id}}"
+        {% endif %}
+        class="fa-stack custom-remove-img-button" data-toggle="tooltip" data-placement="top"
+            title="remover imagem">
+            <i style="border-radius:   50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+            <i style="border-radius: 50%;" class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
+        </span>
+    </div>
+    <div class="container position-relative">
+        <span class="fa-stack custom-prepend-descricao" data-toggle="tooltip" data-placement="top"
+            title="Descrição da imagem">
+            <i style="border-radius: 50%;" class="fa-solid fa-edit fa-stack-1x "></i>
+        </span>
+        <textarea class="image-descricao-input" id="descricao" name="descricao" value="" rows="3" 
+        {% if imagem %}
+        data-uuid="{{imagem.id}}"
+        {% else %}
+        data-uuid=""
+        {% endif %}
+        placeholder="digite uma descrição para a imagem...">{% if imagem %}{{imagem.descricao}}{% endif %}</textarea>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        (function(params) {
+            let thumbnailId = params.imagem_id ? "thumbnail-" + params.imagem_id : "thumbnail";
+            let thumbnailContainer = $("#" + thumbnailId);
+            let inputGaleriaId = thumbnailContainer.find("#galeria_id");
+            let imageDataUrl = thumbnailContainer.find("img").attr("src");
+            let inputImagemId = thumbnailContainer.find("#imagem_id");
+            
+            function toggleLoading() {
+                var $thumbnail = thumbnailContainer.find('.image-container');
+                
+                if ($thumbnail.hasClass('loading')) {
+                    $thumbnail.removeClass('loading');
+                    $thumbnail.find('.spinner').hide();
+                } else {
+                    $thumbnail.addClass('loading');
+                    $thumbnail.find('.spinner').show();
+                }
+            }
+
+            function bindEvents() {
+                let inputDescricao = $("#" + thumbnailId).find(".image-descricao-input");
+                console.log("bindando eventos", inputDescricao);
+                inputDescricao.on("keyup", debounce(function() {
+                    console.log("input descricao mudou");
+                    saveImage();
+                }, 1000));
+            }
+
+            function saveImage() {
+                if (!inputGaleriaId.val()) return;
+
+                toggleLoading();
+                $.ajax({
+                    url: "/saveImagem",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    method: "POST",
+                    data: JSON.stringify({
+                        imagem_id: params.imagem_id,
+                        descricao: $("#" + thumbnailId).find(".image-descricao-input").val(),
+                        dataUrl: imageDataUrl,
+                        galeria_id: inputGaleriaId.val()
+                    }),
+                    success: function(response) {
+                        showFloatingMessage("Imagem atualizada com sucesso", "alert-success");
+                        let imagem = JSON.parse(response.content);
+                        params.imagem_id = imagem.id; 
+                        $("#" + thumbnailId + ".custom-remove-img-button").attr("id", imagem.id);
+                        toggleLoading();
+                    },
+                    error: function(error) {
+                        showFloatingMessage("Erro ao atualizar imagem", "alert-danger");
+                        toggleLoading();
+                    }
+                })
+            }
+            
+            bindEvents();
+            if (!params.imagem_id) {
+                saveImage();
+            }
+        })({imagem_id: "{{imagem.id}}"});
+    });
+</script>
