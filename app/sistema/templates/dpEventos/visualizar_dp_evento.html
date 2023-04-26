@@ -35,76 +35,69 @@
 <div 
 class="card shadow mb-4 w-100" 
 style="height: calc(100vh - 75px); overflow-y: hidden;">
-    <div class="d-flex justify-content-between pt-3 px-2">
-        <div class="d-flex flex-column">
-            <div class="d-flex align-items-center ">
-                <i class="fa-solid fa-location-dot "></i>
-                <span class="ml-2"><strong>{{dpEvento.cidade.nome}},  </strong>{{dpEvento.endereco_completo}}</span>
-            </div>
-            <div class="d-flex align-items-center ">
-                <i class="fa-solid fa-calendar-days"></i>
-                 <span class="ml-2">de {{dpEvento.data_inicio_formatada}}  até </span>
-                <span class="ml-2">{{dpEvento.data_fim_formatada}}</span>
-            </div>
-        </div>
-        <div id="add-membro-execucao-btn">
-            <div data-toggle="tooltip" data-placement="top" title="Adicionar Membro a Equipe de Execução"
-            class="d-flex align-items-center ">            
-                <button onclick="addMembroExecucaoModal()" 
-                class="btn btn-success">Adicionar</button>
-            </div>
-        </div>
-        <div id="add-atividade-btn">
-            <div  data-toggle="tooltip" data-placement="top" title="Adicionar Atividade"
-            class="d-flex align-items-center ">            
-                <button onclick="addAtividadeModal()" 
-                class="btn btn-success">Adicionar</button>
-            </div>
-        </div>
-        <div id="add-avaliacao-btn">
-            <div data-toggle="tooltip" data-placement="top" title="Adicionar Avaliação" 
-            class="d-flex align-items-center ">            
-                <button onclick="addAvaliacaoModal()" 
-                class="btn btn-success">Adicionar</button>
-            </div>
-        </div>
-        <div id="add-servico-contratado-btn">
-            <div data-toggle="tooltip" data-placement="top" title="Adicionar Serviço" 
-            class="d-flex align-items-center ">            
-                <button onclick="openServicoContratadoModal()" 
-                class="btn btn-success">Adicionar</button>
-            </div>
-        </div>
-        {% comment %} add galeria button {% endcomment %}
-        <div id="add-galeria-btn">
-            <div data-toggle="tooltip" data-placement="top" title="Adicionar Galeria" 
-            class="d-flex align-items-center ">            
-                <button onclick="openGaleriaModal()" 
-                class="btn btn-success">Adicionar</button>
-            </div>
-        </div>
-    </div>
+    
     <div class="card-body w-100">
-        <ul id="dpEvento-visualizar-tabs" class="nav nav-tabs w-100">
-            <li class=" cs-tab-link active">
-                <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
-            </li>
-            {% comment %} <li class=" cs-tab-link active">
-                <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
-            </li> {% endcomment %}
-            <li class=" cs-tab-link active">
-                <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
-            </li>
-            <li class=" cs-tab-link active">
-                <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
-            </li>
-            <li class=" cs-tab-link active">
-                <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
-            </li>
-            {% comment %} <li class=" cs-tab-link active">
-                <a id="servico-contratado-tab" data-toggle="tab" href="#servicoContratado">Serviços</a>
-            </li> {% endcomment %}
-        </ul>
+        <div class="d-flex">
+            <ul id="dpEvento-visualizar-tabs" class="nav nav-tabs w-100">
+                <li class=" cs-tab-link active">
+                    <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
+                </li>
+                {% comment %} <li class=" cs-tab-link active">
+                    <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
+                </li> {% endcomment %}
+                <li class=" cs-tab-link active">
+                    <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
+                </li>
+                <li class=" cs-tab-link active">
+                    <a id="avaliacao-local-tab" data-toggle="tab" href="#avaliacao">Avaliação do Local</a>
+                </li>
+                <li class=" cs-tab-link active">
+                    <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
+                </li>
+                {% comment %} <li class=" cs-tab-link active">
+                    <a id="servico-contratado-tab" data-toggle="tab" href="#servicoContratado">Serviços</a>
+                </li> {% endcomment %}
+            </ul>
+            <div class="d-flex justify-content-between px-2">
+                <div id="add-membro-execucao-btn">
+                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Membro a Equipe de Execução"
+                    class="d-flex align-items-center ">            
+                        <button onclick="addMembroExecucaoModal()" 
+                        class="btn btn-success">Adicionar</button>
+                    </div>
+                </div>
+                <div id="add-atividade-btn">
+                    <div  data-toggle="tooltip" data-placement="top" title="Adicionar Atividade"
+                    class="d-flex align-items-center ">            
+                        <button onclick="addAtividadeModal()" 
+                        class="btn btn-success">Adicionar</button>
+                    </div>
+                </div>
+                <div id="add-avaliacao-btn">
+                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Avaliação" 
+                    class="d-flex align-items-center ">            
+                        <button onclick="addAvaliacaoModal()" 
+                        class="btn btn-success">Adicionar</button>
+                    </div>
+                </div>
+                <div id="add-servico-contratado-btn">
+                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Serviço" 
+                    class="d-flex align-items-center ">            
+                        <button onclick="openServicoContratadoModal()" 
+                        class="btn btn-success">Adicionar</button>
+                    </div>
+                </div>
+                {% comment %} add galeria button {% endcomment %}
+                <div id="add-galeria-btn">
+                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Galeria" 
+                    class="d-flex align-items-center ">            
+                        <button onclick="openGaleriaModal()" 
+                        class="btn btn-success">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="tab-content w-100 h-100">
             <div id="membrosExecucao" 
             class="tab-pane active in h-100"

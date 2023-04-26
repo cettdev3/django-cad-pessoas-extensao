@@ -82,9 +82,15 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
+
+# as rotas da migration controller servem para migrar os dados do banco de dados antigo para o novo
+# a ordem da migrações deve ser a mesma ordem que as rotas estão declaradas
+# so devem ser usadas uma unica vez no momento do deploy da nova feature
 router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
 router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
 router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+router.register(r'migrations', MigrationsViewSets, 'seed-atividades-galeria')
+
 router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 
 urlpatterns = [

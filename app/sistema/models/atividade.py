@@ -5,7 +5,7 @@ from .dpEvento import DpEvento
 from .membroExecucao import MembroExecucao
 from .cidade import Cidade
 from .departamento import Departamento
-
+from .galeria import Galeria
 class Atividade(models.Model):
     id = models.AutoField(primary_key=True)
     descricao = models.CharField(null = True, blank=True, max_length=300)
@@ -28,6 +28,7 @@ class Atividade(models.Model):
     cargaHoraria = models.FloatField(null = True, blank=True)
     id_protocolo = models.CharField(null = True, blank=True, max_length=100)
     valor = models.FloatField(null = True, blank=True)
+    galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         db_table = 'atividades'
