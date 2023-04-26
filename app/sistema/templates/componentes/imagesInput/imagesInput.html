@@ -55,11 +55,75 @@
         }
     }
 
+    function toggleLoading(thumbnailContainer) {
+        console.log("container da thumb: ",thumbnailContainer)
+        var $imageContainer = thumbnailContainer.find('.image-container');
+        console.log("image container: ", $imageContainer)
+        if ($imageContainer.hasClass('loading')) {
+            $imageContainer.removeClass('loading');
+            $imageContainer.find('.spinner').hide();
+        } else {
+            $imageContainer.addClass('loading');
+            $imageContainer.find('.spinner').show();
+        }
+    }
+
+    function bindEvents(thumbnail) {
+        let inputDescricao = thumbnail.find("textarea");
+        inputDescricao.on("keyup", debounce(function() {
+            console.log("input descricao mudou dentro de input images");
+            saveImage(thumbnail);
+        }, 1000));
+    }
+
+    function saveImage(thumbnail) {
+        let inputGaleriaId = thumbnail.find("#galeria_id");
+        let imageTag = thumbnail.find("img")
+        let imageDataUrl = imageTag.attr("src");
+
+        let inputImagemId = thumbnail.find("#imagem_id");
+        if (!inputGaleriaId.val()) return;
+        console.log("salvando imagem pelo input images: ",{
+            imagem_id: inputImagemId.val(),
+            descricao: thumbnail.find(".image-descricao-input").val(),
+            dataUrl: imageDataUrl,
+            galeria_id: inputGaleriaId.val()
+        })
+        console.log("inputImagemId: ", inputImagemId)
+        toggleLoading(thumbnail);
+        $.ajax({
+            url: "/saveImagem",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            method: "POST",
+            data: JSON.stringify({
+                imagem_id: inputImagemId.val(),
+                descricao: thumbnail.find(".image-descricao-input").val(),
+                dataUrl: imageDataUrl,
+                galeria_id: inputGaleriaId.val()
+            }),
+            success: function(response) {
+                console.log("response: ", response)
+                showFloatingMessage("Imagem atualizada com sucesso", "alert-success");
+                let imagem = JSON.parse(response.content);
+                inputImagemId.val(imagem.id);
+                thumbnail.find(".custom-remove-img-button").attr("id", imagem.id);
+                toggleLoading(thumbnail);
+            },
+            error: function(error) {
+                console.log("error: ", error)
+                showFloatingMessage("Erro ao atualizar imagem", "alert-danger");
+                toggleLoading(thumbnail);
+            }
+        })
+    }
 
     function handleFiles(files) {
         const thumbnailsContainer = $('#thumbnails-container');
 
         // Loop through the selected files
+        console.log("quantidade de arquivos: ", files.length)
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const reader = new FileReader();
@@ -72,27 +136,33 @@
 
                 thumbnail.find(".col-md-4").attr("data-uuid", uuid);
                 thumbnail.find("img").attr("src", e.target.result);
-                thumbnail.find("textarea")
-                    .attr("id", `descricao_${i}`)
+
+                let inputDescricao = thumbnail.find("textarea")
+                inputDescricao.attr("id", `descricao_${i}`)
                     .attr("name", `descricao_${i}`)
                     .attr("data-uuid", uuid);
-                thumbnail.find("#galeria_id").val({{galeria_id}});
 
-                // Append the thumbnail to the container using jQuery
-                thumbnailsContainer.append(thumbnail);
+                    
+                    thumbnail.find("#galeria_id").val({{galeria_id}});
+                    thumbnail.find("#thumbnail-id").val(uuid);
+                    thumbnail.attr("id", `thumbnail-${uuid}`);
+                    
+                    
+                    thumbnailsContainer.append(thumbnail);
+                    galleryImages.push(e.target.result);
+                    galleryImagesFiles.push(file);
+                    
+                    const hiddenImageInput = $(`<input type="hidden" name="gallery_image_${i}">`);
+                    hiddenImageInput.val(e.target.result);
+                    $("#agenda-form").append(hiddenImageInput);
+                    let thumbnailDom = $('*[data-uuid="' + uuid + '"]');
+                    let galeriaIdValue = thumbnailDom.find("#galeria_id").val();
+                    if (galeriaIdValue) {
+                        bindEvents(thumbnailDom);
+                        saveImage(thumbnailDom);
+                    }
+                };
 
-                // Add the image data URL to the galleryImages array
-                galleryImages.push(e.target.result);
-                galleryImagesFiles.push(file);
-                toggleDropZoneText(galleryImagesFiles);
-
-                // Create a hidden input to save the image
-                const hiddenImageInput = $(`<input type="hidden" name="gallery_image_${i}">`);
-                hiddenImageInput.val(e.target.result);
-                $("#agenda-form").append(hiddenImageInput);
-            };
-
-            // Read the image as a data URL
             reader.readAsDataURL(file);
         }
     }

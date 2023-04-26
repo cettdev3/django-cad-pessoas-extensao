@@ -2,7 +2,7 @@
 {% if imagem %}
 id="thumbnail-{{imagem.id}}" 
 {% else %}
-id="thumbnail"
+id=""0
 {% endif %}
 class="col-md-4 mt-4 thumbnail-template-container"
 {% if imagem %}
@@ -11,11 +11,11 @@ data-uuid="{{imagem.id}}"
 data-uuid=""
 {% endif %}>
     <div class="custom-image-thumbnail ">
-        {% if imagem %}
         <input type="text" id="imagem_id" name="imagem_id" 
+        {% if imagem %}
         value="{{ imagem.id }}"
-        hidden>
         {% endif %}
+        hidden>
         <input type="text" id="galeria_id" name="galeria_id" 
         {% if galeria_id %}
         value="{{galeria_id}}"
@@ -60,9 +60,10 @@ data-uuid=""
         placeholder="digite uma descrição para a imagem...">{% if imagem %}{{imagem.descricao}}{% endif %}</textarea>
     </div>
 </div>
-<script>
+<script class="thumbnail-script" id="current-script-id">
     $(document).ready(function() {
         (function(params) {
+            console.log("parametros", params)
             let thumbnailId = params.imagem_id ? "thumbnail-" + params.imagem_id : "thumbnail";
             let thumbnailContainer = $("#" + thumbnailId);
             let inputGaleriaId = thumbnailContainer.find("#galeria_id");
@@ -85,14 +86,14 @@ data-uuid=""
                 let inputDescricao = $("#" + thumbnailId).find(".image-descricao-input");
                 console.log("bindando eventos", inputDescricao);
                 inputDescricao.on("keyup", debounce(function() {
-                    console.log("input descricao mudou");
+                    console.log("input descricao mudou dentro da thumbnail");
                     saveImage();
                 }, 1000));
             }
 
             function saveImage() {
                 if (!inputGaleriaId.val()) return;
-
+                console.log("salvando imagem pela thumbnail")
                 toggleLoading();
                 $.ajax({
                     url: "/saveImagem",
@@ -120,10 +121,10 @@ data-uuid=""
                 })
             }
             
-            bindEvents();
-            if (!params.imagem_id) {
-                saveImage();
+            if (params.imagem_id) {
+                bindEvents();
             }
+
         })({imagem_id: "{{imagem.id}}"});
     });
 </script>

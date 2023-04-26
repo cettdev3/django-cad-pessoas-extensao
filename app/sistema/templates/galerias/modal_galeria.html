@@ -1,3 +1,10 @@
+<style>
+    .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+</style>
 <div class="modal fade" id="cadastrarGaleriaModal" tabindex="-1" role="dialog"
     aria-labelledby="cadastrarGaleriaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -44,13 +51,16 @@
             <div class="modal-footer">
                 <button onclick="saveGaleria('{{galeria.id}}')" type="button" class="btn btn-primary">
                     {% if galeria.id %}
-                    <span>Salvar Alterações</span>
+                    <span id="save-galeria-btn">Salvar Alterações</span>
                     {% else %}
-                    <span>Cadastrar</span>
+                    <span id="save-galeria-btn">Cadastrar</span>
                     {% endif %}
                 </button>
             </div>
         </div>
+    </div>
+    <div id="save-galeria-spinner" class="spinner-border center" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Salvando...</span>
     </div>
 </div>
 
@@ -65,7 +75,10 @@
     }
 
     function saveGaleria(galeria_id) {
-        console.log(getFormData())
+        console.log("salvando galeria: ", getFormData())
+        $("#save-galeria-btn").html("Salvando...");
+        $("#save-galeria-btn").prop("disabled", true);
+        $("#save-galeria-spinner").show();
         $.ajax({
             type: "POST",
             url: "/saveGaleria",
@@ -75,9 +88,10 @@
             dataType: "json",
             success: function (response) {
                 clearModalForm(response)
+                showFloatingMessage("Galeria salva com sucesso", "alert-success");
             },
             error: function (error) {
-                console.log(error);
+                showFloatingMessage("Erro ao atualizar imagem", "alert-danger");
             },
         });
     }
@@ -111,11 +125,10 @@
         };
 
         if (!galeriaId) galeriaData.imagens = images;
-
         return galeriaData;
     }
 
     $(document).ready(function () {
-
+        $("#save-galeria-spinner").hide();
     });
 </script>
