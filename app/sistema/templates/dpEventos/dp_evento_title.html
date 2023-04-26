@@ -1,0 +1,39 @@
+<style>
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip-text {
+      visibility: hidden;
+      width: max-content;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 1;
+      bottom: -125%; /* Position the tooltip above the icon */
+      left: 50%;
+      margin-left: -60px; /* Half the tooltip's width */
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    </style>
+    
+    <div class="d-flex align-items-start p-1">
+        <span class="h4 ml-2">{{dpEvento.tipo_formatado}} - {{dpEvento.cidade.nome}}</span>
+
+        <div class="tooltip-container ml-2">
+            <div class="tooltip-text">
+                {{dpEvento.endereco_completo}} <br> de {{dpEvento.data_inicio_formatada}} até {{dpEvento.data_fim_formatada}}
+            </div>
+            <i class="fa-solid fa-info-circle"></i>
+        </div>
+    </div>

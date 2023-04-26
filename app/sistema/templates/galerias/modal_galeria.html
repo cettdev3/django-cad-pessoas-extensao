@@ -75,6 +75,7 @@
     }
 
     function saveGaleria(galeria_id) {
+        console.log("salvando galeria: ", getFormData())
         $("#save-galeria-btn").html("Salvando...");
         $("#save-galeria-btn").prop("disabled", true);
         $("#save-galeria-spinner").show();
@@ -124,7 +125,6 @@
         };
 
         if (!galeriaId) galeriaData.imagens = images;
-
         return galeriaData;
     }
 
