@@ -143,9 +143,9 @@ class MigrationsViewSets(viewsets.ModelViewSet):
         for atividade in Atividade.objects.all():
             if atividade.galeria:
                 continue
-            
+            nome = "galeria: "+atividade.tipoAtividade.nome if atividade.tipoAtividade else "galeria"
             atividade.galeria = Galeria.objects.create(
-                nome="galeria: "+atividade.tipoAtividade.nome,
+                nome=nome,
                 evento=atividade.evento,
             )
             atividade.save()
