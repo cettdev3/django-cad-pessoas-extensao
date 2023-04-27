@@ -42,6 +42,11 @@
                         RECICLA GOIÁS
                     </option>
                     <option 
+                    {% if dpEvento and dpEvento.tipo == "pauta_positiva" %} selected {% endif %} 
+                    value="pauta_positiva">
+                        PAUTA POSITIVA
+                    </option>
+                    <option 
                     {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
                     value="outro">
                         OUTRO
