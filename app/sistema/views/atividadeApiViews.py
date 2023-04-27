@@ -101,7 +101,7 @@ class AtividadeApiView(APIView):
                 )
             
         galeria = Galeria.objects.create(nome="galeria: "+tipoAtividade.nome, evento=evento)
-        
+
         atividadeData = {
             "descricao": data["descricao"] if data["descricao"] else None,
             "quantidadeCertificacoes": data["quantidadeCertificacoes"] if data["quantidadeCertificacoes"] else None,
@@ -125,6 +125,7 @@ class AtividadeApiView(APIView):
             "cep": data["cep"] if data["cep"] else None,
             "complemento": data["complemento"] if data["complemento"] else None,
             "valor": float(data["valor"]) if data["valor"] else None,
+            "atividade_meta": data["atividade_meta"] if data["atividade_meta"] else False,
         }
 
         atividade = Atividade.objects.create(**atividadeData)
@@ -246,6 +247,8 @@ class AtividadeDetailApiView(APIView):
             atividade.data_realizacao_fim = data["data_realizacao_fim"]
         if data["valor"]:
             atividade.valor = data["valor"]
+        if data["atividade_meta"] != None:
+            atividade.atividade_meta = data["atividade_meta"]
 
         atividade.save()
         serializer = AtividadeSerializer(atividade)

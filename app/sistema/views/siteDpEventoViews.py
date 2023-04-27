@@ -156,14 +156,16 @@ def visualizarDpEvento(request,codigo):
 
 def getFilteredEventos(filters):
     eventos = None
-    print("filtros", filters)
     if 'departamento_id' in filters and filters['departamento_id']:
         eventos = DpEvento.objects.prefetch_related(
         Prefetch(
             'atividade_set',
             queryset=Atividade.objects.select_related(
                 'tipoAtividade'
-            ).filter(departamento=filters['departamento_id'])
+            ).filter(
+                departamento=filters['departamento_id'],
+                atividade_meta=True
+            )
         ))
     else:
         eventos = DpEvento.objects.prefetch_related(
@@ -313,28 +315,23 @@ def getAtividadeLabel(doc, atividade, counter):
     return doc
 
 def getAtividadeImage(doc: Document, atividade, counter):
-    # Assuming atividade has an image instance
     imagem = atividade.galeria.imagem_set.first()
     if not imagem:
         return doc
-    # Access AlfrescoAPI to get the image content and save it locally
     alfresco_api = AlfrescoAPI()
     image_path = f"tmp/{imagem.id_alfresco}.jpg"
     alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
 
-    # Use Pillow to read and save the image
     try:
         img = Image.open(image_path)
         img.save(image_path)
     except IOError:
         print("Error: Unable to read or save the image using Pillow")
 
-    # Add image description
     p = doc.add_paragraph()
     p.add_run(f"Figura {counter}: {imagem.descricao}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-    # Add the image to the docx
     try:
         img_paragraph = doc.add_paragraph()
         img_run = img_paragraph.add_run()
@@ -346,7 +343,6 @@ def getAtividadeImage(doc: Document, atividade, counter):
         p.add_run(error_message)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     finally:
-        # Delete the image file
         try:
             os.remove(image_path)
         except OSError as e:
@@ -369,9 +365,19 @@ def getAtividade(doc, atividade, counter):
     doc.add_paragraph()
     return doc
 
+def reportEventos(eventos):
+    eventosLength = len(eventos) > 0
+    activitiesLength = 0
+    for evento in eventos:
+        activitiesLength = activitiesLength + evento.atividade_set.count()
+    return activitiesLength > 0 and eventosLength > 0
+
 def getRelatorioType1(doc, relatorioData):
     counter = 0
     for nomeEvento, eventos in relatorioData.items():
+        if not reportEventos(eventos):
+            continue
+
         doc = getSectionTitle(doc, nomeEvento)
         old_evento = 0
         for evento in eventos:

@@ -64,7 +64,21 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <label><b>Descrição:</b></label>
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <label><b>Descrição:</b></label>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="mr-2" style="width: 16px; height: 16px;">
+                            <input style="width: 100%; height: 100%;" class="mb-1" 
+                            type="checkbox" 
+                            {% if atividade.id and atividade.atividade_meta %}
+                            checked
+                            {% endif %}
+                            id="atividade_meta"
+                            name="atividade_meta">
+                        </div>
+                        <span class="mr-1" for="atividade_meta">Contabilizar atividade para relatório</span>
+                    </div>
+                </div>
                 <input type="text"
                 required
                 class="form-control"
