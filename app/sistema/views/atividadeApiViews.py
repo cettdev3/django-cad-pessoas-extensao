@@ -116,13 +116,14 @@ class AtividadeApiView(APIView):
             "tipoAtividade": tipoAtividade,
             "responsavel": responsavel,
             "departamento": departamento,
+            "data_realizacao_inicio": datetime.strptime(data["data_realizacao_inicio"], "%Y-%m-%d").date() if data["data_realizacao_inicio"] else None,
+            "data_realizacao_fim": datetime.strptime(data["data_realizacao_fim"], "%Y-%m-%d").date() if data["data_realizacao_fim"] else None,
             "cidade": cidade,
             "galeria": galeria,
             "logradouro": data["logradouro"] if data["logradouro"] else None,
             "bairro": data["bairro"] if data["bairro"] else None,
             "cep": data["cep"] if data["cep"] else None,
             "complemento": data["complemento"] if data["complemento"] else None,
-            "id_protocolo": data["id_protocolo"] if data["id_protocolo"] else None,
             "valor": float(data["valor"]) if data["valor"] else None,
         }
 
@@ -239,8 +240,10 @@ class AtividadeDetailApiView(APIView):
             atividade.quantidadeInscricoes = data["quantidadeInscricoes"]
         if data["cargaHoraria"]:
             atividade.cargaHoraria = data["cargaHoraria"]
-        if data["id_protocolo"]:
-            atividade.id_protocolo = data["id_protocolo"]
+        if data["data_realizacao_inicio"]:
+            atividade.data_realizacao_inicio = data["data_realizacao_inicio"]
+        if data["data_realizacao_fim"]:
+            atividade.data_realizacao_fim = data["data_realizacao_fim"]
         if data["valor"]:
             atividade.valor = data["valor"]
 

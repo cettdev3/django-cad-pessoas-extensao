@@ -49,7 +49,7 @@
                                     </div>
                                     <div id="ensinoFormSelectEscola" class="col-sm-3">
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-2">
                                         <label><b>Status:</b></label>
                                         <select required class="form-control" 
                                         id="status" name="status">
@@ -88,6 +88,91 @@
                                                 {% endif %}
                                             {% endif %}
                                             value="cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label><b>Etapa:</b></label>
+                                        <select class="form-control" 
+                                        id="etapa" name="etapa">
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == None or ensino.etapa == '' %}
+                                                    selected
+                                                {% endif %}
+                                            {% else %}
+                                                selected 
+                                            {% endif %}
+                                            value="">selecione uma etapa</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '1' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="1">1</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '2' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="2">2</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '3' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="3">3</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '4' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="4">4</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '5' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="5">5</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '6' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="6">6</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '7' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="7">7</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '8' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="8">8</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '9' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="9">9</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.etapa == '10' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="10">10</option>
                                         </select>
                                     </div>
                                 </div>

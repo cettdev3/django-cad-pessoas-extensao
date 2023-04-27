@@ -1,17 +1,17 @@
 <div class="w-100">
     <form id="cadastrarServicoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-12">
-                <label><b>Descricao:</b></label>
-                <textarea type="text"
-                required
+            <div class="col-sm-3">
+                <label><b>Nome:</b></label>
+                <input type="text"
                 class="form-control"
-                id="descricao"
-                name="descricao">{{servico.descricao|default_if_none:""}}</textarea>
+                {% if servico.id %}
+                value="{{servico.nome}}"
+                {% endif %}
+                id="nome"
+                name="nome">
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>status:</b></label>
                 <select class="form-control" id="status" name="status">
                     <option value="pendente" {% if servico.status == 'pendente' %}selected{% endif %}>Pendente</option>
@@ -19,9 +19,7 @@
                     <option value="cancelado" {% if servico.status == 'cancelado' %}selected{% endif %}>Cancelado</option>
                 </select>
             </div>
-        </div>
-        {% comment %} <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>Quantidade de Atendimentos:</b></label>
                 <input type="number"
                 required
@@ -32,7 +30,7 @@
                 id="quantidadeAtendimentos"
                 name="quantidadeAtendimentos">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label><b>Quantidade de Vendas:</b></label>
                 <input type="number"
                 required
@@ -43,7 +41,17 @@
                 id="quantidadeVendas"
                 name="quantidadeVendas">
             </div>
-        </div> {% endcomment %}
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Descricao:</b></label>
+                <textarea type="text"
+                required
+                class="form-control"
+                id="descricao"
+                name="descricao">{{servico.descricao|default_if_none:""}}</textarea>
+            </div>
+        </div>
         {% comment %} <div class="form-group row">
             <div class="col-sm-4">
                 <input id="atividade-servico-endereco" type="checkbox" class="mr-1">

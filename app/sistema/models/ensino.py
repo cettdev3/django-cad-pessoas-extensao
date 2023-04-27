@@ -26,6 +26,7 @@ class Ensino(models.Model):
     data_inicio = models.DateTimeField(null = True)
     data_fim = models.DateTimeField(null = True)
     tipo = models.CharField(null = True, max_length=100)
+    etapa = models.CharField(null = True, max_length=100)
     process_instance = models.CharField(null = True, max_length=100)
     observacao = models.CharField(null = True, max_length=500)
     status = models.CharField(null = True, max_length=100)
@@ -86,3 +87,9 @@ class Ensino(models.Model):
         elif self.tipo == self.GPS:
             return "GPS"
         return "Não definido"
+
+    @property
+    def etapa_formatada(self):
+        if self.etapa:
+            return "Etapa "+self.etapa
+        return ""

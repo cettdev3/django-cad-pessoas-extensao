@@ -4,17 +4,18 @@ from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
 from sistema.models.ensino import Ensino
 from sistema.models.tipoAtividade import TipoAtividade
+from sistema.services.alfrescoApi import AlfrescoAPI
 from sistema.models.atividade import Atividade
+from sistema.models.alocacao import Alocacao
 from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
-import itertools
+from PIL import Image
 import requests
-from docx.enum.text import WD_UNDERLINE
-from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, Inches
 import json
 import os
-from django.http import HttpResponse
 from django.http import FileResponse
 import docx
 from django.http import JsonResponse
@@ -24,6 +25,8 @@ from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
 from django.db.models import Prefetch
 from collections import defaultdict
+from docx.image.exceptions import UnrecognizedImageError
+from docx import Document
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_dp_eventos(request):
@@ -151,7 +154,7 @@ def visualizarDpEvento(request,codigo):
         'path_back': path_back
     })
 
-def createRelatorioGPS(doc, counter, filters):
+def getFilteredEventos(filters):
     eventos = None
     print("filtros", filters)
     if 'departamento_id' in filters and filters['departamento_id']:
@@ -161,7 +164,7 @@ def createRelatorioGPS(doc, counter, filters):
             queryset=Atividade.objects.select_related(
                 'tipoAtividade'
             ).filter(departamento=filters['departamento_id'])
-        )).filter(tipo=DpEvento.CURSO_GPS)
+        ))
     else:
         eventos = DpEvento.objects.prefetch_related(
         Prefetch(
@@ -186,272 +189,222 @@ def createRelatorioGPS(doc, counter, filters):
             result[tipo].setdefault(tipo_atividade, [])
             result[tipo][tipo_atividade].append(atividade)
 
-    for key,tipoEvento in result.items():
-        title = doc.add_paragraph()
-        title_run = title.add_run(f'{key}')
-        title_run.bold = True
-        title_run.underline = WD_UNDERLINE.SINGLE
-        title.space_after = Pt(0)
+    report = defaultdict(list)
+    for dp_evento in eventos:
+        report[dp_evento.tipo].append(dp_evento)
+    if True:
+        return report
+    return result
 
-        for skey, values in tipoEvento.items():
-            title_run = doc.add_paragraph()
-            title_run = title_run.add_run(f'{skey}')
-            title_run.bold = True
-            title_run.underline = WD_UNDERLINE.SINGLE
-            title_run.space_after = Pt(0)
-            
-            atividades = values
-            if len(atividades) == 0 or not atividades[0].tipoAtividade:
-                continue
-            
-            tipoAtividadeDescricao = doc.add_paragraph()
-            tipoAtividadeDescricao = tipoAtividadeDescricao.add_run(f'{atividades[0].tipoAtividade.descricao}')
+def getSectionTitle(doc, nomeEvento):
+    title = doc.add_paragraph()
+    title_run = title.add_run(f'{nomeEvento}')
+    title_run.bold = True
+    title_run.underline = WD_UNDERLINE.SINGLE
+    title.space_after = Pt(0)
+    return doc
 
-            for atividade in atividades:
-                acaoCargaHoraria = ""
-                cidade = ""
-                matriculas = ""
-                alunosCertificados = ""
-                dataInicio = ""
-                dataFim = ""
-                local = ""
-                etapa = ""
-                cursos = []
-                atividadeCargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
-                acaoCargaHoraria = f"Ação {str(counter)}: {int(atividadeCargaHoraria)}h"
-                cidade = f"{atividade.cidade.nome}"
-                if atividade.quantidadeMatriculas:
-                    matriculas = f"{atividade.quantidadeMatriculas}"
-                if atividade.quantidadeCertificacoes:
-                    alunosCertificados = f"{atividade.quantidadeCertificacoes}"
-                evento = atividade.evento
-                dataInicio = f"{evento.data_inicio.strftime('%d/%m/%Y')}" 
-                dataFim = f"{evento.data_fim.strftime('%d/%m/%Y')}"
-                local = f"{atividade.endereco_completo}"
-                if evento.acaoEnsino:
-                    etapa = f"{evento.acaoEnsino.observacao}"
-                    alocacoes = evento.acaoEnsino.alocacao_set.all()
-                    if alocacoes:
-                        for alocacao in alocacoes:
-                            cursos.append(f"{alocacao.curso.nome}")
+def getCidade(doc, atividade):
+    cidade = atividade.cidade
+    cidadeParagraph = doc.add_paragraph()
+    cidadeParagraph.add_run(f"cidade:").bold = True
+    cidadeParagraph.add_run(f" {cidade.nome}")
+    cidadeParagraphFormat = cidadeParagraph.paragraph_format
+    cidadeParagraphFormat.space_after = Pt(0)
+    return doc
 
-                section_title = doc.add_paragraph()
-                section_title_run = section_title.add_run(f'{acaoCargaHoraria}')
-                section_title_run.bold = True
-                section_title_run.underline = WD_UNDERLINE.SINGLE
-                section_title_format = section_title.paragraph_format
-                section_title_format.space_after = Pt(0)
+def getMatriculas(acaoEnsino):
+    alocacoes = acaoEnsino.alocacao_set.all()
+    matriculas = 0
+    for alocacao in alocacoes:
+        matriculas += alocacao.quantidade_matriculas
+    return matriculas
 
-                cidadeParagraph = doc.add_paragraph()
-                cidadeParagraph.add_run(f"cidade:").bold = True
-                cidadeParagraph.add_run(f" {cidade}")
-                cidadeParagraphFormat = cidadeParagraph.paragraph_format
-                cidadeParagraphFormat.space_after = Pt(0)
-                
-                if matriculas:
-                    matriculasParagraph = doc.add_paragraph()
-                    matriculasParagraph.add_run(f"Matriculas:").bold = True
-                    matriculasParagraph.add_run(f" {matriculas}")
-                    matriculasParagraphFormat = matriculasParagraph.paragraph_format
-                    matriculasParagraphFormat.space_after = Pt(0)
+def getServicosAtendimentos(atividade):
+    servicos = atividade.servico_set.all()
+    atendimentos = 0
+    for servico in servicos:
+        atendimentos += servico.quantidadeAtendimentos
+    return atendimentos
 
-                dataParagraph = doc.add_paragraph()
-                dataParagraph.add_run(f"data:").bold = True
-                dataParagraph.add_run(f" {dataInicio} até {dataFim}")
-                dataParagraphFormat = dataParagraph.paragraph_format
-                dataParagraphFormat.space_after = Pt(0)
+def getQuantitativo(doc, atividade):
+    quantitativoValor = atividade.tipo_quantitativo_valor
+    quantitativoLabel = atividade.tipo_quantitativo_label
 
-                localParagraph = doc.add_paragraph()
-                localParagraph.add_run(f"local:").bold = True
-                localParagraph.add_run(f" {local}")
-                localParagraphFormat = localParagraph.paragraph_format
-                localParagraphFormat.space_after = Pt(0)
+    if atividade.evento.acaoEnsino:
+        quantitativoValor = getMatriculas(atividade.evento.acaoEnsino)
+        quantitativoLabel = 'Quantidade de Matrículas'
+    if atividade.servico_set.count() > 0:
+        quantitativoValor = getServicosAtendimentos(atividade)
 
-                etapaParagraph = doc.add_paragraph()
-                etapaParagraph.add_run(f"etapa:").bold = True
-                etapaParagraph.add_run(f" {etapa}")
-                etapaParagraphFormat = etapaParagraph.paragraph_format
-                etapaParagraphFormat.space_after = Pt(0)
+    quantitativoParagraph = doc.add_paragraph()
+    quantitativoParagraph.add_run(f"{quantitativoLabel}:").bold = True
+    quantitativoParagraph.add_run(f" {quantitativoValor}")
+    quantitativoParagraphFormat = quantitativoParagraph.paragraph_format
+    quantitativoParagraphFormat.space_after = Pt(0)
+    return doc
 
-                cursosParagraph = doc.add_paragraph()
-                cursosParagraph.add_run(f"Cursos oferecidos:").bold = True
-                cursosParagraphFormat = cursosParagraph.paragraph_format
-                cursosParagraphFormat.space_after = Pt(0)
-                
-                for curso in cursos:
-                    cursoParagraph = doc.add_paragraph(f"{curso};")
-                    cursoParagraphFormat = cursoParagraph.paragraph_format
-                    cursoParagraphFormat.space_after = Pt(0)
+def getData(doc, atividade):
+    dataInicio = atividade.data_realizacao_inicio_formatada
+    dataFim = atividade.data_realizacao_fim_formatada
+    dataStr = f"{dataInicio} até {dataFim}" if dataInicio != dataFim else f"{dataInicio}"
+    dataParagraph = doc.add_paragraph()
+    dataParagraph.add_run(f"Data:").bold = True
+    dataParagraph.add_run(f" {dataStr}")
+    dataParagraphFormat = dataParagraph.paragraph_format
+    dataParagraphFormat.space_after = Pt(0)
+    return doc
 
-                if alunosCertificados:
-                    etapaParagraph = doc.add_paragraph()
-                    etapaParagraph.add_run(f"Alunos certificados:").bold = True
-                    etapaParagraph.add_run(f" {alunosCertificados}")
-                    etapaParagraphFormat = etapaParagraph.paragraph_format
-                    etapaParagraphFormat.space_after = Pt(0)
-                doc.add_paragraph()
-                counter += 1
-                
-    return doc, counter
+def getLocal(doc, atividade):
+    local = atividade.endereco_completo
+    localParagraph = doc.add_paragraph()
+    localParagraph.add_run(f"Local:").bold = True
+    localParagraph.add_run(f" {local}")
+    localParagraphFormat = localParagraph.paragraph_format
+    localParagraphFormat.space_after = Pt(0)
+    return doc
 
-def createRelatorioOutros(doc, counter, filters):
-    eventos = None
-    if 'departamento_id' in filters  and filters['departamento_id']:
-        eventos = DpEvento.objects.prefetch_related(
-        Prefetch(
-            'atividade_set',
-            queryset=Atividade.objects.select_related(
-                'tipoAtividade'
-            ).filter(
-                departamento=filters['departamento_id']
-            )
-        )).filter(~Q(tipo=DpEvento.CURSO_GPS))
-    else:
-        eventos = DpEvento.objects.prefetch_related(
-        Prefetch(
-            'atividade_set',
-            queryset=Atividade.objects.select_related(
-                'tipoAtividade'
-            )
-        )).filter(~Q(tipo=DpEvento.CURSO_GPS))
+def getEtapa(doc, atividade):
+    etapa = atividade.evento.acaoEnsino.etapa_formatada
+    if len(etapa) > 0:
+        etapaParagraph = doc.add_paragraph()
+        etapaParagraph.add_run(f"Etapa:").bold = True
+        etapaParagraph.add_run(f" {etapa}")
+        etapaParagraphFormat = etapaParagraph.paragraph_format
+        etapaParagraphFormat.space_after = Pt(0)
+        return doc
     
-    if 'data_inicio' in filters:
-        eventos = eventos.filter(data_inicio__gte=filters['data_inicio'])
-    if 'data_fim' in filters:
-        eventos = eventos.filter(data_fim__lte=filters['data_fim'])
+    return doc
 
-    atividadesCounter = counter
-    for evento in eventos:
-        # if evento has no activities, skip it
-        print("evento.cidade.nome: ", evento.cidade.nome)
-        print("evento.cidade.nome: ", len(evento.atividade_set.all()))
-        if not evento.atividade_set.all():
-            continue
-        title = doc.add_paragraph()
-        title_run = title.add_run(f'{evento.tipo_formatado} - {evento.cidade.nome}')
-        title_run.bold = True
-        title_run.underline = WD_UNDERLINE.SINGLE
-        title.space_after = Pt(0)
+def getSubAtividades(doc: Document, atividade):
+    if atividade.evento.acaoEnsino:
+        alocacoes = Alocacao.objects.filter(acaoEnsino=atividade.evento.acaoEnsino)
+        if alocacoes:
+            subAtividadesParagraph = doc.add_paragraph()
+            subAtividadesParagraph.add_run(f"Cursos Ofertados:").bold = True
+            subAtividadesParagraphFormat = subAtividadesParagraph.paragraph_format
+            subAtividadesParagraphFormat.space_after = Pt(0)
+            for alocacao in alocacoes:
+                curso = alocacao.curso.nome
+                codigoSiga = alocacao.codigo_siga if alocacao.codigo_siga else ""
+                quantidadeMatriculas = alocacao.quantidade_matriculas if alocacao.quantidade_matriculas else ""
+                subAtividadeParagraph = doc.add_paragraph(f"{codigoSiga} {curso}: {quantidadeMatriculas}")
+                subAtividadeParagraphFormat = subAtividadeParagraph.paragraph_format
+                subAtividadeParagraphFormat.space_after = Pt(0)
+            return doc
+    if atividade.servico_set.count() > 0:
+        subAtividadesParagraph = doc.add_paragraph()
+        subAtividadesParagraph.add_run(f"Serviços Ofertados:").bold = True
+        subAtividadesParagraphFormat = subAtividadesParagraph.paragraph_format
+        subAtividadesParagraphFormat.space_after = Pt(0)
+        for servico in atividade.servico_set.all():
+            servicoParagraph = doc.add_paragraph(f"{servico.nome}: {servico.quantidadeAtendimentos}")
+            servicoParagraphFormat = servicoParagraph.paragraph_format
+            servicoParagraphFormat.space_after = Pt(0)
+        return doc
+    return doc
 
-        atividades = evento.atividade_set.all()
-        for atividade in atividades:
-            if not atividade.tipoAtividade:
-                continue
-            
-            tipo = atividade.tipoAtividade.nome
-            atividadeCargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
-            print("atividadesCounter", atividadesCounter)
-            acaoCargaHoraria = f"Ação {atividadesCounter} - {str(int(atividadeCargaHoraria))}h"
+def getAtividadeLabel(doc, atividade, counter):
+    cargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else ""
+    atividadeLabel = doc.add_paragraph()
+    atividadeLabel.add_run(f"Ação {counter} - {cargaHoraria}").bold = True
+    atividadeLabelFormat = atividadeLabel.paragraph_format
+    atividadeLabelFormat.space_after = Pt(0)
+    return doc
 
-            service_cargaHoraria_title = doc.add_paragraph()
-            service_cargaHoraria_title_run = service_cargaHoraria_title.add_run(f'{acaoCargaHoraria}')
-            service_cargaHoraria_title_run.bold = True
-            service_cargaHoraria_title_run.underline = WD_UNDERLINE.SINGLE
-            service_cargaHoraria_title_format = service_cargaHoraria_title.paragraph_format
-            service_cargaHoraria_title_format.space_after = Pt(0)
-            
-            cidade = f"{atividade.cidade.nome}"
-            cidadeParagraph = doc.add_paragraph()
-            cidadeParagraph.add_run(f"cidade: ").bold = True
-            cidadeParagraph.add_run(f" {cidade}")
-            cidadeParagraphFormat = cidadeParagraph.paragraph_format
-            cidadeParagraphFormat.space_after = Pt(0)
+def getAtividadeImage(doc: Document, atividade, counter):
+    # Assuming atividade has an image instance
+    imagem = atividade.galeria.imagem_set.first()
+    if not imagem:
+        return doc
+    # Access AlfrescoAPI to get the image content and save it locally
+    alfresco_api = AlfrescoAPI()
+    image_path = f"{imagem.id_alfresco}.jpg"
+    alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
 
-            dataInicio = f"{evento.data_inicio.strftime('%d/%m/%Y')}"
-            dataFim = f"{evento.data_fim.strftime('%d/%m/%Y')}"
-            dataParagraph = doc.add_paragraph()
-            dataParagraph.add_run(f"data: ").bold = True
-            dataParagraph.add_run(f" {dataInicio} até {dataFim}")
-            dataParagraphFormat = dataParagraph.paragraph_format
-            dataParagraphFormat.space_after = Pt(0)
+    # Use Pillow to read and save the image
+    try:
+        img = Image.open(image_path)
+        img.save(image_path)
+    except IOError:
+        print("Error: Unable to read or save the image using Pillow")
 
-            local = f"{evento.escola.nome}"
-            localParagraph = doc.add_paragraph()
-            localParagraph.add_run(f"local: ").bold = True
-            localParagraph.add_run(f" {local}")
-            localParagraphFormat = localParagraph.paragraph_format
-            localParagraphFormat.space_after = Pt(0)
-            
-            if not atividade.quantidadeCertificacoes:
-                servicosParagraph = doc.add_paragraph()
-                servicosParagraph.add_run(f"Serviços oferecidos: ").bold = True
-                servicosParagraphFormat = servicosParagraph.paragraph_format
-                servicosParagraphFormat.space_after = Pt(0)
+    # Add image description
+    p = doc.add_paragraph()
+    p.add_run(f"Figura {counter}: {imagem.descricao}")
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-                servicos = atividade.tipoAtividade.nome
-                if servicos == "serviços diversos":
-                    servicos_set = atividade.servico_set.all()
-                    servicos = ""
-                    for servico in servicos_set:
-                        servicoOferecidoParagraph = doc.add_paragraph()
-                        servicoOferecidoParagraph.add_run(f" - {servico.nome}")
-                        servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
-                        servicoOferecidoParagraphFormat.space_after = Pt(0)
-                else:
-                    servicoOferecidoParagraph = doc.add_paragraph()
-                    servicoOferecidoParagraph.add_run(f" - {atividade.tipoAtividade.nome}")
-                    servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
-                    servicoOferecidoParagraphFormat.space_after = Pt(0)
+    # Add the image to the docx
+    try:
+        img_paragraph = doc.add_paragraph()
+        img_run = img_paragraph.add_run()
+        img_run.add_picture(image_path, width=Inches(4.0))
+        img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    except UnrecognizedImageError:
+        error_message = f"Error: Unable to recognize the image format for {imagem.descricao}."
+        p = doc.add_paragraph()
+        p.add_run(error_message)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    finally:
+        # Delete the image file
+        try:
+            os.remove(image_path)
+        except OSError as e:
+            print(f"Error: Unable to delete the image file: {e}")
+
+    return doc
+
+
+def getAtividade(doc, atividade, counter):
+    doc = getAtividadeLabel(doc, atividade, counter)
+    doc = getCidade(doc, atividade)
+    doc = getQuantitativo(doc, atividade)
+    doc = getData(doc, atividade)
+    doc = getLocal(doc, atividade)
+    if atividade.evento.acaoEnsino:
+        doc = getEtapa(doc, atividade)
+    doc = getSubAtividades(doc, atividade)
+    doc.add_paragraph()
+    doc = getAtividadeImage(doc, atividade, counter)
+    doc.add_paragraph()
+    return doc
+
+def getRelatorioType1(doc, relatorioData):
+    counter = 0
+    for nomeEvento, eventos in relatorioData.items():
+        doc = getSectionTitle(doc, nomeEvento)
+        old_evento = 0
+        for evento in eventos:
+            current_evento = evento.id
+            for atividade in evento.atividade_set.all():
+                if current_evento != old_evento:
+                    doc = getSectionTitle(doc, f"{evento.tipo} - {evento.cidade.nome}")
+                    old_evento = current_evento
+
+                doc = getSectionTitle(doc, f"{atividade.tipoAtividade.nome}")
+                counter = counter + 1
+                doc = getAtividade(doc, atividade, counter)
+    return doc
+
+def getRelatorioType2(doc, relatorioData):
+    for nomeEvento, tiposAtividades in relatorioData.items():
+        print("nomeEvento", nomeEvento)
+        doc = getSectionTitle(doc, nomeEvento)
+        for index, (nomeAtividade, atividades) in enumerate(tiposAtividades.items()):
+            if index == 0:
+                print("primeiro index")
                 
-                servicos = atividade.tipoAtividade.nome
-                if servicos == "serviços diversos":
-                    servicos_set = atividade.servico_set.all()
-                    servicos = ""
-                    
-                    vendasParagraph = doc.add_paragraph()
-                    vendasParagraph.add_run(f"Número de vendas: ").bold = True
-                    vendasParagraphFormat = vendasParagraph.paragraph_format
-                    vendasParagraphFormat.space_after = Pt(0)
+            print("nomeAtividade", nomeAtividade)
+            for atividade in atividades:
+                print("atividade individual", atividade)
 
-                    for servico in servicos_set:
-                        servicoOferecidoParagraph = doc.add_paragraph()
-                        servicoOferecidoParagraph.add_run(f" - {servico.nome}: {str(int(servico.quantidadeVendas))} vendas")
-                        servicoOferecidoParagraphFormat = servicoOferecidoParagraph.paragraph_format
-                        servicoOferecidoParagraphFormat.space_after = Pt(0)
+    return doc
 
-                servicos = atividade.tipoAtividade.nome
-                qtdAtendimentos = atividade.quantidadeAtendimentos
-                if servicos == "serviços diversos":
-                    servicos_set = atividade.servico_set.all()
-                    servicos = ""
-                    servicosAtendimentosCounter = 0
-                    for servico in servicos_set:
-                        servicosAtendimentosCounter += servico.quantidadeAtendimentos if servico.quantidadeAtendimentos else 0
-                    qtdAtendimentos = atividade.quantidadeAtendimentos if atividade.quantidadeAtendimentos else servicosAtendimentosCounter
-                if qtdAtendimentos:
-                    pessoasAtendidasParagraph = doc.add_paragraph()
-                    pessoasAtendidasParagraph.add_run(f"Quantidade de Atendimentos: ").bold = True
-                    pessoasAtendidasParagraph.add_run(f" {qtdAtendimentos}")
-                    pessoasAtendidasParagraphFormat = pessoasAtendidasParagraph.paragraph_format
-                    pessoasAtendidasParagraphFormat.space_after = Pt(0)
-
-            if atividade.quantidadeCertificacoes:
-                quantidadeCertificacoes = f"{str(int(atividade.quantidadeCertificacoes))}"
-                quantidadeCertificacoesParagraph = doc.add_paragraph()
-                quantidadeCertificacoesParagraph.add_run(f"Quantidade de certificações: ").bold = True
-                quantidadeCertificacoesParagraph.add_run(f" {quantidadeCertificacoes}")
-                quantidadeCertificacoesParagraphFormat = quantidadeCertificacoesParagraph.paragraph_format
-                quantidadeCertificacoesParagraphFormat.space_after = Pt(0)
-            
-            if atividade.quantidadeMatriculas:
-                quantidadeMatriculas = f"{str(int(atividade.quantidadeMatriculas))}"
-                quantidadeMatriculasParagraph = doc.add_paragraph()
-                quantidadeMatriculasParagraph.add_run(f"Quantidade de matrículas: ").bold = True
-                quantidadeMatriculasParagraph.add_run(f" {quantidadeMatriculas}")
-                quantidadeMatriculasParagraphFormat = quantidadeMatriculasParagraph.paragraph_format
-                quantidadeMatriculasParagraphFormat.space_after = Pt(0)
-
-            if atividade.quantidadeInscricoes:
-                quantidadeInscricoes = f"{str(int(atividade.quantidadeInscricoes))}"
-                quantidadeInscricoesParagraph = doc.add_paragraph()
-                quantidadeInscricoesParagraph.add_run(f"Quantidade de inscrições: ").bold = True
-                quantidadeInscricoesParagraph.add_run(f" {quantidadeInscricoes}")
-                quantidadeInscricoesParagraphFormat = quantidadeInscricoesParagraph.paragraph_format
-                quantidadeInscricoesParagraphFormat.space_after = Pt(0)
-
-            doc.add_paragraph()
-            atividadesCounter += 1
-
+def createRelatorio(doc, relatorioData, type = "type 1"):
+    if type == "type 1":
+        return getRelatorioType1(doc, relatorioData)
+    if type == "type 2":
+        return getRelatorioType2(doc, relatorioData)
     return doc
 
 @login_required(login_url='/auth-user/login-user')
@@ -465,10 +418,8 @@ def relatorioDpEvento(request):
         filters['data_fim'] = request.GET.get('data_fim')
 
     doc = docx.Document()
-
-    counter = int(1)
-    doc, counter = createRelatorioGPS(doc, counter, filters)
-    doc = createRelatorioOutros(doc, counter, filters)
+    relatorioData = getFilteredEventos(filters)
+    doc = createRelatorio(doc, relatorioData)
     with open('dp_evento_report.docx', 'wb') as f:
         doc.save(f)
 

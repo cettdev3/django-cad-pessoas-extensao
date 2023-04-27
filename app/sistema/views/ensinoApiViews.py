@@ -70,6 +70,7 @@ class EnsinoApiView(APIView):
             data_fim = datetime.strptime(request.data.get("data_fim"), '%Y-%m-%dT%H:%M')
         observacao = request.data.get("observacao")
         logradouro = request.data.get("logradouro")
+        etapa = request.data.get("etapa")
         bairro = request.data.get("bairro")
         cep = request.data.get("cep")
         complemento = request.data.get("complemento")
@@ -170,6 +171,8 @@ class EnsinoDetailApiView(APIView):
             ensino.complemento = request.data.get("complemento")
         if request.data.get("bairro"):
             ensino.bairro = request.data.get("bairro")
+        if request.data.get("etapa"):
+            ensino.etapa = request.data.get("etapa")
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
