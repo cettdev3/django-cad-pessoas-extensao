@@ -319,7 +319,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
         return doc
     # Access AlfrescoAPI to get the image content and save it locally
     alfresco_api = AlfrescoAPI()
-    image_path = f"{imagem.id_alfresco}.jpg"
+    image_path = f"tmp/{imagem.id_alfresco}.jpg"
     alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
 
     # Use Pillow to read and save the image
