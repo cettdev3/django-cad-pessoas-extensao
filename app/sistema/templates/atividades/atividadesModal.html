@@ -96,6 +96,10 @@
         });
     }
 
+    function getAtividadeMetaCheckBoxValue() {
+        return  $("#atividade_meta").is(':checked')
+    }
+
     function getFormData() {
         let form = $('#'+formId)
         var unindexed_array = form.serializeArray();
@@ -104,7 +108,7 @@
         $.map(unindexed_array, function (n, i) {
             values[n['name']] = n['value'];
         });
-
+        values['atividade_meta'] = getAtividadeMetaCheckBoxValue()
         return values
     }
 

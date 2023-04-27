@@ -48,5 +48,6 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "servico_set",
             "id_protocolo",
             "valor",
+            "atividade_meta"
         ]
         depth = 2

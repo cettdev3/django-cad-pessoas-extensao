@@ -31,6 +31,7 @@ class Atividade(models.Model):
     data_realizacao_fim = models.DateField(null = True, blank=True)
     valor = models.FloatField(null = True, blank=True)
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
+    atividade_meta = models.BooleanField(default=False, null = True, blank= True)
     
     class Meta:
         db_table = 'atividades'
