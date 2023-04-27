@@ -14,3 +14,4 @@ python-docx
 ntplib
 reportlab
 python-decouple
+pillow

@@ -29,6 +29,8 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "status",
             "acao",
             "evento",
+            "data_realizacao_inicio",
+            "data_realizacao_fim",
             "tipoAtividade",
             "responsavel",
             "departamento",

@@ -10,7 +10,10 @@ from ..models.ticket import Ticket
 from ..models.cidade import Cidade
 from ..models.escola import Escola
 from ..models.itinerario import Itinerario
+from ..models.atividade import Atividade
 from ..models.ensino import Ensino
+from ..models.imagem import Imagem
+from ..models.avaliacao import Avaliacao
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
@@ -252,31 +255,43 @@ class DpEventoDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, dp_evento_id, *args, **kwargs):
-        # default return message, rota invalida, contate o administrador do sistema
-        # return_message = {"res": "Rota inválida, contate o administrador do sistema"}
-        # return Response(return_message, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            instance = self.get_object(DpEvento, dp_evento_id)
+            if not instance:
+                return Response(
+                    {"res": "Não existe ação com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        instance = self.get_object(DpEvento, dp_evento_id)
-        if not instance:
-            return Response(
-                {"res": "Não existe ação com o id informado"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            membrosExecucao = MembroExecucao.objects.filter(evento=instance)
+            for membro_execucao in membrosExecucao:
+                tickets = Ticket.objects.filter(membro_execucao=membro_execucao)
+                for ticket in tickets:
+                    ticket.delete()
 
-        instance.atividade_set.all().delete()
-        instance.avaliacao_set.all().delete()
-        membro_execucao_set = instance.membroexecucao_set.all()
-        for membro_execucao in membro_execucao_set:
-            ticket = Ticket.objects.filter(membro_execucao=membro_execucao).first()
-            print("ticket, ",ticket)
-            if ticket is not None:
-                ticket.delete()
-            itinerario = membro_execucao.itinerario
-            if itinerario is not None:
-                itinerario.delete()
-            membro_execucao.delete()
+                itinerario = Itinerario.objects.filter(membroexecucao=membro_execucao).first()
+                if itinerario is not None:
+                    itinerarioItems = ItinerarioItem.objects.filter(itinerario=itinerario)
+                    for itinerarioItem in itinerarioItems:
+                        itinerarioItem.delete()
 
-        instance.delete()
+                    itinerario.delete()
+
+                membro_execucao.delete()
+            for atividade in Atividade.objects.filter(evento=instance):
+                galeria = atividade.galeria
+                if galeria is not None:
+                    alfrescoApi = AlfrescoAPI()
+                    for imagem in Imagem.objects.filter(galeria=galeria):
+                        alfrescoApi.deleteNode(imagem.id_alfresco)
+                        imagem.delete()
+
+                atividade.delete()
+
+            for avaliacao in Avaliacao.objects.filter(evento=instance):
+                avaliacao.delete()
+
+            instance.delete()
         return Response(
             {"res": "ação deletada!"},
             status=status.HTTP_200_OK

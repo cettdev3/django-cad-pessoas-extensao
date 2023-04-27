@@ -71,6 +71,8 @@ class AlocacaoApiView(APIView):
                     bairro = None
                     cidade = None
                     cep = None
+                    codigo_siga = None
+                    quantidade_matriculas = None
                     aulas_sabado = False
                     
                     if "curso_id" in alocacaoData:
@@ -123,6 +125,10 @@ class AlocacaoApiView(APIView):
                     
                     if alocacaoData["aulas_sabado"]:
                         aulas_sabado = alocacaoData["aulas_sabado"]
+                    if alocacaoData["quantidade_matriculas"]:
+                        quantidade_matriculas = alocacaoData["quantidade_matriculas"]
+                    if alocacaoData["codigo_siga"]:
+                        codigo_siga = alocacaoData["codigo_siga"]
 
                     alocacao = Alocacao.objects.create(
                         data_inicio = data_inicio,
@@ -137,7 +143,9 @@ class AlocacaoApiView(APIView):
                         bairro = bairro,
                         cidade = cidade,
                         cep = cep,
-                        aulas_sabado = aulas_sabado
+                        aulas_sabado = aulas_sabado,
+                        quantidade_matriculas = quantidade_matriculas,
+                        codigo_siga = codigo_siga
                     )
 
                     turnos = alocacaoData["turnos"]
@@ -374,6 +382,14 @@ class AlocacaoDetailApiView(APIView):
         if request.data.get("aulas_sabado") is not None:
             aulas_sabado = request.data.get("aulas_sabado")
             alocacao.aulas_sabado = aulas_sabado
+
+        if request.data.get("codigo_siga"):
+            codigo_siga = request.data.get("codigo_siga")
+            alocacao.codigo_siga = codigo_siga
+        
+        if request.data.get("quantidade_matriculas"):
+            quantidade_matriculas = request.data.get("quantidade_matriculas")
+            alocacao.quantidade_matriculas = quantidade_matriculas
         
         if request.data.get("turnos"):
             turnos = request.data.get("turnos")
