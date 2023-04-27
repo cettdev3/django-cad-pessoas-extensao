@@ -420,12 +420,12 @@ def relatorioDpEvento(request):
     doc = docx.Document()
     relatorioData = getFilteredEventos(filters)
     doc = createRelatorio(doc, relatorioData)
-    with open('dp_evento_report.docx', 'wb') as f:
+    with open('tmp/dp_evento_report.docx', 'wb') as f:
         doc.save(f)
 
-    response = FileResponse(open('dp_evento_report.docx', 'rb'))
+    response = FileResponse(open('tmp/dp_evento_report.docx', 'rb'))
     response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     response['Content-Disposition'] = 'attachment; filename="dp_evento_report.docx"'
 
-    os.remove('dp_evento_report.docx')
+    os.remove('tmp/dp_evento_report.docx')
     return response
