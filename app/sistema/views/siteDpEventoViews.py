@@ -217,14 +217,14 @@ def getMatriculas(acaoEnsino):
     alocacoes = acaoEnsino.alocacao_set.all()
     matriculas = 0
     for alocacao in alocacoes:
-        matriculas += alocacao.quantidade_matriculas
+        matriculas += alocacao.quantidade_matriculas if alocacao.quantidade_matriculas else 0
     return matriculas
 
 def getServicosAtendimentos(atividade):
     servicos = atividade.servico_set.all()
     atendimentos = 0
     for servico in servicos:
-        atendimentos += servico.quantidadeAtendimentos
+        atendimentos += servico.quantidadeAtendimentos if servico.quantidadeAtendimentos else 0
     return atendimentos
 
 def getQuantitativo(doc, atividade):

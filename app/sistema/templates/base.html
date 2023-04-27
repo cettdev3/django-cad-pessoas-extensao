@@ -43,9 +43,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
    
 
-    <!-- TABLE STYLE -->
+    <!-- CUSTOM STYLE -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/table.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom_photo_gallery.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/spinner-container.css' %}">
 
     <style>
         #accordionSidebar::-webkit-scrollbar {
@@ -265,6 +266,10 @@
     <script type="text/javascript" src="{% static 'js/ticket.js' %}"></script>
 
     <script type="text/javascript">
+        function toggleLoading() {
+            $("#loading-container").toggle();
+        }
+
         function showFloatingMessage(message, style) {
             $("#success-delete").removeClass("alert-success");
             $("#success-delete").removeClass("alert-danger");
