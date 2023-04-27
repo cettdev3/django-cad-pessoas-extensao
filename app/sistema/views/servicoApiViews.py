@@ -51,17 +51,17 @@ class ServicoApiView(APIView):
                 )
         
         data = {
-            "nome": request.data.get("nome"),
+            "nome": request.data.get("nome") or None,
             "quantidadeAtendimentos": request.data.get("quantidadeAtendimentos") or None,
             "quantidadeVendas": request.data.get("quantidadeVendas") or None,
-            "atividade": atividade,
-            "cidade": cidade,
-            "logradouro": request.data.get("logradouro"),
-            "bairro": request.data.get("bairro"),
-            "cep": request.data.get("cep"),
-            "complemento": request.data.get("complemento"),
-            "status": request.data.get("status"),
-            "descricao": request.data.get("descricao")
+            "atividade": atividade or None,
+            "cidade": cidade or None,
+            "logradouro": request.data.get("logradouro") or None,
+            "bairro": request.data.get("bairro") or None,
+            "cep": request.data.get("cep") or None,
+            "complemento": request.data.get("complemento") or None,
+            "status": request.data.get("status") or None,
+            "descricao": request.data.get("descricao") or None,
         }
         
         servico = Servico.objects.create(**data)

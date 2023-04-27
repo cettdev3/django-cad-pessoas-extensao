@@ -70,5 +70,5 @@ def editarEscola(request, escola_id):
 
 @login_required(login_url='/auth-user/login-user')
 def escolasSelect(request):
-    escolas = Escola.objects.all()
+    escolas = Escola.objects.order_by('cidade__nome').all()
     return render(request,'escolas/escolas_select.html',{'escolas':escolas})

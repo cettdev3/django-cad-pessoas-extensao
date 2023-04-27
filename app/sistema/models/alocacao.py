@@ -15,6 +15,8 @@ class Alocacao(models.Model):
     data_fim = models.DateField(null = True)
     status = models.CharField(null = True, max_length=50)   
     observacao = models.CharField(null = True, max_length=500)
+    codigo_siga = models.CharField(null = True, max_length=100)
+    quantidade_matriculas = models.IntegerField(null = True)
     bairro = models.CharField(null = True, max_length=100) 
     logradouro = models.CharField(null = True, max_length=250) 
     cep = models.CharField(null = True, max_length=100) 

@@ -24,6 +24,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "status",
             "endereco",
             "status_class",
+            "etapa",
             "logradouro",
             "complemento",
             "bairro",

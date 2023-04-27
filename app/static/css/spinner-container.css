@@ -1,0 +1,18 @@
+.spinner-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1003;
+    top: 50%;
+    left: 50%;
+    width: 100%; 
+    height: 100%;
+    transform: translate(-50%, -50%);
+}
+
+.spinner-container .spinner-lg {
+    width: 3rem;
+    height: 3rem;
+    border-width: .25em;
+}

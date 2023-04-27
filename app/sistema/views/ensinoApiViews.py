@@ -7,6 +7,7 @@ from rest_framework import permissions
 from django.db import transaction
 from django.db.models import Q
 from ..models.cidade import Cidade
+from ..models.ticket  import Ticket
 from ..models.escola import Escola
 from ..models.alocacao import Alocacao
 from ..models.endereco import Endereco
@@ -69,6 +70,7 @@ class EnsinoApiView(APIView):
             data_fim = datetime.strptime(request.data.get("data_fim"), '%Y-%m-%dT%H:%M')
         observacao = request.data.get("observacao")
         logradouro = request.data.get("logradouro")
+        etapa = request.data.get("etapa")
         bairro = request.data.get("bairro")
         cep = request.data.get("cep")
         complemento = request.data.get("complemento")
@@ -169,6 +171,8 @@ class EnsinoDetailApiView(APIView):
             ensino.complemento = request.data.get("complemento")
         if request.data.get("bairro"):
             ensino.bairro = request.data.get("bairro")
+        if request.data.get("etapa"):
+            ensino.etapa = request.data.get("etapa")
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
@@ -205,6 +209,9 @@ class EnsinoDetailApiView(APIView):
             # try:
             alocacoes = Alocacao.objects.filter(acaoEnsino__id=ensino.id)
             for alocacao in alocacoes:
+                demandas = Ticket.objects.filter(alocacao=alocacao)
+                for demanda in demandas:
+                    demanda.delete()
                 alocacao.delete()
             ensino.delete()
             # except Exception as e:

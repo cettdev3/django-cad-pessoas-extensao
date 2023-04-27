@@ -37,6 +37,7 @@ def galeriaTable(request):
         headers=headers
     )
     galerias = json.loads(response.content)
+    print(galerias)
     return render(
         request,
         'galerias/galerias_table.html',

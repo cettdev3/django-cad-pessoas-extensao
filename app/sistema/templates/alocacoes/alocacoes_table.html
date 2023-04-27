@@ -121,7 +121,12 @@
         <td class="alocacao-w-15 text-left">{{alocacao.professor.nome}}</td>
         {% endif %}
         {% if show_column_escola %}
-        <td class="alocacao-w-15 text-left">{{alocacao.acaoEnsino.escola.nome}}</td>
+        <td class="alocacao-w-15 text-left">
+            {{alocacao.acaoEnsino.escola.nome}} 
+            {% if alocacao.acaoEnsino.observacao and alocacao.acaoEnsino.observacao != 'None' and alocacao.acaoEnsino.observacao != '' %}
+                : {{alocacao.acaoEnsino.observacao}}
+            {% endif %}
+        </td>
         {% endif %}
         <td class="alocacao-w-15 text-left">{{alocacao.data_inicio_formatada|default_if_none:""}}</td>
         <td class="alocacao-w-15 text-left">{{alocacao.data_fim_formatada|default_if_none:""}}</td>

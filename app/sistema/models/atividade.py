@@ -5,7 +5,7 @@ from .dpEvento import DpEvento
 from .membroExecucao import MembroExecucao
 from .cidade import Cidade
 from .departamento import Departamento
-
+from .galeria import Galeria
 class Atividade(models.Model):
     id = models.AutoField(primary_key=True)
     descricao = models.CharField(null = True, blank=True, max_length=300)
@@ -27,7 +27,10 @@ class Atividade(models.Model):
     quantidadeInscricoes = models.IntegerField(null = True, blank=True)
     cargaHoraria = models.FloatField(null = True, blank=True)
     id_protocolo = models.CharField(null = True, blank=True, max_length=100)
+    data_realizacao_inicio = models.DateField(null = True, blank=True)
+    data_realizacao_fim = models.DateField(null = True, blank=True)
     valor = models.FloatField(null = True, blank=True)
+    galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         db_table = 'atividades'
@@ -46,3 +49,56 @@ class Atividade(models.Model):
         if self.cep:
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
+    
+    @property
+    def tipo_quantitativo(self):
+        if self.quantidadeAtendimentos:
+            return "Atendimento"
+        elif self.quantidadeCertificacoes:
+            return "Certificação"
+        elif self.quantidadeInscricoes:
+            return "Inscrição"
+        elif self.quantidadeMatriculas:
+            return "Matrícula"
+        else:
+            return "Outro"
+    
+    @property
+    def tipo_quantitativo_label(self):
+        if self.quantidadeAtendimentos:
+            return "Quantidade de Atendimentos"
+        elif self.quantidadeCertificacoes:
+            return "Quantidade de Certificações"
+        elif self.quantidadeInscricoes:   
+            return "Quantidade de Inscrições"
+        elif self.quantidadeMatriculas:
+            return "Quantidade de Matrículas"
+        else:
+            return "Quantidade de Atendimentos"
+
+    @property
+    def tipo_quantitativo_valor(self):
+        if self.quantidadeAtendimentos:
+            return self.quantidadeAtendimentos
+        elif self.quantidadeCertificacoes:
+            return self.quantidadeCertificacoes
+        elif self.quantidadeInscricoes:
+            return self.quantidadeInscricoes
+        elif self.quantidadeMatriculas:
+            return self.quantidadeMatriculas
+        else:
+            return 0
+        
+    @property
+    def data_realizacao_inicio_formatada(self):
+        if self.data_realizacao_inicio:
+            return self.data_realizacao_inicio.strftime("%d/%m/%Y")
+        else:
+            return ""
+    
+    @property
+    def data_realizacao_fim_formatada(self):
+        if self.data_realizacao_fim:
+            return self.data_realizacao_fim.strftime("%d/%m/%Y")
+        else:
+            return ""

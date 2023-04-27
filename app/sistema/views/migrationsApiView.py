@@ -6,6 +6,7 @@ from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.pessoa import Pessoas
 from ..models.ticket import Ticket
+from ..models.galeria import Galeria
 from ..models.atividade import Atividade
 from ..models.membroExecucao import MembroExecucao
 from rest_framework.decorators import action
@@ -136,3 +137,16 @@ class MigrationsViewSets(viewsets.ModelViewSet):
         for evento in DpEvento.objects.all():
             membro_execucao_por_pessoa(evento)
         return Response(data={}, status=st.HTTP_201_CREATED, content_type="application/json")
+    
+    @action(methods=["POST"], detail=False, url_path="seed-atividades-galeria")
+    def seedAtividadesGaleria(self, *args, **kwargs):
+        for atividade in Atividade.objects.all():
+            if atividade.galeria:
+                continue
+            nome = "galeria: "+atividade.tipoAtividade.nome if atividade.tipoAtividade else "galeria"
+            atividade.galeria = Galeria.objects.create(
+                nome=nome,
+                evento=atividade.evento,
+            )
+            atividade.save()
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

@@ -24,6 +24,7 @@ from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
 from sistema.views.membroExecucaoApiViews import MembroExecucaoApiView, MembroExecucaoDetailApiView
 from sistema.views.pessoaApiViews import PessoaApiView, PessoaDetailApiView, PessoaViewSets
 from sistema.views.galeriaApiViews import GaleriaApiView, GaleriaDetailApiView
+from sistema.views.imagemApiViews import ImagemApiView, ImagemDetailApiView
 from sistema.views.cidadeApiViews import CidadeApiView, CidadeDetailApiView
 from sistema.views.acaoApiViews import AcaoApiView, AcaoDetailApiView
 from sistema.views.escolaApiViews import EscolaApiView, EscolaDetailApiView
@@ -64,6 +65,10 @@ from sistema.views.siteGaleriaViews import (
     saveGaleria,
     deleteGaleria
 )
+from sistema.views.siteImagemViews import (
+    deleteImagem,
+    saveImagem
+)
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -77,9 +82,15 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
+
+# as rotas da migration controller servem para migrar os dados do banco de dados antigo para o novo
+# a ordem da migrações deve ser a mesma ordem que as rotas estão declaradas
+# so devem ser usadas uma unica vez no momento do deploy da nova feature
 router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
 router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
 router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+router.register(r'migrations', MigrationsViewSets, 'seed-atividades-galeria')
+
 router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 
 urlpatterns = [
@@ -298,7 +309,11 @@ urlpatterns = [
     path("galeriaModal", galeriaModal),
     path("galeriaTable", galeriaTable),
     path("saveGaleria", saveGaleria),
-    path("deleteGaleri", deleteGaleria),
+    path("deleteGaleria/<galeria_id>", deleteGaleria),
+    
+    # ROTAS PARA IMAGENS
+    path("saveImagem", saveImagem),
+    path("deleteImagem/<imagem_id>", deleteImagem),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
@@ -308,6 +323,9 @@ urlpatterns = [
 
     path("galerias", GaleriaApiView.as_view()),
     path("galerias/<int:galeria_id>", GaleriaDetailApiView.as_view()),
+    
+    path("imagens", ImagemApiView.as_view()),
+    path("imagens/<int:imagem_id>", ImagemDetailApiView.as_view()),
     
     path("enderecos", EnderecoApiView.as_view()),
     path('enderecos/<int:endereco_id>', EnderecoDetailApiView.as_view()),

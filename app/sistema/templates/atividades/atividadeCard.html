@@ -20,21 +20,26 @@
         background-color: #806c56;
         color: white;
     }
+
+    .activity-container {
+        align-items: start;
+        text-align: start;
+    }
 </style>
-<div class="d-flex flex-column">
-    <div class="d-flex">
+<div class="d-flex flex-column align-items-start">
+    <div class="d-flex activity-container">
         <span class="boxed-box bg-purple mr-1"><strong>{{atividade.status}}</strong></span>
         <span class="boxed-box bg-orange mr-1"><strong>{{atividade.departamento.nome}}</strong></span>
         {% if atividade.tipoAtividade %}
         <span class="boxed-box bg-brown mr-1"><strong>{{atividade.tipoAtividade.nome}}</strong></span>
         {% endif %}
-        {% if atividade.responsavel %}
-        <span><strong>Responsável: </strong>{{atividade.responsavel.pessoa.nome}}</span>
-        {% endif %}
     </div>
+    {% if atividade.responsavel %}
+    <span><strong>Responsável: </strong>{{atividade.responsavel.pessoa.nome}}</span>
+    {% endif %}
     {% if atividade.descricao != 'None' and atividade.descricao %}
     <div class="d-flex text-left"> 
-        <span>{{atividade.descricao}}</span>
+        <span><strong>Descrição: </strong>{{atividade.descricao}}</span>
     </div>
     {% endif %}
 </div>

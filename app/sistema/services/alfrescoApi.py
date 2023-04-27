@@ -90,3 +90,13 @@ class AlfrescoAPI:
         else: 
             print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
+        
+    def deleteNode(self, nodeId):
+        url = self.__base_url+"nodes/"+nodeId+"?alf_ticket="+self.__alf_ticket
+        response = requests.delete(url)
+
+        if response.status_code == 200 or response.status_code == 201 or response.status_code == 204:
+            return response
+        else: 
+            print("Houve um erro com a requisição",response.status_code, response.content)
+            return ""

@@ -134,7 +134,7 @@ cellspacing="0">
                     </div>
                     <span>{{dpEvento.endereco_completo}}</span>
                 </div>
-                <div><span class="font-weight-bold">{{dpEvento.descricao}}</span></div>
+                <div><span class="font-weight-bold">{{dpEvento.descricao|default_if_none:"Nenhum descrição fornecida para este evento"}}</span></div>
             </td>
             <td  class="dpEvento-vw-50 text-left position-relative">
                 <div class="d-flex flex-wrap py-1">
