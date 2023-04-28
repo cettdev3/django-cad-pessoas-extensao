@@ -21,7 +21,7 @@ cellspacing="0">
             <th class="text-left">
                 <span class="column-label ml-1">Evento/Ação de Ensino</span>
             </th>
-            <th class="text-left">Escola</th>
+            <th class="text-left">Escola/Local</th>
             <th class="text-left clickable-column" 
             id="column-demanda-status" data-toggle="tooltip"
             data-placement="top" onclick="orderTableBy(
@@ -42,7 +42,7 @@ cellspacing="0">
     <tbody>
         {% for demanda in demandas %}
         <tr>
-            <td class="text-left">
+            <td class="text-left w-15" >
                 <div class="d-flex flex-column justify-content-start align-items-start">
                     <div class="d-flex flex-column justify-content-start align-items-start">
                         {% if demanda.model == 'alocacao' %}
@@ -53,11 +53,15 @@ cellspacing="0">
                         <span class=" ">
                             {{demanda.membro_execucao.pessoa.nome|default_if_none:""}}
                         </span>
+                        {% elif  demanda.model == 'pessoa' %}
+                        <span class=" ">
+                            {{demanda.pessoa.nome|default_if_none:""}}
+                        </span>
                         {% endif %}
                     </div>
                 </div>
             </td>
-            <td  class="text-left position-relative">
+            <td  class="text-left position-relative w-35">
                 <div class="d-flex flex-wrap ">
                     {% if demanda.model == 'alocacao' %}
                     <div class="d-flex flex-column justify-content-start align-items-start">
@@ -71,6 +75,13 @@ cellspacing="0">
                                Ação de ensino ocorreu de {{demanda.alocacao.acaoEnsino.data_inicio_formatada|default_if_none:""}} até {{demanda.alocacao.acaoEnsino.data_fim_formatada|default_if_none:""}}
                             </span>
                         </div>
+                        {% if demanda.observacao %} 
+                            <div>
+                                <span class=" ">
+                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
+                                </span>
+                            </div>  
+                        {% endif %}
                     </div>
                     {% elif demanda.model == 'membro_execucao' or demanda.model == None or demanda.model == '' %}
                         <div class="d-flex flex-column justify-content-start align-items-start">
@@ -86,12 +97,27 @@ cellspacing="0">
                                 <span class=" ">
                                 Evento ocorreu de {{demanda.membro_execucao.evento.data_inicio_formatada|default_if_none:""}} até {{demanda.membro_execucao.evento.data_fim_formatada|default_if_none:""}}
                                 </span>
-                            </div>    
+                            </div>  
+                            {% if demanda.observacao %} 
+                            <div>
+                                <span class=" ">
+                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
+                                </span>
+                            </div>  
+                            {% endif %}
+                        </div>
+                    {% elif  demanda.model == 'pessoa' %}
+                        <div class="d-flex flex-column justify-content-start align-items-start">
+                            <div>
+                                <span class=" ">
+                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
+                                </span>
+                            </div> 
                         </div>
                     {% endif %}
                 </div>
             </td>
-            <td  class="text-left position-relative">
+            <td  class="text-left position-relative w-35">
                 <div>
                     {% if demanda.model == 'alocacao' %}
                     <span class="">
@@ -102,27 +128,18 @@ cellspacing="0">
                         {{demanda.membro_execucao.evento.escola.nome|default_if_none:""}}
                     </span>
                     {% endif %}
+                    {% if demanda.endereco_completo %}
+                    <div class="">
+                        <strong>Endereço</strong>: {{demanda.endereco_completo|default_if_none:""}}
+                    </div>
+                    {% endif %}
                 </div>
             </td>
-            <td  class="text-left position-relative">
+            <td  class="text-left position-relative w-15">
                 <div class="d-flex flex-wrap ">
                     {% include "tickets/ticket_card.html" with ticket=demanda model=demanda.model show_delete=False show_edit=True %}
                 </div>
             </td>
-            {% comment %} <td class="w-2 text-left" style="position: relative;">
-                <button id="showHiddenMenuTable{{demanda.id}}" 
-                class="btn-circle">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>                         
-                </button>
-                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
-                id="hiddenMenuContainer{{demanda.id}}" 
-                class="btn-group-custom">
-                    <a id="linkVisualizarDpEvento{{demanda.id}}" href="/visualizarDpEvento/({{demanda.id}})"></a>
-                    <button onclick="visualizarDpEvento('{{demanda.id}}')">Visualizar</button> 
-                    <button onclick="carregarDpEventoModalEditar('{{demanda.id}}')">Editar</button> 
-                    <button onclick="openDeleteModal(() => deleteDpEvento('{{demanda.id}}'))" >Excluir</button>
-                </div>
-            </td> {% endcomment %}
         </tr>
         {% endfor %}
     </tbody>
