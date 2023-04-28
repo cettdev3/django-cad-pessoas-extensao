@@ -178,6 +178,7 @@ def getFilteredEventos(filters):
     if 'data_fim' in filters:
         eventos = eventos.filter(data_fim__lte=filters['data_fim'])
     result = {}
+    eventos = eventos.order_by('data_inicio')
 
     for evento in eventos:
         if evento.atividade_set.count() == 0:
