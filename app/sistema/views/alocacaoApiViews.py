@@ -125,9 +125,9 @@ class AlocacaoApiView(APIView):
                     
                     if alocacaoData["aulas_sabado"]:
                         aulas_sabado = alocacaoData["aulas_sabado"]
-                    if alocacaoData["quantidade_matriculas"]:
+                    if alocacaoData.get("quantidade_matriculas"):
                         quantidade_matriculas = alocacaoData["quantidade_matriculas"]
-                    if alocacaoData["codigo_siga"]:
+                    if alocacaoData.get("codigo_siga"):
                         codigo_siga = alocacaoData["codigo_siga"]
 
                     alocacao = Alocacao.objects.create(
