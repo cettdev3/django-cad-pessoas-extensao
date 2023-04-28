@@ -92,3 +92,10 @@ def editarEnsino(request, codigo):
     body = json.loads(request.body)['data']
     response = requests.put('http://localhost:8000/ensino/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+@login_required(login_url='/auth-user/login-user')
+def getEnsino(request, ensino_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/ensino/'+str(ensino_id), headers=headers)
+    return JsonResponse(json.loads(response.content),status=response.status_code)

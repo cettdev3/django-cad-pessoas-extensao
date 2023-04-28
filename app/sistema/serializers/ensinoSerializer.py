@@ -1,9 +1,6 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
-
-from .enderecoSerializer import EnderecoSerializer
-
-from ..models.endereco import Endereco
+from .dpEventoEnsinoSerializer import DpEventoEnsinoSerializer
 from ..models.ensino import Ensino
 
 class EnsinoSerializer(serializers.ModelSerializer):
@@ -12,6 +9,8 @@ class EnsinoSerializer(serializers.ModelSerializer):
     data_inicio_formatada = serializers.DateField(format='%d/%m/%Y')
     data_fim_formatada = serializers.DateField(format='%d/%m/%Y')
     tipo_formatado = serializers.CharField(read_only=True)
+    first_dp_evento = serializers.SerializerMethodField()
+
     class Meta:
         model = Ensino
         fields = [
@@ -34,6 +33,15 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "data_inicio_formatada",
             "data_fim_formatada",
             "tipo_formatado",
+            "first_dp_evento",
         ]
         depth = 2
         
+    def get_first_dp_evento(self, obj):
+        if not hasattr(obj, 'first_dp_evento'):
+            return None
+        
+        first_dp_evento = obj.first_dp_evento[0] if obj.first_dp_evento else None
+        if first_dp_evento:
+            return DpEventoEnsinoSerializer(first_dp_evento).data
+        return None
