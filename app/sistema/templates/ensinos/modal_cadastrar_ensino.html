@@ -47,49 +47,6 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div id="ensinoFormSelectEscola" class="col-sm-3">
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <label><b>Status:</b></label>
-                                        <select required class="form-control" 
-                                        id="status" name="status">
-                                            <option 
-                                            {% if ensino %}
-                                                {% if ensino.status == 'planejamento' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="planejamento">Planejamento</option>
-                                            <option 
-                                            {% if ensino %}
-                                                {% if ensino.status == 'andamento' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="andamento">Em Andamento</option>
-                                            <option 
-                                            {% if ensino %}
-                                                {% if ensino.status == 'finalizado' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="finalizado">Finalizado</option>
-                                            <option 
-                                            {% if ensino %}
-                                                {% if ensino.status == 'adiado' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="adiado">Adiado</option>
-                                            <option 
-                                            {% if ensino %}
-                                                {% if ensino.status == 'cancelado' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="cancelado">Cancelado</option>
-                                        </select>
-                                    </div>
                                     <div class="col-sm-2">
                                         <label><b>Etapa:</b></label>
                                         <select class="form-control" 
@@ -173,6 +130,49 @@
                                                 {% endif %}
                                             {% endif %}
                                             value="10">10</option>
+                                        </select>
+                                    </div>
+                                    <div id="ensinoFormSelectEscola" class="col-sm-3">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label><b>Status:</b></label>
+                                        <select required class="form-control" 
+                                        id="status" name="status">
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'planejamento' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="planejamento">Planejamento</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'andamento' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="andamento">Em Andamento</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'finalizado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="finalizado">Finalizado</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'adiado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="adiado">Adiado</option>
+                                            <option 
+                                            {% if ensino %}
+                                                {% if ensino.status == 'cancelado' %}
+                                                    selected
+                                                {% endif %}
+                                            {% endif %}
+                                            value="cancelado">Cancelado</option>
                                         </select>
                                     </div>
                                 </div>
