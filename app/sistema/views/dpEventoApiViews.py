@@ -99,12 +99,22 @@ class DpEventoApiView(APIView):
                     {"res": "Não existe ação de ensino com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            
+        dataInicio = None
+        if postDpEventoData["data_inicio"]:
+            datetimeInicio = datetime.strptime(postDpEventoData["data_inicio"], '%Y-%m-%dT%H:%M')
+            dataInicio = datetimeInicio.date()
+
+        dataFim = None
+        if postDpEventoData["data_fim"]:
+            datetimeFim = datetime.strptime(postDpEventoData["data_fim"], '%Y-%m-%dT%H:%M')
+            dataFim = datetimeFim.date()
 
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
             "descricao": postDpEventoData["descricao"] if postDpEventoData["descricao"] else None,
-            "data_inicio": postDpEventoData["data_inicio"] if postDpEventoData["data_inicio"] else None,
-            "data_fim": postDpEventoData["data_fim"] if postDpEventoData["data_fim"] else None,
+            "data_inicio": dataInicio,
+            "data_fim": dataFim,
             "bairro": postDpEventoData["bairro"] if postDpEventoData["bairro"] else None,
             "logradouro": postDpEventoData["logradouro"] if postDpEventoData["logradouro"] else None,
             "cep": postDpEventoData["cep"] if postDpEventoData["cep"] else None,
@@ -116,60 +126,9 @@ class DpEventoApiView(APIView):
 
         membrosExecucaoData = []
         
-        with transaction.atomic():
-            dp_eventoData = DpEvento.objects.create(**dp_eventoData)
-            databaseMembrsoExecucao = []
-            for membrosExecucaoData in membrosExecucaoData:
-                membrosExecucaoData["evento"] = dp_eventoData
-                membroExecucao = MembroExecucao.objects.create(**membrosExecucaoData)
-                databaseMembrsoExecucao.append(membroExecucao)
-
-            for itinerarioData in postItinerariosData:
-                itinerario = Itinerario.objects.create(
-                    color=itinerarioData["color"] if itinerarioData["color"] else None,
-                )
-                print("criando itinerario", itinerario.id)
-
-
-                for postItinerarioItemData in itinerarioData["itens"]:
-                    cidade = None
-                    if postItinerarioItemData.get("cidade_id"):
-                        cidade = self.get_object(Cidade, postItinerarioItemData["cidade_id"])
-                        if not cidade:
-                            return Response(
-                                {"res": "Não existe cidade com o id informado"},
-                                status=status.HTTP_400_BAD_REQUEST,
-                            )
-                    print("dados vindos do post: ",postItinerarioItemData)
-                    data = postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None
-                    if data:
-                        # convert str '2023-01-16T10:09' to datetime
-                        data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
-                    itinerarioItemData = {
-                        "data_hora": data,
-                        "endereco": postItinerarioItemData["endereco"] if postItinerarioItemData.get("endereco") else None,
-                        "bairro": postItinerarioItemData["bairro"] if postItinerarioItemData.get("bairro") else None,
-                        "logradouro": postItinerarioItemData["logradouro"] if postItinerarioItemData.get("logradouro") else None,
-                        "cep": postItinerarioItemData["cep"] if postItinerarioItemData.get("cep") else None,
-                        "complemento": postItinerarioItemData["complemento"] if postItinerarioItemData.get("complemento") else None,
-                        "cidade": cidade,
-                        "escola": postItinerarioItemData["escola"] if postItinerarioItemData.get("escola") else None,
-                        "latitude": postItinerarioItemData["latitude"] if postItinerarioItemData.get("latitude") else None,
-                        "longitude": postItinerarioItemData["longitude"] if postItinerarioItemData.get("longitude") else None,
-                        "itinerario": itinerario,
-                    }
-
-                    itinerarioItem = ItinerarioItem.objects.create(**itinerarioItemData)
-                for membroExecucao in databaseMembrsoExecucao:
-                    for itinerarioMembroEquipe in itinerarioData["membros_equipe"]:
-                        isSamePerson = int(membroExecucao.pessoa.id) == int(itinerarioMembroEquipe["pessoa_id"])
-                        isSameType = membroExecucao.tipo == itinerarioMembroEquipe["tipo_solicitacao"]
-                        if isSamePerson and isSameType:
-                            membroExecucao.itinerario = itinerario
-                            membroExecucao.save()
-
-            dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
-            print("dados salvos", dp_eventoSerializer.data)
+        dp_eventoData = DpEvento.objects.create(**dp_eventoData)
+        dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
+        print("dados salvos", dp_eventoSerializer.data)
         return Response(dp_eventoSerializer.data, status=status.HTTP_200_OK)
 
 class DpEventoDetailApiView(APIView):

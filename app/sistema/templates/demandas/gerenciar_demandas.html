@@ -41,7 +41,11 @@
             <input type="text" name="order_by" id="filterDemandaOrderBy" hidden>
         </div>
         <div class="d-flex">
-
+            <button id="adicionarDemanda" 
+            onclick="carregarDemandasModal()"
+            class="btn-cadastrar rounded d-flex justify-content-between align-items-center">
+                <span>Cadastrar Demanda</span>
+            </button>
         </div>
     </div>
 
@@ -60,6 +64,21 @@
             }
         })
         return filtros
+    }
+
+    function carregarDemandasModal() {
+        $.ajax({
+            url: "/ticketModal",
+            data: { 
+                membro_execucao_id: null, 
+                model: "pessoa",
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
+            }
+        });
     }
     
     function carregarDemandas(filters= null, state = null) {

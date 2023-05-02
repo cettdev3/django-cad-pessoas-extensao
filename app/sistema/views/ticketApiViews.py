@@ -7,6 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
+from ..models.pessoa import Pessoas
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer 
@@ -28,7 +29,7 @@ class TicketApiView(APIView):
         escola = request.GET.get("escola")
         order_by = request.GET.get("order_by")
 
-        tickets = Ticket.objects.select_related("membro_execucao", "alocacao")
+        tickets = Ticket.objects.select_related("membro_execucao", "alocacao", "pessoa")
         if favorecido:
             tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido))
         if escola:
@@ -39,6 +40,7 @@ class TicketApiView(APIView):
                 pessoa_name=Case(
                     When(alocacao__isnull=False, then='alocacao__professor__nome'),
                     When(membro_execucao__isnull=False, then='membro_execucao__pessoa__nome'),
+                    When(pessoa__isnull=False, then='pessoa__nome'),
                     default=Value(''),
                     output_field=CharField(),
                 ),
@@ -58,7 +60,9 @@ class TicketApiView(APIView):
     def post(self, request, *args, **kwargs):
         membro_execucao = None
         alocacao = None
+        pessoa = None
         model = request.data.get("model")
+
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
             if not membro_execucao and model == "membro_execucao":
@@ -74,6 +78,15 @@ class TicketApiView(APIView):
                     {"res": "Não existe alocação com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+            
+        if request.data.get("pessoa_id"):
+            pessoa = self.get_object(Pessoas, request.data.get("pessoa_id"))
+            if not pessoa:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            
             
         cidade = None
         if request.data.get("cidade_id"):
@@ -105,6 +118,7 @@ class TicketApiView(APIView):
             "id_protocolo": id_protocolo, 
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
+            "pessoa": pessoa,
             "model": model,
             "meta": request.data.get("meta"),
             "data_inicio": dataInicio,
@@ -146,8 +160,6 @@ class TicketDetailApiView(APIView):
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def put(self, request, ticket_id, *args, **kwargs):
-        print("dentro do put")
-        print(request.data)
         ticket = self.get_object(Ticket, ticket_id)
         if not ticket:
                 return Response(
@@ -188,6 +200,14 @@ class TicketDetailApiView(APIView):
         if request.data.get("status"):
             if len(ticket.id_protocolo) > 0 and request.data.get("status") != Ticket().STATUS_CRIACAO_PENDENTE and request.data.get("status") != Ticket().STATUS_ATRASADO_PARA_CRIACAO:
                 ticket.status = request.data.get("status")
+        if request.data.get("pessoa_id"):
+            pessoa = self.get_object(Pessoas, request.data.get("pessoa_id"))
+            if not pessoa:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            ticket.pessoa = pessoa
 
         nsaDataInicio = request.data.get("nsa_data_inicio")
         nsaDataFim = request.data.get("nsa_data_fim")
@@ -222,16 +242,16 @@ class TicketDetailApiView(APIView):
             status=st.HTTP_200_OK
         )
     
-class TicketViewSets(viewsets.ModelViewSet):
-    @action(methods=["POST"], detail=False, url_path="complete-prestacao-contas")
-    def migratreTickets(self, request, ticket_id, *args, **kwargs):
-        ticket = self.get_object(Ticket, ticket_id)
-        if not ticket:
-                return Response(
-                    {"res": "Não existe ticket com o id informado"}, 
-                    status=st.HTTP_400_BAD_REQUEST
-                )
-        if request.data.get("status"):
-            ticket.status = request.data.get("status")
-        ticket.save()
-        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+# class TicketViewSets(viewsets.ModelViewSet):
+#     @action(methods=["POST"], detail=False, url_path="complete-prestacao-contas")
+#     def migratreTickets(self, request, ticket_id, *args, **kwargs):
+#         ticket = self.get_object(Ticket, ticket_id)
+#         if not ticket:
+#                 return Response(
+#                     {"res": "Não existe ticket com o id informado"}, 
+#                     status=st.HTTP_400_BAD_REQUEST
+#                 )
+#         if request.data.get("status"):
+#             ticket.status = request.data.get("status")
+#         ticket.save()
+#         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

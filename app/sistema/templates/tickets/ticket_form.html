@@ -21,16 +21,16 @@
     <input type="text" hidden
     id="model"
     name="model"
-    {% if model == 'alocacao' %}
-    value="{{model}}"
+    {% if model is None or model == 'None' or model == '' %}
+    value=""
     {% else %}
-    value="{{membro_execucao}}"
+    value="{{model}}"
     {% endif %}>
 
     <div class="form-group row">
-        <div 
+        <div
         {% if layout == '6' %}
-        class="col-sm-6"
+        class="col-sm-6 mb-1"
         {% else %}
         class="col-sm-3"
         {% endif %}>
@@ -103,7 +103,7 @@
         </div>
         <div 
         {% if layout == '6' %}
-        class="col-sm-6"
+        class="col-sm-6 mb-1"
         {% else %}
         class="col-sm-3"
         {% endif %}>
@@ -257,6 +257,12 @@
             </select>
         </div>
     </div>
+    {% if model == 'pessoa' %}
+    <div class="form-group row">
+        <div id="pessoasSelectContainer" class="col-sm-12">
+        </div>
+    </div>
+    {% endif %}
     <div class="form-group d-flex justify-content-start align-items-start">
         <div class="col-sm-12">
             <label><b>Descrição:</b></label>
@@ -267,6 +273,7 @@
             class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
         </div>
     </div>
+    {% if model == 'alocacao' or model == 'membro_execucao' %}
     <div class="form-group d-flex justify-content-start align-items-start">
         <input name="use_dpEvento_endereco"  
         id="use_dpEvento_endereco" 
@@ -283,11 +290,17 @@
             </b>
         </label>
     </div>
+    {% endif %}
     <div class="form-group row">
         <div id="select_cidade" class="col-sm-2">
             <input type="text" name="selected_cidade" id="selected_cidade" 
             {% if ticket %}
             value="{{ticket.cidade.id}}"
+            {% endif %}
+            hidden> 
+            <input type="text" name="selected_pessoa" id="selected_pessoa" 
+            {% if ticket %}
+            value="{{ticket.pessoa.id}}"
             {% endif %}
             hidden> 
         </div>
@@ -336,15 +349,20 @@
             {% endif %}>
         </div>
     </div>
+    {% if parent_entity is not None %}
     <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
     <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
     <input type="text" name="parent_entity_cep" id="parent_entity_cep" hidden value="{{parent_entity.cep|default_if_none:''}}">
     <input type="text" name="parent_entity_complemento" id="parent_entity_complemento" hidden value="{{parent_entity.complemento|default_if_none:''}}">
     <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}">
+    {% endif %}
+
     {% if model == 'membro_execucao' %}
     <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{entity.id}}">
     {% elif model == 'alocacao'  %}
     <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
+    {% elif model == 'pessoa'  %}
+    <input type="text" name="selected_pessoa_id" id="selected_pessoa_id" hidden value="{{entity.id}}">
     {% endif %}
 </form>
 <script>
@@ -358,6 +376,20 @@
                 $("#cadastrarTicketForm{{form_id}} #select_cidade").html(data)
                 $("#cadastrarTicketForm{{form_id}} #cidade_id").val(selected)
             }
+        });
+    }
+   
+    function carregarSelectPessoas() {
+        $.ajax({
+            url: "/pessoasSelect",
+            method: "GET",
+            success: function (data) {
+                let selected = $("#cadastrarTicketForm{{form_id}} #selected_pessoa_id").val()
+                console.log("carregarSelectPessoas {{form_id}}", selected)
+                $("#cadastrarTicketForm{{form_id}} #pessoasSelectContainer").html(data)
+                $("#cadastrarTicketForm{{form_id}} #pessoa_id").val(selected)
+
+            } 
         });
     }
 
@@ -402,5 +434,6 @@
         });
         
         carregarSelectCidades();
+        carregarSelectPessoas();
     });
 </script>

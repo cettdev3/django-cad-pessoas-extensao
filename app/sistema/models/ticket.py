@@ -2,6 +2,7 @@ from django.db import models
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
+from ..models.pessoa import Pessoas
 from ..models.servicoContratado import ServicoContratado
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -29,6 +30,7 @@ class Ticket(models.Model):
     id_protocolo = models.CharField(null = True, max_length=100)
     membro_execucao =  models.ForeignKey(MembroExecucao, on_delete=models.SET_NULL, null=True)
     alocacao =  models.ForeignKey(Alocacao, on_delete=models.SET_NULL, null=True)
+    pessoa = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True)
     servico_contratado = models.ForeignKey(ServicoContratado, on_delete=models.SET_NULL, null=True)
     meta = models.JSONField(null = True)
     model = models.CharField(null = True, blank=True, max_length=100)

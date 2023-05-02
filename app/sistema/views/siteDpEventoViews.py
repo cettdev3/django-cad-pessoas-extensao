@@ -91,10 +91,9 @@ def saveDpEvento(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     dpEventoData = json.loads(request.body)['data']
-    itinerarios = json.loads(request.body)['itinerarios']
     dpEventoResponse = requests.post(
         'http://localhost:8000/dp-eventos', 
-        json={"dpEvento": dpEventoData, "itinerarios": itinerarios}, 
+        json={"dpEvento": dpEventoData}, 
         headers=headers
     )
     dpEventoResponseStatusCode = dpEventoResponse.status_code
@@ -179,6 +178,7 @@ def getFilteredEventos(filters):
     if 'data_fim' in filters:
         eventos = eventos.filter(data_fim__lte=filters['data_fim'])
     result = {}
+    eventos = eventos.order_by('data_inicio')
 
     for evento in eventos:
         if evento.atividade_set.count() == 0:

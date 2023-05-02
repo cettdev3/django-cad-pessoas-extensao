@@ -17,7 +17,7 @@ from django.contrib import admin
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
-from sistema.views.ticketApiViews import TicketApiView, TicketViewSets
+from sistema.views.ticketApiViews import TicketApiView
 from sistema.views.avaliacaoApiViews import AvaliacaoApiView, AvaliacaoDetailApiView
 from sistema.views.enderecoApiViews import EnderecoApiView, EnderecoDetailApiView
 from sistema.views.ensinoApiViews import EnsinoApiView, EnsinoDetailApiView
@@ -37,7 +37,7 @@ from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edica
 from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
-from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino
+from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino, getEnsino
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
@@ -65,10 +65,12 @@ from sistema.views.siteGaleriaViews import (
     saveGaleria,
     deleteGaleria
 )
+
 from sistema.views.siteImagemViews import (
     deleteImagem,
     saveImagem
 )
+
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -86,12 +88,12 @@ router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 # as rotas da migration controller servem para migrar os dados do banco de dados antigo para o novo
 # a ordem da migrações deve ser a mesma ordem que as rotas estão declaradas
 # so devem ser usadas uma unica vez no momento do deploy da nova feature
-router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
-router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
-router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
-router.register(r'migrations', MigrationsViewSets, 'seed-atividades-galeria')
+# router.register(r'migrations', MigrationsViewSets, 'migration-acoes')
+# router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
+# router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
+# router.register(r'migrations', MigrationsViewSets, 'seed-atividades-galeria')
 
-router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
+# router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 
 urlpatterns = [
     path('token', TokenObtainPairView.as_view()),
@@ -183,6 +185,7 @@ urlpatterns = [
     path("visualizarEnsino/<codigo>",visualizarEnsino),
     path("saveEnsino",saveEnsino),
     path("editarEnsino/<codigo>",editarEnsino),
+    path("getEnsino/<ensino_id>",getEnsino),
     
     # ROTAS PARA TESTES
     path("testeForm",testeForm),

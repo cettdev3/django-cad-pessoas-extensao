@@ -120,11 +120,22 @@
                 <button id="buttonMenuEnsinos{{ensino.id}}" class="btn-circle">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
-                <div style="display: none; position: absolute; z-index: 2; right: 10%"
+                <div style="display: none; position: absolute; z-index: 2; right: 10%; width: max-content"
                     id="hiddenMenuEnsinos{{ensino.id}}" class="btn-group-custom">
                     <a id="linkVisualizarensino{{ensino.id}}" href="/visualizarEnsino/({{ensino.id}})"></a>
                     <button onclick="visualizarEnsino('{{ensino.id}}')">Visualizar</button>
                     <button onclick="carregarEnsinosModalCadastrar('{{ensino.id}}')">Editar</button>
+                    {% if ensino.first_dp_evento  %}
+                    <a id="linkVisualizarEvento{{ensino.first_dp_evento.id}}"
+                    href="/visualizarEnsino/({{ensino.first_dp_evento.id}})"></a>
+                    <button onclick="visualizarEvento('{{ensino.first_dp_evento.id}}')">
+                        Ver Evento
+                    </button>
+                    {% else %}
+                    <button onclick="cadastrarEvento('{{ensino.id}}')">
+                        Iniciar Evento
+                    </button>
+                    {% endif %}
                     <button class="delete-btn"
                         onclick="openDeleteModal(() => deleteEnsino('{{ensino.id}}'))">Excluir</button>
                 </div>
@@ -132,10 +143,20 @@
         </tr>
         {% endfor %}
     </tbody>
+    <div id="loading-container" class="spinner-container" style="top:10%; display: none">
+        <div class="spinner-border text-primary spinner-lg" role="status">
+        </div>
+    </div>
 </table>
+
+
 <script>
     function visualizarEnsino(id) {
         location.href = "visualizarEnsino/" + id
+    }
+   
+    function visualizarEvento(id) {
+        location.href = "visualizarDpEvento/" + id
     }
 
     $(document).ready(function () {

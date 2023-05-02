@@ -3,10 +3,12 @@ from rest_framework import serializers
 from ...models.ticket import Ticket
 from .membroExecucaoTicketSerializer import MembroExecucaoTicketSerializer
 from .alocacaoTicketSerializer import AlocacaoTicketSerializer
+from .pessoaTicketSerializer import PessoaTicketSerializer
 class TicketSerializer(serializers.ModelSerializer):
     meta = serializers.JSONField(allow_null=True)
     membro_execucao = MembroExecucaoTicketSerializer(many=False, read_only=True)
     alocacao = AlocacaoTicketSerializer(many=False, read_only=True)
+    pessoa = PessoaTicketSerializer(many=False, read_only=True)
     status_formatado = serializers.CharField(read_only=True)
     status_calculado = serializers.CharField(read_only=True)
 
@@ -19,6 +21,7 @@ class TicketSerializer(serializers.ModelSerializer):
             "id_protocolo",
             "membro_execucao",
             "alocacao",
+            "pessoa",
             "meta",
             "model",
             "data_inicio",
