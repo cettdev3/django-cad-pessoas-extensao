@@ -127,7 +127,12 @@ cellspacing="0">
                     <span class="">
                         {{demanda.membro_execucao.evento.escola.nome|default_if_none:""}}
                     </span>
+                    {% elif demanda.model == 'pessoa'%}
+                    <span class="">
+                        {{demanda.escola.nome|default_if_none:""}}
+                    </span>
                     {% endif %}
+
                     {% if demanda.endereco_completo %}
                     <div class="">
                         <strong>Endereço</strong>: {{demanda.endereco_completo|default_if_none:""}}

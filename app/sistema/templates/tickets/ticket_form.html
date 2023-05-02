@@ -259,7 +259,9 @@
     </div>
     {% if model == 'pessoa' %}
     <div class="form-group row">
-        <div id="pessoasSelectContainer" class="col-sm-12">
+        <div id="pessoasSelectContainer" class="col-sm-6">
+        </div>
+        <div id="escolasSelectContainer" class="col-sm-6">
         </div>
     </div>
     {% endif %}
@@ -363,9 +365,22 @@
     <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
     {% elif model == 'pessoa'  %}
     <input type="text" name="selected_pessoa_id" id="selected_pessoa_id" hidden value="{{entity.id}}">
+    <input type="text" name="selected_escola_id" id="selected_escola_id" hidden value="{{ticket.escola.id}}">
     {% endif %}
 </form>
+{{ escolas|json_script:"escolas-script" }}
 <script>
+    var escolas = JSON.parse(document.getElementById("escolas-script").textContent);
+    
+    function bindEnderecoFields(escolaId) {
+        let escola = escolas.find(escola => escola.id == escolaId)
+        $('#cadastrarTicketForm{{form_id}} #bairro').val(escola.bairro);
+        $('#cadastrarTicketForm{{form_id}} #logradouro').val(escola.logradouro);
+        $('#cadastrarTicketForm{{form_id}} #cep').val(escola.cep);
+        $('#cadastrarTicketForm{{form_id}} #complemento').val(escola.complemento);
+        $('#cadastrarTicketForm{{form_id}} #cidade_id').val(escola.cidade.id);
+    } 
+
     function carregarSelectCidades() {
         console.log("buscando select cidade")
         $.ajax({
@@ -385,9 +400,34 @@
             method: "GET",
             success: function (data) {
                 let selected = $("#cadastrarTicketForm{{form_id}} #selected_pessoa_id").val()
-                console.log("carregarSelectPessoas {{form_id}}", selected)
                 $("#cadastrarTicketForm{{form_id}} #pessoasSelectContainer").html(data)
                 $("#cadastrarTicketForm{{form_id}} #pessoa_id").val(selected)
+
+            } 
+        });
+    }
+    
+    function carregarSelectEscolas() {
+        $.ajax({
+            url: "/escolasSelect",
+            method: "GET",
+            success: function (data) {
+                let selected = $("#cadastrarTicketForm{{form_id}} #selected_escola_id").val()
+                $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer").html(data)
+                $("#cadastrarTicketForm{{form_id}} #escola_id").val(selected)
+
+            } 
+        });
+    }
+    
+    function carregarEscola(id) {
+        $.ajax({
+            url: "/escolasSelect",
+            method: "GET",
+            success: function (data) {
+                let selected = $("#cadastrarTicketForm{{form_id}} #selected_escola_id").val()
+                $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer").html(data)
+                $("#cadastrarTicketForm{{form_id}} #escola_id").val(selected)
 
             } 
         });
@@ -404,9 +444,24 @@
     }
 
     $(document).ready(function() {     
-        $('#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco').change(function() {
-            console.log("change {{form_id}}", this.checked)
-            if (this.checked) {
+        let inputEnderecoEvento = $("#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco")
+        let inputEnderecoEscola = $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer")
+        console.log(inputEnderecoEscola)
+
+        let type = "entity"
+        let inputCheckboxEndereco = inputEnderecoEvento 
+        if (inputEnderecoEscola.length > 0) {
+            inputCheckboxEndereco = inputEnderecoEscola
+            type = "escola"
+
+        }
+
+        inputEnderecoEscola
+        console.log("ready {{form_id}}", inputCheckboxEndereco)
+        $(inputCheckboxEndereco).change(function(event) {
+            if ($(event.target).attr("type") != "checkbox") return
+            let checked =  $(event.target).is(":checked")
+            if (checked && type == "entity") {
                 var bairro = $('#cadastrarTicketForm{{form_id}} #parent_entity_bairro').val();
                 var logradouro = $('#cadastrarTicketForm{{form_id}} #parent_entity_logradouro').val();
                 var cep = $('#cadastrarTicketForm{{form_id}} #parent_entity_cep').val();
@@ -424,6 +479,9 @@
                 $('#cadastrarTicketForm{{form_id}} #cep').val(cep);
                 $('#cadastrarTicketForm{{form_id}} #complemento').val(complemento);
                 $('#cadastrarTicketForm{{form_id}} #cidade_id').val(cidade);
+            } else if (checked && type == "escola") {
+                let escolaId = $("#cadastrarTicketForm{{form_id}} #escola_id").val()
+                bindEnderecoFields(escolaId)
             } else {
                 $('#cadastrarTicketForm{{form_id}} #bairro').val("");
                 $('#cadastrarTicketForm{{form_id}} #logradouro').val("");
@@ -435,5 +493,6 @@
         
         carregarSelectCidades();
         carregarSelectPessoas();
+        carregarSelectEscolas();
     });
 </script>

@@ -7,6 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
+from ..models.escola import Escola
 from ..models.pessoa import Pessoas
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
@@ -31,9 +32,9 @@ class TicketApiView(APIView):
 
         tickets = Ticket.objects.select_related("membro_execucao", "alocacao", "pessoa")
         if favorecido:
-            tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido))
+            tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
         if escola:
-            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola))
+            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola) | Q(escola__nome__icontains=escola))
         
         if order_by and order_by == "favorecido":
             tickets = tickets.annotate(
@@ -62,6 +63,7 @@ class TicketApiView(APIView):
         alocacao = None
         pessoa = None
         model = request.data.get("model")
+        escola = None
 
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
@@ -86,7 +88,20 @@ class TicketApiView(APIView):
                     {"res": "Não existe pessoa com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
-            
+        
+        if not membro_execucao and not alocacao and not pessoa:
+            return Response(
+                {"res": "É necessário informar um membro da equipe de execução, uma alocação ou uma pessoa"},
+                status=st.HTTP_400_BAD_REQUEST,
+            )
+        
+        if request.data.get("escola_id"):
+            escola = self.get_object(Escola, request.data.get("escola_id"))
+            if not escola:
+                return Response(
+                    {"res": "Não existe escola com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
             
         cidade = None
         if request.data.get("cidade_id"):
@@ -100,8 +115,8 @@ class TicketApiView(APIView):
         id_protocolo = request.data.get("id_protocolo")
         dataInicio = request.data.get("data_inicio") if request.data.get("data_inicio") else None
         dataFim = request.data.get("data_fim") if request.data.get("data_fim") else None
-        nsa_data_inicio = request.data.get("nsa_data_inicio")
-        nsa_data_fim = request.data.get("nsa_data_fim")
+        nsa_data_inicio = request.data.get("nao_se_aplica_data_inicio")
+        nsa_data_fim = request.data.get("nao_se_aplica_data_fim")
         if nsa_data_inicio == "on":
             dataInicio = None
         if nsa_data_fim == "on":
@@ -109,7 +124,13 @@ class TicketApiView(APIView):
 
         status = request.data.get("status") if request.data.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
         if len(id_protocolo) > 0:
-            status = Ticket().STATUS_CRIADO
+            # O ticket so pode ser atribuido a aluns status se tiver um protocolo
+            if request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_PRESTACAO_CONTAS_PENDENTE, Ticket().STATUS_PRESTACAO_CONTAS_CRIADA, Ticket().STATUS_CANCELADO]:
+                status = request.data.get("status")
+            else:
+                status = Ticket().STATUS_CRIADO
+        elif request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_CRIACAO_PENDENTE]:
+            status = request.data.get("status")
         
 
         ticketData = {
@@ -119,12 +140,13 @@ class TicketApiView(APIView):
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
             "pessoa": pessoa,
+            "escola": escola,
             "model": model,
             "meta": request.data.get("meta"),
             "data_inicio": dataInicio,
             "data_fim": dataFim,
-            "nao_se_aplica_data_inicio": request.data.get("nsa_data_inicio") == "on",
-            "nao_se_aplica_data_fim": request.data.get("nsa_data_fim") == "on",
+            "nao_se_aplica_data_inicio": nsa_data_inicio == "on",
+            "nao_se_aplica_data_fim": nsa_data_fim == "on",
             "bairro": request.data.get("bairro") ,
             "logradouro": request.data.get("logradouro"),
             "cep": request.data.get("cep"),
@@ -132,7 +154,7 @@ class TicketApiView(APIView):
             "cidade":   cidade,
             "observacao": request.data.get("observacao"),
         }
-    
+
         ticketData = Ticket.objects.create(**ticketData)
         ticketSerializer = TicketSerializer(ticketData)
         return Response(ticketSerializer.data, status=st.HTTP_200_OK)
