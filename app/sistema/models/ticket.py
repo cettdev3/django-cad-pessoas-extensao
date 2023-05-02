@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 class Ticket(models.Model):
-    STATUS_CRIACAO_PENDENTE = "CRIACAO_PENDENTE"
-    STATUS_CRIADO = "CRIADO"
-    STATUS_ATRASADO_PARA_CRIACAO = "ATRASADO_PARA_CRIACAO"
-    STATUS_PRESTACAO_CONTAS_PENDENTE = "PENDING_PRESTACAO_CONTAS"
-    STATUS_PRESTACAO_CONTAS_CRIADA = "PRESTACAO_CONTAS_CREATED"
-    STATUS_CANCELADO = "CANCELADO"
+    STATUS_CRIACAO_PENDENTE = "CRIACAO_PENDENTE" # significa que o ticket foi criado mas ainda não foi criado no sistema externo
+    STATUS_CRIADO = "CRIADO" # significa que o ticket foi criado no sistema externo
+    STATUS_ATRASADO_PARA_CRIACAO = "ATRASADO_PARA_CRIACAO" # significa que o ticket nao foi criado no sistema externo mas o evento já está próximo
+    STATUS_PRESTACAO_CONTAS_PENDENTE = "PENDING_PRESTACAO_CONTAS" # significa que a data do ticket ja passou e o ticket ainda nao foi prestado contas
+    STATUS_PRESTACAO_CONTAS_CRIADA = "PRESTACAO_CONTAS_CREATED" # significa que a data do ticket ja passou e o ticket ja foi prestado contas
+    STATUS_CANCELADO = "CANCELADO" # significa que o ticket foi cancelado
 
     TIPO_DIARIA = "diaria"
     TIPO_ADIANTAMENTO = "adiantamento"
@@ -51,8 +51,13 @@ class Ticket(models.Model):
     def calculate_status(self):
         if self.status == self.STATUS_CANCELADO:
             return self.status
+
+        if self.model == 'pessoa':
+            return self.status
+        
         entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
         today = timezone.now().date()
+
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
             data_inicio_evento_date = entity.data_inicio.fromisoformat(self.data_fim) if isinstance(entity.data_inicio, str) else entity.data_inicio
             delta = data_inicio_evento_date.date() - today if isinstance(data_inicio_evento_date, datetime) else data_inicio_evento_date - today
@@ -152,6 +157,7 @@ class Ticket(models.Model):
             return "demanda criada no protocolo"
         elif self.status == self.STATUS_CANCELADO:
             return "demanda cancelada"
+        print("Status não identificado")
         return "Status não identificado"
 
     @property

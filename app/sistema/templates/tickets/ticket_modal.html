@@ -114,6 +114,8 @@
     }
 
     function cadastrarTicket() {
+        {% comment %} print("cadastrarTicket", getFormData())
+        return {% endcomment %}
         $.ajax({
             url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),
