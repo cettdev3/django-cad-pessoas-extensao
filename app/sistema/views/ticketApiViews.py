@@ -7,6 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
+from ..models.escola import Escola
 from ..models.pessoa import Pessoas
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
@@ -33,7 +34,7 @@ class TicketApiView(APIView):
         if favorecido:
             tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
         if escola:
-            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola))
+            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola) | Q(escola__nome__icontains=escola))
         
         if order_by and order_by == "favorecido":
             tickets = tickets.annotate(
@@ -62,7 +63,8 @@ class TicketApiView(APIView):
         alocacao = None
         pessoa = None
         model = request.data.get("model")
-        print("dados na criação do ticket", request.data)
+        escola = None
+
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
             if not membro_execucao and model == "membro_execucao":
@@ -88,11 +90,18 @@ class TicketApiView(APIView):
                 )
         
         if not membro_execucao and not alocacao and not pessoa:
-            print("entrei erro")
             return Response(
                 {"res": "É necessário informar um membro da equipe de execução, uma alocação ou uma pessoa"},
                 status=st.HTTP_400_BAD_REQUEST,
             )
+        
+        if request.data.get("escola_id"):
+            escola = self.get_object(Escola, request.data.get("escola_id"))
+            if not escola:
+                return Response(
+                    {"res": "Não existe escola com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
             
         cidade = None
         if request.data.get("cidade_id"):
@@ -131,6 +140,7 @@ class TicketApiView(APIView):
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
             "pessoa": pessoa,
+            "escola": escola,
             "model": model,
             "meta": request.data.get("meta"),
             "data_inicio": dataInicio,

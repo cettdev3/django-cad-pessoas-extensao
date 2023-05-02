@@ -7,9 +7,11 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.ticket import Ticket
+from sistema.models.escola import Escola
 from sistema.models.alocacao import Alocacao
 from sistema.models.dpEvento import DpEvento
 from sistema.models.pessoa import Pessoas
+from ..serializers.escolaSerializer import EscolaSerializer
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -45,7 +47,8 @@ def ticketModal(request):
         data['layout'] = layout
     if model:
         data['model'] = model
-
+    escolas = Escola.objects.all()
+    data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'tickets/ticket_modal.html',data)
 
 def ticketModalEdit(request, ticket_id):
@@ -63,9 +66,11 @@ def ticketModalEdit(request, ticket_id):
         data['parent_entity'] = ticket.alocacao.acaoEnsino
     if model == 'pessoa':
         data['entity'] = ticket.pessoa
-        data['parent_entity'] = None
+        data['parent_entity'] = Escola.objects.get(id=ticket.escola.id)
     if layout:
         data['layout'] = layout
+    escolas = Escola.objects.all()
+    data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'tickets/ticket_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
