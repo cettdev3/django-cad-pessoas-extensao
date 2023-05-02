@@ -547,13 +547,16 @@
             event.preventDefault()
             processTabBtnClick(1)
         })
+        
         $("#formDpEventosPrev").click(function (event) {
             event.preventDefault()
             processTabBtnClick(-1)
         })
+
         $("#use_dpEvento_endereco").change(function () {
             if (this.checked) setMembroExecucaoAddressForm(getFormData())
         })
+
         $("body").css("overflow", "hidden")
         bindEnderecosInputs()
         addMembroExecucaoForm(0)

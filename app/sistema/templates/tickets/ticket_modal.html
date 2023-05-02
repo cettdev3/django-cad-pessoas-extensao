@@ -58,7 +58,7 @@
                     <div>
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
-                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity %}
+                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity escolas=escolas%}
                             </div>
                         </div>
                     </div>
@@ -114,6 +114,8 @@
     }
 
     function cadastrarTicket() {
+        {% comment %} print("cadastrarTicket", getFormData())
+        return {% endcomment %}
         $.ajax({
             url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),
