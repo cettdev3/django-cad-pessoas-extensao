@@ -31,7 +31,7 @@ class TicketApiView(APIView):
 
         tickets = Ticket.objects.select_related("membro_execucao", "alocacao", "pessoa")
         if favorecido:
-            tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido))
+            tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
         if escola:
             tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola))
         
