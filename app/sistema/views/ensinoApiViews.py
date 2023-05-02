@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status as str
 from rest_framework import permissions
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from ..models.cidade import Cidade
 from ..models.ticket  import Ticket
 from ..models.escola import Escola
 from ..models.alocacao import Alocacao
 from ..models.endereco import Endereco
 from ..models.ensino import Ensino
+from ..models.dpEvento import DpEvento
 from ..serializers.ensinoSerializer import EnsinoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -32,8 +33,9 @@ class EnsinoApiView(APIView):
         data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
         data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
         escolas = request.GET.getlist('escolas') if request.GET.getlist('escolas') != "None" else None
+        first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
 
-        ensinos = Ensino.objects
+        ensinos = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade')
         if observacao:
             ensinos = ensinos.filter(observacao__icontains=observacao)
         if data_inicio and not data_fim:
@@ -120,7 +122,8 @@ class EnsinoApiView(APIView):
             cep = cep,
             escola = escola
         )
-
+        first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
+        ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade').get(id=ensino.id)
         ensinoSerializer = EnsinoSerializer(ensino)
         return Response(ensinoSerializer.data, status=str.HTTP_201_CREATED)
 
@@ -135,8 +138,8 @@ class EnsinoDetailApiView(APIView):
             return None
             
     def get(self, request, ensino_id, *args, **kwargs):
-
-        ensino = self.get_object(Ensino, ensino_id)
+        first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
+        ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade').get(id=ensino_id)
         if not ensino:
             return Response(
                 {"res": "Não existe ensino com o id informado"},
@@ -193,6 +196,8 @@ class EnsinoDetailApiView(APIView):
             ensino.cep = request.data.get("cep")
 
         ensino.save()
+        first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
+        ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade').get(id=ensino.id)
         serializer = EnsinoSerializer(ensino)
         
         return Response(serializer.data, status=str.HTTP_200_OK)

@@ -9,6 +9,7 @@ from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.ticket import Ticket
 from sistema.models.alocacao import Alocacao
 from sistema.models.dpEvento import DpEvento
+from sistema.models.pessoa import Pessoas
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -32,6 +33,11 @@ def ticketModal(request):
         parent_entity = alocacao.acaoEnsino
         data['entity'] = alocacao
         data['parent_entity'] = parent_entity
+    if request.GET.get('pessoa_id') and model == 'pessoa':
+        print("pessoa_id: ", request.GET.get('pessoa_id'))
+        pessoa = Pessoas.objects.get(id=request.GET.get('pessoa_id'))
+        data['entity'] = pessoa
+        data['parent_entity'] = None
     if id:
         ticket = ticket.objects.get(id=id)
         data['ticket'] = ticket
@@ -55,6 +61,9 @@ def ticketModalEdit(request, ticket_id):
     if model == 'alocacao':
         data['entity'] = ticket.alocacao
         data['parent_entity'] = ticket.alocacao.acaoEnsino
+    if model == 'pessoa':
+        data['entity'] = ticket.pessoa
+        data['parent_entity'] = None
     if layout:
         data['layout'] = layout
     return render(request,'tickets/ticket_modal.html',data)
@@ -84,7 +93,7 @@ def saveTicket(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    print(body)
+
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 

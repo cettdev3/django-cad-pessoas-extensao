@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastrarServicoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <label><b>Nome:</b></label>
                 <input type="text"
                 class="form-control"
@@ -11,7 +11,7 @@
                 id="nome"
                 name="nome">
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <label><b>status:</b></label>
                 <select class="form-control" id="status" name="status">
                     <option value="pendente" {% if servico.status == 'pendente' %}selected{% endif %}>Pendente</option>
@@ -19,7 +19,7 @@
                     <option value="cancelado" {% if servico.status == 'cancelado' %}selected{% endif %}>Cancelado</option>
                 </select>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <label><b>Quantidade de Atendimentos:</b></label>
                 <input type="number"
                 required
@@ -30,7 +30,7 @@
                 id="quantidadeAtendimentos"
                 name="quantidadeAtendimentos">
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-3" hidden>
                 <label><b>Quantidade de Vendas:</b></label>
                 <input type="number"
                 required

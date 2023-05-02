@@ -16,6 +16,10 @@
                             Cadastrar Demanda para: {{entity.professor.nome}}
                             {% elif model == 'membro_execucao' %}
                             Cadastrar Demanda para: {{entity.pessoa.nome}}
+                            {% elif model == 'pessoa' %}
+                            Cadastrar Demanda para: {{entity.nome}}
+                            {% else %}
+                            Cadastrar Demanda
                             {% endif %}
                         {% endif %}
                     </div>
@@ -54,7 +58,7 @@
                     <div>
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
-                                {% include "tickets/ticket_form.html" with ticket=ticket %}
+                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity %}
                             </div>
                         </div>
                     </div>
@@ -147,7 +151,7 @@
         $.map(unindexed_array, function (n, i) {
             values[n['name']] = n['value'];
         });
-        
+
         return values
     }
 
