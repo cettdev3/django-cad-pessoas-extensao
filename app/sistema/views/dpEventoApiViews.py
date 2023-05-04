@@ -102,12 +102,12 @@ class DpEventoApiView(APIView):
             
         dataInicio = None
         if postDpEventoData["data_inicio"]:
-            datetimeInicio = datetime.strptime(postDpEventoData["data_inicio"], '%Y-%m-%dT%H:%M')
+            datetimeInicio = datetime.strptime(postDpEventoData["data_inicio"], '%Y-%m-%d')
             dataInicio = datetimeInicio.date()
 
         dataFim = None
         if postDpEventoData["data_fim"]:
-            datetimeFim = datetime.strptime(postDpEventoData["data_fim"], '%Y-%m-%dT%H:%M')
+            datetimeFim = datetime.strptime(postDpEventoData["data_fim"], '%Y-%m-%d')
             dataFim = datetimeFim.date()
 
         dp_eventoData = {
