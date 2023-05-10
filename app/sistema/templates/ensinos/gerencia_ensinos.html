@@ -285,7 +285,19 @@ z-index: 4
 
         $.ajax({
             url: "/getEnsino/"+ ensinoId,
-            success: function (data) {    
+            success: function (data) {  
+                if (!data.escola) {
+                    showFloatingMessage("A ação de ensina precisa ter uma escola para criar o evento", "alert-danger");
+                    toggleLoading()
+                    return
+                }
+
+                if (!data.cidade) {
+                    showFloatingMessage("A ação de ensina precisa ter uma cidade para criar o evento", "alert-danger");
+                    toggleLoading()
+                    return
+                }
+                
                 evento.acao_ensino_id = data.id
                 evento.bairro = data.bairro
                 evento.cep = data.cep
@@ -294,15 +306,17 @@ z-index: 4
                 evento.data_fim = data.data_fim
                 evento.data_inicio = data.data_inicio
                 evento.descricao = data.observacao
-                evento.escola_id = data.escola.id
+                evento.escolas = [data.escola.id]
                 evento.logradouro = data.logradouro
                 
-                if (data.tipo.toLowerCase() == "emprestimo") {
+                if (data.tipo && data.tipo.toLowerCase() == "emprestimo") {
                     evento.tipo = "emprestimo"
-                } else if (data.tipo.toLowerCase() == "outros") {
+                } else if (data.tipo && data.tipo.toLowerCase() == "outros") {
                     evento.tipo = "outro"
-                } else if (data.tipo.toLowerCase() == "gps") {
+                } else if (data.tipo && data.tipo.toLowerCase() == "gps") {
                     evento.tipo = "curso_gps"
+                } else {
+                    evento.tipo = "outro"
                 }
                 console.log(data)
                 $.ajax({

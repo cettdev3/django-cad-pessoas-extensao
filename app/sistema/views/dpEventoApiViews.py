@@ -83,7 +83,7 @@ class DpEventoApiView(APIView):
         escola = None
         acaoEnsino = None
         postDpEventoData = request.data.get("dpEvento")
-        postItinerariosData = request.data.get("itinerarios")
+
         print("postDpEventoData", postDpEventoData)
         if postDpEventoData["cidade_id"]:
             cidade = self.get_object(Cidade, postDpEventoData["cidade_id"])

@@ -116,7 +116,7 @@
                 id="cep" 
                 class="form-control" 
                 {% if dpEvento %}
-                value="{{dpEvento.cep}}"
+                value="{{dpEvento.cep|default_if_none:""}}"
                 {% endif %}>
             </div>
         </div>
@@ -129,7 +129,7 @@
                 id="bairro" 
                 class="form-control" 
                 {% if dpEvento %}
-                value="{{dpEvento.bairro}}"
+                value="{{dpEvento.bairro|default_if_none:""}}"
                 {% endif %}>
             </div>
             <div class="col-sm-4">
@@ -140,7 +140,7 @@
                 id="logradouro" 
                 class="form-control" 
                 {% if dpEvento %}
-                value="{{dpEvento.logradouro}}"
+                value="{{dpEvento.logradouro|default_if_none:""}}"
                 {% endif %}>
             </div>
             <div class="col-sm-4">
@@ -151,7 +151,7 @@
                 id="complemento" 
                 class="form-control" 
                 {% if dpEvento %}
-                value="{{dpEvento.complemento}}"
+                value="{{dpEvento.complemento|default_if_none:""}}"
                 {% endif %}>
             </div>
         </div>
