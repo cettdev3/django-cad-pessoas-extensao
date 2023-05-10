@@ -144,7 +144,7 @@
                 return item.id == escolaId;
             });
             let badge = $("<span class='badge badge-secondary mx-1 my-1 py-1'></span>");
-            badge.text(escola.cidade.nome + " - " + escola.nome + " #" + escola.id);
+            badge.text(escola.cidade.nome + " - " + escola.nome );
             badge.css("cursor", "pointer");
             badge.attr("title", "Clique para utilizar o endereço desta escola");
             badge.click(function(){
