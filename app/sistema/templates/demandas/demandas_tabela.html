@@ -124,9 +124,11 @@ cellspacing="0">
                         {{demanda.alocacao.acaoEnsino.escola.nome|default_if_none:""}}
                     </span>
                     {% elif demanda.model == 'membro_execucao' or demanda.model == None or demanda.model == '' %}
-                    <span class="">
-                        {{demanda.membro_execucao.evento.escola.nome|default_if_none:""}}
-                    </span>
+                    <div class="">
+                        {% for escola in demanda.membro_execucao.evento.escolas %}
+                            <div>{{escola.nome|default_if_none:""}}<div>
+                        {% endfor %}
+                    </div>
                     {% elif demanda.model == 'pessoa'%}
                     <span class="">
                         {{demanda.escola.nome|default_if_none:""}}

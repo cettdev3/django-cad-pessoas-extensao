@@ -1,13 +1,14 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from ...models.dpEvento import DpEvento
+from .escolaTicketSerializer import EscolaTicketSerializer
 
 class DpEventoTicketSerializer(serializers.ModelSerializer):
     endereco_completo = serializers.CharField(read_only=True)
     data_inicio_formatada = serializers.CharField(read_only=True)
     data_fim_formatada = serializers.CharField(read_only=True)
     tipo_formatado = serializers.CharField(read_only=True)
-    
+    escolas = EscolaTicketSerializer(many=True, read_only=True)
     class Meta:
         model = DpEvento
         fields = [
@@ -22,5 +23,6 @@ class DpEventoTicketSerializer(serializers.ModelSerializer):
             "data_fim_formatada",
             "tipo_formatado",
             "escola",
+            "escolas"
         ]
         depth = 5

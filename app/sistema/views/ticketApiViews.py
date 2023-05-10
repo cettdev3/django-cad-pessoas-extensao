@@ -34,7 +34,11 @@ class TicketApiView(APIView):
         if favorecido:
             tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
         if escola:
-            tickets = tickets.filter(Q(membro_execucao__evento__escola__nome__icontains=escola) | Q(alocacao__acaoEnsino__escola__nome__icontains=escola) | Q(escola__nome__icontains=escola))
+            tickets = tickets.filter(
+                Q(membro_execucao__evento__escolas__nome__icontains=escola) | 
+                Q(alocacao__acaoEnsino__escola__nome__icontains=escola) | 
+                Q(escola__nome__icontains=escola)
+            )
         
         if order_by and order_by == "favorecido":
             tickets = tickets.annotate(

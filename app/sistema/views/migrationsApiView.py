@@ -7,6 +7,7 @@ from ..models.dpEvento import DpEvento
 from ..models.pessoa import Pessoas
 from ..models.ticket import Ticket
 from ..models.galeria import Galeria
+from ..models.dpEventoEscola import DpEventoEscola
 from ..models.atividade import Atividade
 from ..models.membroExecucao import MembroExecucao
 from rest_framework.decorators import action
@@ -149,4 +150,15 @@ class MigrationsViewSets(viewsets.ModelViewSet):
                 evento=atividade.evento,
             )
             atividade.save()
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+    
+    @action(methods=["POST"], detail=False, url_path="transferir-evento-escola")
+    # devido a mudança no modelo de dados, foi necessário transferir a escola do evento para a pivot eventos_escolas
+    def transferirEventoEscola(self, *args, **kwargs):
+        for evento in DpEvento.objects.all():
+            if evento.escola:
+                evento_escola = DpEventoEscola.objects.create(
+                    escola=evento.escola,
+                    dp_evento=evento,
+                )
         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
