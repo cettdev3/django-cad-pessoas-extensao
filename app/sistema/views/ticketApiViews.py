@@ -9,6 +9,7 @@ from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
 from ..models.escola import Escola
 from ..models.pessoa import Pessoas
+from ..models.atividade import Atividade
 from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer 
@@ -66,6 +67,7 @@ class TicketApiView(APIView):
         membro_execucao = None
         alocacao = None
         pessoa = None
+        atividade = None
         model = request.data.get("model")
         escola = None
 
@@ -93,9 +95,17 @@ class TicketApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST,
                 )
         
-        if not membro_execucao and not alocacao and not pessoa:
+        if request.data.get("atividade_id"):
+            atividade = self.get_object(Atividade, request.data.get("atividade_id"))
+            if not atividade:
+                return Response(
+                    {"res": "Não existe atividade com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+        
+        if not membro_execucao and not alocacao and not pessoa and not atividade:
             return Response(
-                {"res": "É necessário informar um membro da equipe de execução, uma alocação ou uma pessoa"},
+                {"res": "É necessário informar um membro da equipe de execução ou uma alocação ou uma pessoa ou uma atividade"},
                 status=st.HTTP_400_BAD_REQUEST,
             )
         
@@ -128,7 +138,7 @@ class TicketApiView(APIView):
 
         status = request.data.get("status") if request.data.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
         if len(id_protocolo) > 0:
-            # O ticket so pode ser atribuido a aluns status se tiver um protocolo
+            # O ticket so pode ser atribuido a alguns status se tiver um protocolo
             if request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_PRESTACAO_CONTAS_PENDENTE, Ticket().STATUS_PRESTACAO_CONTAS_CRIADA, Ticket().STATUS_CANCELADO]:
                 status = request.data.get("status")
             else:
@@ -144,6 +154,7 @@ class TicketApiView(APIView):
             "membro_execucao":  membro_execucao,
             "alocacao": alocacao,
             "pessoa": pessoa,
+            "atividade": atividade,
             "escola": escola,
             "model": model,
             "meta": request.data.get("meta"),

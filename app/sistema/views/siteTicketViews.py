@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.ticket import Ticket
 from sistema.models.escola import Escola
+from sistema.models.atividade import Atividade
 from sistema.models.alocacao import Alocacao
 from sistema.models.dpEvento import DpEvento
 from sistema.models.pessoa import Pessoas
@@ -40,6 +41,12 @@ def ticketModal(request):
         pessoa = Pessoas.objects.get(id=request.GET.get('pessoa_id'))
         data['entity'] = pessoa
         data['parent_entity'] = None
+    if request.GET.get('atividade_id') and model == 'atividade':
+        print("atividade_id: ", request.GET.get('atividade_id'))
+        atividade = Atividade.objects.get(id=request.GET.get('atividade_id'))
+        data['entity'] = atividade
+        parent_entity = atividade.evento
+        data['parent_entity'] = parent_entity
     if id:
         ticket = ticket.objects.get(id=id)
         data['ticket'] = ticket

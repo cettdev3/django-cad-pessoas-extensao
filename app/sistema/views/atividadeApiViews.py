@@ -38,7 +38,7 @@ class AtividadeApiView(APIView):
             "tipoAtividade", 
             "departamento", 
             "responsavel",
-            "cidade").prefetch_related("servico_set").all()
+            "cidade").prefetch_related("servico_set", "ticket_set").all()
         serializer = AtividadeSerializer(atividades, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -18,6 +18,8 @@
                             Cadastrar Demanda para: {{entity.pessoa.nome}}
                             {% elif model == 'pessoa' %}
                             Cadastrar Demanda para: {{entity.nome}}
+                            {% elif model == 'atividade' %}
+                            Cadastrar Demanda para: {{entity.descricao}}
                             {% else %}
                             Cadastrar Demanda
                             {% endif %}
@@ -58,7 +60,7 @@
                     <div>
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
-                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity escolas=escolas%}
+                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity escolas=escolas parent_entity=parent_entity %}
                             </div>
                         </div>
                     </div>
@@ -114,7 +116,7 @@
     }
 
     function cadastrarTicket() {
-        {% comment %} print("cadastrarTicket", getFormData())
+        {% comment %} console.log("cadastrarTicket", getFormData())
         return {% endcomment %}
         $.ajax({
             url: "/saveTicket",
@@ -125,7 +127,7 @@
             method: "POST",
             success: function (data) {
                 showFloatingMessage("Demanda criada com sucesso!", "alert-success")
-                clearModalFormTicket()
+                clearModalFormTicket('{{model}}')
             }
         });
     }
@@ -140,7 +142,7 @@
             method: "POST",
             success: function (data) {
                 showFloatingMessage("Demanda atualizada com sucesso!", "alert-success")
-                clearModalFormTicket(data)
+                clearModalFormTicket('{{model}}')
             }
         });
     }

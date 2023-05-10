@@ -83,15 +83,6 @@
         });
     }
 
-    function clearModalFormTicket() {
-        $("#cadastrarTicketModal").modal('hide');
-        $("#modalTicketContainer").html("");
-        $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
-        carregarMembrosExecucao()
-    }
-
-
     $(document).ready(function () {
         $(document).mouseup(function (e) {
             $("div[id^='" + hiddenMenuMembroExecucaoId + "']").each(function (i, el) {

@@ -275,7 +275,7 @@
             class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
         </div>
     </div>
-    {% if model == 'alocacao' or model == 'membro_execucao' %}
+    {% if model == 'alocacao' or model == 'membro_execucao' or model == 'atividade' %}
     <div class="form-group d-flex justify-content-start align-items-start">
         <input name="use_dpEvento_endereco"  
         id="use_dpEvento_endereco" 
@@ -286,7 +286,7 @@
             <b>Usar endereço
                 {% if model == 'alocacao' %}
                 da ação de ensino
-                {% elif model == 'membro_execucao' or model == 'servico_contratado' %}
+                {% elif model == 'membro_execucao' or model == 'servico_contratado' or model == 'atividade' %}
                 do evento
                 {% endif %}
             </b>
@@ -351,6 +351,7 @@
             {% endif %}>
         </div>
     </div>
+
     {% if parent_entity is not None %}
     <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
     <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
@@ -366,6 +367,8 @@
     {% elif model == 'pessoa'  %}
     <input type="text" name="selected_pessoa_id" id="selected_pessoa_id" hidden value="{{entity.id}}">
     <input type="text" name="selected_escola_id" id="selected_escola_id" hidden value="{{ticket.escola.id}}">
+    {% elif model == 'atividade'  %}
+    <input type="text" name="atividade_id" id="atividade_id" hidden value="{{entity.id}}">
     {% endif %}
 </form>
 {{ escolas|json_script:"escolas-script" }}

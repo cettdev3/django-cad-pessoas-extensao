@@ -167,6 +167,27 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             }
         });
     }
+
+    function clearModalFormTicket(tableToReload = null) {
+        console.log("clearModalFormTicket", tableToReload)
+        $("#cadastrarTicketModal").modal('hide');
+        $("#modalTicketContainer").html("");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        if (tableToReload == "atividade") {
+            carregarAtividades()
+        } else if (tableToReload == "avaliacao") {
+            carregarAvaliacoes()
+        } else if (tableToReload == "servico") {
+            carregarServicos()
+        } else if (tableToReload == "servicoContratado") {
+            carregarServicosContratados()
+        } else if (tableToReload == "galeria") {
+            carregarGalerias()
+        } else if (tableToReload == "membro_execucao") {
+            carregarMembrosExecucao()
+        }
+    }
     
     function addAtividadeModal() {
         $.ajax({

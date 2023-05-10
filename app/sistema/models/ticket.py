@@ -3,6 +3,7 @@ from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
 from ..models.escola import Escola
+from ..models.atividade import Atividade
 from ..models.pessoa import Pessoas
 from ..models.servicoContratado import ServicoContratado
 from datetime import datetime, timedelta
@@ -33,6 +34,7 @@ class Ticket(models.Model):
     alocacao =  models.ForeignKey(Alocacao, on_delete=models.SET_NULL, null=True)
     pessoa = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
+    atividade = models.ForeignKey(Atividade, on_delete=models.SET_NULL, null=True)
     servico_contratado = models.ForeignKey(ServicoContratado, on_delete=models.SET_NULL, null=True)
     meta = models.JSONField(null = True)
     model = models.CharField(null = True, blank=True, max_length=100)
@@ -57,7 +59,17 @@ class Ticket(models.Model):
         if self.model == 'pessoa':
             return self.status
         
-        entity = self.alocacao.acaoEnsino if self.model == 'alocacao' else self.membro_execucao.evento 
+        entity = None
+        if self.model == 'alocacao':
+            entity = self.alocacao.acaoEnsino 
+        if self.model == 'membro_execucao':
+            entity = self.membro_execucao.evento
+        if self.model == 'atividade':
+            entity = self.atividade.evento
+        
+        if not entity:
+            return self.status
+        
         today = timezone.now().date()
 
         if self.status == self.STATUS_CRIACAO_PENDENTE and entity.data_inicio:
@@ -72,7 +84,7 @@ class Ticket(models.Model):
             is_after = today > two_days_later
             if is_after:
                 return self.STATUS_PRESTACAO_CONTAS_PENDENTE
-        return self.status
+        return self.status                       
     
     @property
     def status_calculado(self):

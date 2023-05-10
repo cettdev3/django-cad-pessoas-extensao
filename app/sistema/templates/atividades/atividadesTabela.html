@@ -49,6 +49,7 @@ cellspacing="0">
             <!-- <th class="text-left">Departamento</th> -->
             <!-- <th class="text-left">Status</th> -->
             <th class="text-left">Atividades relacionadas</th>
+            <th class="text-left">Demandas</th>
             <!-- <th class="w-2 text-left">Tipo</th> -->
         </tr>
     </thead>
@@ -81,18 +82,26 @@ cellspacing="0">
                     {% endfor %}
                 </div>
             </td>
+            <td class="membro-execucao-w-70 text-left">
+                <div class="membro-execucao-w-100 d-flex flex-wrap">
+                    {% for demanda in atividade.ticket_set.all %}
+                        {% include "tickets/ticket_card.html" with ticket=demanda model='atividade' show_delete=True show_edit=True show_conclude=False %}
+                    {% endfor %}
+                </div>
+            </td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuAtividades{{atividade.id}}" 
                 class="btn-circle">
                     <i class="fa-solid fa-ellipsis-vertical"></i>                        
                 </button>
-                <div style="display: none; position: absolute; z-index: 2; right: 10%" 
+                <div style="display: none; position: absolute; z-index: 2; right: 10%;" 
                 id="hiddenMenuAtividades{{atividade.id}}" 
                 class="btn-group-custom">
                     <a id="linkVisualizarAtividade{{atividade.id}}" href="/visualizarAtividade/({{atividade.id}})"></a>
                     <!-- <button onclick="visualizarCidade({{cidade.id}})">Visualizar</button>  -->
                     <button onclick="editarAtividadeModal('{{atividade.id}}')">Editar</button> 
-                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar Atividade Relacionada</button> 
+                    <button onclick="openServicoDialog('{{atividade.id}}')">Adicionar SubAtividade</button> 
+                    <button onclick="adicionarDemandaAtividade('{{atividade.id}}')">Adicionar Demanda</button> 
                     <button onclick="openGaleriaModal({{atividade.galeria.id}})">Imagens</button>
                     <button onclick="openDeleteModal(() => deleteAtividade('{{atividade.id}}'))" >Excluir</button>
                 </div>
@@ -115,6 +124,21 @@ cellspacing="0">
     var rotaModalAtividade = "atividadesModalCadastrar"
     var rotaVisualizarAtividade = "visualizarAtividade"
     var deleteServicoControl = []
+
+    function adicionarDemandaAtividade(atividade_id) {
+        $.ajax({
+            url: "/ticketModal",
+            data: { 
+                atividade_id: atividade_id, 
+                model: "atividade",
+                layout: 6 
+            },
+            success: function (data) {
+                $("#" + "modalTicketContainer").html(data);
+                $('#' + "cadastrarTicketModal").modal('toggle');
+            }
+        });
+    }
 
     function editarAtividadeModal(id) {
         $.ajax({
