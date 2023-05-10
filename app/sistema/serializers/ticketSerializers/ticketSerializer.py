@@ -5,15 +5,17 @@ from .membroExecucaoTicketSerializer import MembroExecucaoTicketSerializer
 from .alocacaoTicketSerializer import AlocacaoTicketSerializer
 from .escolaTicketSerializer import EscolaTicketSerializer
 from .pessoaTicketSerializer import PessoaTicketSerializer
+from .pessoaTicketSerializer import PessoaTicketSerializer
+from .atividadeTicketSerializer import AtividadeTicketSerializer
 class TicketSerializer(serializers.ModelSerializer):
     meta = serializers.JSONField(allow_null=True)
     membro_execucao = MembroExecucaoTicketSerializer(many=False, read_only=True)
     alocacao = AlocacaoTicketSerializer(many=False, read_only=True)
     pessoa = PessoaTicketSerializer(many=False, read_only=True)
-    pessoa = EscolaTicketSerializer(many=False, read_only=True)
+    escola = EscolaTicketSerializer(many=False, read_only=True)
     status_formatado = serializers.CharField(read_only=True)
     status_calculado = serializers.CharField(read_only=True)
-
+    atividade = AtividadeTicketSerializer(many=False, read_only=True)
     class Meta:
         model = Ticket
         fields = [
@@ -39,6 +41,7 @@ class TicketSerializer(serializers.ModelSerializer):
             "complemento",
             "cidade",
             "observacao",
+            "atividade",
             "endereco_completo",
             "icon",
             "tipo_formatado",

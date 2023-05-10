@@ -3,7 +3,6 @@ from rest_framework import serializers
 from ..models.dpEvento import DpEvento
 from ..models.cidade import Cidade
 from .escolaSerializer import EscolaSerializer
-
 from .membroExecucaoSerializer import MembroExecucaoSerializer
 
 class DpEventoSerializer(serializers.ModelSerializer):

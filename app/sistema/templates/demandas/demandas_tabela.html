@@ -53,6 +53,10 @@ cellspacing="0">
                         <span class=" ">
                             {{demanda.membro_execucao.pessoa.nome|default_if_none:""}}
                         </span>
+                        {% elif demanda.model == 'atividade' %}
+                        <span class=" ">
+                            Demanda criada para uma atividade
+                        </span>
                         {% elif  demanda.model == 'pessoa' %}
                         <span class=" ">
                             {{demanda.pessoa.nome|default_if_none:""}}
@@ -96,6 +100,29 @@ cellspacing="0">
                             <div>
                                 <span class=" ">
                                 Evento ocorreu de {{demanda.membro_execucao.evento.data_inicio_formatada|default_if_none:""}} até {{demanda.membro_execucao.evento.data_fim_formatada|default_if_none:""}}
+                                </span>
+                            </div>  
+                            {% if demanda.observacao %} 
+                            <div>
+                                <span class=" ">
+                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
+                                </span>
+                            </div>  
+                            {% endif %}
+                        </div>
+                    {% elif demanda.model == 'atividade' or demanda.model == None or demanda.model == '' %}
+                        <div class="d-flex flex-column justify-content-start align-items-start">
+                            <div>
+                                <span class=" ">
+                                    Demanda registrada no evento, {{demanda.atividade.evento.tipo_formatado|default_if_none:""}}
+                                </span>
+                                <span class=" ">
+                                   em {{demanda.atividade.evento.cidade.nome|default_if_none:""}}
+                                </span>
+                            </div>
+                            <div>
+                                <span class=" ">
+                                Evento ocorreu de {{demanda.atividade.evento.data_inicio_formatada|default_if_none:""}} até {{demanda.membro_execucao.evento.data_fim_formatada|default_if_none:""}}
                                 </span>
                             </div>  
                             {% if demanda.observacao %} 
