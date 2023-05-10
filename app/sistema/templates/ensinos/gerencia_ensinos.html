@@ -285,11 +285,11 @@ z-index: 4
 
         $.ajax({
             url: "/getEnsino/"+ ensinoId,
-            success: function (data) {                
+            success: function (data) {    
                 evento.acao_ensino_id = data.id
                 evento.bairro = data.bairro
                 evento.cep = data.cep
-                evento.cidade_id = data.cidade.id
+                evento.cidade_id = data.cidade ? data.cidade.id : null
                 evento.complemento = data.complemento
                 evento.data_fim = data.data_fim
                 evento.data_inicio = data.data_inicio
