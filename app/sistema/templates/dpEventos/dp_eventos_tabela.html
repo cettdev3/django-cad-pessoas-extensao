@@ -269,6 +269,7 @@ cellspacing="0">
                 target[key] = value;
                 if (value) {
                     carregarDpEventos()
+                    console.log($("#modalDpEvento"))
                 }
                 target[key] = false
                 return false;
@@ -281,6 +282,7 @@ cellspacing="0">
                 if (value) {
                     console.log("ticketModificadaEventProxy")
                     carregarDpEventos()
+                    $("#ticketModificadaEvent").val(false)
                 }
                 target[key] = false
                 return false;

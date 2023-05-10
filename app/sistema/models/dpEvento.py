@@ -37,6 +37,7 @@ class DpEvento(models.Model):
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
+    escolas = models.ManyToManyField(Escola, through='DpEventoEscola', blank=True, related_name='escolas')
     acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True, blank= True)
     
     class Meta:

@@ -14,6 +14,7 @@ from ..models.atividade import Atividade
 from ..models.ensino import Ensino
 from ..models.imagem import Imagem
 from ..models.avaliacao import Avaliacao
+from ..models.dpEventoEscola import DpEventoEscola
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
@@ -83,20 +84,12 @@ class DpEventoApiView(APIView):
         acaoEnsino = None
         postDpEventoData = request.data.get("dpEvento")
         postItinerariosData = request.data.get("itinerarios")
-
+        print("postDpEventoData", postDpEventoData)
         if postDpEventoData["cidade_id"]:
             cidade = self.get_object(Cidade, postDpEventoData["cidade_id"])
             if not cidade:
                 return Response(
                     {"res": "Não existe cidade com o id informado"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        if postDpEventoData["escola_id"]:
-            escola = self.get_object(Escola, postDpEventoData["escola_id"])
-            if not escola:
-                return Response(
-                    {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
@@ -127,16 +120,22 @@ class DpEventoApiView(APIView):
             "cep": postDpEventoData["cep"] if postDpEventoData["cep"] else None,
             "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
             "cidade": cidade,
-            "escola": escola,
             "acaoEnsino": acaoEnsino,
         }
 
-        membrosExecucaoData = []
-        
-        dp_eventoData = DpEvento.objects.create(**dp_eventoData)
-        dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
-        print("dados salvos", dp_eventoSerializer.data)
-        return Response(dp_eventoSerializer.data, status=status.HTTP_200_OK)
+        with transaction.atomic():
+            dp_eventoData = DpEvento.objects.create(**dp_eventoData)
+            dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
+            if postDpEventoData["escolas"]:
+                for escola_id in postDpEventoData["escolas"]:
+                    escola = self.get_object(Escola, escola_id)
+                    if not escola:
+                        return Response(
+                            {"res": "Não existe escola com o id informado"},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    dpEventoEscola = DpEventoEscola.objects.create(escola=escola, dp_evento=dp_eventoData)      
+            return Response(dp_eventoSerializer.data, status=status.HTTP_200_OK)
 
 class DpEventoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -204,7 +203,6 @@ class DpEventoDetailApiView(APIView):
                 )
             dp_evento.escola = escola
         
-        print(request.data.get("acao_ensino_id"))
         if request.data.get("acao_ensino_id"):
             acaoEnsino = self.get_object(Ensino, request.data.get("acao_ensino_id"))
             if not acaoEnsino:
@@ -215,10 +213,23 @@ class DpEventoDetailApiView(APIView):
             dp_evento.acaoEnsino = acaoEnsino
         else:
             dp_evento.acaoEnsino = None
+        
+        DpEventoEscola.objects.filter(dp_evento=dp_evento).delete()
+        with transaction.atomic():
+            if request.data.get("escolas"):
+                escolas_ids = request.data.get("escolas")
+                for escola_id in escolas_ids:
+                    escola = self.get_object(Escola, escola_id)
+                    if not escola:
+                        return Response(
+                            {"res": f"Não existe escola com o id {escola_id} informado"},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    DpEventoEscola.objects.create(dp_evento=dp_evento, escola=escola)
 
-        dp_evento.save()
-        serializer = DpEventoSerializer(dp_evento)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            dp_evento.save()
+            serializer = DpEventoSerializer(dp_evento)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, dp_evento_id, *args, **kwargs):
         with transaction.atomic():
@@ -256,7 +267,8 @@ class DpEventoDetailApiView(APIView):
 
             for avaliacao in Avaliacao.objects.filter(evento=instance):
                 avaliacao.delete()
-
+            
+            DpEventoEscola.objects.filter(dp_evento=instance).delete()
             instance.delete()
         return Response(
             {"res": "ação deletada!"},

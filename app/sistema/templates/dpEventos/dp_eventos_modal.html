@@ -149,7 +149,7 @@
         <form id="cadastrarDpEventoForm" class="custom-modal-body-container w-75-vw px-2">
             <div id="dpEvento-tabs" class="tab-content">
                 <div id="home" class="tab-pane active">
-                    {% include "dpEventos/dp_evento_form.html" with dpEvento=dpEvento %}
+                    {% include "dpEventos/dp_evento_form.html" with dpEvento=dpEvento selectedEscolas=selectedEscolas %}
                 </div>
                 {% if not dpEvento %}
                 <div id="pessoas" class="tab-pane">
@@ -373,7 +373,7 @@
             pessoa_tickets.push(pessoa_ticket)
         });
         values["membros_execucao"] = pessoa_tickets
-
+        values["escolas"] = getSelectedEscolas()
         return values
     }
 

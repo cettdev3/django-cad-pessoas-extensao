@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label><b>Tipo:</b></label>
                 <select required 
                 id="tipo"
@@ -58,14 +58,7 @@
                     </option>
                 </select>
             </div>
-            <div class="col-sm-4">
-                {% if dpEvento %}
-                {% include 'escolas/escolas_select.html' with escola_id=dpEvento.escola.id escolas=escolas %}
-                {% else %}
-                {% include 'escolas/escolas_select.html' %}
-                {% endif %}
-            </div>
-            <div id="acao-ensino-select-container" class="col-sm-4">
+            <div id="acao-ensino-select-container" class="col-sm-6">
                 {% if dpEvento %}
                 {% include 'ensinos/ensino_select.html' with selectes=dpEvento.acaoEnsino.id ensinos=ensinos %}
                 {% else %}
@@ -73,6 +66,15 @@
                 {% endif %}
             </div>
         </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                {% if dpEvento %}
+                {% include 'escolas/escolas_select_multiple.html' with id=dpEvento.escola.id items=escolas selectedEscolas=selectedEscolas %}
+                {% else %}
+                {% include 'escolas/escolas_select_multiple.html' with id=1 items=escolas selectedEscolas=selectedEscolas %}
+                {% endif %}
+            </div>
+       </div>
         
         <div class="form-group row">
             <div class="col-sm-12">
@@ -181,7 +183,7 @@
 
     function bindEnderecoFields(escolaId) {
         let escola = escolas.find(escola => escola.id == escolaId)
-        if (escola && getCheckBoxValue("use_select_value")) {
+        if (escola) {
             $("#logradouro").val(escola.logradouro).trigger("change")
             $("#bairro").val(escola.bairro).trigger("change")
             $("#cep").val(escola.cep).trigger("change")
@@ -190,27 +192,12 @@
         }
     } 
 
-    function carregarSelectEscolas() {
-        $.ajax({
-            url: "/escolasSelect",
-            method: "GET",
-            success: function (data) {
-                $("#dpEventoFormSelectCidade").html(data)
-                $("#escola_id").change(function (val) {
-                    let selectedEscola = $(this).val() 
-                    bindEnderecoFields(selectedEscola)
-                })
-
-                $("#use_select_value").change(function (val) {
-                    let selectedEscola = $("#escola_id").val() 
-                    bindEnderecoFields(selectedEscola)
-                })
-            }
-        });
-    }
-
     $(document).ready(function () {
         carregarSelectCidades(cidade_id)
-        carregarSelectEscolas()
+        $("#selected_address_escola_id").change(function (val) {
+            console.log("escola modificada: ",$(this).val())
+            let selectedEscola = $(this).val() 
+            bindEnderecoFields(selectedEscola)
+        })
     })
 </script>

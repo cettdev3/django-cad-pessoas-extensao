@@ -20,3 +20,4 @@ from .servico import Servico
 from .servicoContratado import ServicoContratado
 from .galeria import Galeria
 from .imagem import Imagem
+from .dpEventoEscola import DpEventoEscola

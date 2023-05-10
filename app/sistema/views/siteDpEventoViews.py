@@ -70,9 +70,14 @@ def dpEventoModal(request):
     data['escolas'] = EscolaSerializer(escolas, many=True).data
     data['ensinos'] = EnsinoSerializer(ensinos, many=True).data
     data['ct_emprestimo'] = DpEvento.EMPRESTIMO
+    data['selectedEscolas'] = []
     if id:
         dpEvento = DpEvento.objects.get(id=id)
         data['dpEvento'] = DpEventoSerializer(dpEvento).data 
+        print("dpEvento:", dpEvento.escolas.all())
+        # data['selectedEscolas'] = dpEvento.escolas.all()
+        data['selectedEscolas'] = EscolaSerializer(dpEvento.escolas.all(), many=True).data
+
     return render(request,'dpEventos/dp_eventos_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -100,22 +105,22 @@ def saveDpEvento(request):
     dpEventoResponse = json.loads(dpEventoResponse.content.decode())
     dpEvento = DpEvento.objects.get(id=dpEventoResponse['id'])
 
-    if dpEvento.tipo in DpEvento.MAPPED_TIPOS:
-        dados = {
-            "variables": {
-                "processDescription": {"value": dpEvento.tipo + ", " + dpEvento.cidade.nome, "type": "String"},
-                "dpEvento_id": {"value": dpEvento.id, "type": "String"},
-                "extrato": {"value": dpEvento.extrato, "type": "String"},
-            },
-            "withVariablesInReturn": True
-        }
+    # if dpEvento.tipo in DpEvento.MAPPED_TIPOS:
+    #     dados = {
+    #         "variables": {
+    #             "processDescription": {"value": dpEvento.tipo + ", " + dpEvento.cidade.nome, "type": "String"},
+    #             "dpEvento_id": {"value": dpEvento.id, "type": "String"},
+    #             "extrato": {"value": dpEvento.extrato, "type": "String"},
+    #         },
+    #         "withVariablesInReturn": True
+    #     }
 
-        camunda = CamundaAPI()
-        camundaResponse = camunda.startProcess("ProcessoDeEmprestimoDeIntensProcess",dados)
-        dpEvento.process_instance = camundaResponse['id']
-        if dpEvento.tipo == DpEvento.EMPRESTIMO:
-            dpEvento.status = DpEvento.STATUS_WAITING_TICKET
-        dpEvento.save()
+    #     camunda = CamundaAPI()
+    #     camundaResponse = camunda.startProcess("ProcessoDeEmprestimoDeIntensProcess",dados)
+    #     dpEvento.process_instance = camundaResponse['id']
+    #     if dpEvento.tipo == DpEvento.EMPRESTIMO:
+    #         dpEvento.status = DpEvento.STATUS_WAITING_TICKET
+    #     dpEvento.save()
 
     return JsonResponse(dpEventoResponse, status=dpEventoResponseStatusCode)
 

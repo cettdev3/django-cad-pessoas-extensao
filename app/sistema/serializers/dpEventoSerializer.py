@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from ..models.dpEvento import DpEvento
 from ..models.cidade import Cidade
+from .escolaSerializer import EscolaSerializer
 
 from .membroExecucaoSerializer import MembroExecucaoSerializer
 
@@ -11,7 +12,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
     data_inicio_formatada = serializers.CharField(read_only=True)
     data_fim_formatada = serializers.CharField(read_only=True)
     tipo_formatado = serializers.CharField(read_only=True)
-    
+    escolas = EscolaSerializer(many=True, read_only=True)
     class Meta:
         model = DpEvento
         fields = [
@@ -29,6 +30,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "complemento",
             "cidade",
             "escola",
+            "escolas",
             "acaoEnsino",
             "endereco_completo",
             "data_inicio_formatada",
