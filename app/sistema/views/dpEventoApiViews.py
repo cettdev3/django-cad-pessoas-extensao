@@ -13,6 +13,7 @@ from ..models.itinerario import Itinerario
 from ..models.atividade import Atividade
 from ..models.ensino import Ensino
 from ..models.imagem import Imagem
+from ..models.galeria import Galeria
 from ..models.avaliacao import Avaliacao
 from ..models.dpEventoEscola import DpEventoEscola
 from ..models.itinerarioItem import ItinerarioItem
@@ -84,7 +85,6 @@ class DpEventoApiView(APIView):
         acaoEnsino = None
         postDpEventoData = request.data.get("dpEvento")
 
-        print("postDpEventoData", postDpEventoData)
         if postDpEventoData["cidade_id"]:
             cidade = self.get_object(Cidade, postDpEventoData["cidade_id"])
             if not cidade:
@@ -124,8 +124,8 @@ class DpEventoApiView(APIView):
         }
 
         with transaction.atomic():
-            dp_eventoData = DpEvento.objects.create(**dp_eventoData)
-            dp_eventoSerializer = DpEventoSerializer(dp_eventoData)
+            evento = DpEvento.objects.create(**dp_eventoData)
+            dp_eventoSerializer = DpEventoSerializer(evento)
             if postDpEventoData["escolas"]:
                 for escola_id in postDpEventoData["escolas"]:
                     escola = self.get_object(Escola, escola_id)
@@ -134,7 +134,8 @@ class DpEventoApiView(APIView):
                             {"res": "Não existe escola com o id informado"},
                             status=status.HTTP_400_BAD_REQUEST,
                         )
-                    dpEventoEscola = DpEventoEscola.objects.create(escola=escola, dp_evento=dp_eventoData)      
+                    dpEventoEscola = DpEventoEscola.objects.create(escola=escola, dp_evento=evento)     
+            galeria = Galeria.objects.create(nome="galeria geral do evento ", evento=evento) 
             return Response(dp_eventoSerializer.data, status=status.HTTP_200_OK)
 
 class DpEventoDetailApiView(APIView):
