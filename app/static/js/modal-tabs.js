@@ -1,7 +1,7 @@
 let customTabsId = "servicoContratadoList"
 let tabsLinkId = "servicoContratadoLink"
-let prevBtn = "formMembrosExecucaoPrev"
-let nextBtn ="formMembrosExecucaoNext"
+let prevBtn = "formServicoContratadoPrev"
+let nextBtn ="formServicoContratadoNext"
 let finishBtn = "finishCadastroServicoContratado"
 
 function getActiveTab() {
@@ -19,8 +19,8 @@ function getActiveTab() {
 
 function functionGetTabsQuantity() {
     let tabs = $("*[id^='"+customTabsId+"']")
-    tabs = $("*[id^='"+customTabsId+"']")
     let length = tabs.length
+    console.log(tabs, length)
     return length
 }
 
