@@ -27,6 +27,14 @@ from django.db.models import Q
 import requests
 from ..services.alfrescoApi import AlfrescoAPI
 
+def parse_date(date_string, formats):
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_string, fmt).date()
+        except ValueError:
+            pass
+    return None
+
 class DpEventoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -100,15 +108,15 @@ class DpEventoApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
+        date_formats = ['%Y-%m-%d', '%Y-%m-%dT%H:%M']
         dataInicio = None
         if postDpEventoData["data_inicio"]:
-            datetimeInicio = datetime.strptime(postDpEventoData["data_inicio"], '%Y-%m-%d')
-            dataInicio = datetimeInicio.date()
+            dataInicio = parse_date(postDpEventoData["data_inicio"], date_formats)
 
         dataFim = None
         if postDpEventoData["data_fim"]:
-            datetimeFim = datetime.strptime(postDpEventoData["data_fim"], '%Y-%m-%d')
-            dataFim = datetimeFim.date()
+            dataFim = parse_date(postDpEventoData["data_fim"], date_formats)
+
 
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
