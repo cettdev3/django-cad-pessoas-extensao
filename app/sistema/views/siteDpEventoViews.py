@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from sistema.models.dpEvento import DpEvento
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
+from sistema.models.departamento import Departamento
 from sistema.models.ensino import Ensino
 from sistema.models.tipoAtividade import TipoAtividade
 from sistema.services.alfrescoApi import AlfrescoAPI
@@ -27,17 +28,27 @@ from django.db.models import Prefetch
 from collections import defaultdict
 from docx.image.exceptions import UnrecognizedImageError
 from docx import Document
+from datetime import datetime, date
+from collections import Counter
 
 @login_required(login_url='/auth-user/login-user')
 def gerencia_dp_eventos(request):
     page_title = "Eventos"
-    count = 0
+    count_finalizados = 0
+    count_andamento = 0
     dp_eventos = DpEvento.objects.all()
-    for p in dp_eventos:
-        count += 1
+    for evento in dp_eventos:
+        if evento.tipo == 'emprestimo' or evento.tipo == 'curso_gps' or evento.tipo == 'pauta_positiva' or evento.tipo == 'outro':
+            count_finalizados += 0
+            count_andamento += 0
+        else:
+            if evento.data_fim >= datetime.now().date():
+                count_finalizados += 1
+            else:
+                count_andamento += 1
     
     return render(request,'dpEventos/gerenciar_dp_eventos.html',
-    {'dp_eventos':dp_eventos,'contagem':count, "page_title": page_title})
+    {'dp_eventos':dp_eventos,'contagem_finalizados':count_finalizados, 'contagem_andamento':count_andamento, 'page_title':page_title})
 
 @login_required(login_url='/auth-user/login-user')
 def dpEventoTable(request):
@@ -153,7 +164,7 @@ def visualizarDpEvento(request,codigo):
         'path_back': path_back
     })
 
-def getFilteredEventos(filters):
+def getFilteredEventos(filters, formatType  = "type 1"):
     eventos = None
     if 'departamento_id' in filters and filters['departamento_id']:
         eventos = DpEvento.objects.prefetch_related(
@@ -177,8 +188,12 @@ def getFilteredEventos(filters):
         eventos = eventos.filter(data_inicio__gte=filters['data_inicio'])
     if 'data_fim' in filters:
         eventos = eventos.filter(data_fim__lte=filters['data_fim'])
+    if 'tipo' in filters and filters['tipo']:
+        eventos = eventos.filter(tipo=filters['tipo'])
     result = {}
     eventos = eventos.order_by('data_inicio')
+    if formatType == "type 2":
+        return eventos
 
     for evento in eventos:
         if evento.atividade_set.count() == 0:
@@ -392,19 +407,65 @@ def getRelatorioType1(doc, relatorioData):
                 doc = getAtividade(doc, atividade, counter)
     return doc
 
+
 def getRelatorioType2(doc, relatorioData):
-    for nomeEvento, tiposAtividades in relatorioData.items():
-        print("nomeEvento", nomeEvento)
-        doc = getSectionTitle(doc, nomeEvento)
-        for index, (nomeAtividade, atividades) in enumerate(tiposAtividades.items()):
-            if index == 0:
-                print("primeiro index")
-                
-            print("nomeAtividade", nomeAtividade)
-            for atividade in atividades:
-                print("atividade individual", atividade)
+    # Initialize a Counter for status
+    status_counter = Counter()
+    tipo_counter = Counter()
+    for evento in relatorioData:
+        # calculate status based on data_inicio and data_fim
+        status = "Não Foi possível determinar o status do evento"
+        if evento.data_inicio and evento.data_fim:
+            today = date.today()
+            if today < evento.data_inicio:
+                status = "Não Iniciado"
+            elif evento.data_inicio <= today <= evento.data_fim:
+                status = "Em Andamento"
+            else:
+                status = "Concluído"
+
+        tipo_counter[evento.tipo_formatado] += 1
+
+        # Update the status counter
+        status_counter[status] += 1
+     # total number of DpEventos
+    doc.add_heading(f'Total de Eventos: {len(relatorioData)}', level=1)
+    # Add status count to the top of the document
+    doc.add_heading('Contagem por status do evento:', level=1)
+    for status, count in status_counter.items():
+        doc.add_paragraph(f'{status}: {count}')
+    
+    doc.add_paragraph('\n')
+    doc.add_heading('Contagem por tipo do evento:', level=1)
+    for tipo, count in tipo_counter.items():
+        doc.add_paragraph(f'{tipo}: {count}')
+    doc.add_paragraph('\n')
+    for evento in relatorioData:
+        status = "Não Foi possível determinar o status do evento"
+        if evento.data_inicio and evento.data_fim:
+            today = date.today()
+            if today < evento.data_inicio:
+                status = "Não Iniciado"
+            elif evento.data_inicio <= today <= evento.data_fim:
+                status = "Em Andamento"
+            else:
+                status = "Concluído"
+
+        # Add each DpEvento's details to the document
+        doc.add_paragraph(f'Tipo: {evento.tipo_formatado}')
+        doc.add_paragraph(f'Status: {status}')
+        doc.add_paragraph(f'Data de Início: {evento.data_inicio_formatada}')
+        doc.add_paragraph(f'Data de Fim: {evento.data_fim_formatada}')
+        doc.add_paragraph(f'Cidade: {evento.cidade.nome if evento.cidade else "N/A"}')  # assuming 'nome' is the field name for city's name in Cidade model
+        doc.add_paragraph(f'Escola: {evento.escola.nome if evento.escola else "N/A"}')  # assuming 'nome' is the field name for school's name in Escola model
+        doc.add_paragraph(f'Endereço: {evento.logradouro}')
+
+        # Add a line break between each DpEvento
+        doc.add_paragraph('\n')
 
     return doc
+
+
 
 def createRelatorio(doc, relatorioData, type = "type 1"):
     if type == "type 1":
@@ -416,16 +477,22 @@ def createRelatorio(doc, relatorioData, type = "type 1"):
 @login_required(login_url='/auth-user/login-user')
 def relatorioDpEvento(request):
     filters = {}
+    departamentoNome = ""
     if request.GET.get('departamento_id'):
         filters['departamento_id'] = request.GET.get('departamento_id')
+        departamento = Departamento.objects.get(id=filters['departamento_id'])
+        departamentoNome = departamento.nome
     if request.GET.get('data_inicio'):
         filters['data_inicio'] = request.GET.get('data_inicio')
     if request.GET.get('data_fim'):
         filters['data_fim'] = request.GET.get('data_fim')
+    if request.GET.get('tipo'):
+        filters['tipo'] = request.GET.get('tipo')
 
+    relatorioTipo = "type 2" if departamentoNome == "Eventos" else "type 1"
     doc = docx.Document()
-    relatorioData = getFilteredEventos(filters)
-    doc = createRelatorio(doc, relatorioData)
+    relatorioData = getFilteredEventos(filters, relatorioTipo)
+    doc = createRelatorio(doc, relatorioData, relatorioTipo)
     with open('tmp/dp_evento_report.docx', 'wb') as f:
         doc.save(f)
 

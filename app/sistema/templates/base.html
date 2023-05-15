@@ -181,7 +181,21 @@
                         {% endif %}
                         
                         {% if page_title %}
-                        <span class="h4 ml-2">{{ page_title }}</span>
+                        <div class="h4 ml-2 d-flex">
+                            {% if contagem_finalizados %}
+                            <span data-toggle="tooltip" 
+                            data-placement="top" 
+                            title="Eventos Finalizados" 
+                            class="badge badge-success">({{contagem_finalizados}}) </span> 
+                            {% endif %}
+                            {% if contagem_andamento %}
+                             <span data-toggle="tooltip"
+                             data-placement="top"
+                             title="Eventos em Andamento"
+                             class="badge badge-warning">({{contagem_andamento}}) </span>
+                            {% endif %}
+                            <span>{{ page_title }}</span> 
+                         </div>
                         {% endif %}
 
                         {% if dpEvento %}
