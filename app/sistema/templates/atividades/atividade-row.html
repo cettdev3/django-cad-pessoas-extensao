@@ -1,0 +1,55 @@
+<div id="atividade-row-container-{{atividade.id}}"  class="w-100" >
+    <div class="d-flex w-25" id="atividade-row-nome-{{atividade.id}}" >
+        <input type="text" 
+        class="input-hover-highlight"
+        placeholder="Escreva o nome da tarefa"
+        value="{{atividade.nome|default_if_none:''}}">
+        <div class="ml-3 position-relative d-flex justify-content-start">
+            <!-- Menu de opções -->
+            <button id="open-drawer-atividade-{{atividade.id|default_if_none:""}}"
+            onclick="showDrawer('{{atividade.id}}')"
+            data-toggle="tooltip" data-placement="top" title="Detalhes"
+            class="btn btn-light btn-sm" type="button">
+                <i class="fa-solid fa-angles-right"></i>
+            </button>
+            <button data-toggle="tooltip" data-placement="top" title="remover atividade" 
+            onclick="openDeleteModal(() => removeAtividade('{{atividade.id}}'))"
+            class="btn btn-danger btn-sm dropdown-item m-0 px-1 py-2 text-danger">
+                <i class="fas fa-trash mx-1"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script> 
+     $(document).ready(function() {
+        (function(params) {    
+            let oldName = "{{atividade.nome|default_if_none:''}}"        
+            function setNomeInputBehaviour(data) {
+                let nomeInput = $("#atividade-row-nome-" + params.atividadeId + " input")
+                if (params.fromCreate == "True") {
+                    nomeInput.focus()
+                }
+
+                nomeInput.on('focusout', function() {
+                    let nome = $(this).val()
+                    if (nome == "") nome = "Tarefa sem título"
+
+                    if (nome == oldName) return
+
+                    $(this).val(nome)
+
+                    let data = {
+                        "nome": nome
+                    }
+
+                    updateAtividade(params.atividadeId, data)
+                })
+            }
+
+            setNomeInputBehaviour()
+            
+
+        })({atividadeId: "{{atividade.id}}", fromCreate: "{{fromCreate}}"});
+    });
+</script>

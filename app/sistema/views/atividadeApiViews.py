@@ -5,14 +5,17 @@ from rest_framework import status
 from rest_framework import permissions
 from django.db import transaction
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, OuterRef
 from ..models.acao import Acao
 from ..models.tipoAtividade import TipoAtividade
 from ..models.cidade import Cidade
 from ..models.atividade import Atividade
+from ..models.servico import Servico
+from ..models.atividadeSection import AtividadeSection
 from ..models.departamento import Departamento
 from ..models.dpEvento import DpEvento
 from ..models.galeria import Galeria
+from ..models.anexo import Anexo
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.atividadeSerializer import AtividadeSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -32,15 +35,21 @@ class AtividadeApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        
         atividades = Atividade.objects.select_related(
             "acao", 
             "tipoAtividade", 
             "departamento", 
             "responsavel",
-            "cidade").prefetch_related("servico_set", "ticket_set").all()
-        serializer = AtividadeSerializer(atividades, many=True)
+            "cidade",
+        ).prefetch_related("servico_set", "ticket_set").all()
 
+        atividades = atividades.prefetch_related(Prefetch(
+            'anexo_set',
+            queryset=Anexo.objects.filter(model='Atividade', id_model=OuterRef('pk')),
+            to_attr='anexos'
+        ))
+
+        serializer = AtividadeSerializer(atividades, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -50,9 +59,10 @@ class AtividadeApiView(APIView):
         cidade = None
         evento = None
         departamento = None
+        section = None
 
         data = request.data
-        if data["cidade_id"]:
+        if data.get("cidade_id"):
             cidade = self.get_object(Cidade, data["cidade_id"])
             if not cidade:
                 return Response(
@@ -76,7 +86,7 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
-        if data["tipo_atividade_id"]:
+        if data.get("tipo_atividade_id"):
             tipoAtividade = self.get_object(TipoAtividade, data["tipo_atividade_id"])
             if not tipoAtividade:
                 return Response(
@@ -84,7 +94,7 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
-        if data["membro_execucao_id"]:
+        if data.get("membro_execucao_id"):
             responsavel = self.get_object(MembroExecucao, data["membro_execucao_id"])
             if not responsavel:
                 return Response(
@@ -92,7 +102,7 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
-        if data["departamento_id"]:
+        if data.get("departamento_id"):
             departamento = self.get_object(Departamento, data["departamento_id"])
             if not departamento:
                 return Response(
@@ -100,32 +110,41 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
-        galeria = Galeria.objects.create(nome="galeria: "+tipoAtividade.nome, evento=evento)
-
+        if data.get("atividade_section_id"):
+            section = self.get_object(AtividadeSection, data["atividade_section_id"])
+            if not section:
+                return Response(
+                    {"res": "Não existe seção com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            
+        galeria = Galeria.objects.create(nome="Galeria sem titulo ", evento=evento)
         atividadeData = {
-            "descricao": data["descricao"] if data["descricao"] else None,
-            "quantidadeCertificacoes": data["quantidadeCertificacoes"] if data["quantidadeCertificacoes"] else None,
-            "quantidadeMatriculas": data["quantidadeMatriculas"] if data["quantidadeMatriculas"] else None,
-            "quantidadeAtendimentos": data["quantidadeAtendimentos"] if data["quantidadeAtendimentos"] else None,
-            "quantidadeInscricoes": data["quantidadeInscricoes"] if data["quantidadeInscricoes"] else None,
-            "cargaHoraria": data["cargaHoraria"] if data["cargaHoraria"] else None,
-            "status": data["status"] if data["status"] else "planejado",
-            "linkDocumentos": data["linkDocumentos"] if data["linkDocumentos"] else None,
+            "descricao": data.get("descricao"),
+            "quantidadeCertificacoes": data.get("quantidadeCertificacoes"),
+            "quantidadeMatriculas": data.get("quantidadeMatriculas"),
+            "quantidadeAtendimentos": data.get("quantidadeAtendimentos"),
+            "quantidadeInscricoes": data.get("quantidadeInscricoes"),
+            "cargaHoraria": data.get("cargaHoraria"),
+            "status": data.get("status", "pendente"),
+            "linkDocumentos": data.get("linkDocumentos"),
             "acao": acao,
             "evento": evento,
             "tipoAtividade": tipoAtividade,
             "responsavel": responsavel,
             "departamento": departamento,
-            "data_realizacao_inicio": datetime.strptime(data["data_realizacao_inicio"], "%Y-%m-%d").date() if data["data_realizacao_inicio"] else None,
-            "data_realizacao_fim": datetime.strptime(data["data_realizacao_fim"], "%Y-%m-%d").date() if data["data_realizacao_fim"] else None,
+            "data_realizacao_inicio": datetime.strptime(data["data_realizacao_inicio"], "%Y-%m-%d").date() if data.get("data_realizacao_inicio") else None,
+            "data_realizacao_fim": datetime.strptime(data["data_realizacao_fim"], "%Y-%m-%d").date() if data.get("data_realizacao_fim") else None,
             "cidade": cidade,
             "galeria": galeria,
-            "logradouro": data["logradouro"] if data["logradouro"] else None,
-            "bairro": data["bairro"] if data["bairro"] else None,
-            "cep": data["cep"] if data["cep"] else None,
-            "complemento": data["complemento"] if data["complemento"] else None,
-            "valor": float(data["valor"]) if data["valor"] else None,
-            "atividade_meta": data["atividade_meta"] if data["atividade_meta"] else False,
+            "logradouro": data.get("logradouro"),
+            "bairro": data.get("bairro"),
+            "cep": data.get("cep"),
+            "complemento": data.get("complemento"),
+            "valor": float(data["valor"]) if data.get("valor") else None,
+            "categoria": data.get("categoria"),
+            "atividade_meta": data.get("atividade_meta", False),
+            "atividadeSection": section
         }
 
         atividade = Atividade.objects.create(**atividadeData)
@@ -143,13 +162,26 @@ class AtividadeDetailApiView(APIView):
             return None
 
     def get(self, request, atividade_id, *args, **kwargs):
+        print("rota de get atividade")
+        atividade = Atividade.objects.filter(id=atividade_id)
+        atividade = atividade.select_related(
+            "acao", 
+            "tipoAtividade", 
+            "departamento", 
+            "responsavel",
+            "cidade"
+        ).prefetch_related("servico_set", "ticket_set").first()
 
-        atividade = self.get_object(Atividade, atividade_id)
         if not atividade:
             return Response(
                 {"res": "Não existe atividade com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
+        anexos = list(anexos.values())
+
+        atividade.anexos = anexos
 
         serializer = AtividadeSerializer(atividade)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -163,17 +195,17 @@ class AtividadeDetailApiView(APIView):
             )
 
         data = request.data
-        if data["cidade_id"]:
-            cidade = self.get_object(Cidade, data["cidade_id"])
+        if data.get("cidade_id"):
+            cidade = self.get_object(Cidade, data.get("cidade_id"))
             if not cidade:
                 return Response(
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             atividade.cidade = cidade
-        
+
         if data.get("acao_id"):
-            acao = self.get_object(Acao, data["acao_id"])
+            acao = self.get_object(Acao, data.get("acao_id"))
             if not acao:
                 return Response(
                     {"res": "Não existe ação com o id informado"},
@@ -182,7 +214,7 @@ class AtividadeDetailApiView(APIView):
             atividade.acao = acao
 
         if data.get("evento_id"):
-            evento = self.get_object(DpEvento, data["evento_id"])
+            evento = self.get_object(DpEvento, data.get("evento_id"))
             if not evento:
                 return Response(
                     {"res": "Não existe evento com o id informado"},
@@ -190,17 +222,17 @@ class AtividadeDetailApiView(APIView):
                 )
             atividade.evento = evento
 
-        if data["tipo_atividade_id"]:
-            tipoAtividade = self.get_object(TipoAtividade, data["tipo_atividade_id"])
+        if data.get("tipo_atividade_id"):
+            tipoAtividade = self.get_object(TipoAtividade, data.get("tipo_atividade_id"))
             if not tipoAtividade:
                 return Response(
                     {"res": "Não existe tipo de atividade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             atividade.tipoAtividade = tipoAtividade
-        
-        if data["membro_execucao_id"]:
-            responsavel = self.get_object(MembroExecucao, data["membro_execucao_id"])
+
+        if data.get("membro_execucao_id"):
+            responsavel = self.get_object(MembroExecucao, data.get("membro_execucao_id"))
             if not responsavel:
                 return Response(
                     {"res": "Não existe responsável com o id informado"},
@@ -208,49 +240,79 @@ class AtividadeDetailApiView(APIView):
                 )
             atividade.responsavel = responsavel
 
-        if data["departamento_id"]:
-            departamento = self.get_object(Departamento, data["departamento_id"])
+        if data.get("departamento_id"):
+            departamento = self.get_object(Departamento, data.get("departamento_id"))
             if not departamento:
                 return Response(
                     {"res": "Não existe departamento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             atividade.departamento = departamento
-        
-        if data["descricao"]:
-            atividade.descricao = data["descricao"]
-        if data["status"]:
-            atividade.status = data["status"]
-        if data["linkDocumentos"]:
-            atividade.linkDocumentos = data["linkDocumentos"]
-        if data["logradouro"]:
-            atividade.logradouro = data["logradouro"]
-        if data["bairro"]:
-            atividade.bairro = data["bairro"]
-        if data["cep"]:
-            atividade.cep = data["cep"]
-        if data["complemento"]:
-            atividade.complemento = data["complemento"]
-        if data["quantidadeCertificacoes"]:
-            atividade.quantidadeCertificacoes = data["quantidadeCertificacoes"]
-        if data["quantidadeMatriculas"]:
-            atividade.quantidadeMatriculas = data["quantidadeMatriculas"]
-        if data["quantidadeAtendimentos"]:
-            atividade.quantidadeAtendimentos = data["quantidadeAtendimentos"]
-        if data["quantidadeInscricoes"]:
-            atividade.quantidadeInscricoes = data["quantidadeInscricoes"]
-        if data["cargaHoraria"]:
-            atividade.cargaHoraria = data["cargaHoraria"]
-        if data["data_realizacao_inicio"]:
-            atividade.data_realizacao_inicio = data["data_realizacao_inicio"]
-        if data["data_realizacao_fim"]:
-            atividade.data_realizacao_fim = data["data_realizacao_fim"]
-        if data["valor"]:
-            atividade.valor = data["valor"]
-        if data["atividade_meta"] != None:
-            atividade.atividade_meta = data["atividade_meta"]
 
+        if data.get("quantidadeCertificacoes") == '':
+            atividade.quantidadeCertificacoes = None
+        else: 
+            atividade.quantidadeCertificacoes = data.get("quantidadeCertificacoes", atividade.quantidadeCertificacoes) 
+
+        if data.get("quantidadeMatriculas") == '':
+            atividade.quantidadeMatriculas = None
+        else: 
+            atividade.quantidadeMatriculas = data.get("quantidadeMatriculas", atividade.quantidadeMatriculas) 
+
+        if data.get("quantidadeAtendimentos") == '':
+            atividade.quantidadeAtendimentos = None
+        else: 
+            atividade.quantidadeAtendimentos = data.get("quantidadeAtendimentos", atividade.quantidadeAtendimentos) 
+
+        if data.get("quantidadeInscricoes") == '':
+            atividade.quantidadeInscricoes = None
+        else: 
+            atividade.quantidadeInscricoes = data.get("quantidadeInscricoes", atividade.quantidadeInscricoes) 
+
+        if data.get("cargaHoraria") == '':
+            atividade.cargaHoraria = None
+        else: 
+            atividade.cargaHoraria = data.get("cargaHoraria", atividade.cargaHoraria) 
+        
+        if data.get("valor") == '':
+            atividade.valor = None
+        else:
+            atividade.valor = data.get("valor", atividade.valor)
+
+        if data.get("nome"):
+            galeriaId = atividade.galeria.id
+            galeria = self.get_object(Galeria, galeriaId)
+            galeria.nome = data.get("nome")
+            galeria.save()
+            atividade.nome = data.get("nome", atividade.nome)
+
+        atividade.descricao = data.get("descricao", atividade.descricao)
+        atividade.status = data.get("status", atividade.status)
+        atividade.linkDocumentos = data.get("linkDocumentos", atividade.linkDocumentos)
+        atividade.logradouro = data.get("logradouro", atividade.logradouro)
+        atividade.bairro = data.get("bairro", atividade.bairro)
+        atividade.cep = data.get("cep", atividade.cep)
+        atividade.complemento = data.get("complemento", atividade.complemento)
+        atividade.data_realizacao_inicio = data.get("data_realizacao_inicio", atividade.data_realizacao_inicio)
+        atividade.data_realizacao_fim = data.get("data_realizacao_fim", atividade.data_realizacao_fim)
+        atividade.categoria = data.get("categoria", atividade.categoria)
+    
+        if "atividade_meta" in data:
+            atividade.atividade_meta = data["atividade_meta"]
         atividade.save()
+
+        atividadeCompleta = Atividade.objects.select_related(
+            "acao", 
+            "tipoAtividade", 
+            "departamento", 
+            "responsavel",
+            "cidade"
+        ).prefetch_related("servico_set", "ticket_set").filter(id=atividade.id)
+
+        anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
+        anexos = list(anexos.values())
+
+        atividade.anexos = anexos
         serializer = AtividadeSerializer(atividade)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -262,8 +324,16 @@ class AtividadeDetailApiView(APIView):
                 {"res": "Não existe atividade com o id informado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        with transaction.atomic():
+            anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
+            for anexo in anexos:
+                anexo.delete()
+            
+            servicos = Servico.objects.filter(atividade=atividade)
+            for servico in servicos:
+                servico.delete()
 
-        atividade.delete()
+            atividade.delete()
         return Response(
             {"res": "atividade deletada!"},
             status=status.HTTP_200_OK

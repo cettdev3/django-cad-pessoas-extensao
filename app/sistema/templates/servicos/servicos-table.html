@@ -1,0 +1,39 @@
+<div>
+    <div id="add-servico-container">
+        {% for servico in servicos %}
+            {% include 'servicos/servico-row.html' with servico=servico %}
+        {% endfor %}
+    </div>
+    <div>
+        <div id="loading-container" class="h-100 loading-container" 
+        style="display: none; position:relative">
+            <div class="spinner-border text-primary " role="status">
+            </div>
+        </div>
+        <button id="add-servico-button" 
+        class="disabled-on-loading btn btn-outline-success my-2 ml-3"
+        onclick="addServico()">
+            <span>
+                Adicionar um Serviço
+            </span>
+        </button>
+    </div>
+</div>
+<script>
+
+    function insertServicoRow(html) {
+        $("#add-servico-container").append(html);
+    }
+
+    function addServico() {
+        $("#add-servico-button").addClass('disabled-on-loading');
+        $("#loading-container").show();
+        createServico({atividade_id: '{{atividade_id}}'}, insertServicoRow)
+    }
+
+    $(document).ready(function() {
+        (function(params) {
+            
+        })({atividade_id: '{{atividade_id}}'});
+    });
+</script>

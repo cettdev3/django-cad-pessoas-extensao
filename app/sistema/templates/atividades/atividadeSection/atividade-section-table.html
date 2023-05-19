@@ -1,0 +1,120 @@
+<div id="atividades-sections-sortable-container" class="d-flex flex-column w-100 sortable">
+    <div class="position-fixed w-100 bg-light" style="height: 20px;">
+        teste cabeçalho
+    </div>
+    {% for atividadeSection in atividadeSections %}
+    {% include "atividades/atividadeSection/atividade-section-item.html" with atividadeSection=atividadeSection index=forloop.counter %}
+    {% endfor %}
+</div>
+<div id="add-section-container" 
+{% if atividadeSections %}
+class="d-flex align-items-center justify-content-start" 
+{% else %}
+class="d-flex align-items-center justify-content-start mt-4" 
+{% endif %}
+>
+    <div id="loading-container" class="h-100 loading-container" 
+    style="display: none; position:relative">
+        <div class="spinner-border text-primary " role="status">
+        </div>
+    </div>
+    <button id="add-section-button" 
+    class="disabled-on-loading btn btn-outline-success mt-2"
+    onclick="addAtividadeSection()">
+        <span>
+            Adicionar uma seção
+        </span>
+    </button>
+</div>
+<script>
+    let atividadeSectionEventoId = '{{evento_id}}'
+    
+    async function addAtividadeToSection(sectionId) {
+        return await createAtividade({
+            evento_id: atividadeSectionEventoId,
+            atividade_section_id: sectionId
+        }, function(html) {
+            console.log(html)
+            $("#collapsable-"+sectionId).append(html);
+        });
+    }
+
+    function removeAtividadeSection(sectionId) {
+        deleteAtividadeSection(sectionId, function(data) {
+            $("#atividade-section-" + sectionId).remove();
+            updateSectionsOrder();
+        })
+    }
+
+    async function addAtividadeSection(sectionId, position = null) {
+        await createAtividadeSection({evento_id: atividadeSectionEventoId}, function(html) {
+            if (position === 'above') {
+                $("#atividade-section-" + sectionId).before(html);
+            } else if (position === 'below') {
+                $("#atividade-section-" + sectionId).after(html);
+            } else {
+                $("#atividades-sections-sortable-container").append(html);
+            }
+        });
+
+        updateSectionsOrder();
+    }
+
+    function updateSectionsOrder() {
+        var newOrder = $("#atividades-sections-sortable-container").sortable('toArray');
+
+        newOrder = newOrder.map(function (item, index) {
+            if (item) {
+                let container = $("#" + item);
+                let containerId = item.split('-')[2];
+                let marginTop = index == 0 ? '32px' : '0px';
+                container.css('margin-top', marginTop);
+            
+                return {
+                    id: containerId,
+                    order: index + 1
+                }
+            }
+        }).filter(function (item) {
+            return item;
+        });
+
+        updateOrder(newOrder);
+    }
+
+
+    async function updateOrder(newOrder) {
+        newOrder.forEach(async function (item) {
+            await updateAtividadeSection(
+                item.id, 
+                {atividade_section_id: item.id, order: item.order}
+            );
+        });
+    }
+
+    function renameAtividadeSection(sectionId) {
+        $("#input-nome-atividade-section-" + sectionId).focus();
+    }
+
+    $(document).ready(function () {
+        $("#atividades-sections-sortable-container").sortable({
+            handle: ".drag-handle", 
+            items: "> div:gt(0)",
+            helper: function (event, ui) {
+                var text = ui.find('[id^="input-nome-atividade-section"]').val();
+                return $('<div class="card bg-success" style="height: 40px; width: 200px">' + text + '</div>');
+            },
+            update: function (event, ui) {
+                updateSectionsOrder();
+            }
+        });
+
+        $("atividades-sections-sortable-container").disableSelection();
+
+        $(".nested-dropdown-menu button").click(function() {
+            var sectionId = $(this).closest('.w-100').attr('id').split('-')[1];
+            var position = $(this).attr('data-position');
+            if (position) addAtividadeSection(sectionId, position);
+        });
+    })
+</script>

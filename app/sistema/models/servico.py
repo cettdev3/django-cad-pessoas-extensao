@@ -16,3 +16,14 @@ class Servico(models.Model):
     status = models.CharField(null = True, max_length=100)
     class Meta:
         db_table = 'servicos'
+
+    @property
+    def status_formatado(self):
+        if self.status == 'concluido':
+            return 'Concluído'
+        elif self.status == 'pendente':
+            return 'Pendente'
+        elif self.status == 'cancelado':
+            return 'Cancelado'
+        else:
+            return 'Não definido'

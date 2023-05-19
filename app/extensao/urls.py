@@ -48,11 +48,11 @@ from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, 
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal, filterMultipleSelect
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
-from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, eliminarTicket, ticketModalEdit, editarTicket
+from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, ticket_form_collapsable, eliminarTicket, ticketModalEdit,updateTicket, editarTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
-from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, eliminarAtividade, atividadeEditarModal, editarAtividade
+from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, deleteAtividade, getAtividadeDrawer, editarAtividade
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteServicosContratadosViews import servicoContratadoModal, servicoContratadoTable, saveServicoContratado, deleteServicoContratado
@@ -65,10 +65,23 @@ from sistema.views.siteGaleriaViews import (
     saveGaleria,
     deleteGaleria
 )
+from sistema.views.siteAtividadeSectionViews import (
+    atividadeSectionModal,
+    atividadeSectionTable,
+    saveAtividadeSection,
+    deleteAtividadeSection,
+    updateAtividadeSection,
+    atividadeSectionComponent
+)
 
 from sistema.views.siteImagemViews import (
     deleteImagem,
     saveImagem
+)
+
+from sistema.views.siteAnexoViews import (
+    deleteAnexo,
+    saveAnexo
 )
 
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
@@ -80,6 +93,8 @@ from sistema.views.dataRemovidaApiViews import DataRemovidaApiView
 from sistema.views.migrationsApiView import MigrationsViewSets
 from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiView
 from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
+from sistema.views.atividadeSectionApiViews import AtividadeSectionApiView, AtividadeSectionDetailApiView
+from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -225,9 +240,9 @@ urlpatterns = [
     path("atividadesTable", atividadesTable),
     path("atividadeModal", atividadeModal),
     path("saveAtividade", saveAtividade),
-    path("eliminarAtividade/<codigo>", eliminarAtividade),
-    path("atividadeEditarModal/<codigo>", atividadeEditarModal),
-    path("editarAtividade/<codigo>", editarAtividade),
+    path("deleteAtividade/<atividade_id>", deleteAtividade),
+    path("getAtividadeDrawer/<atividade_id>", getAtividadeDrawer),
+    path("editarAtividade/<atividade_id>", editarAtividade),
     path("atividadesDpEventoTable", atividadesDpEventoTable),
     
     # ROTAS PARA MEMBROS DE EXECUCAO
@@ -269,12 +284,14 @@ urlpatterns = [
     path("ticketModalEdit/<ticket_id>",ticketModalEdit),
     path("saveTicket",saveTicket),
     path("editarTicket/<ticket_id>",editarTicket),
+    path("updateTicket/<ticket_id>",updateTicket),
     path("ticket_form",ticket_form),
+    path("ticket_form_collapsable",ticket_form_collapsable),
     path("eliminarTicket/<ticket_id>",eliminarTicket),
     
     # ROTAS PARA SERVICOS
     path("ServicoModalCadastrar",ServicoModalCadastrar),
-    path("editarServico/<codigo>",editarServico),
+    path("editarServico/<servico_id>",editarServico),
     path("eliminarServico/<codigo>",eliminarServico),
     path("saveServico",saveServico),
 
@@ -314,10 +331,22 @@ urlpatterns = [
     path("galeriaTable", galeriaTable),
     path("saveGaleria", saveGaleria),
     path("deleteGaleria/<galeria_id>", deleteGaleria),
+
+    #ROTAS PARA SEÇÂO DE ATIVIDADES
+    path("atividadeSectionModal", atividadeSectionModal),
+    path("atividadeSectionTable", atividadeSectionTable),
+    path("saveAtividadeSection", saveAtividadeSection),
+    path("deleteAtividadeSection/<int:atividade_section_id>", deleteAtividadeSection),
+    path("updateAtividadeSection/<int:atividade_section_id>", updateAtividadeSection),
+    path("atividadeSectionComponent//<int:atividade_section_id>", atividadeSectionComponent),
     
     # ROTAS PARA IMAGENS
     path("saveImagem", saveImagem),
     path("deleteImagem/<imagem_id>", deleteImagem),
+    
+    # ROTAS PARA ANEXOS
+    path("saveAnexo", saveAnexo),
+    path("deleteAnexo/<anexo_id>", deleteAnexo),
 
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
@@ -389,6 +418,13 @@ urlpatterns = [
 
     path("servicos-contratados", ServicoContratadoApiView.as_view()),
     path('servicos-contratados/<int:servico_contratado_id>', ServicoContratadoDetailApiView.as_view()),
+    
+    path("atividade-section", AtividadeSectionApiView.as_view()),
+    path('atividade-section/<int:atividade_section_id>', AtividadeSectionDetailApiView.as_view()),
+
+    path("anexos", AnexoApiView.as_view()),
+    path('anexos/<int:anexo_id>', AnexoDetailApiView.as_view()),
+    
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

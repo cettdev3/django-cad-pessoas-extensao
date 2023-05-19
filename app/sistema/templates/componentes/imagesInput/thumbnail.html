@@ -10,7 +10,11 @@ data-uuid="{{imagem.id}}"
 {% else %}
 data-uuid=""
 {% endif %}>
-    <div class="custom-image-thumbnail ">
+    <div
+    class="custom-image-thumbnail "
+    {% if thumbnailStyle %}
+    style="width: auto;"
+    {% endif %}>
         <input type="text" id="imagem_id" name="imagem_id" 
         {% if imagem %}
         value="{{ imagem.id }}"
@@ -41,12 +45,23 @@ data-uuid=""
             id="{{imagem.id}}"
         {% endif %}
         class="fa-stack custom-remove-img-button" data-toggle="tooltip" data-placement="top"
-            title="remover imagem">
+            title="remover imagem"
+            {% if thumbnailStyle %}
+                style="right: 0px;"
+            {% else %}
+                style="right: 0px;"
+            {% endif %}
+            >
             <i style="border-radius:   50%;" class="fas fa-circle-thin fa-stack-2x"></i>
             <i style="border-radius: 50%;" class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
         </span>
     </div>
-    <div class="container position-relative">
+    
+    {% if thumbnailStyle %}
+        <div class="container position-relative" style="padding: 0px; padding-left: 25px">
+    {% else %}
+        <div class="container position-relative">
+    {% endif %}
         <span class="fa-stack custom-prepend-descricao" data-toggle="tooltip" data-placement="top"
             title="Descrição da imagem">
             <i style="border-radius: 50%;" class="fa-solid fa-edit fa-stack-1x "></i>

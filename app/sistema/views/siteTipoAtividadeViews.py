@@ -72,7 +72,6 @@ def tipoAtividadeEditarModal(request, codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def tiposAtividadesSelect(request):
-    print("dentro do select de atividade")
     data = {}
     if request.GET.get('tipo_atividade_id'):
         data['tipo_atividade_id'] = int(request.GET.get('tipo_atividade_id'))

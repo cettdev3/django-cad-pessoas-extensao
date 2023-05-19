@@ -12,3 +12,5 @@ class GaleriaSerializer(serializers.ModelSerializer):
             "nome",
             "imagem_set"
         ]
+
+    depth = 2

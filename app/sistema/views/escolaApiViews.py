@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework import permissions
 from ..serializers.escolaSerializer import EscolaSerializer
 from ..models.escola import Escola
+from ..models.dpEvento import DpEvento
 from ..models.endereco import Endereco
 from ..models.cidade import Cidade
 from rest_framework.authentication import TokenAuthentication
@@ -21,7 +22,12 @@ class EscolaApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        escolas = Escola.objects.all()
+        escolas = None
+        evento_id = request.data.get('evento_id')
+        if evento_id:
+            escolas = DpEvento.objects.get(id=evento_id).escolas.all()
+        else: 
+            escolas = Escola.objects.all()
         serializer = EscolaSerializer(escolas, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

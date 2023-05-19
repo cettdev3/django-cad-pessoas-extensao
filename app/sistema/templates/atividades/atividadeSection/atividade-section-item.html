@@ -1,0 +1,133 @@
+<div id="atividade-section-{{atividadeSection.id}}" 
+{% if index == 1 %}
+style="margin-top: 32px;"
+{% endif %} 
+class="w-100">
+    <!-- <h1>{{counter}}</h1> -->
+    <div id="header-section-{{atividadeSection.id}}" 
+    class="w-100 bg-success d-flex justify-content-start align-items-center header-section-container">
+        <div class="visible-handle drag-handle pr-2 pl-1" style="cursor: grab;">   <!-- Add this div as a drag handle -->
+            <i class="fas fa-bars"></i>   <!-- This is a 'drag' icon from Font Awesome. You can replace it with your own icon -->
+        </div>
+        <button class="btn btn-success btn-sm" 
+            id="btn-collapse-{{atividadeSection.id}}"
+            data-toggle="collapse" 
+            data-target="#collapsable-{{atividadeSection.id}}" 
+            aria-expanded="false" 
+            aria-controls="collapsable-{{atividadeSection.id}}">
+            <i class="fas fa-chevron-down"></i>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <input type="text" 
+        id="input-nome-atividade-section-{{atividadeSection.id}}"
+        name="nome" 
+        placeholder="Nova seção"
+        value="{{atividadeSection.nome|default_if_none:""}}" 
+        class="w-20 bg-success input-hover-highlight" >
+        <div class="ml-3 position-relative d-flex justify-content-start">
+            <!-- Menu de opções -->
+            <button id="add-atividade-{{atividadeSection.id|default_if_none:""}}"
+            onclick="addAtividadeToSection('{{atividadeSection.id}}')"
+            class="btn btn-success btn-sm" type="button">
+                <i class="fas fa-plus visible-handle"></i>
+            </button>
+            <div class="multilevel-dropdown">
+                <button class="btn btn-success btn-sm custom-dropdown-toggle" type="button">
+                    <i class="fas fa-ellipsis-h visible-handle"></i>
+                </button>
+                <div class="multilevel-dropdown-menu">
+                    <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2"
+                    onclick="renameAtividadeSection('{{atividadeSection.id}}')">
+                        <i class="fas fa-pen mx-1"></i>
+                        <span>Renomear seção</span>
+                    </button>
+                    <div class="nested-multilevel-dropdown">
+                        <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2" 
+                        data-toggle="dropdown">
+                            <i class="fa-sharp fa-solid fa-bars-staggered"></i>
+                            <span>Adicionar uma sessão</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="nested-dropdown-menu">
+                            <button onclick="addAtividadeSection('{{atividadeSection.id}}', 'above')" 
+                            class="dropdown-item btn btn-success btn-sm dropdown-item m-0 px-1 py-2">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Adicionar sessão acima</span>
+                            </button>
+                            <button onclick="addAtividadeSection('{{atividadeSection.id}}', 'below')" 
+                            class="dropdown-item btn btn-success btn-sm dropdown-item m-0 px-1 py-2">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>Adicionar sessão abaixo</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button  onclick="openDeleteModal(() => removeAtividadeSection('{{atividadeSection.id}}'))"
+                    class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2 text-danger">
+                        <i class="fas fa-trash mx-1"></i>
+                        <span>Excluir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="collapsable-{{atividadeSection.id}}" class="collapsable collapse">
+        {% for atividade in atividadeSection.atividade_set.all %}
+            {% include "atividades/atividade-row.html" with atividade=atividade %}
+        {% endfor %}
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        (function(params) {
+            let oldName = "Seção se titulo"
+
+            function setNomeInputBehaviour(data) {
+                let nomeInput = $("#header-section-" + params.atividadeSectionId + " input")
+                if (params.fromCreate == "True") {
+                    nomeInput.focus()
+                }
+
+                nomeInput.on('focusout', function() {
+                    let nome = $(this).val()
+                    if (nome == oldName) return
+                    if (nome == "") nome = "Seção se titulo"
+
+                    $(this).val(nome)
+
+                    let data = {
+                        "atividade_section_id": params.atividadeSectionId,
+                        "nome": nome
+                    }
+
+                    updateAtividadeSection(params.atividadeSectionId, data)
+                })
+            }
+
+            function setChevronBehavior(params) {
+                var collapseId = "#collapsable-" + params.atividadeSectionId;
+                var buttonId = "#btn-collapse-" + params.atividadeSectionId;
+                $(collapseId).on('show.bs.collapse', function () {
+                    $(buttonId + ' i.fa-chevron-right').hide();
+                    $(buttonId + ' i.fa-chevron-down').show();
+                });
+    
+                $(collapseId).on('hide.bs.collapse', function () {
+                    $(buttonId + ' i.fa-chevron-down').hide();
+                    $(buttonId + ' i.fa-chevron-right').show();
+                });
+
+                if (params.chevronStart === "open") {
+                    $(collapseId).collapse('show');
+                } else {
+                    $(collapseId).collapse('hide');
+                    $(buttonId + ' i.fa-chevron-down').hide();
+                }
+            }
+
+            setNomeInputBehaviour(params)
+            setChevronBehavior(params)
+        })({atividadeSectionId: "{{atividadeSection.id}}", fromCreate: "{{fromCreate}}", "chevronStart": "open"});
+    });
+</script>

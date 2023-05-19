@@ -34,17 +34,30 @@ def eliminarServico(request,codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def saveServico(request):
+    print("dentro da request para salvar servico")
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
+    body = json.loads(request.body)
+    print("saveServico", body)
     response = requests.post('http://localhost:8000/servicos', json=body, headers=headers)
+    return render(request,'servicos/servico-row.html',{'servico':json.loads(response.content), 'fromCreate': True})
 
+@login_required(login_url='/auth-user/login-user')
+def editarServico(request, servico_id):
+    print("dentro da request para editar servico")
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)
+    print("body", body)
+    response = requests.put('http://localhost:8000/servicos/'+str(servico_id), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
-def editarServico(request, codigo):
-    token, created = Token.objects.get_or_create(user=request.user)
+def getServicos(request):
+    atividade_id = request.GET.get('atividade_id')
+    token = Token.objects.get(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
-    response = requests.put('http://localhost:8000/servicos/'+str(codigo), json=body, headers=headers)
-    return JsonResponse(json.loads(response.content),status=response.status_code)
+    body =  {'atividade_id': atividade_id}
+    response = requests.get('http://localhost:8000/servicos', json=body, headers=headers)
+    servicos = json.loads(response.content)
+    return render(request,'servicos/servicos-table.html',{'servicos':servicos})

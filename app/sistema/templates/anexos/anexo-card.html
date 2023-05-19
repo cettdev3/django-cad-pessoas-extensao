@@ -1,0 +1,61 @@
+<style>
+    .pptm-button {
+        background-color: white;
+        color: orange;
+        border: 1px solid orange;
+    }
+
+    .pptm-button:hover {
+        background-color: orange;
+        color: white;
+    }
+</style>
+<div id="anexo-card-{{anexo.id}}" 
+class="anexo-card position-relative">
+    <a href="{{ anexo.shared_link }}" 
+    data-toggle="tooltip" data-placement="top" title="clique para baixar: {{ anexo.nome }}"
+    {% if anexo.extension == "img" %}
+    class="btn btn-outline-info d-flex justify-content-between align-items-start w-100" 
+    {% elif anexo.extension == "doc" %}
+    class="btn btn-outline-primary d-flex justify-content-between align-items-start w-100" 
+    {% elif anexo.extension == "xls" %}
+    class="btn btn-outline-success d-flex justify-content-between align-items-start w-100" 
+    {% elif anexo.extension == "pdf" %}
+    class="btn btn-outline-danger d-flex justify-content-between align-items-start w-100" 
+    {% elif anexo.extension == "ppt" %}
+    class="btn pptm-button d-flex justify-content-between align-items-start w-100" 
+    {% else %}
+    class="btn btn-outline-secondary d-flex justify-content-between align-items-start w-100" 
+    {% endif %}
+    
+    download target="_blank">
+        {% if anexo.extension == "img" %}
+            <i class="fas fa-file-image" style="font-size: 30px"></i>
+        {% elif anexo.extension == "doc" %}
+            <i class="fas fa-file-word" style="font-size: 30px"></i>
+        {% elif anexo.extension == "xls" %}
+            <i class="fas fa-file-excel" style="font-size: 30px"></i>
+        {% elif anexo.extension == "pdf" %}
+            <i class="fas fa-file-pdf" style="font-size: 30px"></i>
+        {% elif anexo.extension == "ppt" %}
+            <i class="fas fa-file-powerpoint" style="font-size: 30px"></i>
+        {% else %}
+            <i class="fas fa-file" style="font-size: 30px"></i>
+        {% endif %}
+        <span style=" display: inline-block;
+        max-width: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-left: 4px" >{{ anexo.nome }}</span>
+    </a>
+    <span class="fa-stack position-absolute" 
+    style="top: 0; right: 0; margin: 5px; cursor: pointer; width: 15px; height: 15px; font-size: 10px; background-color: transparent; color: transparent"
+    data-toggle="tooltip" 
+    data-placement="top"
+    title="remover anexo"
+    onclick="openDeleteModal(() => removeAnexoCard('{{anexo.id}}'))">
+        <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
+        <i style="border-radius: 50%;color: #000"  class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
+    </span>
+</div>

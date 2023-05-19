@@ -70,5 +70,11 @@ def editarEscola(request, escola_id):
 
 @login_required(login_url='/auth-user/login-user')
 def escolasSelect(request):
-    escolas = Escola.objects.order_by('cidade__nome').all()
-    return render(request,'escolas/escolas_select.html',{'escolas':escolas})
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    selected = request.GET.get('selected')
+    body = request.GET
+    escolas = requests.get('http://localhost:8000/escolas', json=body, headers=headers)
+    escolas = json.loads(escolas.content)
+    selected = int(selected) if selected.isdigit() else None 
+    return render(request,'escolas/escolas_select.html',{'escolas':escolas, "escola_id": selected})

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from sistema.models.atividade import Atividade
 from sistema.models.acao import Acao
+from sistema.models.atividadeSection import AtividadeSection
 from sistema.models.dpEvento import DpEvento
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -17,6 +18,7 @@ from rest_framework.authtoken.models import Token
 def atividadesTable(request):
     nome = request.GET.get('nome')
     acao_id = request.GET.get('acao_id')
+    evento_id = request.GET.get('dp_evento_id')
     atividades = Atividade.objects
     if acao_id:
         atividades = atividades.filter(acao__id = acao_id)
@@ -42,16 +44,18 @@ def atividadesDpEventoTable(request):
             Q(descricao__contains = nome) | 
             Q(tipoAtividade__nome__contains = nome)
         )
-
+    atividadeSections = AtividadeSection.objects.filter(evento__id = evento_id).order_by("order").all()
     atividades = atividades.all()
-    print(atividades)
-    return render(request,'atividades/atividadesTabela.html',{'atividades':atividades})
+    return render(request,'atividades/atividadesTabela.html',{
+        'atividades':atividades, 
+        'evento_id':evento_id,
+        'atividadeSections':atividadeSections
+    })
 
 @login_required(login_url='/auth-user/login-user')
 def atividadeModal(request):
     acao_id = request.GET.get('acao_id')
     evento_id = request.GET.get('dp_evento_id')
-    print("evento_id", evento_id)
     data = {}
     if acao_id:
         acao = Acao.objects.get(id=acao_id)
@@ -62,29 +66,45 @@ def atividadeModal(request):
     return render(request,'atividades/atividadesModal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
-def eliminarAtividade(request, codigo):
-    atividade = Atividade.objects.get(id=codigo)
-    atividade.delete()
-    return JsonResponse({"message": "Deletado com sucesso"}, status=status.HTTP_200_OK)
+def deleteAtividade(request, atividade_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    url = 'http://localhost:8000/atividades/' + str(atividade_id)
+    response = requests.delete(url, headers=headers)
+    return JsonResponse({'status': response.status_code, 'message': response.content.decode()})
 
 @login_required(login_url='/auth-user/login-user')
 def saveAtividade(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
+    body = json.loads(request.body)
     response = requests.post('http://localhost:8000/atividades', json=body, headers=headers)
-    return JsonResponse(json.loads(response.content),status=response.status_code)
+    atividade = json.loads(response.content)
+    return render(request,'atividades/atividade-row.html',{"atividade":atividade, "fromCreate": True})
 
 @login_required(login_url='/auth-user/login-user')
-def editarAtividade(request, codigo):
+def editarAtividade(request, atividade_id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
-    response = requests.put('http://localhost:8000/atividades/'+str(codigo), json=body, headers=headers)
-    return JsonResponse(json.loads(response.content),status=response.status_code)
+    body = json.loads(request.body)
+    template = body.get('template') if body.get('template') else "atividade-row.html"
+    response = requests.put('http://localhost:8000/atividades/'+str(atividade_id), json=body, headers=headers)
+    atividade = json.loads(response.content)
+    categorias = Atividade().CATEGORY_CHOICES
+    thumbnailStyle = True
+    return render(request,'atividades/'+template,{"atividade":atividade, "fromCreate": True, "categorias":categorias, "thumbnailStyle":thumbnailStyle})
 
 @login_required(login_url='/auth-user/login-user')
-def atividadeEditarModal(request, codigo):
-    id = request.GET.get('id')
-    atividade = Atividade.objects.get(id=codigo)
-    return render(request,'atividades/atividadesModal.html',{"atividade":atividade})
+def getAtividadeDrawer(request, atividade_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/atividades/'+str(atividade_id), headers=headers)
+    atividade = json.loads(response.content)
+    categorias = Atividade().CATEGORY_CHOICES
+    thumbnailStyle = True
+    
+    return render(request,'atividades/atividade-drawer.html',{
+        "atividade":atividade, 
+        "categorias":categorias, 
+        "thumbnailStyle":thumbnailStyle
+    })

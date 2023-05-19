@@ -36,6 +36,7 @@ class Ticket(models.Model):
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
     atividade = models.ForeignKey(Atividade, on_delete=models.SET_NULL, null=True)
     servico_contratado = models.ForeignKey(ServicoContratado, on_delete=models.SET_NULL, null=True)
+    beneficiario = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True, related_name="beneficiario")
     meta = models.JSONField(null = True)
     model = models.CharField(null = True, blank=True, max_length=100)
     data_inicio = models.DateField(null = True, blank= True)

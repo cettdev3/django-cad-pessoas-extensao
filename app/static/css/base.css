@@ -11,3 +11,42 @@
     height: 22px;
     position: fixed;
 }
+
+.scroll-custom::-webkit-scrollbar {
+    width: 4px;
+}
+
+.scroll-custom::-moz-scrollbar {
+    width: 4px;
+}
+
+.scroll-custom::-ms-scrollbar {
+    width: 4px;
+}
+
+.scroll-custom::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.scroll-custom::-moz-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.scroll-custom::-ms-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.scroll-custom::-webkit-scrollbar-button {
+    display: none;
+}
+
+.scroll-custom::-moz-scrollbar-button {
+    display: none;
+}
+
+.scroll-custom::-ms-scrollbar-button {
+    display: none;
+}

@@ -23,8 +23,14 @@ class ServicoApiView(APIView):
             return None
         
     def get(self, request, *args, **kwargs):
-        cidades = Servico.objects.all()
-        serializer = ServicoSerializer(cidades, many=True)
+        atividade_id = request.data.get('atividade_id')
+        print("dentro do get de serviços: ",atividade_id)
+        servicos = Servico.objects
+        if atividade_id:
+            servicos = servicos.filter(atividade__id=atividade_id)
+        servicos = servicos.all()
+
+        serializer = ServicoSerializer(servicos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -60,7 +66,7 @@ class ServicoApiView(APIView):
             "bairro": request.data.get("bairro") or None,
             "cep": request.data.get("cep") or None,
             "complemento": request.data.get("complemento") or None,
-            "status": request.data.get("status") or None,
+            "status": request.data.get("status") or "pendente",
             "descricao": request.data.get("descricao") or None,
         }
         
@@ -91,8 +97,8 @@ class ServicoDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, servico_id, *args, **kwargs):
-
         servico = self.get_object(Servico, servico_id)
+        print("dentro do put de serviços: ",servico_id, request.data, servico)
         if not servico:
             return Response(
                 {"res": "Não existe servico com o id informado"}, 

@@ -1,5 +1,13 @@
-<div class="d-flex justify-content-between">
+<div 
+{% if thumbnailStyle %}
+class="d-flex justify-content-end"
+{% else %}
+class="d-flex justify-content-between"
+{% endif %}
+>
+    {% if not thumbnailStyle %}
     <label for="galeria_images">Imagens:</label>
+    {% endif %}
     <span class="fa-stack custom-add-img-button my-1" id="add-image-button" data-toggle="tooltip" data-placement="top"
         title="adicionar imagem">
         <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
@@ -30,7 +38,7 @@
                 >Você pode arrastar suas imagens para esta área</p>
                 <div class="row mt-3" id="thumbnails-container">
                     {% for imagem in imagens %}
-                        {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id %}
+                        {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id thumbnailStyle=thumbnailStyle %}
                     {% endfor %}
                 </div>
             </div>
@@ -55,7 +63,8 @@
         }
     }
 
-    function toggleLoading(thumbnailContainer) {
+    function toggleLoadingThumbnail(thumbnailContainer, from = "teste") {
+        console.log("from: ", from)
         console.log("container da thumb: ",thumbnailContainer)
         var $imageContainer = thumbnailContainer.find('.image-container');
         console.log("image container: ", $imageContainer)
@@ -90,7 +99,7 @@
             galeria_id: inputGaleriaId.val()
         })
         console.log("inputImagemId: ", inputImagemId)
-        toggleLoading(thumbnail);
+        toggleLoadingThumbnail(thumbnail, "saveImage");
         $.ajax({
             url: "/saveImagem",
             headers: {
@@ -109,12 +118,12 @@
                 let imagem = JSON.parse(response.content);
                 inputImagemId.val(imagem.id);
                 thumbnail.find(".custom-remove-img-button").attr("id", imagem.id);
-                toggleLoading(thumbnail);
+                toggleLoadingThumbnail(thumbnail, "ajaxSuccess");
             },
             error: function(error) {
                 console.log("error: ", error)
                 showFloatingMessage("Erro ao atualizar imagem", "alert-danger");
-                toggleLoading(thumbnail);
+                toggleLoadingThumbnail("ajaxError",thumbnail);
             }
         })
     }

@@ -125,10 +125,19 @@ class TicketApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+        
+        beneficiario = None
+        if request.data.get("beneficiario_id"):
+            beneficiario = self.get_object(Pessoas, request.data.get("beneficiario_id"))
+            if not beneficiario:
+                return Response(
+                    {"res": "Não existe beneficiario com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
 
-        id_protocolo = request.data.get("id_protocolo")
-        dataInicio = request.data.get("data_inicio") if request.data.get("data_inicio") else None
-        dataFim = request.data.get("data_fim") if request.data.get("data_fim") else None
+        id_protocolo = request.data.get("id_protocolo", "")
+        dataInicio = request.data.get("data_inicio", None)
+        dataFim = request.data.get("data_fim", None)
         nsa_data_inicio = request.data.get("nao_se_aplica_data_inicio")
         nsa_data_fim = request.data.get("nao_se_aplica_data_fim")
         if nsa_data_inicio == "on":
@@ -168,6 +177,7 @@ class TicketApiView(APIView):
             "complemento": request.data.get("complemento"),
             "cidade":   cidade,
             "observacao": request.data.get("observacao"),
+            "beneficiario": beneficiario,
         }
 
         ticketData = Ticket.objects.create(**ticketData)
@@ -198,6 +208,7 @@ class TicketDetailApiView(APIView):
 
     def put(self, request, ticket_id, *args, **kwargs):
         ticket = self.get_object(Ticket, ticket_id)
+        print("ticket api view updates",request.data)
         if not ticket:
                 return Response(
                     {"res": "Não existe ticket com o id informado"}, 
@@ -212,9 +223,9 @@ class TicketDetailApiView(APIView):
             ticket.id_protocolo = request.data.get("id_protocolo")
         if request.data.get("meta"):
             ticket.meta = request.data.get("meta")
-        if request.data.get("data_inicio"):
+        if request.data.get("data_inicio") or request.data.get("nao_se_aplica_data_inicio") == "on" or request.data.get("nao_se_aplica_data_inicio") == True:
             ticket.data_inicio = request.data.get("data_inicio")
-        if request.data.get("data_fim"):
+        if request.data.get("data_fim") or request.data.get("nao_se_aplica_data_fim") == "on" or request.data.get("nao_se_aplica_data_fim") == True:
             ticket.data_fim = request.data.get("data_fim")
         if request.data.get("bairro"):
             ticket.bairro = request.data.get("bairro")
@@ -245,24 +256,47 @@ class TicketDetailApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST,
                 )
             ticket.pessoa = pessoa
+        if request.data.get("atividade_id"):
+            atividade = self.get_object(Atividade, request.data.get("atividade_id"))
+            if not atividade:
+                return Response(
+                    {"res": "Não existe atividade com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            ticket.atividade = atividade
 
-        nsaDataInicio = request.data.get("nsa_data_inicio")
-        nsaDataFim = request.data.get("nsa_data_fim")
-
-        saveDataInicio = nsaDataInicio == "on"
-        ticket.nao_se_aplica_data_inicio = saveDataInicio
-        if saveDataInicio:
-            ticket.data_inicio = None
+        if request.data.get("escola_id"):
+            escola = self.get_object(Escola, request.data.get("escola_id"))
+            if not escola:
+                return Response(
+                    {"res": "Não existe escola com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            ticket.escola = escola
         
-        saveDataFim = nsaDataFim == "on"
-        ticket.nao_se_aplica_data_fim = saveDataFim
-        if saveDataFim:
-            ticket.data_fim = None
+        if request.data.get("beneficiario_id"):
+            print("dentro de beneficiario_id", request.data.get("beneficiario_id") )
+            beneficiario = self.get_object(Pessoas, request.data.get("beneficiario_id"))
+            if not beneficiario:
+                return Response(
+                    {"res": "Não existe pessoa com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            ticket.beneficiario = beneficiario
+        
+        if request.data.get("nao_se_aplica_data_inicio") in ["on","off", True, False]:
+            nsaDataInicio = request.data.get("nao_se_aplica_data_inicio")
+            saveDataInicio = nsaDataInicio or nsaDataInicio == "on"
+            ticket.nao_se_aplica_data_inicio = saveDataInicio
+
+        if request.data.get("nao_se_aplica_data_fim") in ["on","off", True, False]:
+            nsaDataFim = request.data.get("nao_se_aplica_data_fim")
+            saveDataFim = nsaDataFim or nsaDataFim == "on"
+            ticket.nao_se_aplica_data_fim = saveDataFim
         
         ticket.save()
         serializer = TicketSerializer(ticket)
        
-        print(serializer.data)
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def delete(self, request, ticket_id, *args, **kwargs):

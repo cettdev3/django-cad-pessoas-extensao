@@ -1,0 +1,120 @@
+<div id="servico-row-container-{{servico.id}}" class="mt-2" style="border-bottom: 1px solid #ccc">
+    <div class="w-100 d-flex align-items-start w-100 px-3 py-1">
+        <div class="multilevel-dropdown mr-1">
+            <button id="btn-status-{{servico.id}}" class="btn btn-sm 
+            {% if servico.status == 'concluido' %}
+                btn-outline-success
+            {% elif servico.status == 'pendente' %}
+                btn-outline-warning
+            {% elif servico.status == 'cancelado' %}
+                btn-outline-secondary
+            {% else %}
+                btn-outline-secondary
+            {% endif %}
+            custom-dropdown-toggle" type="button">
+                <span>{{servico.status_formatado}}</span>
+            </button>
+            <div id="dropdown-categorias" class="multilevel-dropdown-menu">
+                <button data-toggle="tooltip" data-placement="top" title="Marcar como concluído"
+                    class="btn btn-sm btn-outline-success"
+                    onclick="editarServicoStatus('{{servico.id}}', {'status': 'concluido'})">
+                    <i class="fa-solid fa-check"></i>
+                    <span>
+                        Concluído
+                    </span>
+                </button>
+                <button data-toggle="tooltip" data-placement="top" title="Marcar como cancelada"
+                    class="btn btn-sm btn-outline-warning"
+                    onclick="editarServicoStatus('{{servico.id}}', {'status': 'pendente'})">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>
+                        Pendente
+                    </span>
+                </button>
+                <button data-toggle="tooltip" data-placement="top" title="Marcar como pendente"
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="editarServicoStatus('{{servico.id}}', {'status': 'cancelado'})">
+                    <i class="fa-solid fa-ban"></i>
+                    <span>
+                        Cancelada
+                    </span>
+                </button>
+            </div>
+        </div>
+        <div class="d-flex w-100">
+            <div class="w-75">
+                <label for="" class="small-label mr-2"><b>Nome: </b></label>
+                <input type="text" name="nome"
+                    onfocusout="updateServicoField('{{servico.id}}', 'nome', this.value, '{{servico.nome}}')"
+                    class="input-hover-highlight" id="servico-row-nome-{{servico.id}}"
+                    placeholder="Escreva o nome do serviço" value="{{servico.nome|default_if_none:''}}">
+            </div>
+            <div class="w-75">
+                <label for="" class="small-label mr-2"><b>Atendimentos: </b></label>
+                <input type="number" name="quantidadeAtendimentos"
+                    onfocusout="updateServicoField('{{servico.id}}', 'quantidadeAtendimentos', this.value, '{{servico.quantidadeAtendimentos}}')"
+                    id="servico-row-quantidade-atendimentos-{{servico.id}}" class="input-hover-highlight"
+                    placeholder="Quantidade de atendimentos"
+                    value="{{servico.quantidadeAtendimentos|default_if_none:''}}">
+            </div>
+            <div>
+                <button data-toggle="tooltip" data-placement="top" title="remover serviço"
+                    onclick="openDeleteModal(() => removeServico('{{servico.id}}'))"
+                    class="btn btn-danger btn-sm dropdown-item m-0 px-1 py-2 text-danger">
+                    <i class="fas fa-trash mx-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="w-100 d-flex px-3 py-1">
+        <label for="" class="small-label mr-1"><b>Descrição: </b></label>
+        <textarea name="descricao" class="input-hover-highlight w-100"
+            onfocusout="updateServicoField('{{servico.id}}', 'descricao', this.value, '{{servico.descricao}}')"
+            cols="3">{{servico.descricao|default_if_none:''}}</textarea>
+    </div>
+</div>
+<script>
+    function removeServico(servicoId) {
+        deleteServico(servicoId, function () {
+            $("#servico-row-container-" + servicoId).remove()
+        })
+    }
+
+    function updateServicoField(servicoId, field, value, oldValue = null) {
+        let data = {}
+        if (value == oldValue) return
+        data[field] = value
+        updateServico(servicoId, data)
+    }
+
+    function editarServicoStatus(servicoId, data) {
+        updateServico(servicoId, data, function (html) {
+            let btnStatus = $("#btn-status-" + servicoId)
+            console.log("depos de pegar o btn:", btnStatus)
+            btnStatus.removeClass('btn-outline-success btn-outline-warning btn-outline-secondary')
+            if (data.status == "concluido") {
+                btnStatus.addClass('btn-outline-success')
+            } else if (data.status == "pendente") {
+                btnStatus.addClass('btn-outline-warning')
+            } else if (data.status == "cancelado") {
+                btnStatus.addClass('btn-outline-secondary')
+            }
+            btnStatus.find('span').text(data.status)
+        })
+    }
+
+    $(document).ready(function () {
+        (function (params) {
+            let oldName = "{{servico.nome|default_if_none:''}}"
+            function setInputBehaviour(data) {
+                let nomeInput = $("#servico-row-nome-" + params.servicoId)
+                if (params.fromCreate == "True") {
+                    nomeInput.focus()
+                }
+            }
+
+            setInputBehaviour()
+
+        })({ servicoId: "{{servico.id}}", fromCreate: "{{fromCreate}}" });
+    });
+</script>

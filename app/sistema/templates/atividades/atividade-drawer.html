@@ -1,0 +1,591 @@
+<style>
+    .anexos-container {
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin: -1%;
+    }
+
+    .anexos-container .anexo-card {
+        width: 23%;
+        margin: 1%;
+    }
+
+    @media (max-width: 768px) {
+        .anexos-container .anexo-card {
+            width: 48%;
+            margin: 1%;
+        }
+    }
+</style>
+
+
+<div class="d-flex flex-column w-100 h-100 bg-light border" style="overflow-x: hidden">
+    <div class="d-flex justify-content-between px-3 py-2" style="border-bottom: 1px solid #ccc">
+        <div class="d-flex position-relative">
+            <div class="multilevel-dropdown mr-1">
+                <button class="btn btn-sm btn-outline-success custom-dropdown-toggle" type="button">
+                    <span>{{atividade.categoria_label|default_if_none:'Atividade'}}</span>
+                </button>
+                <div id="dropdown-categorias" class="multilevel-dropdown-menu">
+                    {% for categoria in categorias %}
+                    <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2"
+                    onclick="updateAtividadeDrawer('{{atividade.id}}', {'categoria': '{{categoria.0}}'})">
+                        <span>{{categoria.1}}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <button data-toggle="tooltip" data-placement="top" 
+            {% if atividade.status == 'pendente' %}
+            title="Marcar como concluído" 
+            class="btn btn-sm btn-outline-warning"
+            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'concluido'})"
+            {% elif atividade.status == 'concluido' %}
+            title="Marcar como cancelada"
+            class="btn btn-sm btn-outline-success"
+            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'cancelada'})"
+            {% elif atividade.status == 'cancelada' %}
+            title="Marcar como pendente"
+            class="btn btn-sm btn-outline-secondary"
+            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'pendente'})"
+            {% endif %}>
+                {% if atividade.status == 'pendente' %}
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                {% elif atividade.status == 'concluido' %}
+                <i class="fa-solid fa-check"></i>
+                {% elif atividade.status == 'cancelada' %}
+                <i class="fa-solid fa-ban"></i>
+                {% endif %}
+                <span>
+                    {{atividade.status}}
+                </span>
+            </button>
+        </div>
+        <div>
+            <button id="add-anexo-button-{{atividade.id}}"
+            data-toggle="tooltip" data-placement="top" title="Adicionar anexo"
+            class="btn btn-light btn-sm">
+                <i class="fa-solid fa-paperclip"></i>
+            </button>
+            <!-- <button id="add-subtarefa-button-{{atividade.id}}"
+            data-toggle="tooltip" data-placement="top" title="Adicionar subtarefa"
+            class="btn btn-light btn-sm">
+                <i class="fa-solid fa-code-branch fa-rotate-90"></i>
+            </button> -->
+            <button id="close-drawer-button"
+            data-toggle="tooltip" data-placement="top" title="Fechar"
+            class="btn btn-light btn-sm">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </div>
+    </div>
+    <div>    
+        <div class="card">
+            <div class="card-header" id="atividadeDadosGerais" data-toggle="collapse" data-target="#collapseDadosGerais" aria-expanded="true" aria-controls="collapseDadosGerais">
+                <h5 class="mb-0">
+                    <span>
+                        Dados Gerais
+                    </span>
+                </h5>
+            </div>
+            <div id="collapseDadosGerais" class="collapse show" aria-labelledby="atividadeDadosGerais">
+                <div class="card-body">
+                    <div class="w-100">
+                        <form id="cadastrarAtividadeForm" action="/" method="POST">
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <input onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'nome': this.value}, 'nome', '{{atividade.nome|default_if_none:""}}')"
+                                    class="form-control-lg font-weight-bold w-100 input-hover-highlight bg-light p-0 px-2"
+                                    type="text" 
+                                    id="nome" 
+                                    name="nome" 
+                                    value="{{atividade.nome|default_if_none:''}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div id="membroExecucaoSelectContainer" class="col-sm-6">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Data de Inicio: </b></label>
+                                    <input type="date"
+                                    class="form-control"
+                                    onchange="updateAtividadeDrawer('{{atividade.id}}', {'data_realizacao_inicio': this.value}, 'data_realizacao_inicio', '{{atividade.data_realizacao_inicio|default_if_none:""}}')"
+                                    {% if atividade.id %}
+                                    value="{{atividade.data_realizacao_inicio}}"
+                                    {% endif %}
+                                    id="data_realizacao_inicio"
+                                    name="data_realizacao_inicio">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Data de Fim:</b></label>
+                                    <input type="date"
+                                    class="form-control"
+                                    onchange="updateAtividadeDrawer('{{atividade.id}}', {'data_realizacao_fim': this.value}, 'data_realizacao_fim', '{{atividade.data_realizacao_fim|default_if_none:""}}')"
+                                    {% if atividade.id %}
+                                    value="{{atividade.data_realizacao_fim}}"
+                                    {% endif %}
+                                    id="data_realizacao_fim"
+                                    name="data_realizacao_fim">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <textarea name="descricao" id="descricao" cols="30" rows="4" class="form-control" 
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'descricao': this.value}, 'descricao', '{{atividade.descricao|default_if_none:""}}')">{% if atividade.id and atividade.descricao and atividade.descricao != 'None' %}{{atividade.descricao}}{% endif %}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div id="tipoAtividadeSelectContainer" class="col-sm-4">
+                                </div>
+                                <div id="departamentoSelectContainer" class="col-sm-3">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Carga Horária:</b></label>
+                                    <input type="number"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.cargaHoraria}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'cargaHoraria': this.value}, 'cargaHoraria', '{{atividade.cargaHoraria|default_if_none:""}}')"
+                                    id="cargaHoraria"
+                                    name="cargaHoraria">
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class=""><b>Valor:</b></label>
+                                    <input type="float"
+                                    step="0.01"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.valor|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'valor': this.value}, 'valor', '{{atividade.valor|default_if_none:""}}')"
+                                    id="valor"
+                                    name="valor">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <label class="custom-small-label"><b>Quantidade de Certificações:</b></label>
+                                    <input type="number"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.quantidadeCertificacoes}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer(
+                                        '{{atividade.id}}', 
+                                        {'quantidadeCertificacoes': this.value}, 
+                                        'quantidadeCertificacoes', 
+                                        '{{atividade.quantidadeCertificacoes}}'
+                                    )"
+                                    id="quantidadeCertificacoes"
+                                    name="quantidadeCertificacoes">    
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="custom-small-label"><b>Quantidade de Matrículas:</b></label>
+                                    <input type="number"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.quantidadeMatriculas}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer(
+                                        '{{atividade.id}}', 
+                                        {'quantidadeMatriculas': this.value}, 
+                                        'quantidadeMatriculas', 
+                                        '{{atividade.quantidadeMatriculas}}'
+                                    )"
+                                    id="quantidadeMatriculas"
+                                    name="quantidadeMatriculas">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="custom-small-label"><b>Quantidade de Atendimentos:</b></label>
+                                    <input type="number"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.quantidadeAtendimentos}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer(
+                                        '{{atividade.id}}', 
+                                        {'quantidadeAtendimentos': this.value}, 
+                                        'quantidadeAtendimentos', 
+                                        '{{atividade.quantidadeAtendimentos}}'
+                                    )"
+                                    id="quantidadeAtendimentos"
+                                    name="quantidadeAtendimentos">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="custom-small-label"><b>Quantidade de Inscrições:</b></label>
+                                    <input type="number"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.quantidadeInscricoes}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer(
+                                        '{{atividade.id}}', 
+                                        {'quantidadeInscricoes': this.value}, 
+                                        'quantidadeInscricoes', 
+                                        '{{atividade.quantidadeInscricoes}}'
+                                    )"
+                                    id="quantidadeInscricoes"
+                                    name="quantidadeInscricoes">
+                                </div>
+                            </div>
+                            {% if acao %}
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
+                                    <span>Usar endereço da ação</span> 
+                                </div>
+                            </div>
+                            {% elif evento %}
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <input id="atividade-user-acao-endereco" type="checkbox" class="mr-1">
+                                    <span>Usar endereço do evento</span> 
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="form-group row">
+                                <div id="cidadesSelectContainer" class="col-sm-3">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Logradouro:</b></label>
+                                    <input type="text"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.logradouro|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'logradouro': this.value}, 'logradouro', '{{atividade.logradouro|default_if_none:""}}')"
+                                    id="logradouro"
+                                    name="logradouro">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>Bairro:</b></label>
+                                    <input type="text"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.bairro|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'bairro': this.value}, 'bairro', '{{atividade.bairro|default_if_none:""}}')"
+                                    id="bairro"
+                                    name="bairro">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><b>CEP:</b></label>
+                                    <input type="text"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.cep|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'cep': this.value}, 'cep', '{{atividade.cep|default_if_none:""}}')"
+                                    id="cep"
+                                    name="cep">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label><b>Complemento:</b></label>
+                                    <input type="text"
+                                    required
+                                    class="form-control"
+                                    {% if atividade.id %}
+                                    value="{{atividade.complemento|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'complemento': this.value}, 'complemento', '{{atividade.complemento|default_if_none:""}}')"
+                                    id="complemento"
+                                    name="complemento">
+                                </div>
+                            </div>
+                            
+                            {% if atividade.acao %}
+                            <input type="text" hidden 
+                            id="acao_id"
+                            name="acao_id" 
+                            value="{{atividade.acao.id}}">
+                            {% elif acao %}
+                            <input type="text" hidden 
+                            id="acao_id"
+                            name="acao_id" 
+                            value="{{acao.id}}">
+                            {% endif %}
+                    
+                            {% if atividade.evento %}
+                            <input type="text" hidden
+                            id="evento_id"
+                            name="evento_id"
+                            value="{{atividade.evento.id}}">
+                            {% elif evento %}
+                            <input type="text" hidden
+                            id="evento_id"
+                            name="evento_id"
+                            value="{{evento.id}}">
+                            {% endif %}
+                    
+                    
+                        </form>
+                        <span hidden id="selected-membro-equipe">{% if atividade %}{{atividade.responsavel.id}}{% endif %}
+                        </span>
+                        <span hidden id="selected-tipo-atividade">{% if atividade %}{{atividade.tipoAtividade.id}}{% endif %}
+                        </span>
+                        <span hidden id="selected-departamento">{% if atividade %}{{atividade.departamento.id}}{% endif %}</span>
+                        <span hidden id="selected-cidade">{% if atividade %}{{atividade.cidade.id}}{% endif %}</span>
+                        {% if acao %}
+                        <span hidden id="acao-logradouro">{{acao.logradouro|default_if_none:""}}</span>
+                        <span hidden id="acao-cep">{{acao.cep|default_if_none:""}}</span>
+                        <span hidden id="acao-bairro">{{acao.bairro|default_if_none:""}}</span>
+                        <span hidden id="acao-complemento">{{acao.complemento|default_if_none:""}}</span>
+                        <span hidden id="acao-cidade">{{acao.cidade.id|default_if_none:""}}</span>
+                        {% endif %}
+                        {% if evento %}
+                        <span hidden id="acao-logradouro">{{evento.logradouro|default_if_none:""}}</span>
+                        <span hidden id="acao-cep">{{evento.cep|default_if_none:""}}</span>
+                        <span hidden id="acao-bairro">{{evento.bairro|default_if_none:""}}</span>
+                        <span hidden id="acao-complemento">{{evento.complemento|default_if_none:""}}</span>
+                        <span hidden id="acao-cidade">{{evento.cidade.id|default_if_none:""}}</span>
+                        {% endif %}
+                    </div>	
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w-100">
+        <div class="card">
+            <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseAnexos" aria-expanded="true" aria-controls="collapseAnexos">
+                <h5 class="mb-0">
+                    <span>
+                        Anexos
+                    </span>
+                </h5>
+            </div>
+            <div id="collapseAnexos" class="collapse show" aria-labelledby="headingOne">
+                <div class="card-body">
+                    <div id="anexos-container-{{atividade.id}}" class="anexos-container">
+                        {% for anexo in atividade.anexos %}
+                            {% include 'anexos/anexo-card.html' with anexo=anexo %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <h5 class="mb-0">
+                            <span>
+                                Serviços
+                            </span>
+                        </h5>
+                    </div>
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+                        <div class="card-body p-0 m-0">
+                           {% include 'servicos/servicos-table.html' with atividade_id=atividade.id servicos=atividade.servico_set %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseDemandas" aria-expanded="true" aria-controls="collapseDemandas">
+                        <h5 class="mb-0">
+                            <span>
+                                Demandas
+                            </span>
+                        </h5>
+                    </div>
+                    <div id="collapseDemandas" class="collapse show" aria-labelledby="headingOne">
+                        <div class="card-body p-0 m-0">
+                            <div id="solicitacoes" class="tab-pane py-3">
+                                <div id="ticket-form-container" class="mb-2">
+                                    {% for demanda in atividade.ticket_set %}
+                                        {% include 'tickets/ticket_form_collapsable_atividade.html' with ticket=demanda atividade_id=atividade.id evento_id=atividade.evento.id %}
+                                    {% endfor %}
+                                </div>
+                                <button onclick="addAtividadeDemanda('{{atividade.id}}')" 
+                                id="add-ticket-form-btn"
+                                type="button"
+                                class="disable-on-loading btn btn-outline-success ml-3 my-2">Adicionar Demanda</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseGaleria" aria-expanded="true" aria-controls="collapseGaleria">
+                        <h5 class="mb-0">
+                            <span>
+                                Galeria de Imagens
+                            </span>
+                        </h5>
+                    </div>
+                    <div id="collapseGaleria" class="collapse show" aria-labelledby="headingOne">
+                        <div class="card-body p-0 m-0">
+                            <div id="solicitacoes" class="tab-pane py-3">
+                                <div id="ticket-form-container" class="mb-2">
+                                    {% include "componentes/imagesInput/imagesInput.html" with imagens=atividade.galeria.imagem_set galeria_id=atividade.galeria.id thumbnailStyle=thumbnailStyle %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="anexoFileInput" style="display: none;" />
+</div>
+
+<script>
+    var galleryImagesFiles = [];
+    function addAtividadeDemanda(atividade_id) {
+        let evento_id = $('#evento_id').val();
+        createDemanda({atividade_id: atividade_id, evento_id: evento_id}, function (html) {
+            $('#ticket-form-container').append(html);
+        })
+    }
+
+    function removeAnexoCard(anexoId) {
+        deleteAnexo(anexoId, function () {
+            $('#anexo-card-'+anexoId).remove();
+        })
+    }
+
+    function updateAtividadeDrawer(atividadeId, data, field = null, oldValue = null) {
+        data.template = 'atividade-drawer.html';
+        if (field && oldValue == data[field]) return
+        updateAtividade(
+            atividadeId,
+            data,
+            function(html) {
+                $('#activity-drawer').html(html);
+            }
+        );
+    }
+
+    $(document).ready(function() {
+        (function(params) {
+            function loadSelectMembroExecucao() {
+                getMembroExecucaoSelect({
+                    evento_id: $('#evento_id').val(),
+                    selected: params.responsavelId,
+                    title: "Responsável"
+                }, function(html) {
+                    $('#membroExecucaoSelectContainer').html(html);
+                    $("#membroExecucaoSelectContainer").find("select").change(function() {
+                        var membroExecucaoId = $(this).val();
+                        if (membroExecucaoId == params.responsavelId) return
+                        updateAtividadeDrawer(params.atividadeId, {
+                            membro_execucao_id: membroExecucaoId
+                        });
+                    });
+                });
+            }
+
+            function loadSelectCidade() {
+                getCidadeSelect({
+                    selected: params.cidadeId
+                }, function(html) {
+                    $('#cidadesSelectContainer').html(html);
+                    $("#cidadesSelectContainer").find("select").change(function() {
+                        var cidadeId = $(this).val();
+                        if (cidadeId == params.cidadeId) return
+                        updateAtividadeDrawer(params.atividadeId, {
+                            cidade_id: cidadeId
+                        });
+                    });
+                });
+            }
+            
+            function loadSelectDepartamento() {
+                getDepartamentoSelect({
+                    selected: params.departamentoId
+                }, function(html) {
+                    $('#departamentoSelectContainer').html(html);
+                    $("#departamentoSelectContainer").find("select").change(function() {
+                        var departamentoId = $(this).val();
+                        if (departamentoId == params.departamentoId) return
+                        updateAtividadeDrawer(params.atividadeId, {
+                            departamento_id: departamentoId
+                        });
+                    });
+                });
+            }
+            
+            function loadSelectTipoAtividade() {
+                getTipoAtividadeSelect({
+                    selected: params.tipoAtividadeId
+                }, function(html) {
+                    $('#tipoAtividadeSelectContainer').html(html);
+                    $("#tipoAtividadeSelectContainer").find("select").change(function() {
+                        var tipoAtividadeId = $(this).val();
+                        if (tipoAtividadeId == params.tipoAtividadeId) return
+                        updateAtividadeDrawer(params.atividadeId, {
+                            tipo_atividade_id: tipoAtividadeId
+                        });
+                    });
+                });
+            }
+            
+            $('#close-drawer-button').click(function() {
+                $('#activity-drawer').hide();
+            });
+
+            $('#add-anexo-button-'+params.atividadeId).click(function() {
+                $('#anexoFileInput').click();
+            });
+
+            $('#anexoFileInput').change(function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                
+                reader.onloadend = function() {
+                    var atividade_id = params.atividadeId
+                    var dataURL = reader.result;
+                    
+                    var data = {
+                        'id_model': atividade_id, 
+                        'model': 'Atividade',
+                        'dataUrl': dataURL,
+                        "nome": file.name,
+                    };
+                    createAnexo(data, function(html) {
+                        $("#anexos-container-"+atividade_id).append(html);
+                    });
+                }
+
+                reader.readAsDataURL(file);
+            });
+
+            loadSelectMembroExecucao()
+            loadSelectDepartamento()
+            loadSelectTipoAtividade()
+            loadSelectCidade()
+        })({
+            atividadeId: "{{atividade.id}}", 
+            responsavelId: "{{atividade.responsavel.id}}",
+            departamentoId: "{{atividade.departamento.id}}",
+            tipoAtividadeId: "{{atividade.tipoAtividade.id}}",
+            nome: "{{atividade.nome}}",
+            cidadeId: "{{atividade.cidade.id}}",
+        });
+    });
+</script>

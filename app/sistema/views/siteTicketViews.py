@@ -101,11 +101,23 @@ def ticket_form(request):
     return render(request,'tickets/ticket_form_collapsable.html', context)
 
 @login_required(login_url='/auth-user/login-user')
+def ticket_form_collapsable(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)
+    response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
+    context = {}
+    context['ticket'] = json.loads(response.content)
+    context['atividade_id'] = body['atividade_id']
+    context['evento_id'] = body['evento_id']
+    
+    return render(request,'tickets/ticket_form_collapsable_atividade.html', context)
+
+@login_required(login_url='/auth-user/login-user')
 def saveTicket(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
@@ -114,9 +126,21 @@ def editarTicket(request, ticket_id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    print(body)
     response = requests.put('http://localhost:8000/tickets/'+ticket_id, json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
+
+# rota de update criada especificamente para o ticket de atividade
+@login_required(login_url='/auth-user/login-user')
+def updateTicket(request, ticket_id):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    body = json.loads(request.body)
+    response = requests.put('http://localhost:8000/tickets/'+ticket_id, json=body, headers=headers)
+    context = {}
+    context['ticket'] = json.loads(response.content)
+    context['atividade_id'] = context['ticket']['atividade']['id']
+    context['evento_id'] = context['ticket']['atividade']['evento']['id']
+    return render(request,'tickets/ticket_form_collapsable_atividade.html', context)
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarTicket(request, ticket_id):

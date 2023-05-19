@@ -68,6 +68,7 @@ def editarDepartamento(request, codigo):
     response = requests.put('http://localhost:8000/departamentos/' + str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
+@login_required(login_url='/auth-user/login-user')
 def departamentosSelect(request):
     data = {}
     if request.GET.get('selected'):

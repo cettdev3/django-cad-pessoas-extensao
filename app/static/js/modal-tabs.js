@@ -20,7 +20,6 @@ function getActiveTab() {
 function functionGetTabsQuantity() {
     let tabs = $("*[id^='"+customTabsId+"']")
     let length = tabs.length
-    console.log(tabs, length)
     return length
 }
 
@@ -64,19 +63,13 @@ function setTabsbehavior() {
 
     activTabFn = getActiveTab()
     tabsQuantity = functionGetTabsQuantity()
-    console.log("activTabFn: " + activTabFn)
-    console.log("tabsQuantity: " + tabsQuantity)
     if (activTabFn == 1 && tabsQuantity > 1) {
-        console.log("first tab")
         showHideTabs(tabsControl.first)
     } else if (tabsQuantity == 1) {
-        console.log("only tab")
         showHideTabs(tabsControl.only)
     } else if (activTabFn == tabsQuantity && tabsQuantity > 1) {
-        console.log("last tab")
         showHideTabs(tabsControl.last)
     } else if (tabsQuantity > 1) {
-        console.log("middle tab")
         showHideTabs(tabsControl.middle)
     }
 }
@@ -86,7 +79,6 @@ function setupTabNavigationEvent() {
     $(document.body).off("click", "#"+prevBtn);
 
     $(document.body).on("click", "#"+nextBtn, function () {
-        console.log("click next")
         processTabBtnClick(1);
     });
 

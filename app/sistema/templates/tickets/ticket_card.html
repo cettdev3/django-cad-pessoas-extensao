@@ -112,7 +112,6 @@
 <script>
     $(document).ready(function () {
         (function (params) {
-            console.log(params);
             $("#ticket-card-container-" + params.id +" #ticket-card-delete-btn").on('click', function () {
                     openDeleteModal(() => {
                         $.ajax({

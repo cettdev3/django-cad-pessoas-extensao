@@ -16,6 +16,7 @@ class TicketSerializer(serializers.ModelSerializer):
     status_formatado = serializers.CharField(read_only=True)
     status_calculado = serializers.CharField(read_only=True)
     atividade = AtividadeTicketSerializer(many=False, read_only=True)
+    beneficiario = PessoaTicketSerializer(many=False, read_only=True)
     class Meta:
         model = Ticket
         fields = [
@@ -26,6 +27,7 @@ class TicketSerializer(serializers.ModelSerializer):
             "membro_execucao",
             "alocacao",
             "pessoa",
+            "beneficiario",
             "escola",
             "meta",
             "model",

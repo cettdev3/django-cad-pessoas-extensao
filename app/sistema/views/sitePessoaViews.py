@@ -103,8 +103,11 @@ def cursosSelect(request):
 
 @login_required(login_url='/auth-user/login-user')
 def pessoasSelect(request):
-    pessoas = Pessoas.objects.all()
-    return render(request,'pessoas/pessoas_select.html',{'pessoas':pessoas})
+    selected = request.GET.get('selected')
+    label = request.GET.get('label', 'Pessoa')
+    selected = int(selected) if selected.isdigit() else None 
+    pessoas = Pessoas.objects.all() 
+    return render(request,'pessoas/pessoas_select.html',{'pessoas':pessoas, "pessoa_id":selected, "label":label})
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarPessoa(request,codigo):

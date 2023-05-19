@@ -1,0 +1,22 @@
+.visible-handle {
+    width: 30px;
+    max-width: 30px;
+}
+
+.visible-handle {
+    visibility: hidden;
+}
+
+.header-section-container:hover .visible-handle {
+    visibility: visible;
+}
+
+.input-hover-highlight {
+    box-sizing: border-box;
+    border: 1px solid transparent;
+}
+
+.input-hover-highlight:hover {
+    border-radius: 5px;
+    border: 1px solid #ced4da ;
+}

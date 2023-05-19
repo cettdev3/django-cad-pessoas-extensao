@@ -5,9 +5,32 @@ from .dpEvento import DpEvento
 from .membroExecucao import MembroExecucao
 from .cidade import Cidade
 from .departamento import Departamento
+from .atividadeSection import AtividadeSection
 from .galeria import Galeria
 class Atividade(models.Model):
+    STATUS_PENDENTE = 'pendente'
+    STATUS_CONCLUIDO = 'concluido'
+    STATUS_CANCELADO = 'cancelado'
+
+    CATEGORIA_TAREFA = 'tarefa'
+    CATEGORIA_PROGRAMACAO = 'programacao'
+    CATEGORIA_META_EXTENSAO = 'meta_extensao'
+    CATEGORIA_REUNIAO = 'reuniao'
+    CATEGORIA_MARCO = 'marco'
+    CATEGORIA_SUBTAREFAS = 'subtarefa'
+
+    CATEGORY_CHOICES = (
+        (CATEGORIA_TAREFA, 'Tarefa'),
+        (CATEGORIA_PROGRAMACAO, 'Programação'),
+        (CATEGORIA_META_EXTENSAO, 'Meta de Extensão'),
+        (CATEGORIA_REUNIAO, 'Reunião'),
+        (CATEGORIA_MARCO, 'Marco'),
+        (CATEGORIA_SUBTAREFAS, 'Subtarefa'),
+    )
+        
+
     id = models.AutoField(primary_key=True)
+    nome = models.CharField(null = True, blank=True, max_length=100)
     descricao = models.CharField(null = True, blank=True, max_length=300)
     linkDocumentos = models.CharField(null = True, blank=True, max_length=5000)
     status = models.CharField(null = True, blank=True, max_length=50)
@@ -32,7 +55,8 @@ class Atividade(models.Model):
     valor = models.FloatField(null = True, blank=True)
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     atividade_meta = models.BooleanField(default=False, null = True, blank= True)
-    
+    categoria = models.CharField(null = True, blank=True, max_length=100)
+    atividadeSection = models.ForeignKey(AtividadeSection, on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         db_table = 'atividades'
     
@@ -103,3 +127,10 @@ class Atividade(models.Model):
             return self.data_realizacao_fim.strftime("%d/%m/%Y")
         else:
             return ""
+        
+    @property
+    def categoria_label(self):
+        if self.categoria:
+            return dict(self.CATEGORY_CHOICES)[self.categoria]
+        else:
+            return "Atividade"

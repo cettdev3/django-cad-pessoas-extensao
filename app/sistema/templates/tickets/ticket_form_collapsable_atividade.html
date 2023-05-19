@@ -1,0 +1,505 @@
+<style>
+    .btn-delete {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        background-color: white;
+    }
+
+    .btn-delete i {
+        font-size: 18px;
+        color: #dc3545;
+    }
+    
+    .btn-delete:hover i {
+        font-size: 18px;
+        color: white;
+    }
+
+    .btn-delete {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        background-color: white;
+    }
+
+    .btn-delete i {
+        font-size: 18px;
+        color: #dc3545;
+    }
+    
+    .btn-delete:hover i {
+        font-size: 18px;
+        color: white;
+    }
+</style>
+<div class="accordion" id="ticket-form-container-{{ticket.id}}">
+  <div class="card">
+    <div class="card-header" 
+    data-toggle="collapse"
+    data-target="#form-section-{{ticket.id}}" 
+    aria-expanded="false"
+    aria-controls="form-section-{{ticket.id}}"
+    style="cursor: pointer">
+        <div class="d-flex justify-content-start align-items-center">
+            <button 
+            type="button" 
+            class="btn btn-danger btn-delete" 
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Excluir ticket"
+            onclick="deleteDemandaForm('{{ticket.id}}')">
+                <i class="fas fa-trash"></i>
+            </button>
+            <h5 class="mb-0 ml-2" id="form-title">{{ticket.tipo_formatado|default_if_none:''}}</h5>
+        </div>
+    </div>
+
+    <div id="form-section-{{ticket.id}}" class="collapse show" aria-labelledby="heading-1" data-parent=".accordion">
+        <div class="card-body">
+            <form id="cadastrarTicketForm{{ticket.id}}" action="/" method="POST">
+                <input type="text" hidden
+                id="model"
+                name="model"
+                {% if model is None or model == 'None' or model == '' %}
+                value=""
+                {% else %}
+                value="{{model}}"
+                {% endif %}>
+            
+                <div class="form-group row">
+                    <div
+                    class="col-sm-4 mb-1">
+                        <label><b>Tipo da demanda: </b></label>
+                        <select required
+                        onchange="updateDemandaForm('{{ticket.id}}', 'tipo', this.value, '{{ticket.tipo}}')"
+                        id="tipo_solicitacao"
+                        class="form-control" 
+                        name="tipo">
+                            <option
+                            value="">
+                                Selecione uma opção
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'diaria' %}
+                            selected
+                            {% endif %}
+                            value="diaria">
+                                DIÁRIA
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'adiantamento' %}
+                            selected
+                            {% endif %}
+                            value="adiantamento">
+                                ADIANTAMENTO
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'adiantamento_insumo' %}
+                            selected
+                            {% endif %}
+                            value="adiantamento_insumo">
+                                ADIANTAMENTO INSUMOS
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'adiantamento_combustivel' %}
+                            selected
+                            {% endif %}
+                            value="adiantamento_combustivel">
+                                ADIANTAMENTO COMBUSTÍVEL
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'veiculo' %}
+                            selected
+                            {% endif %}
+                            value="veiculo">
+                                VEÍCULO
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'passagem' %}
+                            selected
+                            {% endif %}
+                            value="passagem">
+                                PASSAGEM
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'rpa' %}
+                            selected
+                            {% endif %}
+                            value="rpa">
+                                RPA
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'nao_se_aplica' %}
+                            selected
+                            {% endif %}
+                            value="nao_se_aplica">
+                                NÃO HAVERÁ SOLICITAÇÂO
+                            </option>
+                        </select>
+                    </div>
+                    <div 
+                    class="col-sm-4 mb-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label><b>Data Início: {{ticket.nao_se_aplica_data_inicio}}</b></label>
+                            <div class="form-group d-flex justify-content-start align-items-start" 
+                            style=" padding: 0; margin: 0">
+                                <input name="nao_se_aplica_data_inicio"  
+                                id="nao_se_aplica_data_inicio" 
+                                style="cursor: pointer; margin-right: 0.5rem;" 
+                                type="checkbox"
+                                {% if ticket.nao_se_aplica_data_inicio == True %}
+                                checked
+                                {% endif %}
+                                onclick="updateDemandaForm('{{ticket.id}}', 'nao_se_aplica_data_inicio', this.checked, '{{ticket.nao_se_aplica_data_inicio}}')">
+                                <label for="nao_se_aplica_data_inicio" 
+                                style="line-height: 1rem;white-space: nowrap;">
+                                    <b>Não se aplica</b>
+                                </label>
+                            </div>
+                        </div>
+                        <input 
+                        type="date" 
+                        name="data_inicio" 
+                        id="data_inicio"
+                        class="form-control" 
+                        onchange="updateDemandaForm('{{ticket.id}}', 'data_inicio', this.value, '{{ticket.data_inicio|date:'Y-m-d'}}')"
+                        {% if ticket and ticket.nao_se_aplica_data_inicio == False or ticket.nao_se_aplica_data_fim == None %}
+                        value="{{ticket.data_inicio}}"
+                        {% else %}
+                        value=""
+                        disabled
+                        {% endif %}>
+                    </div>
+                    <div 
+                    class="col-sm-4 mb-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label>
+                                <b>Data Fim:</b>
+                            </label>
+                            <div class="form-group d-flex justify-content-start align-items-start" 
+                            style=" padding: 0; margin: 0">
+                                <input name="nao_se_aplica_data_fim"  
+                                id="nao_se_aplica_data_fim" 
+                                style="cursor: pointer; margin-right: 0.5rem;" 
+                                type="checkbox"
+                                {% if ticket.nao_se_aplica_data_fim == True %}
+                                checked
+                                {% endif %}
+                                onclick="updateDemandaForm('{{ticket.id}}', 'nao_se_aplica_data_fim', this.checked, '{{ticket.nao_se_aplica_data_fim}}')">
+                                <label for="nao_se_aplica_data_fim" 
+                                style="line-height: 1rem;white-space: nowrap;">
+                                    <b>Não se aplica</b>
+                                </label>
+                            </div>
+                        </div>
+            
+                        <input 
+                        type="date" 
+                        name="data_fim" 
+                        id="data_fim"
+                        class="form-control" 
+                        onchange="updateDemandaForm('{{ticket.id}}', 'data_fim', this.value, '{{ticket.data_fim|date:'Y-m-d'}}')"
+                        {% if ticket and ticket.nao_se_aplica_data_fim == False or ticket.nao_se_aplica_data_fim == None %}
+                        value="{{ticket.data_fim}}"
+                        {% else %}
+                        value=""
+                        disabled
+                        {% endif %}>
+                    </div>
+                    <div 
+                    class="col-sm-6 mb-1">
+                        <label><b>Id da demanda:</b></label>
+                        <input 
+                        type="text" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'id_protocolo', this.value, '{{ticket.id_protocolo}}')"
+                        {% if ticket %}
+                        value="{{ ticket.id_protocolo|default_if_none:''}}" 
+                        {% endif %}
+                        class="form-control" 
+                        name="id_protocolo">
+                    </div>
+                    <div 
+                    class="col-sm-6 mb-1">
+                        <label><b>Status:</b></label>
+                        <select required 
+                        id="status"
+                        class="form-control" 
+                        name="status">
+                            <option
+                            value="">
+                                Selecione uma opção
+                            </option>
+                        <!-- CRIACAO_PENDENTE -->
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'CRIACAO_PENDENTE' %}
+                            selected
+                            {% endif %}
+                            value="CRIACAO_PENDENTE">
+                                CRIAÇÂO PENDENTE
+                            </option>
+                            <!-- CRIADO -->
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'CRIADO' %}
+                            selected
+                            {% endif %}
+                            value="CRIADO">
+                                CRIADO
+                            </option>
+            
+                            <!-- ATRASADO_PARA_CRIACAO -->
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'ATRASADO_PARA_CRIACAO' %}
+                            selected
+                            {% endif %}
+                            value="ATRASADO_PARA_CRIACAO">
+                                ATRASADO PARA CRIACAO
+                            </option>
+                        <!-- PENDING_PRESTACAO_CONTAS -->
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'PENDING_PRESTACAO_CONTAS' %}
+                            selected
+                            {% endif %}
+                            value="PENDING_PRESTACAO_CONTAS">
+                                PRESTAÇÂO DE CONTAS PENDENTE
+                            </option>
+                        <!-- PRESTACAO_CONTAS_CREATED -->
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'PRESTACAO_CONTAS_CREATED' %}
+                            selected
+                            {% endif %}
+                            value="PRESTACAO_CONTAS_CREATED">
+                                CONTAS PRESTADAS
+                            </option>
+                            <option 
+                            {% if ticket and ticket.status_calculado == 'CANCELADO' %}
+                            selected
+                            {% endif %}
+                            value="CANCELADO">
+                                CANCELADO
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div id="beneficiarioSelectContainer" class="col-sm-6">
+                    </div>
+                    <div id="escolasSelectContainer" class="col-sm-6">
+                    </div> 
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label><b>Descrição:</b></label>
+                        <textarea 
+                        rows="4"
+                        placeholder="Descreva a necessidade da demanda"
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'observacao', this.value, '{{ticket.observacao|default_if_none:''}}')"
+                        name="observacao" 
+                        class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
+                    </div>
+                </div>
+                {% if model == 'alocacao' or model == 'membro_execucao' or model == 'atividade' %}
+                <div class="form-group d-flex justify-content-start align-items-start">
+                    <input name="use_dpEvento_endereco"  
+                    id="use_dpEvento_endereco" 
+                    style="cursor: pointer; margin-right: 0.5rem;" 
+                    type="checkbox">
+                    <label for="use_dpEvento_endereco" 
+                    style="line-height: 1rem;white-space: nowrap;">
+                        <b>Usar endereço
+                            {% if model == 'alocacao' %}
+                            da ação de ensino
+                            {% elif model == 'membro_execucao' or model == 'servico_contratado' or model == 'atividade' %}
+                            do evento
+                            {% endif %}
+                        </b>
+                    </label>
+                </div>
+                {% endif %}
+                <div class="form-group row">
+                    <div class="col-sm-2">
+                        <label><b>CEP:</b></label>
+                        <input 
+                        type="text" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'cep', this.value, '{{ticket.cep|default_if_none:''}}')"
+                        id="cep"
+                        name="cep" 
+                        class="form-control" 
+                        {% if ticket %}
+                        value="{{ticket.cep|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                    <div id="cidadesSelectContainer" class="col-sm-3">
+                    </div> 
+                    <div class="col-sm-3">
+                        <label><b>Bairro:</b></label>
+                        <input 
+                        type="text" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'bairro', this.value, '{{ticket.bairro|default_if_none:''}}')"
+                        name="bairro" 
+                        class="form-control" 
+                        id="bairro"
+                        {% if ticket %}
+                        value="{{ticket.bairro|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><b>Logradouro:</b></label>
+                        <input 
+                        type="text" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'logradouro', this.value, '{{ticket.logradouro|default_if_none:''}}')"
+                        name="logradouro" 
+                        class="form-control" 
+                        id="logradouro"
+                        {% if ticket %}
+                        value="{{ticket.logradouro|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label><b>Complemento:</b></label>
+                        <input 
+                        type="text" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'complemento', this.value, '{{ticket.complemento|default_if_none:''}}')"
+                        id="complemento"
+                        name="complemento" 
+                        class="form-control" 
+                        {% if ticket %}
+                        value="{{ticket.complemento|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                </div>
+            
+                {% if parent_entity is not None %}
+                <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
+                <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
+                <input type="text" name="parent_entity_cep" id="parent_entity_cep" hidden value="{{parent_entity.cep|default_if_none:''}}">
+                <input type="text" name="parent_entity_complemento" id="parent_entity_complemento" hidden value="{{parent_entity.complemento|default_if_none:''}}">
+                <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}">
+                {% endif %}
+            
+                {% if model == 'membro_execucao' %}
+                <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{entity.id}}">
+                {% elif model == 'alocacao'  %}
+                <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
+                {% elif model == 'pessoa'  %}
+                <input type="text" name="selected_pessoa_id" id="selected_pessoa_id" hidden value="{{entity.id}}">
+                <input type="text" name="selected_escola_id" id="selected_escola_id" hidden value="{{ticket.escola.id}}">
+                {% elif model == 'atividade'  %}
+                <input type="text" name="atividade_id" id="atividade_id" hidden value="{{entity.id}}">
+                {% endif %}
+            </form>
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+    function deleteDemandaForm(ticketId) {
+        deleteDemanda(ticketId, function () {
+            $(`#ticket-form-container-${ticketId}`).remove()
+        })
+    }
+
+    function updateDemandaForm(ticketId, field, value, oldValue = null) {
+        let data = {}
+        console.log("updateDemandaForm", ticketId, field, value, oldValue)        
+        if (value == oldValue) return
+        if (field == 'nao_se_aplica_data_inicio') {
+            let dataInicioInput = $(`#ticket-form-container-${ticketId} #data_inicio`)
+            if (value) {
+                dataInicioInput.attr('disabled', true)
+                dataInicioInput.val('')
+                data['data_inicio'] = null
+            } else {
+                dataInicioInput.attr('disabled', false)
+            }
+        }
+
+        if (field == 'nao_se_aplica_data_fim') {
+            let dataFimInput = $(`#ticket-form-container-${ticketId} #data_fim`)
+            if (value) {
+                dataFimInput.attr('disabled', true)
+                dataFimInput.val('')
+                data['data_fim'] = null
+            } else {
+                dataFimInput.attr('disabled', false)
+            }
+        }
+
+        data[field] = value
+        console.log("data to update: ", data)
+        updateDemanda(ticketId, data)
+    }
+
+    $(document).ready(function() {
+        (function (params) {
+            console.log("parametro no ticket form", params)
+            function loadSelects() {
+                getEscolaSelect({
+                    evento_id: params.eventoId,
+                    selected: params.escolaId,
+                }, function (html) {
+                    $(`#ticket-form-container-${params.ticketId} #escolasSelectContainer`).html(html);
+                    $(`#ticket-form-container-${params.ticketId} #escolasSelectContainer #escola_id`).change(function() {
+                        let escola_id = $(this).val()
+                        updateDemanda(params.ticketId, {
+                            escola_id: escola_id,
+                            evento_id: params.eventoId,
+                            atividade_id: params.atividadeId,
+                        })
+                    });
+                })
+
+                getPessoaSelect({
+                    selected: params.beneficiarioId,
+                    label: 'Beneficiário',
+                }, function (html) {
+                    $(`#ticket-form-container-${params.ticketId} #beneficiarioSelectContainer`).html(html);
+                    $(`#ticket-form-container-${params.ticketId} #beneficiarioSelectContainer #pessoa_id`).change(function() {
+                        let pessoa_id = $(this).val()
+                        updateDemanda(params.ticketId, {
+                            atividade_id: params.atividadeId,
+                            evento_id: params.eventoId,
+                            beneficiario_id: pessoa_id,
+                        })
+                    });
+                })
+                
+                getCidadeSelect({
+                    selected: params.cidadeId,
+                }, function (html) {
+                    $(`#ticket-form-container-${params.ticketId} #cidadesSelectContainer`).html(html);
+                    $(`#ticket-form-container-${params.ticketId} #cidadesSelectContainer #cidade_id`).change(function() {
+                        let cidade_id = $(this).val()
+                        updateDemanda(params.ticketId, {
+                            atividade_id: params.atividadeId,
+                            evento_id: params.eventoId,
+                            cidade_id: cidade_id,
+                        })
+                    });
+                })
+            }
+
+            $(`#ticket-form-container-${params.ticketId} #tipo_solicitacao`).change(function() {
+                var selectedOption = $(this).find('option:selected');
+                var title = selectedOption.text().trim();
+                $(`#ticket-form-container-${params.ticketId} #form-title`).html(title);
+            });
+
+            loadSelects();
+        })({ 
+            ticketId: "{{ticket.id}}", 
+            fromCreate: "{{fromCreate}}", 
+            eventoId: "{{evento_id}}",
+            atividadeId: "{{atividade_id}}",
+            escolaId: "{{ticket.escola.id}}",
+            beneficiarioId: "{{ticket.beneficiario.id}}",
+            cidadeId: "{{ticket.cidade.id}}",
+            dataInicio: "{{ticket.data_inicio}}",
+            nsaDataInicio: "{{ticket.nao_se_aplica_data_inicio}}",
+        });
+    });
+</script>

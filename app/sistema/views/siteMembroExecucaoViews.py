@@ -130,6 +130,7 @@ def eliminarMembroExecucao(request,codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoSelect(request):
+    print(request.GET)
     data = {}
     if request.GET.get('membro_execucao_id'):
         data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
@@ -145,7 +146,7 @@ def membrosExecucaoSelect(request):
     data["select_id"] = request.GET.get('select_id')
     data['title'] = request.GET.get('title')
     selectedId = request.GET.get('selected') if request.GET.get('selected') else request.GET.get('membro_execucao_id')
-    selectedId = selectedId.strip()
+    selectedId = selectedId.strip() if selectedId else ""
     selectedId = int(selectedId) if selectedId else ""
     data["selected_membro_execucao_id"] = selectedId
     return render(request,'membrosExecucao/membroExecucaoSelect.html', data)

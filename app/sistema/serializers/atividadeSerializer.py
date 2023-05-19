@@ -8,6 +8,7 @@ from ..serializers.tipoAtividadeSerializer import TipoAtividadeSerializer
 from ..serializers.departamentoSerializer import DepartamentoSerializer
 from ..serializers.cidadeSerializer import CidadeSerializer
 from ..serializers.dpEventoSerializer import DpEventoSerializer
+from ..serializers.anexoSerializer import AnexoSerializer
 from ..serializers.servicoSerializer import ServicoSerializer
 from ..serializers.galeriaSerializer import GaleriaSerializer
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer
@@ -22,10 +23,13 @@ class AtividadeSerializer(serializers.ModelSerializer):
     servico_set = ServicoSerializer(many=True, read_only=True)
     galeria = GaleriaSerializer(many=False, read_only=True)
     ticket_set = TicketSerializer(many=True, read_only=True)
+    anexos = AnexoSerializer(many=True, read_only=True)
     class Meta:
         model = Atividade
         fields = [
             "id",
+            "nome",
+            "anexos",
             "descricao",
             "linkDocumentos",
             "status",
@@ -51,6 +55,9 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "id_protocolo",
             "valor",
             "ticket_set",
-            "atividade_meta"
+            "atividade_meta",
+            "categoria",
+            "categoria_label"
         ]
-        depth = 2
+        
+        depth = 4

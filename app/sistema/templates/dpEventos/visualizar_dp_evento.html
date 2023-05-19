@@ -33,10 +33,10 @@
       }
 </style>
 <div 
-class="card shadow mb-4 w-100" 
-style="height: calc(100vh - 75px); overflow-y: hidden;">
+class="shadow w-100" 
+style="height: calc(100vh - 75px);">
     
-    <div class="card-body w-100">
+    <div class="w-100 h-100 mb-2 ">
         <div class="d-flex">
             <ul id="dpEvento-visualizar-tabs" class="nav nav-tabs w-100">
                 <li class=" cs-tab-link active">
@@ -98,24 +98,23 @@ style="height: calc(100vh - 75px); overflow-y: hidden;">
             </div>
         </div>
 
-        <div class="tab-content w-100 h-100">
+        <div class="tab-content w-100 h-100 scroll-custom position-relative" 
+        style="overflow: scroll; margin-bottom: 24px; padding-bottom: 24px">
             <div id="membrosExecucao" 
-            class="tab-pane active in h-100"
-            style="overflow-y: scroll;" >
+            class="tab-pane active in" >
                 <div id="receberTabelaMembrosExecucao" ></div>
             </div>
             {% comment %} <div id="itinerarios" class="tab-pane" style="height: 100%;">
                 {% include "itinerarios/itinerario_input.html" with itinerario=dpEvento acao=dpEvento %}
             </div> {% endcomment %}
-            <div id="atividades" class="tab-pane" style="height: 100%;">
+            <div id="atividades" class="tab-pane" >
                 <div id="atividadesTableContainer"></div>
             </div>
-            <div id="avaliacao" class="tab-pane" style="height: 100%;">
+            <div id="avaliacao" class="tab-pane" >
                 <div id="avaliacaoLocalTableContainer"></div>
             </div>
-            <div id="galerias" class="tab-pane h-100 scroll-custom"
-            style="overflow-y: scroll;" >
-                <div id="galeriasTableContainer" class="mb-3" ></div>
+            <div id="galerias" class="tab-pane" >
+                <div id="galeriasTableContainer"></div>
             </div>
             {% comment %} <div id="servicoContratado"  class="tab-pane active in h-100"
             style="overflow-y: scroll;">

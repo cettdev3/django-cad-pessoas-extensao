@@ -14,6 +14,7 @@ def saveImagem(request):
     url = 'http://localhost:8000/imagens/' + str(galeria_id) if galeria_id else 'http://localhost:8000/imagens'
     body = payload
     response = None
+    print("payload dentro do siteview: ", payload)
     if galeria_id:
         response = requests.put(url, json=body, headers=headers)
         print(response.content)

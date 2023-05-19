@@ -16,13 +16,70 @@
             <div class="modal-body">
                 <form id="filtrosRelatorioModal">
                     <div class="form-group row">
-                        <div class="col-sm-4" id="filtrorelatorioEventosDepartamentoSelect">
+                        <div class="col-sm-3" id="filtrorelatorioEventosDepartamentoSelect">
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
+                            <label><b>Tipo do Evento:</b></label>
+                            <select required 
+                            id="tipo"
+                            class="form-control" 
+                            name="tipo">
+                                <option
+                                value="">
+                                    Selecione uma opção
+                                </option>
+                                <option
+                                {% if dpEvento and dpEvento.tipo == "emprestimo" %} selected {% endif %}
+                                value="emprestimo">
+                                    EMPRÉSTIMO
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "curso_gps" %} selected {% endif %} 
+                                value="curso_gps">
+                                    CURSO GPS
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "feirao" %} selected {% endif %} 
+                                value="feirao">
+                                    FEIRÃO DO EMPREGO
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "goias_feito_a_mao" %} selected {% endif %} 
+                                value="goias_feito_a_mao">
+                                    GOIÁS FEITO À MÃO
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "mutirao" %} selected {% endif %} 
+                                value="mutirao">
+                                    MUTIRÃO
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "recicla_goias" %} selected {% endif %} 
+                                value="recicla_goias">
+                                    RECICLA GOIÁS
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "feira_agro_centro_oeste" %} selected {% endif %} 
+                                value="feira_agro_centro_oeste">
+                                    FEIRA AGRO CENTRO OESTE
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "pauta_positiva" %} selected {% endif %} 
+                                value="pauta_positiva">
+                                    PAUTA POSITIVA
+                                </option>
+                                <option 
+                                {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
+                                value="outro">
+                                    OUTRO
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
                             <label><b>Data de Inicio:</b></label>
                             <input type="date" class="form-control" id="data_inicio" name="data_inicio">
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <label><b>Data de Fim:</b></label>
                             <input type="date" class="form-control" id="data_fim" name="data_fim">
                         </div>
@@ -59,10 +116,12 @@
         var data_inicio = $("#data_inicio").val();
         var data_fim = $("#data_fim").val();
         var departamento_id = $("#filtrorelatorioEventosDepartamentoSelect select").val();
+        var tipo = $("#tipo").val();
         var filtros = {
             data_inicio: data_inicio,
             data_fim: data_fim,
-            departamento_id: departamento_id
+            departamento_id: departamento_id,
+            tipo: tipo
         }
         return filtros;
     }
