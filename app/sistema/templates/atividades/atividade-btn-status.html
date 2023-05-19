@@ -1,0 +1,65 @@
+<div class="dropdown mr-1">
+    <button 
+    {% if atividade.status == 'pendente' %}
+    class="btn btn-sm btn-outline-warning rounded-circle"
+    {% elif atividade.status == 'concluido' %}
+    class="btn btn-sm btn-outline-success rounded-circle"
+    {% elif atividade.status == 'cancelada' %}
+    class="btn btn-sm btn-outline-secondary rounded-circle"
+    {% endif %}
+    data-toggle="dropdown"
+    id="dropdownMenuButton-status-{{atividade.id}}"
+    type="button">
+        {% if atividade.status == 'pendente' %}
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        {% elif atividade.status == 'concluido' %}
+        <i class="fa-solid fa-check"></i>
+        {% elif atividade.status == 'cancelada' %}
+        <i class="fa-solid fa-ban"></i>
+        {% endif %}
+    </button>
+    <div id="dropdown-categorias" class="dropdown-menu p-0" 
+    aria-labelledby="dropdownMenuButton-status-{{atividade.id}}">
+        {% if atividade.status != 'pendente' %}
+        <button class="btn btn-status-atividade-{{atividade.id}} btn-sm btn-outline-warning m-0 w-100 d-flex align-items-center"
+        data-status="pendente"
+        data-toggle="tooltip" data-placement="top" title="Marcar como pendente">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="ml-2">Pendente</span>
+        </button>
+        {% endif %}
+        {% if atividade.status != 'concluido' %}
+        <button class="btn btn-status-atividade-{{atividade.id}} btn-sm btn-outline-success m-0 w-100 d-flex align-items-center"
+        data-status="concluido"
+        data-toggle="tooltip" data-placement="top" title="Marcar como concluído">
+            <i class="fa-solid fa-check"></i>
+            <span class="ml-2">Concluír</span>
+        </button>
+        {% endif %}
+        {% if atividade.status != 'cancelada' %}
+        <button class="btn btn-status-atividade-{{atividade.id}} btn-sm btn-outline-secondary m-0 w-100 d-flex align-items-center"
+        data-status="cancelada"
+        data-toggle="tooltip" data-placement="top" title="Marcar como cancelado">
+            <i class="fa-solid fa-ban"></i>
+            <span class="ml-2">Cancelar</span>
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        (function(params) {    
+            $(".btn-status-atividade-"+params.atividadeId).on('click', function() {
+                let status = $(this).attr('data-status')
+                let data = {
+                    status: status,
+                    template: "atividade-btn-status.html"
+                }
+                updateAtividade(params.atividadeId, data, function(html) {
+                    $("#atividade-row-status-"+params.atividadeId).html(html)
+                })
+            })
+        })({atividadeId: "{{atividade.id}}"});
+    });
+</script>

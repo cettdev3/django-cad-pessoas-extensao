@@ -1,11 +1,33 @@
-<div id="atividade-row-container-{{atividade.id}}"  class="w-100" >
-    <div class="d-flex w-25" id="atividade-row-nome-{{atividade.id}}" >
+<div id="atividade-row-container-{{atividade.id}}"  class="w-100 d-flex" >
+    <div class="d-flex w-35" id="atividade-row-nome-{{atividade.id}}" >
+        <div id="atividade-row-status-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
+           {% include 'atividades/atividade-btn-status.html' with atividade=atividade %}
+        </div>
+        <div id="atividade-row-categoria-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
+           {% include 'atividades/atividade-btn-categoria.html' with atividade=atividade categorias=categorias %}
+        </div>
         <input type="text" 
-        class="input-hover-highlight"
+        class="input-hover-highlight w-95 bg-light ml-1"
         placeholder="Escreva o nome da tarefa"
         value="{{atividade.nome|default_if_none:''}}">
-        <div class="ml-3 position-relative d-flex justify-content-start">
-            <!-- Menu de opções -->
+    </div>
+    <div class="w-20 d-flex align-items-center" style="box-sizing: border-box;">
+        <div id="select-membro-execucao-atividade-{{atividade.id}}">
+            {% include 'atividades/atividade-select-membro-execucao.html' with membrosExecucao=membrosExecucao atividade=atividade %}
+        </div>
+    </div>
+    <div class="w-15  d-flex align-items-center" style="box-sizing: border-box;">
+        <div id="select-departamento-atividade-{{atividade.id}}">
+            {% include 'atividades/atividade-select-departamento.html' with departamentos=departamentos atividade=atividade %}
+        </div>
+    </div>
+    <div class="w-20  d-flex align-items-center" style="box-sizing: border-box;">
+        <div id="input-data-realizacao-atividade-{{atividade.id}}">
+            {% include 'atividades/atividade-input-data-fim.html' with atividade=atividade %}
+        </div>
+    </div>
+    <div class="10 ">
+        <div class="ml-3 position-relative d-flex justify-content-end w-100">
             <button id="open-drawer-atividade-{{atividade.id|default_if_none:""}}"
             onclick="showDrawer('{{atividade.id}}')"
             data-toggle="tooltip" data-placement="top" title="Detalhes"
@@ -22,7 +44,7 @@
 </div>
 
 <script> 
-     $(document).ready(function() {
+    $(document).ready(function() {
         (function(params) {    
             let oldName = "{{atividade.nome|default_if_none:''}}"        
             function setNomeInputBehaviour(data) {
@@ -46,6 +68,14 @@
                     updateAtividade(params.atividadeId, data)
                 })
             }
+
+            $(`atividade-row-status-${params.atividadeId}`).on('click', function() {
+                let status = $(this).attr('data-status')
+                let data = {
+                    "status": status
+                }
+                updateAtividade(params.atividadeId, data)
+            })
 
             setNomeInputBehaviour()
             

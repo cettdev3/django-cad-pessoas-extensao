@@ -1,0 +1,30 @@
+<select style="font-size: 0.8rem;" 
+name="departamento_id" 
+id="departamento_id-{{atividade.id}}" 
+class="input-hover-highlight  w-95 bg-light ml-1 py-1 px-2">
+    <option value="">Selecione um Departamento</option>
+    {% for departamento in departamentos %}
+    <option value="{{departamento.id}}" {% if departamento.id == atividade.departamento.id %} selected {% endif %}>
+        <span>{{departamento.nome}}</span>
+    </option>
+    {% endfor %}
+</select>
+
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            $("#departamento_id-" + params.atividadeId).on('change', function () {
+                let departamento_id = $(this).val()
+                let data = {
+                    departamento_id: departamento_id,
+                    template: "atividade-select-departamento.html"
+                }
+                updateAtividade(params.atividadeId, data, function (html) {
+                    if (!html) {
+                        $("#departamento_id-" + params.atividadeId).val(params.oldDepartamentoId)  
+                    } 
+                })
+            })
+        })({ atividadeId: "{{atividade.id}}", oldDepartamentoId: "{{atividade.departamento.id}}" });
+    });
+</script>

@@ -1,0 +1,33 @@
+<div class="dropdown mr-1">
+    <button data-toggle="dropdown"
+    id="dropdownMenuButton-categoria-{{atividade.id}}"
+    class="custom-badge custom-badge-sm {{atividade.categoria_badge|default_if_none:''}}"
+    type="button">
+        <span><strong>{{atividade.categoria_label|default_if_none:'Atividade'}}</strong></span>
+    </button>
+    <div id="dropdown-categorias" class="dropdown-menu" aria-labelledby="dropdownMenuButton-categoria-{{atividade.id}}">
+        {% for categoria in categorias %}
+        <button class="btn-categoria-atividade-{{atividade.id}} btn btn-success btn-sm dropdown-item m-0 px-1 py-2 {{categoria.2}}"
+        data-category="{{categoria.0}}">
+            <span><strong>{{categoria.1}}</strong></span>
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            $(".btn-categoria-atividade-" + params.atividadeId).on('click', function () {
+                let status = $(this).attr('data-category')
+                let data = {
+                    categoria: status,
+                    template: "atividade-btn-categoria.html"
+                }
+                updateAtividade(params.atividadeId, data, function (html) {
+                    $("#atividade-row-categoria-" + params.atividadeId).html(html)
+                })
+            })
+        })({ atividadeId: "{{atividade.id}}" });
+    });
+</script>

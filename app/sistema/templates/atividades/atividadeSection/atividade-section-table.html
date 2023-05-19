@@ -1,9 +1,6 @@
 <div id="atividades-sections-sortable-container" class="d-flex flex-column w-100 sortable">
-    <div class="position-fixed w-100 bg-light" style="height: 20px;">
-        teste cabeçalho
-    </div>
     {% for atividadeSection in atividadeSections %}
-    {% include "atividades/atividadeSection/atividade-section-item.html" with atividadeSection=atividadeSection index=forloop.counter %}
+        {% include "atividades/atividadeSection/atividade-section-item.html" with atividadeSection=atividadeSection index=forloop.counter categorias=categorias departamentos=departamentos %}
     {% endfor %}
 </div>
 <div id="add-section-container" 
@@ -28,7 +25,7 @@ class="d-flex align-items-center justify-content-start mt-4"
 </div>
 <script>
     let atividadeSectionEventoId = '{{evento_id}}'
-    
+
     async function addAtividadeToSection(sectionId) {
         return await createAtividade({
             evento_id: atividadeSectionEventoId,
@@ -67,8 +64,8 @@ class="d-flex align-items-center justify-content-start mt-4"
             if (item) {
                 let container = $("#" + item);
                 let containerId = item.split('-')[2];
-                let marginTop = index == 0 ? '32px' : '0px';
-                container.css('margin-top', marginTop);
+                // let marginTop = index == 0 ? '32px' : '0px';
+                // container.css('margin-top', marginTop);
             
                 return {
                     id: containerId,
@@ -99,7 +96,6 @@ class="d-flex align-items-center justify-content-start mt-4"
     $(document).ready(function () {
         $("#atividades-sections-sortable-container").sortable({
             handle: ".drag-handle", 
-            items: "> div:gt(0)",
             helper: function (event, ui) {
                 var text = ui.find('[id^="input-nome-atividade-section"]').val();
                 return $('<div class="card bg-success" style="height: 40px; width: 200px">' + text + '</div>');

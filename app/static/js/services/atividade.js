@@ -35,6 +35,7 @@ async function updateAtividade(atividade_id, data, callback = null) {
         error: function (data) {
             toggleLoading("updateAtividade error")
             showFloatingMessage("Erro ao atualizar atividade", "alert-danger");
+            if (callback) callback(null);
         }
     });
 }

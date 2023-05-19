@@ -1,0 +1,25 @@
+
+<input type="date" 
+id="data_fim-{{atividade.id}}"
+class="input-hover-highlight form-control form-control-sm d-inline-block w-100 bg-light" 
+name="data_fim" 
+value="{{atividade.data_realizacao_fim|date:'Y-m-d'}}">
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            $("#data_fim-" + params.atividadeId).change(function () {
+                let data_fim = $(this).val()
+                let data = {
+                    data_realizacao_fim: data_fim,
+                    template: "atividade-input-data-fim.html"
+                }
+
+                updateAtividade(params.atividadeId, data, function (html) {
+                    if (!html) {
+                        $("#data_fim-" + params.atividadeId).val(params.oldResponsavelId)  
+                    } 
+                })
+            })
+        })({ atividadeId: "{{atividade.id}}", oldResponsavelId: "{{atividade.data_realizacao_fim}}" });
+    });
+</script>

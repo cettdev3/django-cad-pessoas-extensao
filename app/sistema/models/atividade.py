@@ -18,14 +18,15 @@ class Atividade(models.Model):
     CATEGORIA_REUNIAO = 'reuniao'
     CATEGORIA_MARCO = 'marco'
     CATEGORIA_SUBTAREFAS = 'subtarefa'
-
+    CATEGORIA_ATIVIDADE = 'atividade'
     CATEGORY_CHOICES = (
-        (CATEGORIA_TAREFA, 'Tarefa'),
-        (CATEGORIA_PROGRAMACAO, 'Programação'),
-        (CATEGORIA_META_EXTENSAO, 'Meta de Extensão'),
-        (CATEGORIA_REUNIAO, 'Reunião'),
-        (CATEGORIA_MARCO, 'Marco'),
-        (CATEGORIA_SUBTAREFAS, 'Subtarefa'),
+        (CATEGORIA_TAREFA, 'Tarefa', 'badge-categoria-tarefa'),
+        (CATEGORIA_PROGRAMACAO, 'Programação', 'badge-categoria-programacao'),
+        (CATEGORIA_META_EXTENSAO, 'Meta de Extens', 'badge-categoria-meta-extensao'),
+        (CATEGORIA_REUNIAO, 'Reunião', 'badge-categoria-reuniao'),
+        (CATEGORIA_MARCO, 'Marco', 'badge-categoria-marco'),
+        (CATEGORIA_SUBTAREFAS, 'Subtarefa', 'badge-categoria-subtarefas'),
+        (CATEGORIA_ATIVIDADE, 'Atividade', 'badge-categoria-atividade'),
     )
         
 
@@ -131,6 +132,15 @@ class Atividade(models.Model):
     @property
     def categoria_label(self):
         if self.categoria:
-            return dict(self.CATEGORY_CHOICES)[self.categoria]
-        else:
-            return "Atividade"
+            for choice in self.CATEGORY_CHOICES:
+                if choice[0] == self.categoria:
+                    return choice[1]  # Return the label
+        return "Atividade"
+    
+    @property
+    def categoria_badge(self):
+        if self.categoria:
+            for choice in self.CATEGORY_CHOICES:
+                if choice[0] == self.categoria:
+                    return choice[2]
+        return "badge-categoria-atividade"

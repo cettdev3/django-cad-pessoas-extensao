@@ -4,17 +4,11 @@
         display: block;
     }
 </style>
-<div style="position: absolute" class="table-container">
-    <div class="position-relative">
-        <div class="position-fixed border w-100 bg-light" style="height: 56px; z-index: 2;">
-            <h1 class="" style="height: 20px">
-                teste primeiro
-            </h1>
-        </div>
-        <div class="w-100" style="left: 0; padding-top: 56px; position: absolute; z-index: 1">
-            {% include "atividades/atividadeSection/atividade-section-table.html" with evento_id=evento_id atividadeSections=atividadeSections %}
-            <hr>
-        </div>
+<div class="table-container">
+    <div class="w-100 position-relative"
+    id="atividades-section-container">
+        {% include "atividades/atividadeSection/atividade-section-table.html" with evento_id=evento_id atividadeSections=atividadeSections categorias=categorias departamentos=departamentos %}
+        <hr>
     </div>
     <div id="activity-drawer" 
     style="display: none; width: 60%; height: 100%; position: fixed; bottom: 0; right: 0; background-color: #f0f0f0; overflow: auto; z-index: 99;">

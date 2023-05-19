@@ -1,0 +1,27 @@
+<select style="font-size: 0.8rem;" name="responsavel_id" id="responsavel_id-{{atividade.id}}" class="input-hover-highlight  w-95 bg-light ml-1 py-1 px-2">
+    <option value="">Selecione um membro</option>
+    {% for membro in membrosExecucao %}
+    <option value="{{membro.id}}" {% if membro.id == atividade.responsavel.id %} selected {% endif %}>
+        <span>{{membro.pessoa.nome}}</span>
+    </option>
+    {% endfor %}
+</select>
+
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            $("#responsavel_id-" + params.atividadeId).on('change', function () {
+                let responsavel_id = $(this).val()
+                let data = {
+                    membro_execucao_id: responsavel_id,
+                    template: "atividade-select-membro-execucao.html"
+                }
+                updateAtividade(params.atividadeId, data, function (html) {
+                    if (!html) {
+                        $("#responsavel_id-" + params.atividadeId).val(params.oldResponsavelId)  
+                    } 
+                })
+            })
+        })({ atividadeId: "{{atividade.id}}", oldResponsavelId: "{{atividade.responsavel.id}}" });
+    });
+</script>

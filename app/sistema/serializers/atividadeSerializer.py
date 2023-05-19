@@ -57,7 +57,8 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "ticket_set",
             "atividade_meta",
             "categoria",
-            "categoria_label"
+            "categoria_label",
+            "categoria_badge"
         ]
         
         depth = 4

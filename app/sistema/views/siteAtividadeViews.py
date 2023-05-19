@@ -4,6 +4,8 @@ from sistema.models.atividade import Atividade
 from sistema.models.acao import Acao
 from sistema.models.atividadeSection import AtividadeSection
 from sistema.models.dpEvento import DpEvento
+from sistema.models.departamento import Departamento
+from sistema.models.membroExecucao import MembroExecucao
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from ..serializers.atividadeSerializer import AtividadeSerializer
@@ -46,11 +48,17 @@ def atividadesDpEventoTable(request):
         )
     atividadeSections = AtividadeSection.objects.filter(evento__id = evento_id).order_by("order").all()
     atividades = atividades.all()
-    return render(request,'atividades/atividadesTabela.html',{
-        'atividades':atividades, 
-        'evento_id':evento_id,
-        'atividadeSections':atividadeSections
-    })
+    categorias = Atividade().CATEGORY_CHOICES
+
+    data = {}
+    data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id = evento_id).all()
+    data['atividades'] = atividades,
+    data['evento_id'] = evento_id
+    data['atividadeSections'] = atividadeSections
+    data['categorias'] = categorias
+    data['departamentos'] = Departamento.objects.all()
+
+    return render(request,'atividades/atividadesTabela.html', data)
 
 @login_required(login_url='/auth-user/login-user')
 def atividadeModal(request):
@@ -80,7 +88,19 @@ def saveAtividade(request):
     body = json.loads(request.body)
     response = requests.post('http://localhost:8000/atividades', json=body, headers=headers)
     atividade = json.loads(response.content)
-    return render(request,'atividades/atividade-row.html',{"atividade":atividade, "fromCreate": True})
+    categorias = Atividade().CATEGORY_CHOICES
+    thumbnailStyle = True
+
+    data = {}
+    eventoId = atividade.get("evento").get("id")
+    data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id = eventoId).all()
+    data['atividade'] = atividade
+    data['evento_id'] = eventoId
+    data['categorias'] = categorias
+    data['thumbnailStyle'] = thumbnailStyle
+    data['fromCreate'] = True
+    data['departamentos'] = Departamento.objects.all()
+    return render(request,'atividades/atividade-row.html',data)
 
 @login_required(login_url='/auth-user/login-user')
 def editarAtividade(request, atividade_id):
@@ -92,7 +112,16 @@ def editarAtividade(request, atividade_id):
     atividade = json.loads(response.content)
     categorias = Atividade().CATEGORY_CHOICES
     thumbnailStyle = True
-    return render(request,'atividades/'+template,{"atividade":atividade, "fromCreate": True, "categorias":categorias, "thumbnailStyle":thumbnailStyle})
+    data = {}
+    # "atividade":atividade, "fromCreate": True, "categorias":categorias, "thumbnailStyle":thumbnailStyle
+    eventoId = atividade.get("evento").get("id")
+    data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id = eventoId).all()
+    data['atividade'] = atividade
+    data['evento_id'] = eventoId
+    data['categorias'] = categorias
+    data['thumbnailStyle'] = thumbnailStyle
+    data['departamentos'] = Departamento.objects.all()
+    return render(request,'atividades/'+template,data)
 
 @login_required(login_url='/auth-user/login-user')
 def getAtividadeDrawer(request, atividade_id):
@@ -102,7 +131,7 @@ def getAtividadeDrawer(request, atividade_id):
     atividade = json.loads(response.content)
     categorias = Atividade().CATEGORY_CHOICES
     thumbnailStyle = True
-    
+
     return render(request,'atividades/atividade-drawer.html',{
         "atividade":atividade, 
         "categorias":categorias, 

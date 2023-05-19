@@ -1,9 +1,5 @@
 <div id="atividade-section-{{atividadeSection.id}}" 
-{% if index == 1 %}
-style="margin-top: 32px;"
-{% endif %} 
 class="w-100">
-    <!-- <h1>{{counter}}</h1> -->
     <div id="header-section-{{atividadeSection.id}}" 
     class="w-100 bg-success d-flex justify-content-start align-items-center header-section-container">
         <div class="visible-handle drag-handle pr-2 pl-1" style="cursor: grab;">   <!-- Add this div as a drag handle -->
@@ -72,7 +68,7 @@ class="w-100">
     </div>
     <div id="collapsable-{{atividadeSection.id}}" class="collapsable collapse">
         {% for atividade in atividadeSection.atividade_set.all %}
-            {% include "atividades/atividade-row.html" with atividade=atividade %}
+            {% include "atividades/atividade-row.html" with atividade=atividade categorias=categorias departamentos=departamentos %}
         {% endfor %}
     </div>
 </div>

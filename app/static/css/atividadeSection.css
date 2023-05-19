@@ -20,3 +20,93 @@
     border-radius: 5px;
     border: 1px solid #ced4da ;
 }
+
+.custom-badge {
+    background-color: #1cc88a;
+    color: white;
+    border-radius: 5px;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    outline: none;
+}
+
+.custom-badge-sm {
+    background-color: #1cc88a;
+    color: white;
+    border-radius: 5px;
+    padding: 0.1rem 0.25rem;
+    font-size: 0.8rem;
+}
+
+/* CATEGORY_CHOICES = (
+    (CATEGORIA_TAREFA, 'Tarefa', '#008080', '#FFFFFF'),
+    (CATEGORIA_PROGRAMACAO, 'Programação', '#FF4500', '#000000'),
+    (CATEGORIA_META_EXTENSAO, 'Meta de Extensão', '#800080', '#FFFFFF'),
+    (CATEGORIA_REUNIAO, 'Reunião', '#008000', '#000000'),
+    (CATEGORIA_MARCO, 'Marco', '#0000FF', '#FFFFFF'),
+    (CATEGORIA_SUBTAREFAS, 'Subtarefa', '#FFFF00', '#000000'),
+) */
+
+.badge-categoria-tarefa {
+    background-color: #FF9800!important;
+    color: #FFFFFF!important;
+}
+.badge-categoria-tarefa:hover {
+    background-color: #FB8C00;
+    color: #FFFFFF;
+}
+
+.badge-categoria-programacao {
+    background-color: #9E9D24;
+    color: #fff;
+}
+.badge-categoria-programacao:hover {
+    background-color: #827717;
+    color: #fff;
+}
+
+.badge-categoria-meta-extensao {
+    background-color: #7CB342;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #FFFFFF;
+}
+
+.badge-categoria-meta-extensao:hover {
+    background-color: #689F38;
+    color: #FFFFFF;
+}
+
+.badge-categoria-reuniao {
+    background-color: #29B6F6;
+    color: #fff;
+}
+
+.badge-categoria-reuniao:hover {
+    background-color: #03A9F4;
+    color: #fff;
+}
+
+.badge-categoria-marco {
+    background-color: #7E57C2;
+    color: #FFFFFF;
+}
+
+.badge-categoria-marco:hover {
+    background-color: #673AB7;
+    color: #FFFFFF;
+}
+
+.badge-categoria-subtarefas {
+    background-color: #FF8A80;
+    color: #fff;
+}
+
+.badge-categoria-subtarefas:hover {
+    background-color: #FF5252;
+    color: #fff;
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator {
+    display: none;
+}

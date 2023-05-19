@@ -142,7 +142,7 @@ class AtividadeApiView(APIView):
             "cep": data.get("cep"),
             "complemento": data.get("complemento"),
             "valor": float(data["valor"]) if data.get("valor") else None,
-            "categoria": data.get("categoria"),
+            "categoria": data.get("categoria", "tarefa"),
             "atividade_meta": data.get("atividade_meta", False),
             "atividadeSection": section
         }
@@ -296,18 +296,9 @@ class AtividadeDetailApiView(APIView):
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio", atividade.data_realizacao_inicio)
         atividade.data_realizacao_fim = data.get("data_realizacao_fim", atividade.data_realizacao_fim)
         atividade.categoria = data.get("categoria", atividade.categoria)
-    
         if "atividade_meta" in data:
             atividade.atividade_meta = data["atividade_meta"]
         atividade.save()
-
-        atividadeCompleta = Atividade.objects.select_related(
-            "acao", 
-            "tipoAtividade", 
-            "departamento", 
-            "responsavel",
-            "cidade"
-        ).prefetch_related("servico_set", "ticket_set").filter(id=atividade.id)
 
         anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
         anexos = list(anexos.values())
