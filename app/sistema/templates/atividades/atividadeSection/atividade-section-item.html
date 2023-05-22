@@ -67,7 +67,7 @@ class="w-100">
         </div>
     </div>
     <div id="collapsable-{{atividadeSection.id}}" class="collapsable collapse">
-        {% for atividade in atividadeSection.atividade_set.all %}
+        {% for atividade in atividadeSection.atividade_set %}
             {% include "atividades/atividade-row.html" with atividade=atividade categorias=categorias departamentos=departamentos %}
         {% endfor %}
     </div>

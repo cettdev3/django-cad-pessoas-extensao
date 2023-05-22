@@ -7,14 +7,16 @@ from sistema.models.dpEvento import DpEvento
 from sistema.models.departamento import Departamento
 from sistema.models.membroExecucao import MembroExecucao
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from ..serializers.atividadeSerializer import AtividadeSerializer
+from ..serializers.atividadeSectionSerializer import AtividadeSectionSerializer
 import requests
 import json
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.db.models import Prefetch
 
 @login_required(login_url='/auth-user/login-user')
 def atividadesTable(request):
@@ -36,29 +38,50 @@ def atividadesTable(request):
 
 @login_required(login_url='/auth-user/login-user')
 def atividadesDpEventoTable(request):
-    nome = request.GET.get('nome')
+    departamento_id = request.GET.get('departamento_id', None)
+    nome = request.GET.get('nome', None)
+    categoria = request.GET.get('categoria', None)
+    responsavel_id = request.GET.get('responsavel_id', None)
+    data_fim = request.GET.get('data_fim', None)
     evento_id = request.GET.get('dp_evento_id')
-    atividades = Atividade.objects
-    if evento_id:
-        atividades = atividades.filter(evento__id = evento_id)
-    if nome:
-        atividades = atividades.filter(
-            Q(descricao__contains = nome) | 
-            Q(tipoAtividade__nome__contains = nome)
-        )
-    atividadeSections = AtividadeSection.objects.filter(evento__id = evento_id).order_by("order").all()
-    atividades = atividades.all()
+    print('evento_id', evento_id)
+    print('departamento_id', departamento_id)
+    print('nome', nome)
+    print('categoria', categoria)
+    print('responsavel_id', responsavel_id)
+    print('data_fim', data_fim)
+    
+    queryset = Atividade.objects.all()
+    if departamento_id is not None and departamento_id != "":
+        queryset = queryset.filter(departamento_id=departamento_id)
+
+    if nome is not None and nome != "":
+        queryset = queryset.filter(nome__icontains=nome)
+        
+    if categoria is not None and categoria != "":
+        queryset = queryset.filter(categoria=categoria)
+
+    if responsavel_id is not None and responsavel_id != "":
+        queryset = queryset.filter(responsavel_id=responsavel_id)
+
+    if data_fim is not None and data_fim != "":
+        queryset = queryset.filter(data_realizacao_fim=data_fim)
+
+    prefetch = Prefetch('atividade_set', queryset=queryset)
+    atividadeSections = AtividadeSection.objects.filter(evento__id=evento_id)
+    
+    atividadeSections = atividadeSections.order_by("order").all().prefetch_related(prefetch)
+
     categorias = Atividade().CATEGORY_CHOICES
 
     data = {}
-    data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id = evento_id).all()
-    data['atividades'] = atividades,
+    data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id=evento_id).all()
     data['evento_id'] = evento_id
-    data['atividadeSections'] = atividadeSections
+    data['atividadeSections'] = AtividadeSectionSerializer(atividadeSections, many=True).data
     data['categorias'] = categorias
     data['departamentos'] = Departamento.objects.all()
 
-    return render(request,'atividades/atividadesTabela.html', data)
+    return render(request, 'atividades/atividadesTabela.html', data)
 
 @login_required(login_url='/auth-user/login-user')
 def atividadeModal(request):

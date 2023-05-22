@@ -65,13 +65,6 @@ style="height: calc(100vh - 75px);">
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
-                <div id="add-atividade-btn">
-                    <div  data-toggle="tooltip" data-placement="top" title="Adicionar Atividade"
-                    class="d-flex align-items-center ">            
-                        <button onclick="addAtividadeModal()" 
-                        class="btn btn-success">Adicionar</button>
-                    </div>
-                </div>
                 <div id="add-avaliacao-btn">
                     <div data-toggle="tooltip" data-placement="top" title="Adicionar Avaliação" 
                     class="d-flex align-items-center ">            
@@ -100,13 +93,72 @@ style="height: calc(100vh - 75px);">
         style="overflow: scroll; margin-bottom: 24px; padding-bottom: 24px">
             <div id="atividades-table-header" class="w-100 bg-light position-sticky pt-3" style="top:0; z-index: 2;">
                 <div class="d-flex w-100">
-                    <div class="w-100">
+                    <div>
                         <div class="d-flex flex-column justify-content-start align-items-start mx-2">
-                            <label for="filterAtividades" class="filter-label">Busca</label>
-                            <input id="filterAtividades" 
+                            <label class="filter-label">Busca</label>
+                            <input style="font-size: 0.8rem;" 
+                            id="filterAtividadesNome" 
                             placeholder="Procurar pelo nome" 
                             class="form-control-sm border-secondary"
-                            name="observacao" type="text">
+                            name="nome" type="text">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                            <label class="filter-label">Departamento</label>
+                            <select style="font-size: 0.8rem;" 
+                            id="filterAtividadesDepartamento" 
+                            name="departamento_id" 
+                            class="form-control-sm border-secondary">
+                                <option value="">Selecione um Departamento</option>
+                                {% for departamento in departamentos %}
+                                <option value="{{departamento.id}}" {% if departamento.id == atividade.departamento.id %} selected {% endif %}>
+                                    <span>{{departamento.nome}}</span>
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                            <label class="filter-label">Categoria</label>
+                            <select style="font-size: 0.8rem;" 
+                            id="filterAtividadesCategoria" 
+                            name="categoria" 
+                            class="form-control-sm border-secondary">
+                                <option value="">Selecione uma Categoria</option>
+                                {% for categoria in categoriaAtividades %}
+                                <option value="{{categoria.0}}">
+                                    <span>{{categoria.1}}</span>
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                            <label class="filter-label">Responsavel</label>
+                            <select style="font-size: 0.8rem;" 
+                            name="responsavel_id" 
+                            id="filterAtividadesResponsavel" 
+                            class="form-control-sm border-secondary">
+                                <option value="">Selecione um responsavel</option>
+                                {% for membro in dpEvento.membroexecucao_set %}
+                                <option value="{{membro.id}}">
+                                    <span>{{membro.pessoa.nome}}</span>
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                            <label class="filter-label">Data de Conclusão</label>
+                            <input type="date" 
+                            style="font-size: 0.8rem;" 
+                            id="filterAtividadesDataFim"
+                            name="data_fim"
+                            class="form-control-sm border-secondary">
                         </div>
                     </div>
                 </div>
@@ -270,11 +322,11 @@ style="height: calc(100vh - 75px);">
         });
     }
 
-    function carregarAtividades() {
+    function carregarAtividades(data = null) {
 
         $.ajax({
             url: "/atividadesDpEventoTable",
-            data: {dp_evento_id: dpEventoId},
+            data: data == null ? {dp_evento_id: dpEventoId} : data,
             success: function (data) {
                 $("#atividadesTableContainer").html(data);
             }
@@ -399,6 +451,28 @@ style="height: calc(100vh - 75px);">
             $("#atividades-table-header").hide()
         }
     }
+
+    function getAtividadeFilters() {
+        let filterAtividades = $("[id^=filterAtividades]")
+        data = {}
+        filterAtividades.each(function() {
+            let filter = $(this)
+            let filterValue = filter.val()
+            let filterName = filter.attr("name")
+            data[filterName] = filterValue
+        })
+        data["dp_evento_id"] = dpEventoId
+        return data
+    }
+    function setFiltersBehaviour() {
+        let filterAtividades = $("[id^=filterAtividades]")
+        filterAtividades.each(function() {
+            let filter = $(this)
+            filter.on("change", function() {
+                carregarAtividades(getAtividadeFilters())
+            })
+        })
+    }
     
     $(document).ready(function() {
         membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
@@ -414,6 +488,8 @@ style="height: calc(100vh - 75px);">
                 return false;
             }
         });
+
+        setFiltersBehaviour()
 
         carregarMembrosExecucao()
         carregarAtividades()
