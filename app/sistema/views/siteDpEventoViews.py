@@ -35,21 +35,10 @@ from collections import Counter
 @login_required(login_url='/auth-user/login-user')
 def gerencia_dp_eventos(request):
     page_title = "Eventos"
-    count_finalizados = 0
-    count_andamento = 0
     dp_eventos = DpEvento.objects.all()
-    for evento in dp_eventos:
-        if evento.tipo == 'emprestimo' or evento.tipo == 'curso_gps' or evento.tipo == 'pauta_positiva' or evento.tipo == 'outro':
-            count_finalizados += 0
-            count_andamento += 0
-        else:
-            if evento.data_fim >= datetime.now().date():
-                count_finalizados += 1
-            else:
-                count_andamento += 1
-    
+    count = dp_eventos.count()
     return render(request,'dpEventos/gerenciar_dp_eventos.html',
-    {'dp_eventos':dp_eventos,'contagem_finalizados':count_finalizados, 'contagem_andamento':count_andamento, 'page_title':page_title})
+    {'dp_eventos':dp_eventos,'count': count, 'page_title':page_title})
 
 @login_required(login_url='/auth-user/login-user')
 def dpEventoTable(request):
