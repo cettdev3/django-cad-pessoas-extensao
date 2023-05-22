@@ -290,6 +290,34 @@
                     </div> 
                 </div>
                 <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label><b>Valor Orçado:</b></label>
+                        <input 
+                        type="number"
+                        step="0.01" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'valor_orcado', this.value, '{{ticket.valor_orcado|default_if_none:''}}')"
+                        id="valor_orcado"
+                        name="valor_orcado" 
+                        class="form-control" 
+                        {% if ticket %}
+                        value="{{ticket.valor_orcado|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                    <div class="col-sm-6">
+                        <label><b>Valor Executado:</b></label>
+                        <input 
+                        type="number"
+                        step="0.01" 
+                        onfocusout="updateDemandaForm('{{ticket.id}}', 'valor_executado', this.value, '{{ticket.valor_executado|default_if_none:''}}')"
+                        id="valor_executado"
+                        name="valor_executado" 
+                        class="form-control" 
+                        {% if ticket %}
+                        value="{{ticket.valor_executado|default_if_none:''}}"
+                        {% endif %}>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <div class="col-sm-12">
                         <label><b>Descrição:</b></label>
                         <textarea 

@@ -50,6 +50,8 @@ class Ticket(models.Model):
     complemento = models.CharField(null = True, max_length=250, blank= True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank= True)
     observacao = models.CharField(null = True, max_length=250, blank= True)
+    valor_orcado = models.DecimalField(null = True, max_digits=10, decimal_places=2, blank= True)
+    valor_executado = models.DecimalField(null = True, max_digits=10, decimal_places=2, blank= True)
 
     class Meta:
         db_table = 'tickets'

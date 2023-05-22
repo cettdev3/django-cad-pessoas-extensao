@@ -49,6 +49,8 @@ class TicketSerializer(serializers.ModelSerializer):
             "tipo_formatado",
             "status_class",
             "status_formatado",
-            "status_calculado"
+            "status_calculado",
+            "valor_orcado",
+            "valor_executado",
         ]
         depth = 2

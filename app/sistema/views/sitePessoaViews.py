@@ -108,7 +108,8 @@ def pessoasSelect(request):
     input_name = request.GET.get('input_name')
     label = request.GET.get('label', 'Pessoa')
     print("selected",selected)
-    selected = int(selected) if selected.isdigit() else None 
+    if selected:
+        selected = int(selected) if selected.isdigit() else None 
     pessoas = Pessoas.objects.all() 
     return render(request,'pessoas/pessoas_select.html',{
         'pessoas':pessoas, 

@@ -80,12 +80,14 @@
                                     <div class="col-sm-3"><strong>Id da demanda:</strong></div>
                                     <div class="col-sm-9">
                                         <input type="text" 
-                                        id="id_protocolo"
+                                        id="id_protocolo_{{demanda.id}}"
                                         name="id_protocolo"
                                         class="form-control" 
                                         value="{{demanda.id_protocolo}}" >
                                         {% comment %} salvar btn {% endcomment %}
-                                        <button onclick="updateIdProtocolo('{{demanda.id}}')" type="button" class="btn btn-primary">Salvar</button>
+                                        <button onclick="updateIdProtocolo('{{demanda.id}}')" 
+                                        type="button" 
+                                        class="btn btn-primary">Salvar</button>
                                     </div>
                                 </div> 
                             </div>
@@ -116,30 +118,11 @@
 
 <script id="membro_execucao_data_{{membro_execucao.id}}">
     function updateIdProtocolo(ticketId){
-        let membroExecucao = JSON.parse($('#membro_execucao').text())
-        let ticketSet = membroExecucao.ticket_set
-        console.log(ticketSet)
-        console.log(ticketId)
-        let ticket = ticketSet.find(ticket => ticket.id == ticketId)
-        ticket["id_protocolo"] = $('#id_protocolo').val()
-        console.log("ticket dentro da modal: ",ticket)
-        let loadingContainer = $('#loading')
-        let buttonLabel = $('#button-label')
-        loadingContainer.show()
-        buttonLabel.hide()
-        $.ajax({
-            url: "/editarTicket/"+ticketId,
-            data: JSON.stringify({"data": ticket}),
-            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
-            dataType: "json",
-            contentType: 'application/json',
-            method: "POST",
-            success: function (data) {
-                showFloatingMessage("Demanda atualizada com sucesso!", "alert-success")
-                loadingContainer.hide()
-                buttonLabel.show()
-            }
-        });
+        let id_protocolo = $("#id_protocolo_" + ticketId).val()
+        console.log("updateIdProtocolo", ticketId, id_protocolo)
+        updateDemanda(ticketId, {
+            id_protocolo: id_protocolo,
+        })
     }
 
     $(document).ready(function () {

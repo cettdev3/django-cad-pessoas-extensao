@@ -141,8 +141,15 @@ def updateTicket(request, ticket_id):
     response = requests.put('http://localhost:8000/tickets/'+ticket_id, json=body, headers=headers)
     context = {}
     context['ticket'] = json.loads(response.content)
-    context['atividade_id'] = context['ticket']['atividade']['id']
-    context['evento_id'] = context['ticket']['atividade']['evento']['id']
+    ticket = context.get('ticket')
+    if ticket:
+        atividade = ticket.get('atividade')
+        if atividade:
+            context['atividade_id'] = atividade.get('id')
+            evento = atividade.get('evento')
+            if evento:
+                context['evento_id'] = evento.get('id')
+    
     return render(request,'tickets/ticket_form_collapsable_atividade.html', context)
 
 @login_required(login_url='/auth-user/login-user')

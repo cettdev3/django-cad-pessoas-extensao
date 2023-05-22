@@ -170,7 +170,13 @@ class TicketApiView(APIView):
         elif request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_CRIACAO_PENDENTE]:
             status = request.data.get("status")
         
+        valor_orcado = None
+        if request.data.get("valor_orcado") and request.data.get("valor_orcado") != "":
+            valor_orcado = request.data.get("valor_orcado")
 
+        valor_executado = None
+        if request.data.get("valor_executado") and request.data.get("valor_executado") != "":
+            valor_executado = request.data.get("valor_executado")
 
         ticketData = {
             "tipo": request.data.get("tipo"),
@@ -193,6 +199,8 @@ class TicketApiView(APIView):
             "complemento": request.data.get("complemento"),
             "cidade":   cidade,
             "observacao": request.data.get("observacao"),
+            "valor_orcado": valor_orcado,
+            "valor_executado": valor_executado,
             "beneficiario": beneficiario,
         }
 
@@ -246,6 +254,10 @@ class TicketDetailApiView(APIView):
         if request.data.get("data_fim") and request.data.get("data_fim") != "":
             if  request.data.get("nao_se_aplica_data_fim") not in ["on", True]:
                 ticket.data_fim = request.data.get("data_fim")
+        if request.data.get("valor_orcado") and request.data.get("valor_orcado") != "":
+            ticket.valor_orcado = request.data.get("valor_orcado")
+        if request.data.get("valor_executado") and request.data.get("valor_executado") != "":
+            ticket.valor_executado = request.data.get("valor_executado")
         if request.data.get("bairro"):
             ticket.bairro = request.data.get("bairro")
         if request.data.get("logradouro"):
