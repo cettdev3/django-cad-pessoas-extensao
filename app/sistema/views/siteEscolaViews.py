@@ -76,5 +76,6 @@ def escolasSelect(request):
     body = request.GET
     escolas = requests.get('http://localhost:8000/escolas', json=body, headers=headers)
     escolas = json.loads(escolas.content)
-    selected = int(selected) if selected.isdigit() else None 
+    if selected:
+        selected = int(selected) if selected.isdigit() else None 
     return render(request,'escolas/escolas_select.html',{'escolas':escolas, "escola_id": selected})

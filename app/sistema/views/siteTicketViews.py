@@ -23,19 +23,21 @@ def ticketModal(request):
     model = request.GET.get('model')
     ticket = None
     data = {}
-    print("model na abertura da modal: ", model)
+    print("model na abertura da modal: ", model, request.GET.get('alocacao_id'))
     if request.GET.get('membro_execucao_id') and model == 'membro_execucao':
         print("membro_execucao_id: ", request.GET.get('membro_execucao_id'))
         membroExecucao = MembroExecucao.objects.get(id=request.GET.get('membro_execucao_id'))
         parent_entity = membroExecucao.evento
-        data['entity'] = membroExecucao
-        data['parent_entity'] = parent_entity
-    if request.GET.get('alocacao_id') and model == 'alocacao':
+        data['membroExecucao'] = membroExecucao
+        data['evento'] = parent_entity
+        data['beneficiario_id'] = membroExecucao.pessoa.id
+    if request.GET.get('alocacao_id'):
         print("alocacao_id: ", request.GET.get('alocacao_id'))
         alocacao = Alocacao.objects.get(id=request.GET.get('alocacao_id'))
-        parent_entity = alocacao.acaoEnsino
-        data['entity'] = alocacao
-        data['parent_entity'] = parent_entity
+        acaoEnsino = alocacao.acaoEnsino
+        data['alocacao'] = alocacao
+        data['acaoEnsino'] = acaoEnsino
+        data['beneficiario_id'] = alocacao.professor.id
     if request.GET.get('pessoa_id') and model == 'pessoa':
         print("pessoa_id: ", request.GET.get('pessoa_id'))
         pessoa = Pessoas.objects.get(id=request.GET.get('pessoa_id'))
@@ -107,6 +109,7 @@ def ticket_form_collapsable(request):
     body = json.loads(request.body)
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     context = {}
+    # print(response.content)
     context['ticket'] = json.loads(response.content)
     context['atividade_id'] = body['atividade_id']
     context['evento_id'] = body['evento_id']

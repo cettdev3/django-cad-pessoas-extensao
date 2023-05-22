@@ -46,7 +46,7 @@
         {% endif %}
         <div class="form-group row">
             <div class="col-sm-12 position-relative">
-                {% include "pessoas/pessoas_select.html" with pessoas=pessoas pessoa_id=pessoa_id id=id_to_remove %}
+                {% include "pessoas/pessoas_select.html" with pessoas=pessoas pessoa_id=pessoa_id id=id_to_remove label='Selecione uma pessoa' %}
             </div>
         </div>  
         <input type="hidden" name="membro_execucao_id" value="{% if membro_execucao %}{{membro_execucao.id}}{% endif %}">     

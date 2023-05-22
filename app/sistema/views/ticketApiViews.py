@@ -70,6 +70,8 @@ class TicketApiView(APIView):
         atividade = None
         model = request.data.get("model")
         escola = None
+        cidade = None
+        beneficiario = None
 
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
@@ -102,13 +104,7 @@ class TicketApiView(APIView):
                     {"res": "Não existe atividade com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
-        
-        if not membro_execucao and not alocacao and not pessoa and not atividade:
-            return Response(
-                {"res": "É necessário informar um membro da equipe de execução ou uma alocação ou uma pessoa ou uma atividade"},
-                status=st.HTTP_400_BAD_REQUEST,
-            )
-        
+
         if request.data.get("escola_id"):
             escola = self.get_object(Escola, request.data.get("escola_id"))
             if not escola:
@@ -117,7 +113,6 @@ class TicketApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST,
                 )
             
-        cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
@@ -125,8 +120,7 @@ class TicketApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
-        
-        beneficiario = None
+            
         if request.data.get("beneficiario_id"):
             beneficiario = self.get_object(Pessoas, request.data.get("beneficiario_id"))
             if not beneficiario:
@@ -134,16 +128,37 @@ class TicketApiView(APIView):
                     {"res": "Não existe beneficiario com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+            
+        dataInicio = None
+        dataFim = None
+
+        if request.data.get("data_inicio") and request.data.get("data_inicio") != "":
+            if request.data.get("nao_se_aplica_data_inicio") not in ["on", True]:
+                dataInicio = request.data.get("data_inicio")
+        
+        if request.data.get("data_fim") and request.data.get("data_fim") != "":
+            if request.data.get("nao_se_aplica_data_fim") not in ["on", True]:
+                dataFim = request.data.get("data_fim")
+        
+        nao_se_aplica_data_inicio = False
+        if request.data.get("nao_se_aplica_data_inicio") in ["on","off", True, False]:
+            nsaDataInicio = request.data.get("nao_se_aplica_data_inicio")
+            if nsaDataInicio == "on":
+                nsaDataInicio = True
+            elif nsaDataInicio == "off":
+                nsaDataInicio = False
+            nao_se_aplica_data_inicio = nsaDataInicio
+
+        nao_se_aplica_data_fim = False
+        if request.data.get("nao_se_aplica_data_fim") in ["on","off", True, False]:
+            nsaDataFim = request.data.get("nao_se_aplica_data_fim")
+            if nsaDataFim == "on":
+                nsaDataFim = True
+            elif nsaDataFim == "off":
+                nsaDataFim = False
+            nao_se_aplica_data_fim = nsaDataFim
 
         id_protocolo = request.data.get("id_protocolo", "")
-        dataInicio = request.data.get("data_inicio", None)
-        dataFim = request.data.get("data_fim", None)
-        nsa_data_inicio = request.data.get("nao_se_aplica_data_inicio")
-        nsa_data_fim = request.data.get("nao_se_aplica_data_fim")
-        if nsa_data_inicio == "on":
-            dataInicio = None
-        if nsa_data_fim == "on":
-            dataFim = None
 
         status = request.data.get("status") if request.data.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
         if len(id_protocolo) > 0:
@@ -155,6 +170,7 @@ class TicketApiView(APIView):
         elif request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_CRIACAO_PENDENTE]:
             status = request.data.get("status")
         
+
 
         ticketData = {
             "tipo": request.data.get("tipo"),
@@ -169,8 +185,8 @@ class TicketApiView(APIView):
             "meta": request.data.get("meta"),
             "data_inicio": dataInicio,
             "data_fim": dataFim,
-            "nao_se_aplica_data_inicio": nsa_data_inicio == "on",
-            "nao_se_aplica_data_fim": nsa_data_fim == "on",
+            "nao_se_aplica_data_inicio": nao_se_aplica_data_inicio,
+            "nao_se_aplica_data_fim": nao_se_aplica_data_fim,
             "bairro": request.data.get("bairro") ,
             "logradouro": request.data.get("logradouro"),
             "cep": request.data.get("cep"),
@@ -182,6 +198,7 @@ class TicketApiView(APIView):
 
         ticketData = Ticket.objects.create(**ticketData)
         ticketSerializer = TicketSerializer(ticketData)
+        print(ticketSerializer.data)
         return Response(ticketSerializer.data, status=st.HTTP_200_OK)
 
 class TicketDetailApiView(APIView):
@@ -223,10 +240,12 @@ class TicketDetailApiView(APIView):
             ticket.id_protocolo = request.data.get("id_protocolo")
         if request.data.get("meta"):
             ticket.meta = request.data.get("meta")
-        if request.data.get("data_inicio") or request.data.get("nao_se_aplica_data_inicio") == "on" or request.data.get("nao_se_aplica_data_inicio") == True:
-            ticket.data_inicio = request.data.get("data_inicio")
-        if request.data.get("data_fim") or request.data.get("nao_se_aplica_data_fim") == "on" or request.data.get("nao_se_aplica_data_fim") == True:
-            ticket.data_fim = request.data.get("data_fim")
+        if request.data.get("data_inicio") and request.data.get("data_fim") != "":
+            if  request.data.get("nao_se_aplica_data_inicio") not in ["on", True]:
+                ticket.data_inicio = request.data.get("data_inicio")
+        if request.data.get("data_fim") and request.data.get("data_fim") != "":
+            if  request.data.get("nao_se_aplica_data_fim") not in ["on", True]:
+                ticket.data_fim = request.data.get("data_fim")
         if request.data.get("bairro"):
             ticket.bairro = request.data.get("bairro")
         if request.data.get("logradouro"):
@@ -286,12 +305,20 @@ class TicketDetailApiView(APIView):
         
         if request.data.get("nao_se_aplica_data_inicio") in ["on","off", True, False]:
             nsaDataInicio = request.data.get("nao_se_aplica_data_inicio")
-            saveDataInicio = nsaDataInicio or nsaDataInicio == "on"
+            if nsaDataInicio == "on":
+                nsaDataInicio = True
+            elif nsaDataInicio == "off":
+                nsaDataInicio = False
+            saveDataInicio = nsaDataInicio
             ticket.nao_se_aplica_data_inicio = saveDataInicio
 
         if request.data.get("nao_se_aplica_data_fim") in ["on","off", True, False]:
             nsaDataFim = request.data.get("nao_se_aplica_data_fim")
-            saveDataFim = nsaDataFim or nsaDataFim == "on"
+            if nsaDataFim == "on":
+                nsaDataFim = True
+            elif nsaDataFim == "off":
+                nsaDataFim = False
+            saveDataFim = nsaDataFim
             ticket.nao_se_aplica_data_fim = saveDataFim
         
         ticket.save()

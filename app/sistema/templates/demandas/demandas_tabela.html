@@ -45,49 +45,35 @@ cellspacing="0">
             <td class="text-left w-15" >
                 <div class="d-flex flex-column justify-content-start align-items-start">
                     <div class="d-flex flex-column justify-content-start align-items-start">
-                        {% if demanda.model == 'alocacao' %}
                         <span class=" ">
-                            {{demanda.alocacao.professor.nome|default_if_none:""}}
+                            {{demanda.beneficiario.nome|default_if_none:""}}
                         </span>
-                        {% elif demanda.model == 'membro_execucao' or demanda.model == None or demanda.model == '' %}
-                        <span class=" ">
-                            {{demanda.membro_execucao.pessoa.nome|default_if_none:""}}
-                        </span>
-                        {% elif demanda.model == 'atividade' %}
-                        <span class=" ">
-                            Demanda criada para uma atividade
-                        </span>
-                        {% elif  demanda.model == 'pessoa' %}
-                        <span class=" ">
-                            {{demanda.pessoa.nome|default_if_none:""}}
-                        </span>
-                        {% endif %}
                     </div>
                 </div>
             </td>
             <td  class="text-left position-relative w-35">
                 <div class="d-flex flex-wrap ">
-                    {% if demanda.model == 'alocacao' %}
+                    {% if demanda.alocacao %}
                     <div class="d-flex flex-column justify-content-start align-items-start">
                         <div>
                             <span class=" ">
                                 Alocado(a) na ação de ensino, {{demanda.alocacao.acaoEnsino.tipo_formatado|default_if_none:""}} em {{demanda.alocacao.acaoEnsino.cidade.nome|default_if_none:""}}
                             </span>
                         </div>
+
                         <div>
                             <span class=" ">
                                Ação de ensino ocorreu de {{demanda.alocacao.acaoEnsino.data_inicio_formatada|default_if_none:""}} até {{demanda.alocacao.acaoEnsino.data_fim_formatada|default_if_none:""}}
                             </span>
                         </div>
-                        {% if demanda.observacao %} 
-                            <div>
-                                <span class=" ">
-                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
-                                </span>
-                            </div>  
-                        {% endif %}
+                        <div>
+                            <span class=" ">
+                                <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
+                            </span>
+                        </div>  
                     </div>
-                    {% elif demanda.model == 'membro_execucao' or demanda.model == None or demanda.model == '' %}
+                    {% endif %}
+                    {% if demanda.membro_execucao %}
                         <div class="d-flex flex-column justify-content-start align-items-start">
                             <div>
                                 <span class=" ">
@@ -102,61 +88,18 @@ cellspacing="0">
                                 Evento ocorreu de {{demanda.membro_execucao.evento.data_inicio_formatada|default_if_none:""}} até {{demanda.membro_execucao.evento.data_fim_formatada|default_if_none:""}}
                                 </span>
                             </div>  
-                            {% if demanda.observacao %} 
                             <div>
                                 <span class=" ">
                                     <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
                                 </span>
                             </div>  
-                            {% endif %}
-                        </div>
-                    {% elif demanda.model == 'atividade' or demanda.model == None or demanda.model == '' %}
-                        <div class="d-flex flex-column justify-content-start align-items-start">
-                            <div>
-                                <span class=" ">
-                                    Demanda registrada no evento, {{demanda.atividade.evento.tipo_formatado|default_if_none:""}}
-                                </span>
-                                <span class=" ">
-                                   em {{demanda.atividade.evento.cidade.nome|default_if_none:""}}
-                                </span>
-                            </div>
-                            <div>
-                                <span class=" ">
-                                Evento ocorreu de {{demanda.atividade.evento.data_inicio_formatada|default_if_none:""}} até {{demanda.membro_execucao.evento.data_fim_formatada|default_if_none:""}}
-                                </span>
-                            </div>  
-                            {% if demanda.observacao %} 
-                            <div>
-                                <span class=" ">
-                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
-                                </span>
-                            </div>  
-                            {% endif %}
-                        </div>
-                    {% elif  demanda.model == 'pessoa' %}
-                        <div class="d-flex flex-column justify-content-start align-items-start">
-                            <div>
-                                <span class=" ">
-                                    <strong>Descrição</strong>: {{demanda.observacao|default_if_none:""}}
-                                </span>
-                            </div> 
                         </div>
                     {% endif %}
                 </div>
             </td>
             <td  class="text-left position-relative w-35">
                 <div>
-                    {% if demanda.model == 'alocacao' %}
-                    <span class="">
-                        {{demanda.alocacao.acaoEnsino.escola.nome|default_if_none:""}}
-                    </span>
-                    {% elif demanda.model == 'membro_execucao' or demanda.model == None or demanda.model == '' %}
-                    <div class="">
-                        {% for escola in demanda.membro_execucao.evento.escolas %}
-                            <div>{{escola.nome|default_if_none:""}}<div>
-                        {% endfor %}
-                    </div>
-                    {% elif demanda.model == 'pessoa'%}
+                    {% if demanda.escola %}
                     <span class="">
                         {{demanda.escola.nome|default_if_none:""}}
                     </span>

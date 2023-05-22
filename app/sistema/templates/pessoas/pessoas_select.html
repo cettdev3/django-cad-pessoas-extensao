@@ -2,10 +2,18 @@
 <select class="form-control"
 {% if id %} 
 id="pessoa_id_{{id}}"
+{% elif input_id %}
+id="{{input_id}}"
 {% else %} 
 id="pessoa_id"
 {% endif %} 
-name="pessoa_id">
+
+{% if input_name %}
+name="{{input_name}}"
+{% else %}
+name="pessoa_id"
+{% endif %}
+>
     <option value="">Selecione Pessoa</option>
     {% for pessoa in pessoas %}
         <option value="{{pessoa.id}}" 

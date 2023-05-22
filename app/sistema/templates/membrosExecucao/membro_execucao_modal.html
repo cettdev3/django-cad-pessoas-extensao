@@ -31,30 +31,11 @@
                             href="#home">1</a>
                             <span>Dados Gerais</span>
                         </li>
-                        {% if not membro_execucao %}
-                        <li id="membroExecucaoTabs2" class="col py-2">
-                            <a id="membrosExecucaoTabLink2" 
-                            data-toggle="tab"
-                            style="display: none;"
-                            role="tab"
-                            href="#solicitacoes">2</a>
-                            <span>Demandas</span>
-                        </li>
-                        {% endif %}
                     </ul>
                     <div class="tab-content">
                         <div id="home" class="tab-pane py-3 active">
                             {% include "membrosExecucao/membro_execucao_form.html" with membroExecucao=membro_execucao state='control_one' acao=acao evento=evento %}
                         </div>
-                        {% if not membro_execucao %}
-                        <div id="solicitacoes" class="tab-pane py-3">
-                            <div id="ticket-form-container" class="mb-2"></div>
-                            <button id="add-ticket-form-btn"
-                            type="button"
-                            onclick="addTicket()"
-                            class="btn btn-primary">Adicionar Demanda</button>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -59,8 +59,9 @@
                 <div class="w-100">
                     <div>
                         <div class="tab-content">
+                            {{membroExecucao.id}}
                             <div id="home" class="tab-pane py-3 active">
-                                {% include "tickets/ticket_form.html" with ticket=ticket model=model entity=entity escolas=escolas parent_entity=parent_entity %}
+                                {% include "tickets/ticket_form.html" with ticket=ticket alocacao_id=alocacao.id membro_execucao_id=membroExecucao.id beneficiario_id=beneficiario_id %}
                             </div>
                         </div>
                     </div>
@@ -96,7 +97,6 @@
     </div>
 </div>
 
-
 <script>
     var formId = "cadastrarTicketForm"
     var ticketModelId = "ticketModelId"
@@ -104,20 +104,8 @@
     var cadastrarTicketModalId = "cadastrarTicketModal"
     var dismissCadastrarTicketId = "dismissCadastrarTicket"
 
-    function clearModalForm(changedResource = null) {
-        document.getElementById(formId).reset();
-        if (changedResource) ticketModificadaEventProxy.modificado = changedResource
-        let dismissBtn = $("#"+dismissCadastrarTicketId)
-        console.log(dismissBtn)
-        dismissBtn.click()
-        console.log("modal fechada")
-        $('.modal-backdrop').remove()
-        $(document.body).removeClass("modal-open");
-    }
-
+    
     function cadastrarTicket() {
-        {% comment %} console.log("cadastrarTicket", getFormData())
-        return {% endcomment %}
         $.ajax({
             url: "/saveTicket",
             data: JSON.stringify({"data":getFormData()}),
@@ -152,11 +140,31 @@
         var unindexed_array = form.serializeArray();
         var values = {};
 
+        let dataInicioCheckbox = $("#nao_se_aplica_data_inicio")
+        let dataFimCheckbox = $("#nao_se_aplica_data_fim")
+        let dataInicio = $("#data_inicio").val()
+        let dataFim = $("#data_fim").val()
+
         $.map(unindexed_array, function (n, i) {
             values[n['name']] = n['value'];
         });
 
+        values["data_inicio"] = dataInicio
+        values["data_fim"] = dataFim
+        values["nao_se_aplica_data_inicio"] = dataInicioCheckbox.prop("checked")
+        values["nao_se_aplica_data_fim"] = dataFimCheckbox.prop("checked")
         return values
+    }
+
+    function clearModalForm(changedResource = null) {
+        document.getElementById(formId).reset();
+        if (changedResource) ticketModificadaEventProxy.modificado = changedResource
+        let dismissBtn = $("#"+dismissCadastrarTicketId)
+        console.log(dismissBtn)
+        dismissBtn.click()
+        console.log("modal fechada")
+        $('.modal-backdrop').remove()
+        $(document.body).removeClass("modal-open");
     }
 
     function getActiveTab() {
@@ -242,7 +250,7 @@
         $("#formTicketPrev").click(function () {
             processTabBtnClick(-1)
         })
-
+        
         maskValues()
     });
 </script>

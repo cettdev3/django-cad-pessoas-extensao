@@ -6,6 +6,7 @@ from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.pessoa import Pessoas
 from ..models.ticket import Ticket
+from ..models.atividadeSection import AtividadeSection
 from ..models.galeria import Galeria
 from ..models.dpEventoEscola import DpEventoEscola
 from ..models.atividade import Atividade
@@ -161,4 +162,47 @@ class MigrationsViewSets(viewsets.ModelViewSet):
                     escola=evento.escola,
                     dp_evento=evento,
                 )
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+    
+    @action(methods=["POST"], detail=False, url_path="update-beneficiario-tickets")
+    # devido a mudança no modelo de dados, foi necessário adicionar o beneficiario nos tickets
+    def criarBeneficiariosTickets(self, *args, **kwargs):
+        with transaction.atomic():
+            for ticket in Ticket.objects.all():
+                if ticket.membro_execucao:
+                    ticket.beneficiario = ticket.membro_execucao.pessoa
+                    ticket.model = 'beneficiario'
+                    escolas = ticket.membro_execucao.evento.escolas.all()
+                    if len(escolas) > 0:
+                        ticket.escola = escolas[0]
+
+                if ticket.pessoa:
+                    ticket.beneficiario = ticket.pessoa
+                    ticket.model = 'beneficiario'
+
+                if ticket.alocacao:
+                    ticket.escola = ticket.alocacao.acaoEnsino.escola
+                    ticket.beneficiario = ticket.alocacao.professor
+                    ticket.model = 'beneficiario'
+
+                ticket.save()
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+    
+    @action(methods=["POST"], detail=False, url_path="create-secao-atividades")
+    # devido a mudança no modelo de dados, foi necessário adicionar o beneficiario nos tickets
+    def criarSecaoAtividades(self, *args, **kwargs):
+        with transaction.atomic():
+            for evento in DpEvento.objects.all():
+                atividadeSection = AtividadeSection()
+                atividadeSection.evento = evento
+                atividadeSection.nome = 'Seção de atividades'
+                atividadeSection.order = 1
+                atividadeSection.save()
+
+                for atividade in Atividade.objects.filter(evento=evento):
+                    atividade.atividadeSection = atividadeSection
+                    if atividade.status == 'realizada':
+                        atividade.status = 'concluido'
+                    atividade.save()
+
         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

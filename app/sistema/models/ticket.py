@@ -3,6 +3,7 @@ from ..models.membroExecucao import MembroExecucao
 from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
 from ..models.escola import Escola
+from ..models.dpEvento import DpEvento
 from ..models.atividade import Atividade
 from ..models.pessoa import Pessoas
 from ..models.servicoContratado import ServicoContratado

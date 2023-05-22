@@ -18,14 +18,11 @@
     }
 </style>
 <form id="cadastrarTicketForm{{form_id}}" action="/" method="POST">
-    <input type="text" hidden
+    <input type="text" 
+    hidden
     id="model"
     name="model"
-    {% if model is None or model == 'None' or model == '' %}
-    value=""
-    {% else %}
-    value="{{model}}"
-    {% endif %}>
+    value="beneficiario">
 
     <div class="form-group row">
         <div
@@ -257,14 +254,13 @@
             </select>
         </div>
     </div>
-    {% if model == 'pessoa' %}
     <div class="form-group row">
-        <div id="pessoasSelectContainer" class="col-sm-6">
+        <input hidden type="text" id="selectedBeneficiarioTicketForm" value="{{ticket.beneficiario.id}}">
+        <div id="beneficiarioSelectContainer" class="col-sm-6">
         </div>
         <div id="escolasSelectContainer" class="col-sm-6">
         </div>
     </div>
-    {% endif %}
     <div class="form-group d-flex justify-content-start align-items-start">
         <div class="col-sm-12">
             <label><b>Descrição:</b></label>
@@ -275,7 +271,7 @@
             class="form-control">{% if ticket %}{{ticket.observacao|default_if_none:""}}{% endif %}</textarea>
         </div>
     </div>
-    {% if model == 'alocacao' or model == 'membro_execucao' or model == 'atividade' %}
+    <!-- {% if model == 'alocacao' or model == 'membro_execucao' or model == 'atividade' %}
     <div class="form-group d-flex justify-content-start align-items-start">
         <input name="use_dpEvento_endereco"  
         id="use_dpEvento_endereco" 
@@ -292,19 +288,9 @@
             </b>
         </label>
     </div>
-    {% endif %}
+    {% endif %} -->
     <div class="form-group row">
-        <div id="select_cidade" class="col-sm-2">
-            <input type="text" name="selected_cidade" id="selected_cidade" 
-            {% if ticket %}
-            value="{{ticket.cidade.id}}"
-            {% endif %}
-            hidden> 
-            <input type="text" name="selected_pessoa" id="selected_pessoa" 
-            {% if ticket %}
-            value="{{ticket.pessoa.id}}"
-            {% endif %}
-            hidden> 
+        <div id="cidadesSelectContainer" class="col-sm-2">
         </div>
         <div class="col-sm-3">
             <label><b>Complemento:</b></label>
@@ -352,24 +338,36 @@
         </div>
     </div>
 
-    {% if parent_entity is not None %}
-    <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
+    <!-- <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
     <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
     <input type="text" name="parent_entity_cep" id="parent_entity_cep" hidden value="{{parent_entity.cep|default_if_none:''}}">
     <input type="text" name="parent_entity_complemento" id="parent_entity_complemento" hidden value="{{parent_entity.complemento|default_if_none:''}}">
-    <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}">
+    <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}"> -->
+
+    {% if ticket %}
+    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{ticket.membro_execucao.id}}">
+    {% elif membro_execucao_id %}
+    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{membro_execucao_id}}">
+    {% endif %}
+    
+    {% if ticket.alocacao %}
+    <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{ticket.alocacao.id}}">
+    {% elif alocacao_id %}
+    <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{alocacao_id}}">
     {% endif %}
 
-    {% if model == 'membro_execucao' %}
-    <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{entity.id}}">
-    {% elif model == 'alocacao'  %}
-    <input type="text" name="alocacao_id" id="alocacao_id" hidden value="{{entity.id}}">
-    {% elif model == 'pessoa'  %}
-    <input type="text" name="selected_pessoa_id" id="selected_pessoa_id" hidden value="{{entity.id}}">
-    <input type="text" name="selected_escola_id" id="selected_escola_id" hidden value="{{ticket.escola.id}}">
-    {% elif model == 'atividade'  %}
-    <input type="text" name="atividade_id" id="atividade_id" hidden value="{{entity.id}}">
+    <input type="text" name="atividade_id" id="atividade_id" hidden value="{{ticket.atividade.id}}">
+
+    
+    {% if ticket %}
+    <input type="text" name="selected_beneficioario_id" id="selected_beneficioario_id" hidden value="{{ticket.beneficiario.id}}">
+    {% elif beneficiario_id %}
+    <input type="text" name="selected_beneficioario_id" id="selected_beneficioario_id" hidden value="{{beneficiario_id}}">
     {% endif %}
+
+    <input type="text" name="selected_escola_id" id="selected_escola_id" hidden value="{{ticket.escola.id}}">
+    <input type="text" name="selected_cidade_id" id="selected_cidade_id" hidden value="{{ticket.cidade.id}}">
+    <input type="text" name="ticket_id" id="ticket_id" hidden value="{{ticket.id}}">
 </form>
 {{ escolas|json_script:"escolas-script" }}
 <script>
@@ -385,41 +383,31 @@
     } 
 
     function carregarSelectCidades() {
-        console.log("buscando select cidade")
-        $.ajax({
-            url: "/cidadesSelect",
-            method: "GET",
-            success: function (data) {
-                let selected = $("#cadastrarTicketForm{{form_id}} #selected_cidade").val()
-                $("#cadastrarTicketForm{{form_id}} #select_cidade").html(data)
-                $("#cadastrarTicketForm{{form_id}} #cidade_id").val(selected)
-            }
-        });
+        let selected = $("#cadastrarTicketForm{{form_id}} #selected_cidade_id").val()
+        getCidadeSelect({
+            selected: selected,
+        }, function (html) {
+            $("#cadastrarTicketForm{{form_id}} #cidadesSelectContainer").html(html)
+        })
     }
-   
-    function carregarSelectPessoas() {
-        $.ajax({
-            url: "/pessoasSelect",
-            method: "GET",
-            success: function (data) {
-                let selected = $("#cadastrarTicketForm{{form_id}} #selected_pessoa_id").val()
-                $("#cadastrarTicketForm{{form_id}} #pessoasSelectContainer").html(data)
-                $("#cadastrarTicketForm{{form_id}} #pessoa_id").val(selected)
 
-            } 
-        });
+    function carregarSelectBeneficiario () {
+       let selected = $("#cadastrarTicketForm{{form_id}} #selected_beneficioario_id").val()
+       getPessoaSelect({
+            selected: selected,
+            input_id: "beneficiario_id",
+            input_name: "beneficiario_id",
+       }, function (html) {
+            $("#cadastrarTicketForm{{form_id}} #beneficiarioSelectContainer").html(html)
+       })
     }
     
     function carregarSelectEscolas() {
-        $.ajax({
-            url: "/escolasSelect",
-            method: "GET",
-            success: function (data) {
-                let selected = $("#cadastrarTicketForm{{form_id}} #selected_escola_id").val()
-                $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer").html(data)
-                $("#cadastrarTicketForm{{form_id}} #escola_id").val(selected)
-
-            } 
+        let selected = $("#cadastrarTicketForm{{form_id}} #selected_escola_id").val()
+        getEscolaSelect({
+            selected: selected,
+        }, function (data) {
+            $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer").html(data)
         });
     }
     
@@ -447,55 +435,8 @@
     }
 
     $(document).ready(function() {     
-        let inputEnderecoEvento = $("#cadastrarTicketForm{{form_id}} #use_dpEvento_endereco")
-        let inputEnderecoEscola = $("#cadastrarTicketForm{{form_id}} #escolasSelectContainer")
-        console.log(inputEnderecoEscola)
-
-        let type = "entity"
-        let inputCheckboxEndereco = inputEnderecoEvento 
-        if (inputEnderecoEscola.length > 0) {
-            inputCheckboxEndereco = inputEnderecoEscola
-            type = "escola"
-
-        }
-
-        inputEnderecoEscola
-        console.log("ready {{form_id}}", inputCheckboxEndereco)
-        $(inputCheckboxEndereco).change(function(event) {
-            if ($(event.target).attr("type") != "checkbox") return
-            let checked =  $(event.target).is(":checked")
-            if (checked && type == "entity") {
-                var bairro = $('#cadastrarTicketForm{{form_id}} #parent_entity_bairro').val();
-                var logradouro = $('#cadastrarTicketForm{{form_id}} #parent_entity_logradouro').val();
-                var cep = $('#cadastrarTicketForm{{form_id}} #parent_entity_cep').val();
-                var complemento = $('#cadastrarTicketForm{{form_id}} #parent_entity_complemento').val();
-                
-                if (bairro == "None") bairro = ""
-                if (logradouro == "None") logradouro = ""
-                if (cep == "None") cep = ""
-                if (complemento == "None") complemento = ""
-                
-                var cidade = $('#cadastrarTicketForm{{form_id}} #parent_entity_cidade').val();
-                console.log(`bairro ${bairro} logradouro ${logradouro} cep ${cep} complemento ${complemento} cidade ${cidade}`)
-                $('#cadastrarTicketForm{{form_id}} #bairro').val(bairro);
-                $('#cadastrarTicketForm{{form_id}} #logradouro').val(logradouro);
-                $('#cadastrarTicketForm{{form_id}} #cep').val(cep);
-                $('#cadastrarTicketForm{{form_id}} #complemento').val(complemento);
-                $('#cadastrarTicketForm{{form_id}} #cidade_id').val(cidade);
-            } else if (checked && type == "escola") {
-                let escolaId = $("#cadastrarTicketForm{{form_id}} #escola_id").val()
-                bindEnderecoFields(escolaId)
-            } else {
-                $('#cadastrarTicketForm{{form_id}} #bairro').val("");
-                $('#cadastrarTicketForm{{form_id}} #logradouro').val("");
-                $('#cadastrarTicketForm{{form_id}} #cep').val("");
-                $('#cadastrarTicketForm{{form_id}} #complemento').val("");
-                $('#cadastrarTicketForm{{form_id}} #cidade_id').val("");
-            }
-        });
-        
         carregarSelectCidades();
-        carregarSelectPessoas();
+        carregarSelectBeneficiario();
         carregarSelectEscolas();
     });
 </script>
