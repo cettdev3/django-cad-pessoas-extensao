@@ -26,19 +26,22 @@ class ImagemApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        print("dentro da api de imagem")
         data = json.loads(request.body)
-        print(data)
         galeria_id = data.get('galeria_id')
         if not galeria_id:
             return Response({'message': 'Galeria não informado'}, status=status.HTTP_400_BAD_REQUEST)
         
         galeria = Galeria.objects.get(id=galeria_id)
 
+        print("dentro da api de imagem 2")
         alfresco = AlfrescoAPI()
         
         image_description = data.get('description', '')
 
         # Process and save the image file to Alfresco
+        print("dentro da api de imagem 3")
+
         image_data_url = data.get('dataUrl', '')
         image_format, image_str = image_data_url.split(';base64,')
         image_ext = image_format.split('/')[-1]
@@ -64,6 +67,7 @@ class ImagemApiView(APIView):
         imagem.save()
         default_storage.delete(image_path)
         serializer = ImagemSerializer(imagem)
+        print("saindo da api de imagem ", serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

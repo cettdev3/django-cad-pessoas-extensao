@@ -84,6 +84,9 @@ def dpEventoModal(request):
     if id:
         dpEvento = DpEvento.objects.get(id=id)
         data['dpEvento'] = DpEventoSerializer(dpEvento).data 
+        if dpEvento.acaoEnsino:
+            ensinoSelected = dpEvento.acaoEnsino.id
+            data['selected_ensino'] = ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
     return render(request,'dpEventos/dp_eventos_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -294,8 +297,12 @@ def getEtapa(doc, atividade):
     return doc
 
 def getSubAtividades(doc: Document, atividade):
-    if atividade.evento.acaoEnsino:
-        alocacoes = Alocacao.objects.filter(acaoEnsino=atividade.evento.acaoEnsino)
+    print("dentro de subatividades: ", atividade.id, atividade.evento.id)
+    eventoEnsino = DpEvento.objects.filter(id=atividade.evento.id).first()
+    print("dentro de subatividades eventoEnsino: ", eventoEnsino.acaoEnsino)
+    if eventoEnsino.acaoEnsino:
+        print("atividade e suas subatividades", eventoEnsino.acaoEnsino.observacao)
+        alocacoes = Alocacao.objects.filter(acaoEnsino=eventoEnsino.acaoEnsino)
         if alocacoes:
             subAtividadesParagraph = doc.add_paragraph()
             subAtividadesParagraph.add_run(f"Cursos Ofertados:").bold = True
@@ -367,6 +374,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
 
 
 def getAtividade(doc, atividade, counter):
+    print("dentro de getAtividade: ", atividade.id)
     doc = getAtividadeLabel(doc, atividade, counter)
     doc = getCidade(doc, atividade)
     doc = getQuantitativo(doc, atividade)
@@ -396,6 +404,7 @@ def getRelatorioType1(doc, relatorioData):
         doc = getSectionTitle(doc, nomeEvento)
         old_evento = 0
         for evento in eventos:
+            print("evento id", evento.id)
             current_evento = evento.id
             for atividade in evento.atividade_set.all():
                 if current_evento != old_evento:

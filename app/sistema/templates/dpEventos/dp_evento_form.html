@@ -67,7 +67,7 @@
             </div>
             <div id="acao-ensino-select-container" class="col-sm-4">
                 {% if dpEvento %}
-                {% include 'ensinos/ensino_select.html' with selectes=dpEvento.acaoEnsino.id ensinos=ensinos %}
+                {% include 'ensinos/ensino_select.html' with ensinoSelected=dpEvento.acaoEnsino selected=selected_ensino ensinos=ensinos %}
                 {% else %}
                 {% include 'ensinos/ensino_select.html' %}
                 {% endif %}

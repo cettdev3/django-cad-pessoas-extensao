@@ -129,9 +129,12 @@ cellspacing="0">
             <td class="dpEvento-w-50 text-left">
                 <div class="d-flex flex-column justify-content-start align-items-start">
                     <div>
-                        <span class="px-2 py-1 boxed">{{dpEvento.tipo_formatado}}</span>
+                        <span class="px-2 py-1 boxed">{{dpEvento.id}}: {{ dpEvento.tipo_formatado}}</span>
                         <span class="font-weight-bold">de {{dpEvento.data_inicio_formatada}} até {{dpEvento.data_fim_formatada}}</span>
                     </div>
+                    <span>
+                        Ação de ensino: {{dpEvento.acaoEnsino.observacao|default_if_none:"nao possui ação de ensino"}}
+                    </span>
                     <span>{{dpEvento.endereco_completo}}</span>
                 </div>
                 <div><span class="font-weight-bold">{{dpEvento.descricao|default_if_none:"Nenhum descrição fornecida para este evento"}}</span></div>

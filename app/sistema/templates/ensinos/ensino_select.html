@@ -1,11 +1,12 @@
-<label><b>Ação de Ensino:</b></label>
+<label><b>Ação de Ensino: </b></label>
 <select class="form-control" 
 id="acao_ensino_id" 
 name="acao_ensino_id">
-    <option value="">Selecione uma ação de ensino</option>
+    <option value="">Selecione uma ação de ensino: </option>
     {% for ensino in ensinos %}
         <option value="{{ensino.id}}"
-        {% if dpEvento and dpEvento.ensino.id == selected %} selected {% endif %}
+        {% if dpEvento and dpEvento.ensino.id == selected or ensinoSelected.id == ensino.id %} selected 
+        {% endif %}
         >{{ensino.observacao}}</option>
     {% endfor %}
 </select>

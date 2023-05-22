@@ -203,9 +203,11 @@ class DpEventoDetailApiView(APIView):
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            dp_evento.escola = escola
+            dp_evento.escola = escola  
         
-        print(request.data.get("acao_ensino_id"))
+        print("dados dentro da api de dpeventos: ", request.data)
+        
+        print("ação  de ensino dentro da api de dpeventos: ", request.data.get("acao_ensino_id"))
         if request.data.get("acao_ensino_id"):
             acaoEnsino = self.get_object(Ensino, request.data.get("acao_ensino_id"))
             if not acaoEnsino:
@@ -214,11 +216,14 @@ class DpEventoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             dp_evento.acaoEnsino = acaoEnsino
+            print("ação de ensino", acaoEnsino.id)
         else:
+            print("dentro do else")
             dp_evento.acaoEnsino = None
 
         dp_evento.save()
         serializer = DpEventoSerializer(dp_evento)
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, dp_evento_id, *args, **kwargs):
