@@ -100,7 +100,7 @@ class DpEventoApiView(APIView):
                     {"res": "Não existe ação de ensino com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        
+            
         date_formats = ['%Y-%m-%d', '%Y-%m-%dT%H:%M']
         dataInicio = None
         if postDpEventoData["data_inicio"]:
@@ -202,7 +202,7 @@ class DpEventoDetailApiView(APIView):
                     {"res": "Não existe escola com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            dp_evento.escola = escola
+            dp_evento.escola = escola  
         
         if request.data.get("acao_ensino_id"):
             acaoEnsino = self.get_object(Ensino, request.data.get("acao_ensino_id"))
@@ -212,7 +212,9 @@ class DpEventoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             dp_evento.acaoEnsino = acaoEnsino
+            print("ação de ensino", acaoEnsino.id)
         else:
+            print("dentro do else")
             dp_evento.acaoEnsino = None
         
         DpEventoEscola.objects.filter(dp_evento=dp_evento).delete()
@@ -228,9 +230,10 @@ class DpEventoDetailApiView(APIView):
                         )
                     DpEventoEscola.objects.create(dp_evento=dp_evento, escola=escola)
 
-            dp_evento.save()
-            serializer = DpEventoSerializer(dp_evento)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        dp_evento.save()
+        serializer = DpEventoSerializer(dp_evento)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, dp_evento_id, *args, **kwargs):
         with transaction.atomic():

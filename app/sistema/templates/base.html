@@ -184,16 +184,20 @@
                         
                         {% if page_title %}
                         <div class="h4 ml-2 d-flex">
-                           <span data-toggle="tooltip" 
-                           data-placement="top" 
-                           title="Eventos Finalizados" 
-                           class="badge badge-success">({{contagem_finalizados}}) </span> 
-                            <span data-toggle="tooltip"
-                            data-placement="top"
-                            title="Eventos em Andamento"
-                            class="badge badge-warning">({{contagem_andamento}}) </span>
-                           <span>{{ page_title }}</span> 
-                        </div>
+                            {% if contagem_finalizados %}
+                            <span data-toggle="tooltip" 
+                            data-placement="top" 
+                            title="Eventos Finalizados" 
+                            class="badge badge-success">({{contagem_finalizados}}) </span> 
+                            {% endif %}
+                            {% if contagem_andamento %}
+                             <span data-toggle="tooltip"
+                             data-placement="top"
+                             title="Eventos em Andamento"
+                             class="badge badge-warning">({{contagem_andamento}}) </span>
+                            {% endif %}
+                            <span>{{ page_title }}</span> 
+                         </div>
                         {% endif %}
 
                         {% if dpEvento %}

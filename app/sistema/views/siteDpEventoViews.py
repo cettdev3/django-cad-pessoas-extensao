@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from sistema.models.dpEvento import DpEvento
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
+from sistema.models.departamento import Departamento
 from sistema.models.ensino import Ensino
 from sistema.models.tipoAtividade import TipoAtividade
 from sistema.services.alfrescoApi import AlfrescoAPI
@@ -37,12 +38,15 @@ def gerencia_dp_eventos(request):
     count_finalizados = 0
     count_andamento = 0
     dp_eventos = DpEvento.objects.all()
-
     for evento in dp_eventos:
-        if evento.data_fim >= datetime.now().date():
-            count_finalizados += 1
+        if evento.tipo == 'emprestimo' or evento.tipo == 'curso_gps' or evento.tipo == 'pauta_positiva' or evento.tipo == 'outro':
+            count_finalizados += 0
+            count_andamento += 0
         else:
-            count_andamento += 1
+            if evento.data_fim >= datetime.now().date():
+                count_finalizados += 1
+            else:
+                count_andamento += 1
     
     return render(request,'dpEventos/gerenciar_dp_eventos.html',
     {'dp_eventos':dp_eventos,'contagem_finalizados':count_finalizados, 'contagem_andamento':count_andamento, 'page_title':page_title})
@@ -82,10 +86,9 @@ def dpEventoModal(request):
     if id:
         dpEvento = DpEvento.objects.get(id=id)
         data['dpEvento'] = DpEventoSerializer(dpEvento).data 
-        print("dpEvento:", dpEvento.escolas.all())
-        # data['selectedEscolas'] = dpEvento.escolas.all()
-        data['selectedEscolas'] = EscolaSerializer(dpEvento.escolas.all(), many=True).data
-
+        if dpEvento.acaoEnsino:
+            ensinoSelected = dpEvento.acaoEnsino.id
+            data['selected_ensino'] = ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
     return render(request,'dpEventos/dp_eventos_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -199,7 +202,6 @@ def getFilteredEventos(filters, formatType  = "type 1"):
     eventos = eventos.order_by('data_inicio')
     if formatType == "type 2":
         return eventos
-    
     for evento in eventos:
         if evento.atividade_set.count() == 0:
             continue
@@ -299,8 +301,12 @@ def getEtapa(doc, atividade):
     return doc
 
 def getSubAtividades(doc: Document, atividade):
-    if atividade.evento.acaoEnsino:
-        alocacoes = Alocacao.objects.filter(acaoEnsino=atividade.evento.acaoEnsino)
+    print("dentro de subatividades: ", atividade.id, atividade.evento.id)
+    eventoEnsino = DpEvento.objects.filter(id=atividade.evento.id).first()
+    print("dentro de subatividades eventoEnsino: ", eventoEnsino.acaoEnsino)
+    if eventoEnsino.acaoEnsino:
+        print("atividade e suas subatividades", eventoEnsino.acaoEnsino.observacao)
+        alocacoes = Alocacao.objects.filter(acaoEnsino=eventoEnsino.acaoEnsino)
         if alocacoes:
             subAtividadesParagraph = doc.add_paragraph()
             subAtividadesParagraph.add_run(f"Cursos Ofertados:").bold = True
@@ -372,6 +378,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
 
 
 def getAtividade(doc, atividade, counter):
+    print("dentro de getAtividade: ", atividade.id)
     doc = getAtividadeLabel(doc, atividade, counter)
     doc = getCidade(doc, atividade)
     doc = getQuantitativo(doc, atividade)
@@ -401,6 +408,7 @@ def getRelatorioType1(doc, relatorioData):
         doc = getSectionTitle(doc, nomeEvento)
         old_evento = 0
         for evento in eventos:
+            print("evento id", evento.id)
             current_evento = evento.id
             for atividade in evento.atividade_set.all():
                 if current_evento != old_evento:
@@ -411,6 +419,7 @@ def getRelatorioType1(doc, relatorioData):
                 counter = counter + 1
                 doc = getAtividade(doc, atividade, counter)
     return doc
+
 
 def getRelatorioType2(doc, relatorioData):
     # Initialize a Counter for status
@@ -469,6 +478,8 @@ def getRelatorioType2(doc, relatorioData):
 
     return doc
 
+
+
 def createRelatorio(doc, relatorioData, type = "type 1"):
     if type == "type 1":
         return getRelatorioType1(doc, relatorioData)
@@ -491,7 +502,6 @@ def relatorioDpEvento(request):
     if request.GET.get('tipo'):
         filters['tipo'] = request.GET.get('tipo')
 
-    print(request.GET)
     relatorioTipo = "type 2" if departamentoNome == "Eventos" else "type 1"
     doc = docx.Document()
     relatorioData = getFilteredEventos(filters, relatorioTipo)

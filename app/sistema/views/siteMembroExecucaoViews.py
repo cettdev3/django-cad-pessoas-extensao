@@ -132,13 +132,12 @@ def eliminarMembroExecucao(request,codigo):
 def membrosExecucaoSelect(request):
     print(request.GET)
     data = {}
+    print("print dentro do select de membro de execução: ",request.GET)
     if request.GET.get('membro_execucao_id'):
         data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
     acao_id = request.GET.get('acao_id')
     evento_id = request.GET.get('evento_id') if request.GET.get('evento_id') else request.GET.get('dp_evento_id')
-    if acao_id:
-        data["membrosExecucao"] = MembroExecucao.objects.filter(acao__id=acao_id)
-    elif evento_id:
+    if evento_id:
         data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id=evento_id)
     else:
         data["membrosExecucao"] = MembroExecucao.objects.all()
