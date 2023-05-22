@@ -233,7 +233,6 @@ class TicketDetailApiView(APIView):
 
     def put(self, request, ticket_id, *args, **kwargs):
         ticket = self.get_object(Ticket, ticket_id)
-        print("ticket api view updates",request.data)
         if not ticket:
                 return Response(
                     {"res": "Não existe ticket com o id informado"}, 
@@ -248,11 +247,12 @@ class TicketDetailApiView(APIView):
             ticket.id_protocolo = request.data.get("id_protocolo")
         if request.data.get("meta"):
             ticket.meta = request.data.get("meta")
-        if request.data.get("data_inicio") and request.data.get("data_fim") != "":
-            if  request.data.get("nao_se_aplica_data_inicio") not in ["on", True]:
+        if  request.data.get("data_inicio"):
+            if request.data.get("nao_se_aplica_data_inicio") not in ["on", True] and len(request.data.get("data_inicio")) > 0 :
+                print("anted salvando data inicio")
                 ticket.data_inicio = request.data.get("data_inicio")
-        if request.data.get("data_fim") and request.data.get("data_fim") != "":
-            if  request.data.get("nao_se_aplica_data_fim") not in ["on", True]:
+        if request.data.get("data_fim"):
+            if  request.data.get("nao_se_aplica_data_fim") not in ["on", True] and len(request.data.get("data_fim")) > 0:
                 ticket.data_fim = request.data.get("data_fim")
         if request.data.get("valor_orcado") and request.data.get("valor_orcado") != "":
             ticket.valor_orcado = request.data.get("valor_orcado")
