@@ -2,23 +2,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import permissions
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-import base64
-import uuid
 import json
-from ..models.galeria import Galeria
-from ..models.imagem import Imagem
-from ..models.dpEvento import DpEvento
 from ..services.alfrescoApi import AlfrescoAPI
-from ..serializers.imagemSerializer import ImagemSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-# todo/todo_api/views.py
 from ..models.anexo import Anexo
 from ..serializers.anexoSerializer import AnexoSerializer
-
+from ..services.anexoService import AnexoService
 class AnexoApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -39,40 +29,9 @@ class AnexoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        alfresco = AlfrescoAPI()
-        # Process and save the file to Alfresco
-        file_data_url = data.get('dataUrl', '')
-        file_format, file_str = file_data_url.split(';base64,')
-        file_ext = file_format.split('/')[-1]
-        mime_type = file_format.split(':')[1]
-        file_content_bytes = base64.b64decode(file_str)
-        file_content = ContentFile(file_content_bytes)
-        file_ext = data.get("nome").split('.')[-1]
-        file_name = f'{uuid.uuid4()}.{file_ext}'
-        file_path = default_storage.save(f'tmp/{file_name}', file_content)
-
-        alfrescoNode = alfresco.createNode(file_path, "cm:content", file_name)
-        shared_link = alfresco.createSharedLink(alfrescoNode.entry_id)
-        shared_link = json.loads(shared_link)
-        entry = shared_link['entry']
-        node_id = entry['id']
-        alfresco_base_url = "https://docs.cett.org.br/alfresco/api/-default-/public/alfresco/versions/1"
-        shared_link_url = f"{alfresco_base_url}/shared-links/{node_id}/content"
-
-        anexo = Anexo(
-            nome=data.get("nome"),
-            fonte=data.get("fonte"),
-            descricao=data.get("descricao"),
-            mime_type=mime_type,
-            model=data.get("model"),
-            id_model=data.get("id_model"),
-            id_alfresco=alfrescoNode.entry_id,
-            shared_link=shared_link_url
-        )
-        anexo.save()
-        default_storage.delete(file_path)
+        anexoService = AnexoService()
+        anexo = anexoService.create_anexo(data)
         serializer = AnexoSerializer(anexo)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

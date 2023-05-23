@@ -1,6 +1,7 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from .dpEventoEnsinoSerializer import DpEventoEnsinoSerializer
+from .anexoSerializer import AnexoSerializer
 from ..models.ensino import Ensino
 
 class EnsinoSerializer(serializers.ModelSerializer):
@@ -10,7 +11,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
     data_fim_formatada = serializers.DateField(format='%d/%m/%Y')
     tipo_formatado = serializers.CharField(read_only=True)
     first_dp_evento = serializers.SerializerMethodField()
-
+    anexo_oficio = AnexoSerializer(read_only=True)
     class Meta:
         model = Ensino
         fields = [
@@ -34,6 +35,8 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "data_fim_formatada",
             "tipo_formatado",
             "first_dp_evento",
+            "numero_oficio",
+            "anexo_oficio",
         ]
         depth = 2
         

@@ -1,2 +1,3 @@
 from .membroExecucaoSerializer import MembroExecucaoSerializer
 from .galeriaSerializer import GaleriaSerializer
+from .anexoSerializer import AnexoSerializer

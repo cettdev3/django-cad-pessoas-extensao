@@ -3,7 +3,6 @@ from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as str
-from rest_framework import permissions
 from django.db import transaction
 from django.db.models import Q, Prefetch
 from ..models.cidade import Cidade
@@ -13,6 +12,7 @@ from ..models.alocacao import Alocacao
 from ..models.endereco import Endereco
 from ..models.ensino import Ensino
 from ..models.dpEvento import DpEvento
+from ..services.anexoService import AnexoService
 from ..serializers.ensinoSerializer import EnsinoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -78,6 +78,7 @@ class EnsinoApiView(APIView):
         complemento = request.data.get("complemento")
         status = request.data.get("status")
         tipo = request.data.get("tipo")
+        numero_oficio = request.data.get("numero_oficio")
         endereco = None
         escola = None
         cidade = None
@@ -108,24 +109,44 @@ class EnsinoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=str.HTTP_400_BAD_REQUEST
                 )
+        with transaction.atomic():
+            ensino = Ensino.objects.create(
+                data_inicio = data_inicio,
+                data_fim = data_fim,
+                observacao = observacao,
+                status = status,
+                tipo = tipo,
+                logradouro = logradouro,
+                complemento = complemento,
+                bairro = bairro,
+                cidade = cidade,
+                cep = cep,
+                escola = escola,
+                numero_oficio = numero_oficio,
+                etapa = etapa
+            )
 
-        ensino = Ensino.objects.create(
-            data_inicio = data_inicio,
-            data_fim = data_fim,
-            observacao = observacao,
-            status = status,
-            tipo = tipo,
-            logradouro = logradouro,
-            complemento = complemento,
-            bairro = bairro,
-            cidade = cidade,
-            cep = cep,
-            escola = escola
-        )
-        first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
-        ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade').get(id=ensino.id)
-        ensinoSerializer = EnsinoSerializer(ensino)
-        return Response(ensinoSerializer.data, status=str.HTTP_201_CREATED)
+            anexoService = AnexoService()
+            anexoOficioDataUrl = request.data.get("oficio_data_url")
+            anexoOficioNome = request.data.get("oficio_name")
+            oficioData = {
+                "dataUrl": anexoOficioDataUrl,
+                "nome": anexoOficioNome,
+                "model": "Ensino",
+                "id_model": ensino.id,
+            }
+
+            anexoOficio = anexoService.create_anexo(oficioData)
+            extension =  anexoOficio.nome.split(".")[-1]
+            anexoOficio.nome = f"oficio_{numero_oficio}.{extension}"
+            anexoOficio.save()
+            ensino.anexo_oficio = anexoOficio
+            ensino.save()
+            
+            first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
+            ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade', 'anexo_oficio').get(id=ensino.id)
+            ensinoSerializer = EnsinoSerializer(ensino)
+            return Response(ensinoSerializer.data, status=str.HTTP_201_CREATED)
 
 class EnsinoDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -194,8 +215,27 @@ class EnsinoDetailApiView(APIView):
             ensino.escola = escola
         if request.data.get("cep"):
             ensino.cep = request.data.get("cep")
+        if request.data.get("numero_oficio"):
+            ensino.numero_oficio = request.data.get("numero_oficio")
 
-        ensino.save()
+        if request.data.get("oficio_data_url"):
+            anexoService = AnexoService()
+            anexoOficioDataUrl = request.data.get("oficio_data_url")
+            anexoOficioNome = request.data.get("oficio_name")
+            oficioData = {
+                "dataUrl": anexoOficioDataUrl,
+                "nome": anexoOficioNome,
+                "model": "Ensino",
+                "id_model": ensino.id,
+            }
+
+            anexoOficio = anexoService.create_anexo(oficioData)
+            extension =  anexoOficio.nome.split(".")[-1]
+            anexoOficio.nome = f"oficio_{ensino.numero_oficio}.{extension}"
+            anexoOficio.save()
+            ensino.anexo_oficio = anexoOficio
+            ensino.save()
+        else: ensino.save()
         first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
         ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade').get(id=ensino.id)
         serializer = EnsinoSerializer(ensino)

@@ -2,7 +2,7 @@ from django.db import models
 from ..models.endereco import Endereco
 from ..models.cidade import Cidade
 from ..models.escola import Escola
-
+from ..models.anexo import Anexo
 class Ensino(models.Model):
     STATUS_PLANNEJADO = "planejamento"
     STATUS_ANDAMENTO = "andamento"
@@ -36,7 +36,8 @@ class Ensino(models.Model):
     complemento = models.CharField(null = True, max_length=250)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
-
+    numero_oficio = models.CharField(null = True, max_length=100)
+    anexo_oficio = models.ForeignKey(Anexo, on_delete=models.SET_NULL, null=True) 
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True)
 
     class Meta:

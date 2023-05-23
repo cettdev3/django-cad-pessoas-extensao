@@ -102,7 +102,14 @@
     <tbody>
         {% for ensino in ensinos %}
         <tr>
-            <td class="ensinos-w-15 text-left">{{ensino.observacao}}</td>
+            <td class="ensinos-w-15 text-left">
+                {{ensino.observacao}}
+                <div class="w-50">
+                    {% if ensino.anexo_oficio %}
+                    {% include 'anexos/anexo-card.html' with anexo=ensino.anexo_oficio %}
+                    {% endif %}
+                </div>
+            </td>
             <td class="ensinos-w-15 text-left">{{ensino.status}}</td>
             <td class="ensinos-w-15 text-left">{{ensino.data_inicio_formatada}}</td>
             <td class="ensinos-w-15 text-left">{{ensino.data_fim_formatada}}</td>
