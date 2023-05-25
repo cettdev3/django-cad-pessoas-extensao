@@ -111,7 +111,8 @@
                     <span class="column-label ml-1">Curso</span>
                 </div>
             </th>
-            <th class="alocacao-w-35 text-left">demandas</th>
+            <th class="alocacao-w-20 text-left">Código SIGA</th>
+            <th class="alocacao-w-15 text-left">Turno</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
@@ -131,12 +132,19 @@
         <td class="alocacao-w-15 text-left">{{alocacao.data_inicio_formatada|default_if_none:""}}</td>
         <td class="alocacao-w-15 text-left">{{alocacao.data_fim_formatada|default_if_none:""}}</td>
         <td class="alocacao-w-15 text-left">
-            {{alocacao.curso.nome}}
+            <div class="d-flex flex-column">
+                <span>{{alocacao.curso.nome}}</span>
+            </div>
         </td>
-        <td class="alocacao-w-35 text-left">
+        <td class="alocacao-w-20 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
-                {% for demanda in alocacao.ticket_set %}
-                    {% include "tickets/ticket_card.html" with ticket=demanda model='alocacao' show_delete=True show_edit=True %}
+                <span>{{alocacao.codigo_siga|default_if_none:'Código não informado'}}</span>
+            </div>
+        </td>
+        <td class="alocacao-w-15 text-left">
+            <div class="membro-execucao-w-100 d-flex flex-wrap">
+                {% for turno in alocacao.turnos %}
+                <span>{{turno.nome}}</span>
                 {% endfor %}
             </div>
         </td>
@@ -147,7 +155,7 @@
             <div style="display: none; position: absolute; z-index: 2; right: 10%" id="hiddenMenuAlocacoes{{alocacao.id}}"
                 class="btn-group-custom">
                 <button onclick="carregarAlocacoesModalCadastrar('{{alocacao.id}}')">Editar</button>
-                <button onclick="criarTicket('{{alocacao.id}}')">Adicionar Demanda</button>
+                <!-- <button onclick="criarTicket('{{alocacao.id}}')">Adicionar Demanda</button> -->
                 <button onclick="openDeleteModal(() => deleteAlocacao('{{alocacao.id}}'))">Excluir</button>
             </div>
         </td>

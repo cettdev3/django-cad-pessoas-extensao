@@ -48,33 +48,6 @@
                                 </select>
                             </div>
                             <div class="col-sm-3">
-                                <label><b>Inicio do Curso:</b></label>
-                                <input 
-                                type="date" 
-                                {% if alocacao %}
-                                value="{{ alocacao.data_inicio}}" 
-                                {% endif %}
-                                class="form-control" 
-                                id="data_inicio-{{pessoa.id}}"
-                                name="data_inicio">
-                            </div>
-                            <div class="col-sm-3">
-                                <label><b>Fim do Curso:</b></label>
-                                <input 
-                                type="date" 
-                                {% if alocacao %}
-                                value="{{ alocacao.data_fim}}" 
-                                {% endif %}
-                                class="form-control" 
-                                id="data_fim-{{pessoa.id}}"
-                                name="data_fim">
-                            </div>
-
-                            <div id="alocacaoFormSelectCidade" class="col-sm-3">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2">
                                 <label><b>Cod. SIGA:</b></label>
                                 <input
                                 type="text" 
@@ -85,7 +58,7 @@
                                 id="codigo_siga-{{pessoa.id}}"
                                 name="codigo_siga">
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <label><b>Matriculados:</b></label>
                                 <input
                                 type="text" 
@@ -107,6 +80,54 @@
                                     <label><b>Haverá aulas Sábado</b></label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label><b>data de Saída:</b></label>
+                                <input
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_saida|default_if_none:""}}" 
+                                {% endif %}
+                                class="form-control"
+                                id="data_saida-{{pessoa.id}}"
+                                name="data_saida">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>data de Retorno:</b></label>
+                                <input
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_retorno|default_if_none:""}}" 
+                                {% endif %}
+                                class="form-control"
+                                id="data_retorno-{{pessoa.id}}"
+                                name="data_retorno">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Inicio do Curso:</b></label>
+                                <input 
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_inicio}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="data_inicio-{{pessoa.id}}"
+                                name="data_inicio">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Fim do Curso:</b></label>
+                                <input 
+                                type="date" 
+                                {% if alocacao %}
+                                value="{{ alocacao.data_fim}}" 
+                                {% endif %}
+                                class="form-control" 
+                                id="data_fim-{{pessoa.id}}"
+                                name="data_fim">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div id="alocacaoFormSelectTurno" class="col-sm-6">
                             </div>
                         </div>
@@ -117,6 +138,8 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <div id="alocacaoFormSelectCidade" class="col-sm-3">
+                            </div>
                             <div class="col-sm-3">
                                 <label><b>logradouro:</b></label>
                                 <input 
@@ -139,18 +162,7 @@
                                 id="bairro-{{pessoa.id}}"
                                 name="bairro">
                             </div>
-                            <div class="col-sm-4">
-                                <label><b>complemento:</b></label>
-                                <input 
-                                type="text" 
-                                {% if alocacao %}
-                                value="{{ alocacao.complemento|default_if_none:""}}" 
-                                {% endif %} 
-                                class="form-control" 
-                                id="complemento-{{pessoa.id}}"
-                                name="complemento">
-                            </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <label><b>cep:</b></label>
                                 <input 
                                 type="text"
@@ -160,6 +172,19 @@
                                 class="form-control" 
                                 id="cep-{{pessoa.id}}"
                                 name="cep">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label><b>complemento:</b></label>
+                                <input 
+                                type="text" 
+                                {% if alocacao %}
+                                value="{{ alocacao.complemento|default_if_none:""}}" 
+                                {% endif %} 
+                                class="form-control" 
+                                id="complemento-{{pessoa.id}}"
+                                name="complemento">
                             </div>
                         </div>
                         

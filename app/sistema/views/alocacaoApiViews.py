@@ -100,10 +100,16 @@ class AlocacaoApiView(APIView):
                             
                     data_inicio = None
                     data_fim = None
+                    data_saida = None
+                    data_retorno = None
                     if alocacaoData["data_inicio"]:
                         data_inicio = datetime.strptime(alocacaoData["data_inicio"], "%Y-%m-%d").date()
                     if alocacaoData["data_fim"]:
                         data_fim = datetime.strptime(alocacaoData["data_fim"], "%Y-%m-%d").date()
+                    if alocacaoData["data_saida"]:
+                        data_saida = datetime.strptime(alocacaoData["data_saida"], "%Y-%m-%d").date()
+                    if alocacaoData["data_retorno"]:
+                        data_retorno = datetime.strptime(alocacaoData["data_retorno"], "%Y-%m-%d").date()
                     status = alocacaoData["status"] if "status" in alocacaoData else None
                     observacao = alocacaoData["observacao"] if "observacao" in alocacaoData else None
                     if alocacaoData["logradouro"]:
@@ -133,6 +139,8 @@ class AlocacaoApiView(APIView):
                     alocacao = Alocacao.objects.create(
                         data_inicio = data_inicio,
                         data_fim = data_fim,
+                        data_saida = data_saida,
+                        data_retorno = data_retorno,
                         observacao = observacao,
                         status = status,
                         acaoEnsino = acaoEnsino,
@@ -189,6 +197,8 @@ class AlocacaoApiView(APIView):
                 
                 data_inicio = None
                 data_fim = None
+                data_saida = None
+                data_retorno = None
                 logradouro = None
                 complemento = None
                 bairro = None
@@ -200,6 +210,10 @@ class AlocacaoApiView(APIView):
                     data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
                 if request.data.get("data_fim"):
                     data_fim = datetime.strptime(request.data.get("data_fim"), "%Y-%m-%d").date()
+                if request.data.get("data_saida"):
+                    data_saida = datetime.strptime(request.data.get("data_saida"), "%Y-%m-%d").date()
+                if request.data.get("data_retorno"):
+                    data_retorno = datetime.strptime(request.data.get("data_retorno"), "%Y-%m-%d").date()
                 status = request.data.get("status") 
                 observacao = request.data.get("observacao") 
 
@@ -226,6 +240,8 @@ class AlocacaoApiView(APIView):
                 alocacao = Alocacao.objects.create(
                     data_inicio = data_inicio,
                     data_fim = data_fim,
+                    data_saida = data_saida,
+                    data_retorno = data_retorno,
                     observacao = observacao,
                     status = status,
                     acaoEnsino = acaoEnsino,
@@ -331,6 +347,18 @@ class AlocacaoDetailApiView(APIView):
             alocacao.data_fim = data_fim
         else:
             alocacao.data_fim = None
+        
+        if request.data.get("data_saida"):
+            data_saida = datetime.strptime(request.data.get("data_saida"), "%Y-%m-%d").date()
+            alocacao.data_saida = data_saida
+        else:
+            alocacao.data_saida = None
+
+        if request.data.get("data_retorno"):
+            data_retorno = datetime.strptime(request.data.get("data_retorno"), "%Y-%m-%d").date()
+            alocacao.data_retorno = data_retorno
+        else:
+            alocacao.data_retorno = None
         
         if request.data.get("status"):
             status = request.data.get("status") 

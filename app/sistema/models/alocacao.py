@@ -13,6 +13,8 @@ class Alocacao(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True) 
     data_inicio = models.DateField(null = True)
     data_fim = models.DateField(null = True)
+    data_saida = models.DateField(null = True)
+    data_retorno = models.DateField(null = True)
     status = models.CharField(null = True, max_length=50)   
     observacao = models.CharField(null = True, max_length=500)
     codigo_siga = models.CharField(null = True, max_length=100)

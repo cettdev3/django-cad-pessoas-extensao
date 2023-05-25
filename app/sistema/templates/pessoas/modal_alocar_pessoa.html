@@ -102,7 +102,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <label><b>Curso:</b></label>
                                 <select required 
                                 class="form-control" 
@@ -118,7 +118,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <label><b>Ação de Ensino:</b></label>
                                 <select required 
                                 onchange="setEnderecos(this, {{pessoa.id}})"
@@ -135,26 +135,8 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-sm-4">
-                                <label><b>Inicio do Curso:</b></label>
-                                <input 
-                                type="date" 
-                                class="form-control" 
-                                id="data_inicio-{{pessoa.id}}"
-                                name="data_inicio">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-4">
-                                <label><b>Fim do Curso:</b></label>
-                                <input 
-                                type="date" 
-                                class="form-control" 
-                                id="data_fim-{{pessoa.id}}"
-                                name="data_fim">
-                            </div>
-                            <div id="alocacaoPessoasTurnosSelect{{pessoa.id}}" class="col-sm-5">
-                                <label><b>Turnos:</b></label>
+                            <div id="alocacaoPessoasTurnosSelect{{pessoa.id}}" class="col-sm-3">
+                                <label><b>Turno:</b></label>
                                 <div id="dropdown-turnos{{pessoa.id}}">
                                     <div id="dropdown{{pessoa.id}}" class="dropdown">
                                         <div class="dflex felx-row">
@@ -192,6 +174,40 @@
                             <div class="col-sm-12">
                                 <label><b>Datas Removidas</b></label>
                                 {% include 'componentes/datasRemovidasInput/datasRemovidasInput.html' with id=pessoa.id %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label><b>Data de Saída:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_saida-{{pessoa.id}}"
+                                name="data_saida">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Data de Retorno:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_retorno-{{pessoa.id}}"
+                                name="data_retorno">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Inicio do Curso:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_inicio-{{pessoa.id}}"
+                                name="data_inicio">
+                            </div>
+                            <div class="col-sm-3">
+                                <label><b>Fim do Curso:</b></label>
+                                <input 
+                                type="date" 
+                                class="form-control" 
+                                id="data_fim-{{pessoa.id}}"
+                                name="data_fim">
                             </div>
                         </div>
                         <div class="form-group row">
