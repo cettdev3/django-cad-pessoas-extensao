@@ -18,6 +18,7 @@ from rest_framework.authtoken.models import Token
 from sistema.models.curso import Curso
 from sistema.models.ensino import Ensino
 from sistema.models.turno import Turno
+from sistema.models.alocacao import Alocacao
 from django.db.models import Q, Exists
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -93,7 +94,7 @@ def pessoasModalAlocar(request):
         ensinos = Ensino.objects.filter(~Q(status="finalizado"))
         ensinos = EnsinoSerializer(ensinos, many=True)
         data['ensinos'] = ensinos.data
-
+    data["tiposAlocacao"] = Alocacao().TIPO_CHOICES
     return render(request,'pessoas/modal_alocar_pessoa.html',data)
 
 @login_required(login_url='/auth-user/login-user')

@@ -25,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from sistema.serializers.dpEventoSerializer import DpEventoSerializer
 from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
+from sistema.serializers.escolaSerializer import EscolaSerializer
 from django.db.models import Prefetch
 from collections import defaultdict
 from docx.image.exceptions import UnrecognizedImageError

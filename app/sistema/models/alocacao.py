@@ -7,10 +7,21 @@ from ..models.curso import Curso
 from ..models.turno import Turno
 
 class Alocacao(models.Model):
+    TIPO_COTEC = 'cotec'
+    TIPO_RPA = 'rpa'
+    TIPO_GPS = 'gps'
+    
+    TIPO_CHOICES = (
+        (TIPO_COTEC, 'COTEC'),
+        (TIPO_RPA, 'RPA'),
+        (TIPO_GPS, 'GPS'),
+    )
+
     id = models.AutoField(primary_key=True)
     acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True)
     professor = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True) 
     curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True) 
+    tipo = models.CharField(null = True, max_length=50)
     data_inicio = models.DateField(null = True)
     data_fim = models.DateField(null = True)
     data_saida = models.DateField(null = True)
@@ -56,3 +67,14 @@ class Alocacao(models.Model):
         if self.data_fim:
             return self.data_fim.strftime("%d/%m/%Y")
         return None
+
+    @property
+    def tipo_formatado(self):
+        if self.tipo:
+            if self.tipo == 'cotec':
+                return 'COTEC'
+            elif self.tipo == 'rpa':
+                return 'RPA'
+            elif self.tipo == 'gps':
+                return 'GPS'
+        return "Não Informado"
