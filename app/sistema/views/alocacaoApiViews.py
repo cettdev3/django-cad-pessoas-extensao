@@ -74,6 +74,7 @@ class AlocacaoApiView(APIView):
                     codigo_siga = None
                     quantidade_matriculas = None
                     aulas_sabado = False
+                    tipo = None
                     
                     if "curso_id" in alocacaoData:
                         curso = self.get_object(Curso, alocacaoData["curso_id"])
@@ -135,7 +136,8 @@ class AlocacaoApiView(APIView):
                         quantidade_matriculas = alocacaoData["quantidade_matriculas"]
                     if alocacaoData.get("codigo_siga"):
                         codigo_siga = alocacaoData["codigo_siga"]
-
+                    if alocacaoData.get("tipo"):
+                        tipo = alocacaoData["tipo"]
                     alocacao = Alocacao.objects.create(
                         data_inicio = data_inicio,
                         data_fim = data_fim,
@@ -153,7 +155,8 @@ class AlocacaoApiView(APIView):
                         cep = cep,
                         aulas_sabado = aulas_sabado,
                         quantidade_matriculas = quantidade_matriculas,
-                        codigo_siga = codigo_siga
+                        codigo_siga = codigo_siga,
+                        tipo = tipo
                     )
 
                     turnos = alocacaoData["turnos"]
@@ -236,6 +239,8 @@ class AlocacaoApiView(APIView):
 
                 if request.data.get("aulas_sabado"):
                     aulas_sabado = request.data.get("aulas_sabado")
+                if request.data.get("tipo"):
+                    tipo = request.data.get("tipo")
 
                 alocacao = Alocacao.objects.create(
                     data_inicio = data_inicio,
@@ -253,6 +258,7 @@ class AlocacaoApiView(APIView):
                     cidade = cidade,
                     cep = cep,
                     aulas_sabado = aulas_sabado,
+                    tipo = tipo
                 )
                 
                 if request.data.get("turnos"):
@@ -406,6 +412,10 @@ class AlocacaoDetailApiView(APIView):
             alocacao.cep = cep
         else:
             alocacao.cep = None
+        
+        if request.data.get("tipo"):
+            tipo = request.data.get("tipo")
+            alocacao.tipo = tipo
 
         if request.data.get("aulas_sabado") is not None:
             aulas_sabado = request.data.get("aulas_sabado")

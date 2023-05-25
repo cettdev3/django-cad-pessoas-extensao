@@ -25,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from sistema.serializers.dpEventoSerializer import DpEventoSerializer
 from sistema.serializers.ensinoSerializer import EnsinoSerializer
 from sistema.serializers.escolaSerializer import EscolaSerializer
+from sistema.serializers.escolaSerializer import EscolaSerializer
 from django.db.models import Prefetch
 from collections import defaultdict
 from docx.image.exceptions import UnrecognizedImageError
@@ -78,6 +79,7 @@ def dpEventoModal(request):
         if dpEvento.acaoEnsino:
             ensinoSelected = dpEvento.acaoEnsino.id
             data['selected_ensino'] = ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
+        data['selectedEscolas'] = EscolaSerializer(dpEvento.escolas.all(), many=True).data
     return render(request,'dpEventos/dp_eventos_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')

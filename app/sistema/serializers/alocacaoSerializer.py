@@ -38,6 +38,7 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "aulas_sabado",
             "dataremovida_set",
             "quantidade_matriculas",
-            "codigo_siga"
+            "codigo_siga",
+            "tipo"
         ]
         depth = 2
