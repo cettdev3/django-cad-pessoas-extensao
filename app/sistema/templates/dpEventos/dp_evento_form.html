@@ -60,7 +60,7 @@
             </div>
             <div id="acao-ensino-select-container" class="col-sm-6">
                 {% if dpEvento %}
-                {% include 'ensinos/ensino_select.html' with selectes=dpEvento.acaoEnsino.id ensinos=ensinos %}
+                {% include 'ensinos/ensino_select.html' with selected=selected_ensino ensinos=ensinos %}
                 {% else %}
                 {% include 'ensinos/ensino_select.html' %}
                 {% endif %}
@@ -69,7 +69,7 @@
         <div class="form-group row">
             <div class="col-sm-12">
                 {% if dpEvento %}
-                {% include 'ensinos/ensino_select.html' with ensinoSelected=dpEvento.acaoEnsino selected=selected_ensino ensinos=ensinos %}
+                {% include 'escolas/escolas_select_multiple.html' with items=escolas selectedEscolas=selectedEscolas %}
                 {% else %}
                 {% include 'escolas/escolas_select_multiple.html' with id=1 items=escolas selectedEscolas=selectedEscolas %}
                 {% endif %}

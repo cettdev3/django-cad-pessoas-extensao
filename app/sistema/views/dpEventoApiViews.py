@@ -170,6 +170,8 @@ class DpEventoDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        print("dados dentro da api: ", request.data)
+
         if request.data.get("tipo"):
             dp_evento.tipo = request.data.get("tipo")
         if request.data.get("descricao"):

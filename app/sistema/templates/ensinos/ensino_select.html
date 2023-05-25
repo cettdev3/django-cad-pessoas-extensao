@@ -5,7 +5,8 @@ name="acao_ensino_id">
     <option value="">Selecione uma ação de ensino: </option>
     {% for ensino in ensinos %}
         <option value="{{ensino.id}}"
-        {% if dpEvento and dpEvento.ensino.id == selected or ensinoSelected.id == ensino.id %} selected 
+        {% if selected == ensino.id %} 
+        selected 
         {% endif %}
         >{{ensino.observacao}}</option>
     {% endfor %}
