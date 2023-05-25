@@ -294,14 +294,16 @@
                                         required>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label><b>Tipo:</b></label>
+                                        <label><b>Tipo: {{ensino.tipo}}</b></label>
                                         <select class="form-control"
                                         name="tipo">
+                                            <option  
+                                            value="">Selecione um tipo</option>
                                             <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
                                             value="gps">GPS</option>
                                             <option {% if ensino.tipo == 'emprestimo' %} selected {% endif %}  
                                             value="emprestimo">Empréstimo</option>
-                                            <option {% if ensino.tipo != 'outros' %} selected {% endif %}  
+                                            <option {% if ensino.tipo == 'outros' %} selected {% endif %}  
                                             value="outros">Outros</option>
                                         </select>
                                     </div>

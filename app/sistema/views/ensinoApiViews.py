@@ -129,19 +129,20 @@ class EnsinoApiView(APIView):
             anexoService = AnexoService()
             anexoOficioDataUrl = request.data.get("oficio_data_url")
             anexoOficioNome = request.data.get("oficio_name")
-            oficioData = {
-                "dataUrl": anexoOficioDataUrl,
-                "nome": anexoOficioNome,
-                "model": "Ensino",
-                "id_model": ensino.id,
-            }
-
-            anexoOficio = anexoService.create_anexo(oficioData)
-            extension =  anexoOficio.nome.split(".")[-1]
-            anexoOficio.nome = f"oficio_{numero_oficio}.{extension}"
-            anexoOficio.save()
-            ensino.anexo_oficio = anexoOficio
-            ensino.save()
+            
+            if anexoOficioDataUrl:
+                oficioData = {
+                    "dataUrl": anexoOficioDataUrl,
+                    "nome": anexoOficioNome,
+                    "model": "Ensino",
+                    "id_model": ensino.id,
+                }
+                anexoOficio = anexoService.create_anexo(oficioData)
+                extension =  anexoOficio.nome.split(".")[-1]
+                anexoOficio.nome = f"oficio_{numero_oficio}.{extension}"
+                anexoOficio.save()
+                ensino.anexo_oficio = anexoOficio
+                ensino.save()
             
             first_dp_evento_prefetch = Prefetch('dpevento_set', queryset=DpEvento.objects.all(), to_attr='first_dp_evento')
             ensino = Ensino.objects.prefetch_related(first_dp_evento_prefetch).select_related('escola', 'cidade', 'anexo_oficio').get(id=ensino.id)

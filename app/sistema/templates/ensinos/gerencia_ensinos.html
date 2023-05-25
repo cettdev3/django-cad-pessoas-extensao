@@ -268,81 +268,9 @@ z-index: 4
     }
 
     function cadastrarEvento(ensinoId) {
-        toggleLoading()
-        let evento = {
-            acao_ensino_id: "",
-            bairro: "",
-            cep: "",
-            cidade_id: "",
-            complemento: "",
-            data_fim: "",
-            data_inicio: "",
-            descricao: "",
-            escola_id: "",
-            logradouro: "",
-            tipo: ""
-        }
-
-        $.ajax({
-            url: "/getEnsino/"+ ensinoId,
-            success: function (data) {  
-                if (!data.escola) {
-                    showFloatingMessage("A ação de ensina precisa ter uma escola para criar o evento", "alert-danger");
-                    toggleLoading()
-                    return
-                }
-
-                if (!data.cidade) {
-                    showFloatingMessage("A ação de ensina precisa ter uma cidade para criar o evento", "alert-danger");
-                    toggleLoading()
-                    return
-                }
-                
-                evento.acao_ensino_id = data.id
-                evento.bairro = data.bairro
-                evento.cep = data.cep
-                evento.cidade_id = data.cidade ? data.cidade.id : null
-                evento.complemento = data.complemento
-                evento.data_fim = data.data_fim
-                evento.data_inicio = data.data_inicio
-                evento.descricao = data.observacao
-                evento.escolas = [data.escola.id]
-                evento.logradouro = data.logradouro
-                
-                if (data.tipo && data.tipo.toLowerCase() == "emprestimo") {
-                    evento.tipo = "emprestimo"
-                } else if (data.tipo && data.tipo.toLowerCase() == "outros") {
-                    evento.tipo = "outro"
-                } else if (data.tipo && data.tipo.toLowerCase() == "gps") {
-                    evento.tipo = "curso_gps"
-                } else {
-                    evento.tipo = "outro"
-                }
-                console.log(data)
-                $.ajax({
-                    url: "/saveDpEvento",
-                    data: JSON.stringify({"data": evento}),
-                    headers: { "X-CSRFToken":  '{{ csrf_token }}' },
-                    dataType: "json",
-                    contentType: 'application/json',
-                    method: "POST",
-                    success: function (data) {
-                        toggleLoading()
-                        showFloatingMessage("Evento cadastrado com sucesso", "alert-success");
-                        carregarEnsinos(getFiltersEnsino())
-                    },
-                    error: function (data) {
-                        console.log(data)
-                        toggleLoading()
-                        showFloatingMessage("Erro ao cadastrar evento", "alert-danger");
-                    }
-                });
-            },
-            error: function (data) {
-                console.log(data)
-            }
-        })
-
+       createEventoFromEnsino(ensinoId, {}, function () {
+        carregarEnsinos(getFiltersEnsino())
+       })
     }
 
     $(document).ready(function () {

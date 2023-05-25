@@ -12,7 +12,7 @@ class Ensino(models.Model):
 
     EMPRESTIMO = 'emprestimo'
     OUTROS = 'outros'
-    GPS = 'GPS'
+    GPS = 'gps'
     
     STATUS_COLORS = {
         STATUS_PLANNEJADO: "evt-status-blue",
