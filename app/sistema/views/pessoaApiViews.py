@@ -21,8 +21,8 @@ class PessoaApiView(APIView):
         cpf = request.GET.get('cpf')
         user_camunda = request.GET.get('user_camunda') if request.GET.get('user_camunda') != "None" else None
         nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
-        data_inicio = request.GET.get('data_inicio') if request.GET.get('data_inicio') != "None" else None
-        data_fim = request.GET.get('data_fim') if request.GET.get('data_fim') != "None" else None
+        data_saida = request.GET.get('data_saida') if request.GET.get('data_saida') != "None" else None
+        data_retorno = request.GET.get('data_retorno') if request.GET.get('data_retorno') != "None" else None
         is_alocated = request.GET.get('is_alocated') if request.GET.get('is_alocated') != "None" else None
         cursos = request.GET.getlist('cursos') if request.GET.getlist('cursos') != "None" else None
         order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
@@ -35,13 +35,13 @@ class PessoaApiView(APIView):
             pessoas = pessoas.filter(user_camunda=user_camunda)
         if nome:
             pessoas = pessoas.filter(nome__icontains = nome)
-        if data_fim and data_inicio:
+        if data_retorno and data_saida:
             pessoas = pessoas.annotate(count_alocacao=Count('alocacao', 
                 filter=Q(
-                    Q(alocacao__data_inicio__gte=data_inicio,alocacao__data_inicio__lte=data_fim) |
-                    Q(alocacao__data_fim__gte=data_inicio,alocacao__data_fim__lte=data_fim) |
-                    Q(alocacao__data_inicio__lte=data_inicio,alocacao__data_fim__gte=data_inicio) |
-                    Q(alocacao__data_inicio__lte=data_fim,alocacao__data_fim__gte=data_fim)
+                    Q(alocacao__data_saida__gte=data_saida,alocacao__data_saida__lte=data_retorno) |
+                    Q(alocacao__data_retorno__gte=data_saida,alocacao__data_retorno__lte=data_retorno) |
+                    Q(alocacao__data_saida__lte=data_saida,alocacao__data_retorno__gte=data_saida) |
+                    Q(alocacao__data_inicio__lte=data_retorno,alocacao__data_retorno__gte=data_retorno)
                 )
             ))
 

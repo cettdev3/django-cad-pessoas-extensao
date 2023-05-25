@@ -40,8 +40,8 @@ def pessoasTable(request):
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get('http://localhost:8000/pessoas', params={
         'nome': request.GET.get('nome'),
-        'data_inicio': request.GET.get('data_inicio'),
-        'data_fim': request.GET.get('data_fim'),
+        'data_saida': request.GET.get('data_inicio'),
+        'data_retorno': request.GET.get('data_fim'),
         'is_alocated': request.GET.get('is_alocated'),
         'cursos': request.GET.getlist('cursos[]'),
         'order_by': request.GET.get('order_by'),

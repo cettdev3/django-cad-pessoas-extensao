@@ -1,3 +1,48 @@
+<style>
+    .btn-xsm {
+        padding: 0.1rem 0.1rem;
+        font-size: 1.0rem;
+        line-height: 1.0;
+        border-radius: 0.2rem;
+    }
+
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .delete-anexo-oficio-btn {
+        display: none;
+        font-size: 1.2rem;
+        height: 50%;
+        overflow: auto;
+        margin: auto;
+        position: absolute;
+        overflow: hidden;
+        top: 0; 
+        bottom: 0; 
+        right: 0;
+        z-index: 2;
+        color: red;
+    }
+    
+    .btn-delete-oficio-background {
+        background-color: white;
+        width: 15%;
+        height: 100%;
+        position: absolute;
+        top:0;
+        right: 0;
+        z-index: 1;
+        display: none;
+    }
+
+    .badge-oficio:hover .delete-anexo-oficio-btn,
+    .badge-oficio:hover .btn-delete-oficio-background {
+        display: block;
+    }
+</style>
 <div class="modal fade" id="cadastrarEnsinoModal" tabindex="-1" role="dialog"
     aria-labelledby="cadastrarEnsinoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -34,20 +79,65 @@
                         <div class="tab-content">
                             <div id="home" class="tab-pane py-3 active">
                                 <div class="form-group row">
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-12">
                                         <label><b>Descrição:</b></label>
+                                        <textarea
+                                        class="form-control"
+                                        id="observacao"
+                                        name="observacao"
+                                        rows="3"
+                                        >{% if ensino %}{{ensino.observacao}}{% endif %}</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-2">
+                                        <label>
+                                            <span><b>Nº Ofício:</b></span>
+                                        </label>
                                         <input 
                                         type="text" 
                                         {% if ensino %}
-                                        value="{{ensino.observacao}}" 
+                                        value="{{ensino.numero_oficio}}" 
                                         {% endif %}
                                         class="form-control" 
-                                        id="observacao" 
-                                        name="observacao" 
+                                        id="numero_oficio" 
+                                        name="numero_oficio" 
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3 d-flex flex-column justify-content-start align-items-start">
+                                        <label>
+                                            <span><b>Anexo Ofício:</b></span>
+                                        </label>
+                                        <div id="oficio-anexo-container" 
+                                        class="d-flex justify-content-between align-items-center w-100">
+                                            <button id="add-anexo-oficio" type="button"
+                                            style="height: calc(1.5em + .75rem + 2px);"
+                                            data-toggle="tooltip" 
+                                            data-placement="top" 
+                                            title="Anexar Ofício"
+                                            class="btn btn-light w-15">
+                                                <i class="fa-solid fa-paperclip"></i>
+                                            </button>
+                                            {% if ensino.anexo_oficio %}
+                                            <div id="document-badge"
+                                            style="height: calc(1.5em + .75rem + 2px); cursor: pointer;position: relative" 
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title="${oficioName}"
+                                            class="ellipsis badge badge-primary d-flex align-items-center w-80 badge-oficio">
+                                                <span>{{ensino.anexo_oficio.nome}}</span>
+                                                <i class="fas fa-trash mx-1 delete-anexo-oficio-btn" 
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Remover oficio"
+                                                onclick="removeAnexoOficio(this)"></i>
+                                                <div class="btn-delete-oficio-background"></div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
                                         <label><b>Etapa:</b></label>
                                         <select class="form-control" 
                                         id="etapa" name="etapa">
@@ -132,9 +222,11 @@
                                             value="10">10</option>
                                         </select>
                                     </div>
-                                    <div id="ensinoFormSelectEscola" class="col-sm-3">
+                                    <div id="ensinoFormSelectEscola" class="col-sm-4">
                                     </div>
-                                    <div class="col-sm-2">
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-3">
                                         <label><b>Status:</b></label>
                                         <select required class="form-control" 
                                         id="status" name="status">
@@ -175,9 +267,7 @@
                                             value="cancelado">Cancelado</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Data de Inicio:</b></label>
                                         <input 
                                         type="datetime-local"
@@ -190,7 +280,7 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label><b>Data de Fim:</b></label>
                                         <input 
                                         type="datetime-local"
@@ -203,15 +293,17 @@
                                         placeholder=""
                                         required>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Tipo:</b></label>
+                                    <div class="col-sm-3">
+                                        <label><b>Tipo: {{ensino.tipo}}</b></label>
                                         <select class="form-control"
                                         name="tipo">
+                                            <option  
+                                            value="">Selecione um tipo</option>
                                             <option {% if ensino.tipo == 'gps' %} selected {% endif %}  
                                             value="gps">GPS</option>
                                             <option {% if ensino.tipo == 'emprestimo' %} selected {% endif %}  
                                             value="emprestimo">Empréstimo</option>
-                                            <option {% if ensino.tipo != 'outros' %} selected {% endif %}  
+                                            <option {% if ensino.tipo == 'outros' %} selected {% endif %}  
                                             value="outros">Outros</option>
                                         </select>
                                     </div>
@@ -293,6 +385,7 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="file" id="anexoFileInput" style="display: none;" />
                     </form>
                 </div>
             </div>
@@ -322,6 +415,8 @@
 <script>
     formId = "cadastrarEnsinoForm"
     ensinoModelId = "ensinoModelId"
+    oficioName = null
+    inputReaderDataUrl = null
     ensinoFormSelectCidadeId = "ensinoFormSelectCidade"
     ensinoFormSelectEnderecosId = "ensinoFormSelectEnderecos"
     selectedCidadeId = "{% if ensino.cidade %}{{ensino.cidade.id}}{% else %}{{ensino.endereco.cidade.id}}{% endif %}"
@@ -339,6 +434,12 @@
     }
 
     function cadastrarEnsino(data) {
+        if (!data["numero_oficio"]) {
+            showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
+            return
+        }
+        toggleLoading("update demanda")
+        console.log(data)
         $.ajax({
             url: "saveEnsino",
             data: JSON.stringify({"data":data}),
@@ -347,33 +448,27 @@
             contentType: 'application/json',
             method: "POST",
             success: function (data) {
+                toggleLoading("update demanda")
+                showFloatingMessage("Ação de ensino cadastrada com sucesso", "alert-success");
                 clearModalForm(data)
+            },
+            error: function (data) {
+                showFloatingMessage("Erro ao cadastrar Ação de ensino", "alert-danger");
+                toggleLoading("update demanda")
             }
         });
     }
 
     function processarCadastrarEnsino() {
         let formData = getFormData()
-        if (formData["endereco_id"] == "novo") {
-            $.ajax({
-                url: "saveEndereco",
-                data: JSON.stringify({"data":formData["endereco"]}),
-                dataType: "json",
-                headers: { "X-CSRFToken":  '{{ csrf_token }}' },
-                contentType: 'application/json',
-                method: "POST",
-                success: function (data) {
-                    formData["endereco_id"] = data["id"]
-                    cadastrarEnsino(formData)
-                }
-            });
-        } else {
-            cadastrarEnsino(formData)
-        }
+        cadastrarEnsino(formData)
     }
 
     function editarEnsino(ensinoId, formData) {
-        
+        if (!formData["numero_oficio"]) {
+            showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
+            return
+        }
         $.ajax({
             url: "editarEnsino/"+ensinoId,
             data: JSON.stringify({"data":formData}),
@@ -400,6 +495,9 @@
             values[n['name']] = n['value'];
         });
         values["endereco"] = endereco
+        values["oficio_data_url"] = inputReaderDataUrl
+        values["oficio_name"] = oficioName
+        
         return values
     }
 
@@ -478,6 +576,12 @@
         editarEnsino(ensinoId,formData)
     }
 
+    function removeAnexoOficio(element) {
+        $("#document-badge").remove()
+        inputReaderDataUrl = null
+        oficioName = null
+    }
+
     $(document).ready(function () {
         $("#"+cadastrarEnsinoModalId).on('hide.bs.modal', function(){
             let pessoaId = $("#"+ensinoModelId).text()
@@ -485,6 +589,41 @@
                 clearModalForm()
             }
         });
+
+        $('#add-anexo-oficio').click(function() {
+                $('#anexoFileInput').click();
+        });
+
+        $('#anexoFileInput').change(function() {
+            var file = this.files[0];
+            var reader = new FileReader();
+            
+            reader.onloadend = function() {
+                inputReaderDataUrl = reader.result;
+                oficioName = file.name;
+                $("#document-badge").remove()
+                $("#oficio-anexo-container").append(
+                    `<div id="document-badge"
+                    style="height: calc(1.5em + .75rem + 2px); cursor: pointer;position: relative" 
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="${oficioName}"
+                    class="ellipsis badge badge-primary d-flex align-items-center w-80 badge-oficio">
+                        <span>${oficioName}</span>
+                        <i class="fas fa-trash mx-1 delete-anexo-oficio-btn" 
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Remover oficio"
+                        onclick="removeAnexoOficio(this)"></i>
+                        <div class="btn-delete-oficio-background"></div>
+                    </div>`
+                )
+
+            }
+
+            reader.readAsDataURL(file);
+        });
+
         carregarSelectCidades()
         carregarSelectEscolas()
         maskValues()

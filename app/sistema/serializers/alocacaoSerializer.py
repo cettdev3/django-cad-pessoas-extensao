@@ -20,6 +20,8 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "curso",
             "data_inicio",
             "data_fim",
+            "data_saida",
+            "data_retorno",
             "data_inicio_formatada",
             "data_fim_formatada",
             "tipo_formatado",

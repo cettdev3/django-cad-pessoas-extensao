@@ -118,6 +118,11 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
+        categoria = data.get("categoria", "tarefa")
+        atividade_meta = False
+        if categoria == 'meta_extensao':
+            atividade_meta = True
+
         galeria = Galeria.objects.create(nome="Galeria sem titulo ", evento=evento)
         atividadeData = {
             "descricao": data.get("descricao"),
@@ -143,7 +148,7 @@ class AtividadeApiView(APIView):
             "complemento": data.get("complemento"),
             "valor": float(data["valor"]) if data.get("valor") else None,
             "categoria": data.get("categoria", "tarefa"),
-            "atividade_meta": data.get("atividade_meta", False),
+            "atividade_meta": atividade_meta,
             "atividadeSection": section
         }
 
@@ -286,6 +291,12 @@ class AtividadeDetailApiView(APIView):
             galeria.save()
             atividade.nome = data.get("nome", atividade.nome)
 
+        categoria = data.get("categoria", atividade.categoria)
+        if categoria == atividade.CATEGORIA_META_EXTENSAO:
+            atividade.atividade_meta = True
+        else:
+            atividade.atividade_meta = False
+
         atividade.descricao = data.get("descricao", atividade.descricao)
         atividade.status = data.get("status", atividade.status)
         atividade.linkDocumentos = data.get("linkDocumentos", atividade.linkDocumentos)
@@ -295,9 +306,7 @@ class AtividadeDetailApiView(APIView):
         atividade.complemento = data.get("complemento", atividade.complemento)
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio", atividade.data_realizacao_inicio)
         atividade.data_realizacao_fim = data.get("data_realizacao_fim", atividade.data_realizacao_fim)
-        atividade.categoria = data.get("categoria", atividade.categoria)
-        if "atividade_meta" in data:
-            atividade.atividade_meta = data["atividade_meta"]
+        atividade.categoria = categoria
         atividade.save()
 
         anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
