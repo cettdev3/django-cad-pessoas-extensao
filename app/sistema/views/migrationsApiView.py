@@ -206,3 +206,14 @@ class MigrationsViewSets(viewsets.ModelViewSet):
                     atividade.save()
 
         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+
+    @action(methods=["POST"], detail=False, url_path="update-atividades-extensao")
+    def updateAtividadesExtensao(self, *args, **kwargs):
+        with transaction.atomic():
+            for atividade in Atividade.objects.all():
+                if atividade.atividade_meta:
+                    atividade.categoria = atividade.CATEGORIA_META_EXTENSAO
+                    atividade.nome = atividade.descricao
+                    atividade.save()
+
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

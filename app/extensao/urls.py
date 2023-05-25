@@ -107,9 +107,10 @@ router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 # router.register(r'migrations', MigrationsViewSets, 'migrations-membros-execucao')
 # router.register(r'migrations', MigrationsViewSets, 'migrate-tickets')
 # router.register(r'migrations', MigrationsViewSets, 'seed-atividades-galeria')
-router.register(r'migrations', MigrationsViewSets, 'transferir-evento-escola')
-router.register(r'migrations', MigrationsViewSets, 'create-secao-atividades')
-router.register(r'migrations', MigrationsViewSets, 'update-beneficiario-tickets')
+# router.register(r'migrations', MigrationsViewSets, 'transferir-evento-escola')
+# router.register(r'migrations', MigrationsViewSets, 'create-secao-atividades')
+# router.register(r'migrations', MigrationsViewSets, 'update-beneficiario-tickets')
+router.register(r'migrations', MigrationsViewSets, 'update-atividades-extensao')
 
 # router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 

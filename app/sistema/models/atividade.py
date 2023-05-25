@@ -31,8 +31,8 @@ class Atividade(models.Model):
         
 
     id = models.AutoField(primary_key=True)
-    nome = models.CharField(null = True, blank=True, max_length=100)
-    descricao = models.CharField(null = True, blank=True, max_length=300)
+    nome = models.CharField(null = True, blank=True, max_length=500)
+    descricao = models.CharField(null = True, blank=True, max_length=500)
     linkDocumentos = models.CharField(null = True, blank=True, max_length=5000)
     status = models.CharField(null = True, blank=True, max_length=50)
     acao = models.ForeignKey(Acao, on_delete=models.SET_NULL, null=True, blank=True)
