@@ -78,6 +78,7 @@ def dpEventoModal(request):
         if dpEvento.acaoEnsino:
             ensinoSelected = dpEvento.acaoEnsino.id
             data['selected_ensino'] = ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
+        data['selectedEscolas'] = EscolaSerializer(dpEvento.escolas.all(), many=True).data
     return render(request,'dpEventos/dp_eventos_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
