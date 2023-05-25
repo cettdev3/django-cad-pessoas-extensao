@@ -60,6 +60,7 @@ def alocacaoModalCadastrar(request):
         alocacao = Alocacao.objects.prefetch_related("dataremovida_set").get(id=id)
         alocacao = AlocacaoSerializer(alocacao).data
         data['alocacao'] = alocacao
+    data["tiposAlocacao"] = Alocacao().TIPO_CHOICES
     return render(request,'alocacoes/modal_cadastrar_alocacao.html',data)
 
 @login_required(login_url='/auth-user/login-user')

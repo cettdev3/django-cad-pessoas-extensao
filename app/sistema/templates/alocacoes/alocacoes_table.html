@@ -111,8 +111,9 @@
                     <span class="column-label ml-1">Curso</span>
                 </div>
             </th>
-            <th class="alocacao-w-20 text-left">Código SIGA</th>
-            <th class="alocacao-w-15 text-left">Turno</th>
+            <th class="alocacao-w-15 text-left">Código SIGA</th>
+            <th class="alocacao-w-10 text-left">Turno</th>
+            <th class="alocacao-w-10 text-left">Tipo</th>
             <th class="w-5 text-left">Ação</th>
         </tr>
     </thead>
@@ -136,16 +137,21 @@
                 <span>{{alocacao.curso.nome}}</span>
             </div>
         </td>
-        <td class="alocacao-w-20 text-left">
+        <td class="alocacao-w-15 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
-                <span>{{alocacao.codigo_siga|default_if_none:'Código não informado'}}</span>
+                <span>{{alocacao.codigo_siga|default_if_none:'Não Informado'}}</span>
             </div>
         </td>
-        <td class="alocacao-w-15 text-left">
+        <td class="alocacao-w-10 text-left">
             <div class="membro-execucao-w-100 d-flex flex-wrap">
                 {% for turno in alocacao.turnos %}
                 <span>{{turno.nome}}; </span>
                 {% endfor %}
+            </div>
+        </td>
+        <td class="alocacao-w-10 text-left">
+            <div class="membro-execucao-w-100 d-flex flex-wrap">
+                <span>{{alocacao.tipo_formatado}} </span>
             </div>
         </td>
         <td class="w-5 text-left" style="position: relative;">
