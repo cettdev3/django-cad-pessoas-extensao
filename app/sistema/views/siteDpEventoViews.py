@@ -462,7 +462,9 @@ def getRelatorioType1(doc, relatorioData):
             current_evento = evento.id
             for atividade in evento.atividade_set.all():
                 if current_evento != old_evento:
-                    doc = getSectionTitle(doc, f"{evento.tipo} - {evento.cidade.nome}")
+                    tipoTexto = evento.tipo if evento.tipo else "Não Informado"
+                    cidadeNomeTexto = evento.cidade.nome if evento.cidade else "Não Informado"
+                    doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
                     old_evento = current_evento
                 tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
