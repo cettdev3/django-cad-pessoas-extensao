@@ -18,7 +18,7 @@ from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, Inches
 import json
 import os
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 import docx
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
@@ -32,80 +32,103 @@ from docx.image.exceptions import UnrecognizedImageError
 from docx import Document
 from datetime import datetime, date
 from collections import Counter
+import xlsxwriter
+from io import BytesIO
+from xlsxwriter.workbook import Worksheet
+from xlsxwriter.format import Format
+from typing import Tuple
 
-@login_required(login_url='/auth-user/login-user')
+
+@login_required(login_url="/auth-user/login-user")
 def gerencia_dp_eventos(request):
     page_title = "Eventos"
     dp_eventos = DpEvento.objects.all()
     count = dp_eventos.count()
-    return render(request,'dpEventos/gerenciar_dp_eventos.html',
-    {'dp_eventos':dp_eventos,'count': count, 'page_title':page_title})
+    return render(
+        request,
+        "dpEventos/gerenciar_dp_eventos.html",
+        {"dp_eventos": dp_eventos, "count": count, "page_title": page_title},
+    )
 
-@login_required(login_url='/auth-user/login-user')
+
+@login_required(login_url="/auth-user/login-user")
 def dpEventoTable(request):
-    tipo = request.GET.get('tipo')
-    data_inicio = request.GET.get('data_inicio')
-    data_fim = request.GET.get('data_fim')
-    order_by = request.GET.get('order_by')
+    tipo = request.GET.get("tipo")
+    data_inicio = request.GET.get("data_inicio")
+    data_fim = request.GET.get("data_fim")
+    order_by = request.GET.get("order_by")
     token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
+    headers = {"Authorization": "Token " + token.key}
 
-    dpEventoResponse = requests.get('http://localhost:8000/dp-eventos', params={
-        'tipo': tipo,
-        'data_inicio': data_inicio,
-        'data_fim': data_fim,
-        'order_by': order_by
-    }, headers=headers)
+    dpEventoResponse = requests.get(
+        "http://localhost:8000/dp-eventos",
+        params={
+            "tipo": tipo,
+            "data_inicio": data_inicio,
+            "data_fim": data_fim,
+            "order_by": order_by,
+        },
+        headers=headers,
+    )
     dpEventoResponseStatusCode = dpEventoResponse.status_code
     dpEventoResponse = json.loads(dpEventoResponse.content.decode())
-    
-    dpEventos = dpEventoResponse
-    return render(request,'dpEventos/dp_eventos_tabela.html',{'dpEventos':dpEventos})
 
-@login_required(login_url='/auth-user/login-user')
+    dpEventos = dpEventoResponse
+    return render(request, "dpEventos/dp_eventos_tabela.html", {"dpEventos": dpEventos})
+
+
+@login_required(login_url="/auth-user/login-user")
 def dpEventoModal(request):
-    id = request.GET.get('id')
+    id = request.GET.get("id")
     dpEvento = None
     data = {}
     escolas = Escola.objects.all()
     ensinos = Ensino.objects.all()
-    data['escolas'] = EscolaSerializer(escolas, many=True).data
-    data['ensinos'] = EnsinoSerializer(ensinos, many=True).data
-    data['ct_emprestimo'] = DpEvento.EMPRESTIMO
-    data['selectedEscolas'] = []
+    data["escolas"] = EscolaSerializer(escolas, many=True).data
+    data["ensinos"] = EnsinoSerializer(ensinos, many=True).data
+    data["ct_emprestimo"] = DpEvento.EMPRESTIMO
+    data["selectedEscolas"] = []
     if id:
         dpEvento = DpEvento.objects.get(id=id)
-        data['dpEvento'] = DpEventoSerializer(dpEvento).data 
+        data["dpEvento"] = DpEventoSerializer(dpEvento).data
         if dpEvento.acaoEnsino:
             ensinoSelected = dpEvento.acaoEnsino.id
-            data['selected_ensino'] = ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
-        data['selectedEscolas'] = EscolaSerializer(dpEvento.escolas.all(), many=True).data
-    return render(request,'dpEventos/dp_eventos_modal.html',data)
+            data["selected_ensino"] = (
+                ensinoSelected if type(ensinoSelected) == "int" else int(ensinoSelected)
+            )
+        data["selectedEscolas"] = EscolaSerializer(
+            dpEvento.escolas.all(), many=True
+        ).data
+    return render(request, "dpEventos/dp_eventos_modal.html", data)
 
-@login_required(login_url='/auth-user/login-user')
-def eliminarDpEvento(request,codigo):
+
+@login_required(login_url="/auth-user/login-user")
+def eliminarDpEvento(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
-    
-    dpEventoResponse = requests.delete('http://localhost:8000/dp-eventos/'+str(codigo), headers=headers)
-    dpEventoResponseStatusCode = dpEventoResponse.status_code
-    dpEventoResponse = json.loads(dpEventoResponse.content.decode())
+    headers = {"Authorization": "Token " + token.key}
 
-    return redirect('/gerencia_dp_eventos')
-
-@login_required(login_url='/auth-user/login-user')
-def saveDpEvento(request):
-    token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
-    dpEventoData = json.loads(request.body)['data']
-    dpEventoResponse = requests.post(
-        'http://localhost:8000/dp-eventos', 
-        json={"dpEvento": dpEventoData}, 
-        headers=headers
+    dpEventoResponse = requests.delete(
+        "http://localhost:8000/dp-eventos/" + str(codigo), headers=headers
     )
     dpEventoResponseStatusCode = dpEventoResponse.status_code
     dpEventoResponse = json.loads(dpEventoResponse.content.decode())
-    dpEvento = DpEvento.objects.get(id=dpEventoResponse['id'])
+
+    return redirect("/gerencia_dp_eventos")
+
+
+@login_required(login_url="/auth-user/login-user")
+def saveDpEvento(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {"Authorization": "Token " + token.key}
+    dpEventoData = json.loads(request.body)["data"]
+    dpEventoResponse = requests.post(
+        "http://localhost:8000/dp-eventos",
+        json={"dpEvento": dpEventoData},
+        headers=headers,
+    )
+    dpEventoResponseStatusCode = dpEventoResponse.status_code
+    dpEventoResponse = json.loads(dpEventoResponse.content.decode())
+    dpEvento = DpEvento.objects.get(id=dpEventoResponse["id"])
 
     # if dpEvento.tipo in DpEvento.MAPPED_TIPOS:
     #     dados = {
@@ -126,28 +149,34 @@ def saveDpEvento(request):
 
     return JsonResponse(dpEventoResponse, status=dpEventoResponseStatusCode)
 
-@login_required(login_url='/auth-user/login-user')
+
+@login_required(login_url="/auth-user/login-user")
 def editarDpEvento(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
-    headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
-    response = requests.put('http://localhost:8000/dp-eventos/'+str(codigo), json=body, headers=headers)
-    return JsonResponse(json.loads(response.content),status=response.status_code)
+    headers = {"Authorization": "Token " + token.key}
+    body = json.loads(request.body)["data"]
+    response = requests.put(
+        "http://localhost:8000/dp-eventos/" + str(codigo), json=body, headers=headers
+    )
+    return JsonResponse(json.loads(response.content), status=response.status_code)
 
-@login_required(login_url='/auth-user/login-user')
+
+@login_required(login_url="/auth-user/login-user")
 def dp_eventosSelect(request):
     dp_eventos = DpEvento.objects.all()
-    return render(request,'dpEventos/dp-eventos_select.html',{'dp_eventos':dp_eventos})
+    return render(
+        request, "dpEventos/dp-eventos_select.html", {"dp_eventos": dp_eventos}
+    )
 
-@login_required(login_url='/auth-user/login-user')
-def visualizarDpEvento(request,codigo):
+
+@login_required(login_url="/auth-user/login-user")
+def visualizarDpEvento(request, codigo):
     dpEvento = DpEvento.objects.prefetch_related(
         Prefetch(
-            "membroexecucao_set", 
-            queryset=MembroExecucao.objects
-            .select_related("itinerario")
+            "membroexecucao_set",
+            queryset=MembroExecucao.objects.select_related("itinerario")
             .prefetch_related("ticket_set")
-            .prefetch_related("itinerario__itinerarioitem_set")
+            .prefetch_related("itinerario__itinerarioitem_set"),
         ),
     )
     dpEvento = dpEvento.get(id=codigo)
@@ -156,41 +185,45 @@ def visualizarDpEvento(request,codigo):
     path_back = "gerencia_dp_eventos"
     dpEvento = DpEventoSerializer(dpEvento).data
     categoriaAtividades = Atividade().CATEGORY_CHOICES
-    return render(request,'dpEventos/visualizar_dp_evento.html',{
-        'dpEvento':dpEvento, 
-        'path_back': path_back,
-        'departamentos': departamentos,
-        'categoriaAtividades': categoriaAtividades
-    })
+    return render(
+        request,
+        "dpEventos/visualizar_dp_evento.html",
+        {
+            "dpEvento": dpEvento,
+            "path_back": path_back,
+            "departamentos": departamentos,
+            "categoriaAtividades": categoriaAtividades,
+        },
+    )
 
-def getFilteredEventos(filters, formatType  = "type 1"):
+
+def getFilteredEventos(filters, formatType="type 1"):
     eventos = None
-    if 'departamento_id' in filters and filters['departamento_id']:
+    if "departamento_id" in filters and filters["departamento_id"]:
         eventos = DpEvento.objects.prefetch_related(
-        Prefetch(
-            'atividade_set',
-            queryset=Atividade.objects.select_related(
-                'tipoAtividade'
-            ).filter(
-                departamento=filters['departamento_id'],
-                atividade_meta=True
+            Prefetch(
+                "atividade_set",
+                queryset=Atividade.objects.select_related("tipoAtividade").filter(
+                    departamento=filters["departamento_id"], atividade_meta=True
+                ),
             )
-        ))
+        )
     else:
         eventos = DpEvento.objects.prefetch_related(
-        Prefetch(
-            'atividade_set',
-            queryset=Atividade.objects.select_related('tipoAtividade')
-        )).filter(tipo=DpEvento.CURSO_GPS)
+            Prefetch(
+                "atividade_set",
+                queryset=Atividade.objects.select_related("tipoAtividade"),
+            )
+        ).filter(tipo=DpEvento.CURSO_GPS)
 
-    if 'data_inicio' in filters:
-        eventos = eventos.filter(data_inicio__gte=filters['data_inicio'])
-    if 'data_fim' in filters:
-        eventos = eventos.filter(data_fim__lte=filters['data_fim'])
-    if 'tipo' in filters and filters['tipo']:
-        eventos = eventos.filter(tipo=filters['tipo'])
+    if "data_inicio" in filters:
+        eventos = eventos.filter(data_inicio__gte=filters["data_inicio"])
+    if "data_fim" in filters:
+        eventos = eventos.filter(data_fim__lte=filters["data_fim"])
+    if "tipo" in filters and filters["tipo"]:
+        eventos = eventos.filter(tipo=filters["tipo"])
     result = {}
-    eventos = eventos.order_by('data_inicio')
+    eventos = eventos.order_by("data_inicio")
     if formatType == "type 2":
         return eventos
     for evento in eventos:
@@ -198,7 +231,7 @@ def getFilteredEventos(filters, formatType  = "type 1"):
             continue
         tipo = evento.tipo
         result.setdefault(tipo, {})
-        
+
         for atividade in evento.atividade_set.all():
             tipo_atividade = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
             result[tipo].setdefault(tipo_atividade, [])
@@ -211,13 +244,15 @@ def getFilteredEventos(filters, formatType  = "type 1"):
         return report
     return result
 
+
 def getSectionTitle(doc, nomeEvento):
     title = doc.add_paragraph()
-    title_run = title.add_run(f'{nomeEvento}')
+    title_run = title.add_run(f"{nomeEvento}")
     title_run.bold = True
     title_run.underline = WD_UNDERLINE.SINGLE
     title.space_after = Pt(0)
     return doc
+
 
 def getCidade(doc, atividade):
     cidade = atividade.cidade
@@ -229,19 +264,26 @@ def getCidade(doc, atividade):
     cidadeParagraphFormat.space_after = Pt(0)
     return doc
 
+
 def getMatriculas(acaoEnsino):
     alocacoes = acaoEnsino.alocacao_set.all()
     matriculas = 0
     for alocacao in alocacoes:
-        matriculas += alocacao.quantidade_matriculas if alocacao.quantidade_matriculas else 0
+        matriculas += (
+            alocacao.quantidade_matriculas if alocacao.quantidade_matriculas else 0
+        )
     return matriculas
+
 
 def getServicosAtendimentos(atividade):
     servicos = atividade.servico_set.all()
     atendimentos = 0
     for servico in servicos:
-        atendimentos += servico.quantidadeAtendimentos if servico.quantidadeAtendimentos else 0
+        atendimentos += (
+            servico.quantidadeAtendimentos if servico.quantidadeAtendimentos else 0
+        )
     return atendimentos
+
 
 def getQuantitativo(doc, atividade):
     quantitativoValor = atividade.tipo_quantitativo_valor
@@ -249,7 +291,7 @@ def getQuantitativo(doc, atividade):
 
     if atividade.evento.acaoEnsino:
         quantitativoValor = getMatriculas(atividade.evento.acaoEnsino)
-        quantitativoLabel = 'Quantidade de Matrículas'
+        quantitativoLabel = "Quantidade de Matrículas"
     if atividade.servico_set.count() > 0:
         quantitativoValor = getServicosAtendimentos(atividade)
 
@@ -260,16 +302,20 @@ def getQuantitativo(doc, atividade):
     quantitativoParagraphFormat.space_after = Pt(0)
     return doc
 
+
 def getData(doc, atividade):
     dataInicio = atividade.data_realizacao_inicio_formatada
     dataFim = atividade.data_realizacao_fim_formatada
-    dataStr = f"{dataInicio} até {dataFim}" if dataInicio != dataFim else f"{dataInicio}"
+    dataStr = (
+        f"{dataInicio} até {dataFim}" if dataInicio != dataFim else f"{dataInicio}"
+    )
     dataParagraph = doc.add_paragraph()
     dataParagraph.add_run(f"Data:").bold = True
     dataParagraph.add_run(f" {dataStr}")
     dataParagraphFormat = dataParagraph.paragraph_format
     dataParagraphFormat.space_after = Pt(0)
     return doc
+
 
 def getLocal(doc, atividade):
     local = atividade.endereco_completo
@@ -280,6 +326,7 @@ def getLocal(doc, atividade):
     localParagraphFormat.space_after = Pt(0)
     return doc
 
+
 def getEtapa(doc, atividade):
     etapa = atividade.evento.acaoEnsino.etapa_formatada
     if len(etapa) > 0:
@@ -289,8 +336,9 @@ def getEtapa(doc, atividade):
         etapaParagraphFormat = etapaParagraph.paragraph_format
         etapaParagraphFormat.space_after = Pt(0)
         return doc
-    
+
     return doc
+
 
 def getSubAtividades(doc: Document, atividade):
     eventoEnsino = DpEvento.objects.filter(id=atividade.evento.id).first()
@@ -304,8 +352,14 @@ def getSubAtividades(doc: Document, atividade):
             for alocacao in alocacoes:
                 curso = alocacao.curso.nome
                 codigoSiga = alocacao.codigo_siga if alocacao.codigo_siga else ""
-                quantidadeMatriculas = alocacao.quantidade_matriculas if alocacao.quantidade_matriculas else ""
-                subAtividadeParagraph = doc.add_paragraph(f"{codigoSiga} {curso}: {quantidadeMatriculas}")
+                quantidadeMatriculas = (
+                    alocacao.quantidade_matriculas
+                    if alocacao.quantidade_matriculas
+                    else ""
+                )
+                subAtividadeParagraph = doc.add_paragraph(
+                    f"{codigoSiga} {curso}: {quantidadeMatriculas}"
+                )
                 subAtividadeParagraphFormat = subAtividadeParagraph.paragraph_format
                 subAtividadeParagraphFormat.space_after = Pt(0)
             return doc
@@ -315,11 +369,14 @@ def getSubAtividades(doc: Document, atividade):
         subAtividadesParagraphFormat = subAtividadesParagraph.paragraph_format
         subAtividadesParagraphFormat.space_after = Pt(0)
         for servico in atividade.servico_set.all():
-            servicoParagraph = doc.add_paragraph(f"{servico.nome}: {servico.quantidadeAtendimentos}")
+            servicoParagraph = doc.add_paragraph(
+                f"{servico.nome}: {servico.quantidadeAtendimentos}"
+            )
             servicoParagraphFormat = servicoParagraph.paragraph_format
             servicoParagraphFormat.space_after = Pt(0)
         return doc
     return doc
+
 
 def getAtividadeLabel(doc, atividade, counter):
     cargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else ""
@@ -328,6 +385,7 @@ def getAtividadeLabel(doc, atividade, counter):
     atividadeLabelFormat = atividadeLabel.paragraph_format
     atividadeLabelFormat.space_after = Pt(0)
     return doc
+
 
 def getAtividadeImage(doc: Document, atividade, counter):
     imagem = atividade.galeria.imagem_set.first()
@@ -353,7 +411,9 @@ def getAtividadeImage(doc: Document, atividade, counter):
         img_run.add_picture(image_path, width=Inches(4.0))
         img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     except UnrecognizedImageError:
-        error_message = f"Error: Unable to recognize the image format for {imagem.descricao}."
+        error_message = (
+            f"Error: Unable to recognize the image format for {imagem.descricao}."
+        )
         p = doc.add_paragraph()
         p.add_run(error_message)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -380,12 +440,14 @@ def getAtividade(doc, atividade, counter):
     doc.add_paragraph()
     return doc
 
+
 def reportEventos(eventos):
     eventosLength = len(eventos) > 0
     activitiesLength = 0
     for evento in eventos:
         activitiesLength = activitiesLength + evento.atividade_set.count()
     return activitiesLength > 0 and eventosLength > 0
+
 
 def getRelatorioType1(doc, relatorioData):
     counter = 0
@@ -429,18 +491,18 @@ def getRelatorioType2(doc, relatorioData):
 
         # Update the status counter
         status_counter[status] += 1
-     # total number of DpEventos
-    doc.add_heading(f'Total de Eventos: {len(relatorioData)}', level=1)
+    # total number of DpEventos
+    doc.add_heading(f"Total de Eventos: {len(relatorioData)}", level=1)
     # Add status count to the top of the document
-    doc.add_heading('Contagem por status do evento:', level=1)
+    doc.add_heading("Contagem por status do evento:", level=1)
     for status, count in status_counter.items():
-        doc.add_paragraph(f'{status}: {count}')
-    
-    doc.add_paragraph('\n')
-    doc.add_heading('Contagem por tipo do evento:', level=1)
+        doc.add_paragraph(f"{status}: {count}")
+
+    doc.add_paragraph("\n")
+    doc.add_heading("Contagem por tipo do evento:", level=1)
     for tipo, count in tipo_counter.items():
-        doc.add_paragraph(f'{tipo}: {count}')
-    doc.add_paragraph('\n')
+        doc.add_paragraph(f"{tipo}: {count}")
+    doc.add_paragraph("\n")
     for evento in relatorioData:
         status = "Não Foi possível determinar o status do evento"
         if evento.data_inicio and evento.data_fim:
@@ -453,53 +515,517 @@ def getRelatorioType2(doc, relatorioData):
                 status = "Concluído"
 
         # Add each DpEvento's details to the document
-        doc.add_paragraph(f'Tipo: {evento.tipo_formatado}')
-        doc.add_paragraph(f'Status: {status}')
-        doc.add_paragraph(f'Data de Início: {evento.data_inicio_formatada}')
-        doc.add_paragraph(f'Data de Fim: {evento.data_fim_formatada}')
-        doc.add_paragraph(f'Cidade: {evento.cidade.nome if evento.cidade else "N/A"}')  # assuming 'nome' is the field name for city's name in Cidade model
-        doc.add_paragraph(f'Escola: {evento.escola.nome if evento.escola else "N/A"}')  # assuming 'nome' is the field name for school's name in Escola model
-        doc.add_paragraph(f'Endereço: {evento.logradouro}')
+        doc.add_paragraph(f"Tipo: {evento.tipo_formatado}")
+        doc.add_paragraph(f"Status: {status}")
+        doc.add_paragraph(f"Data de Início: {evento.data_inicio_formatada}")
+        doc.add_paragraph(f"Data de Fim: {evento.data_fim_formatada}")
+        doc.add_paragraph(
+            f'Cidade: {evento.cidade.nome if evento.cidade else "N/A"}'
+        )  # assuming 'nome' is the field name for city's name in Cidade model
+        doc.add_paragraph(
+            f'Escola: {evento.escola.nome if evento.escola else "N/A"}'
+        )  # assuming 'nome' is the field name for school's name in Escola model
+        doc.add_paragraph(f"Endereço: {evento.logradouro}")
 
         # Add a line break between each DpEvento
-        doc.add_paragraph('\n')
+        doc.add_paragraph("\n")
 
     return doc
 
 
-
-def createRelatorio(doc, relatorioData, type = "type 1"):
+def createRelatorio(doc, relatorioData, type="type 1"):
     if type == "type 1":
         return getRelatorioType1(doc, relatorioData)
     if type == "type 2":
         return getRelatorioType2(doc, relatorioData)
     return doc
 
-@login_required(login_url='/auth-user/login-user')
+
+@login_required(login_url="/auth-user/login-user")
 def relatorioDpEvento(request):
     filters = {}
     departamentoNome = ""
-    if request.GET.get('departamento_id'):
-        filters['departamento_id'] = request.GET.get('departamento_id')
-        departamento = Departamento.objects.get(id=filters['departamento_id'])
+    if request.GET.get("departamento_id"):
+        filters["departamento_id"] = request.GET.get("departamento_id")
+        departamento = Departamento.objects.get(id=filters["departamento_id"])
         departamentoNome = departamento.nome
-    if request.GET.get('data_inicio'):
-        filters['data_inicio'] = request.GET.get('data_inicio')
-    if request.GET.get('data_fim'):
-        filters['data_fim'] = request.GET.get('data_fim')
-    if request.GET.get('tipo'):
-        filters['tipo'] = request.GET.get('tipo')
+    if request.GET.get("data_inicio"):
+        filters["data_inicio"] = request.GET.get("data_inicio")
+    if request.GET.get("data_fim"):
+        filters["data_fim"] = request.GET.get("data_fim")
+    if request.GET.get("tipo"):
+        filters["tipo"] = request.GET.get("tipo")
 
     relatorioTipo = "type 2" if departamentoNome == "Eventos" else "type 1"
     doc = docx.Document()
     relatorioData = getFilteredEventos(filters, relatorioTipo)
     doc = createRelatorio(doc, relatorioData, relatorioTipo)
-    with open('tmp/dp_evento_report.docx', 'wb') as f:
+    with open("tmp/dp_evento_report.docx", "wb") as f:
         doc.save(f)
 
-    response = FileResponse(open('tmp/dp_evento_report.docx', 'rb'))
-    response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    response['Content-Disposition'] = 'attachment; filename="dp_evento_report.docx"'
+    response = FileResponse(open("tmp/dp_evento_report.docx", "rb"))
+    response[
+        "Content-Type"
+    ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    response["Content-Disposition"] = 'attachment; filename="dp_evento_report.docx"'
 
-    os.remove('tmp/dp_evento_report.docx')
+    os.remove("tmp/dp_evento_report.docx")
     return response
+
+
+def getEventoRow(
+    worksheet: Worksheet, evento: DpEvento, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if startRow == endRow:
+        worksheet.write(startRow, column, str(evento.tipo_formatado), style)
+        return worksheet
+    
+    worksheet.merge_range(startRow, column, endRow, column, str(evento.tipo_formatado), style)
+    return worksheet
+
+
+def getAtividadeCountRow(
+    worksheet: Worksheet, atividadeCount: int, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if startRow == endRow:
+        worksheet.write(startRow, column, atividadeCount, style)
+        return worksheet
+
+    worksheet.merge_range(startRow, column, endRow, column, atividadeCount, style)
+    return worksheet
+
+def getTipoAtividadeRow(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.tipoAtividade:
+        if startRow == endRow:
+            worksheet.write(startRow, column, str(atividade.tipoAtividade.nome), style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, str(atividade.tipoAtividade.nome), style)
+        return worksheet
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeHorasRow(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.cargaHoraria:
+        if startRow == endRow:
+            worksheet.write(startRow, column, f"{str(int(atividade.cargaHoraria))}h", style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, f"{str(int(atividade.cargaHoraria))}h", style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeDescricaoRow(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.descricao:
+        if startRow == endRow:
+            worksheet.write(startRow, column, str(atividade.descricao), style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, str(atividade.descricao), style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeEscolaRow(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    escola = atividade.evento.escolas.first()
+    if escola:
+        if startRow == endRow:
+            worksheet.write(startRow, column, str(escola.nome), style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, str(escola.nome), style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeEventoEtapa(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.evento.acaoEnsino:
+        if atividade.evento.acaoEnsino.etapa:
+            if startRow == endRow:
+                worksheet.write(startRow, column, f"Etapa {atividade.evento.acaoEnsino.etapa}", style)
+                return worksheet
+            worksheet.merge_range(startRow, column, endRow, column, f"Etapa {atividade.evento.acaoEnsino.etapa}", style)
+        else:
+            if startRow == endRow:
+                worksheet.write(startRow, column, "N/I", style)
+            worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeLocal(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if len(atividade.evento.endereco_completo) > 0:
+        if startRow == endRow:
+            worksheet.write(startRow, column, str(atividade.evento.endereco_completo), style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, str(atividade.evento.endereco_completo), style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeDataInicio(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.data_realizacao_inicio_formatada:
+        if startRow == endRow:
+            worksheet.write(startRow, column, atividade.data_realizacao_inicio_formatada, style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, atividade.data_realizacao_inicio_formatada, style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+    return worksheet
+
+
+def getAtividadeDataFim(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
+) -> Worksheet:
+    if atividade.data_realizacao_fim_formatada:
+        if startRow == endRow:
+            worksheet.write(startRow, column, atividade.data_realizacao_fim_formatada, style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, atividade.data_realizacao_fim_formatada, style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+
+    return worksheet
+
+def getAtividadeAtendimentosRow(
+    worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format, alocacoes: list
+) -> Worksheet:
+    quantidade_atendimentos = atividade.quantidadeAtendimentos
+    if not quantidade_atendimentos:
+        quantidade_atendimentos = 0
+        if len(alocacoes) > 0:
+            for alocacao in alocacoes:
+                if alocacao.quantidade_matriculas:
+                    quantidade_atendimentos += alocacao.quantidade_matriculas
+    if not quantidade_atendimentos or quantidade_atendimentos == 0:
+        quantidade_atendimentos = atividade.quantidadeCertificacoes
+    if not quantidade_atendimentos or quantidade_atendimentos == 0:
+        quantidade_atendimentos = atividade.quantidadeInscricoes
+    if not quantidade_atendimentos or quantidade_atendimentos == 0:
+        quantidade_atendimentos = atividade.quantidadeMatriculas
+
+    if quantidade_atendimentos:
+        if startRow == endRow:
+            worksheet.write(startRow, column, quantidade_atendimentos, style)
+            return worksheet
+        worksheet.merge_range(startRow, column, endRow, column, quantidade_atendimentos, style)
+    else:
+        if startRow == endRow:
+            worksheet.write(startRow, column, "N/I", style)
+        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+
+    return worksheet
+
+
+def getAtividadeCurso(
+    worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
+) -> Worksheet:
+    if alocacao.curso.nome:
+        worksheet.write(row, column, alocacao.curso.nome, style)
+    else:
+        worksheet.write(row, column, "N/I", style)
+    return worksheet
+
+def getAtividadeCursoSiga(
+    worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
+) -> Worksheet:
+    if alocacao.codigo_siga:
+        worksheet.write(row, column, alocacao.codigo_siga, style)
+    else:
+        worksheet.write(row, column, "N/I", style)
+    return worksheet
+
+def getAtividadeCursoOficio(
+    worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
+) -> Worksheet:
+    numero_oficio = alocacao.acaoEnsino.numero_oficio
+    if numero_oficio:
+        worksheet.write(row, column, numero_oficio, style)
+    else:
+        worksheet.write(row, column, "N/I", style)
+    return worksheet
+
+def getAtividadeCursoAtendimentos(
+    worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
+) -> Worksheet:
+    if alocacao.quantidade_matriculas:
+        worksheet.write(row, column, alocacao.quantidade_matriculas, style)
+    else:
+        worksheet.write(row, column, "N/I", style)
+    return worksheet
+
+def getAtividadeCursoTurno(
+    worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
+) -> Worksheet:
+    turno = alocacao.turnos.first()
+    if turno:
+        worksheet.write(row, column, turno.nome, style)
+    else:
+        worksheet.write(row, column, "N/I", style)
+    return worksheet
+
+
+@login_required(login_url="/auth-user/login-user")
+def relatorioSintetico(request):
+    #  {'data_inicio': ['2023-05-26'], 'data_fim': ['2023-05-31'], 'departamento_id': ['1'], 'tipo': ['emprestimo']}
+    data_inicio = request.GET.get("data_inicio")
+    data_fim = request.GET.get("data_fim")
+    departamento_id = request.GET.get("departamento_id")
+    tipo = request.GET.get("tipo")
+
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet()
+    merge_format = workbook.add_format(
+        {
+            "bold": 1,
+            "border": 1,
+            "align": "center",
+            "valign": "vcenter",
+            "fg_color": "yellow",
+        }
+    )
+
+    centered = workbook.add_format()
+    centered.set_align('center')
+    centered.set_align('vcenter')
+    centered.set_text_wrap(True)
+
+    headers = [
+        'Evento',
+        "Quantidade de Ações",
+        "Ação de Extensão",
+        "Horas Executadas",
+        "Quantidade Atendimentos",
+        "Descrição da Ação",
+        "COTEC/RESPONSÁVEL",
+        "Etapa",
+        "Local",
+        "Data de Início (Atividade)",
+        "Data de Fim (Atividade)",
+        "Curso",
+        "COD. SIGA",
+        "Turno",
+        "Ofício",
+        "ALUNOS"
+    ]
+
+        
+    max_len_headers = [len(header) for header in headers]
+
+    for i, header in enumerate(headers):
+        worksheet.write(0, i, header, centered)
+    filters = {}
+    eventos = DpEvento.objects
+    if data_inicio:
+        filters["data_inicio"] = data_inicio
+    if data_fim:
+        filters["data_fim"] = data_fim
+    if departamento_id:
+        filters["departamento_id"] = departamento_id
+    if tipo:
+        filters["tipo"] = tipo
+
+    eventos = getFilteredEventos(filters, "type 2")
+    
+    startRow = 1
+    previousRowCount = 0
+    atividadeCounter = 0
+    for evento in eventos:
+        atividades = Atividade.objects.filter(evento=evento)
+        
+        alocacoes = []
+        if evento.acaoEnsino:
+            acaoEnsino = evento.acaoEnsino
+            alocacoes = Alocacao.objects.filter(acaoEnsino=acaoEnsino).select_related('curso').all()
+
+        alocacoesCount = 1 if len(alocacoes) == 0 else len(alocacoes)
+        atividadeCount = len(atividades)
+        if atividadeCount == 0:
+            continue
+
+        row = startRow
+
+        # coluna do evento
+        startEventoRow = row
+        endEventoRow = (alocacoesCount * atividadeCount) + (previousRowCount)
+        worksheet = getEventoRow(worksheet, evento, startEventoRow, endEventoRow, headers.index("Evento"), centered)
+
+        # coluna da atividade
+        atividadeStartRow = startRow
+        atividadeEndRow = startRow + alocacoesCount - 1
+        for atividade in atividades:
+            atividadeCounter += 1
+            worksheet = getAtividadeCountRow(worksheet, atividadeCounter, atividadeStartRow, atividadeEndRow, headers.index("Quantidade de Ações"), centered)
+            worksheet = getTipoAtividadeRow(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Ação de Extensão"), centered)
+            worksheet = getAtividadeHorasRow(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Horas Executadas"), centered)
+            worksheet = getAtividadeAtendimentosRow(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Quantidade Atendimentos"), centered, alocacoes)
+            worksheet = getAtividadeDescricaoRow(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Descrição da Ação"), centered)
+            worksheet = getAtividadeEscolaRow(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("COTEC/RESPONSÁVEL"), centered)
+            worksheet = getAtividadeEventoEtapa(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Etapa"), centered)
+            worksheet = getAtividadeLocal(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Local"), centered)
+            worksheet = getAtividadeDataInicio(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Data de Início (Atividade)"), centered)
+            worksheet = getAtividadeDataFim(worksheet, atividade, atividadeStartRow, atividadeEndRow, headers.index("Data de Fim (Atividade)"), centered)
+            atividadeStartRow += alocacoesCount
+            atividadeEndRow += alocacoesCount
+
+            # coluna do curso
+            if len(alocacoes) == 0:
+                worksheet.write(row, headers.index("Curso"), "N/A", centered)
+                worksheet.write(row, headers.index("COD. SIGA"), "N/A", centered)
+                worksheet.write(row, headers.index("Turno"), "N/A", centered)
+                worksheet.write(row, headers.index("Ofício"), "N/A", centered)
+                worksheet.write(row, headers.index("ALUNOS"), "N/A", centered)
+                row += 1
+
+            for alocacao in alocacoes:
+                worksheet = getAtividadeCurso(worksheet, alocacao, row, headers.index("Curso"), centered)
+                worksheet = getAtividadeCursoSiga(worksheet, alocacao, row, headers.index("COD. SIGA"), centered)
+                worksheet = getAtividadeCursoTurno(worksheet, alocacao, row, headers.index("Turno"), centered)
+                worksheet = getAtividadeCursoOficio(worksheet, alocacao, row, headers.index("Ofício"), centered)
+                worksheet = getAtividadeCursoAtendimentos(worksheet, alocacao, row, headers.index("ALUNOS"), centered)
+                row += 1
+
+        startRow = row
+        previousRowCount = row - 1
+
+    for i, header in enumerate(headers):
+        if header == "Descrição da Ação" or header == "Local":
+            worksheet.set_column(i, i, 50)
+        elif header == "Curso" or header == "COD. SIGA" or header == "COTEC/RESPONSÁVEL":
+            worksheet.set_column(i, i, 30)
+        else:
+            worksheet.set_column(i, i, max_len_headers[i] + 5)
+
+    workbook.close()
+
+    response = HttpResponse(output.getvalue(), content_type="application/vnd.ms-excel")
+    response["Content-Disposition"] = "attachment; filename=RelatorioSintetico.xlsx"
+    return response
+
+
+# @login_required(login_url='/auth-user/login-user')
+# def relatorioSintetico(request):
+#     output = BytesIO()
+#     workbook = xlsxwriter.Workbook(output)
+#     worksheet = workbook.add_worksheet()
+#     centered = workbook.add_format()
+#     centered.set_align('center')
+#     centered.set_align('vcenter')
+#     headers = [
+#         'Evento',
+#         "Quantidade de Ações",
+#         "Ação de Extensão",
+#         "Horas Executadas",
+#         "Descrição da Ação",
+#         "COTEC/RESPONSÁVEL",
+#         "Etapa",
+#         "Local",
+#         "Data de Início (Atividade)",
+#         "Data de Fim (Atividade)",
+#         "Curso"
+#     ]
+#     max_len_headers = [len(header) for header in headers]
+
+#     for i, header in enumerate(headers):
+#         worksheet.write(0, i, header, centered)
+
+#     eventos = DpEvento.objects.all().prefetch_related('atividade_set')
+
+#     row = 1
+#     atividadeCounter = 1
+#     for evento in eventos:
+#         atividades = Atividade.objects.filter(evento=evento)
+
+#         if len(atividades) == 0:
+#             continue
+
+#         atividadesCount = len(atividades)
+#         if atividadesCount == 1:
+#             cursosCount = 0
+#             worksheet = getEventoRow(worksheet, evento, row, headers.index("Evento"), centered)
+#             atividadeCounter += 1
+#             worksheet = getAtividadeCountRow(worksheet, atividadeCounter, row, headers.index("Quantidade de Ações"), centered)
+#             atividade = atividades[0]
+#             worksheet = getTipoAtividadeRow(worksheet, atividade, row, headers.index("Ação de Extensão"), centered)
+#             worksheet = getAtividadeHorasRow(worksheet, atividade, row, headers.index("Horas Executadas"), centered)
+#             worksheet = getAtividadeDescricaoRow(worksheet, atividade, row, headers.index("Descrição da Ação"), centered)
+#             worksheet = getAtividadeEscolaRow(worksheet, atividade, row, headers.index("COTEC/RESPONSÁVEL"), centered)
+#             worksheet = getAtividadeEventoEtapa(worksheet, atividade, row, headers.index("Etapa"), centered)
+#             worksheet = getAtividadeLocal(worksheet, atividade, row, headers.index("Local"), centered)
+#             worksheet = getAtividadeDataInicio(worksheet, atividade, row, headers.index("Data de Início (Atividade)"), centered)
+#             worksheet = getAtividadeDataFim(worksheet, atividade, row, headers.index("Data de Fim (Atividade)"), centered)
+#             if evento.acaoEnsino:
+#                 acaoEnsino = evento.acaoEnsino
+#                 cursos = Alocacao.objects.filter(acaoEnsino=acaoEnsino).select_related('curso').all()
+#                 cursosCount = len(cursos)
+#                 if cursosCount == 1:
+#                     curso = cursos[0]
+#                     worksheet = getAtividadeCurso(worksheet, curso, row, headers.index("Curso"), centered)
+#                     row += 1
+#                 elif cursosCount > 1:
+#                     for curso in cursos:
+#                         row += 1
+#                         worksheet = getAtividadeCurso(worksheet, curso, row, headers.index("Curso"), centered)
+#             row += 1
+#         else:
+#             worksheet = getEventoRow(worksheet, evento, row, headers.index("Evento"), centered)
+#             for atividade in atividades:
+#                 atividadeCounter += 1
+#                 worksheet = getAtividadeCountRow(worksheet, atividadeCounter, row, headers.index("Quantidade de Ações"), centered)
+#                 worksheet = getTipoAtividadeRow(worksheet, atividade, row, headers.index("Ação de Extensão"), centered)
+#                 worksheet = getAtividadeHorasRow(worksheet, atividade, row, headers.index("Horas Executadas"), centered)
+#                 worksheet = getAtividadeDescricaoRow(worksheet, atividade, row, headers.index("Descrição da Ação"), centered)
+#                 worksheet = getAtividadeEscolaRow(worksheet, atividade, row, headers.index("COTEC/RESPONSÁVEL"), centered)
+#                 worksheet = getAtividadeEventoEtapa(worksheet, atividade, row, headers.index("Etapa"), centered)
+#                 worksheet = getAtividadeLocal(worksheet, atividade, row, headers.index("Local"), centered)
+#                 worksheet = getAtividadeDataInicio(worksheet, atividade, row, headers.index("Data de Início (Atividade)"), centered)
+#                 worksheet = getAtividadeDataFim(worksheet, atividade, row, headers.index("Data de Fim (Atividade)"), centered)
+#                 row += 1
+#             worksheet.merge_range(row - atividadesCount, 0, row -1, 0, str(evento.tipo_formatado), centered)
+
+#     for i, header in enumerate(headers):
+#         worksheet.set_column(i, i, max_len_headers[i] + 5)
+#     worksheet.autofit()
+#     # Fecha o objeto do tipo Workbook. Isso é necessário antes de passar o objeto para a HttpResponse
+#     workbook.close()
+
+#     # Crie uma resposta HTTP com o xls
+#     response = HttpResponse(output.getvalue(), content_type='application/vnd.ms-excel')
+#     response['Content-Disposition'] = 'attachment; filename=RelatorioSintetico.xlsx'
+
+#     return response
