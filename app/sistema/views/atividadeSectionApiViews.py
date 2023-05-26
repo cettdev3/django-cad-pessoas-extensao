@@ -68,15 +68,12 @@ class AtividadeSectionDetailApiView(APIView):
                 {"res": "Não existe seção de atividade com o id informado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        print("atividadeSection antes: ", atividadeSection.id, atividadeSection.order)
         if request.data.get("nome"):
             atividadeSection.nome = request.data.get("nome")
         if request.data.get("order"):
-            print("order: ",request.data.get("order"))
             atividadeSection.order = request.data.get("order")
         
         atividadeSection.save()
-        print("atividadeSection depois: ", atividadeSection.id, atividadeSection.order)
         serializer = AtividadeSectionSerializer(atividadeSection)
         return Response(serializer.data, status=status.HTTP_200_OK)
         

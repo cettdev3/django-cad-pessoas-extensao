@@ -43,7 +43,6 @@ def membro_execucao_por_pessoa(dpevento):
         for item in result:
             for pessoaId, membrosExecucao in item.items():
                 
-                print("pessoa id: ",pessoaId)
                 membroExecucaoCreated = MembroExecucao.objects.create(**{
                     'pessoa': Pessoas.objects.get(id=pessoaId),
                     'evento': dpevento,

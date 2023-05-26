@@ -49,7 +49,6 @@ class DpEventoApiView(APIView):
 
     def get(self, request, *args, **kwargs):
 
-        print("dentro do get de dpEvento")
         dp_eventos = DpEvento.objects.prefetch_related(Prefetch(
             'membroexecucao_set',
             queryset=MembroExecucao.objects.order_by('ticket__status').distinct()
@@ -149,7 +148,6 @@ class DpEventoDetailApiView(APIView):
             return None
 
     def get(self, request, dp_evento_id, *args, **kwargs):
-        print("dentro do fet")
         dp_evento = DpEvento.objects.prefetch_related(
             Prefetch('membro_execucao_set', queryset=MembroExecucao.objects.prefetch_related('ticket_set'))
         ).get(id=dp_evento_id)
@@ -170,7 +168,6 @@ class DpEventoDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        print("dados dentro da api: ", request.data)
 
         if request.data.get("tipo"):
             dp_evento.tipo = request.data.get("tipo")
@@ -214,9 +211,7 @@ class DpEventoDetailApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             dp_evento.acaoEnsino = acaoEnsino
-            print("ação de ensino", acaoEnsino.id)
         else:
-            print("dentro do else")
             dp_evento.acaoEnsino = None
         
         DpEventoEscola.objects.filter(dp_evento=dp_evento).delete()

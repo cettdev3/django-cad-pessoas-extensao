@@ -13,11 +13,9 @@ class CursoApiView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
-        print("dentro da rota de cursos")
         nome = request.GET.get('nome') if request.GET.get('nome') != "None" else None
         order_by = request.GET.get('order_by') if request.GET.get('order_by') != "None" else None
         cursos = Curso.objects
-        print(nome, order_by)
         if nome:
             cursos = cursos.filter(nome__icontains=nome)
         if order_by:

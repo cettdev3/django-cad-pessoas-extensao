@@ -10,9 +10,7 @@ from rest_framework.authtoken.models import Token
 def createDataRemovida(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    print("fsajhfadlskhf",request.body)
     body = json.loads(request.body)
-    print(body)
     response = requests.post('http://localhost:8000/datas-removidas', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 

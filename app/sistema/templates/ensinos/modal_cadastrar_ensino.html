@@ -434,10 +434,10 @@
     }
 
     function cadastrarEnsino(data) {
-        if (!data["numero_oficio"]) {
-            showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
-            return
-        }
+        // if (!data["numero_oficio"]) {
+        //     showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
+        //     return
+        // }
         toggleLoading("update demanda")
         console.log(data)
         $.ajax({
@@ -465,10 +465,10 @@
     }
 
     function editarEnsino(ensinoId, formData) {
-        if (!formData["numero_oficio"]) {
-            showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
-            return
-        }
+        // if (!formData["numero_oficio"]) {
+        //     showFloatingMessage("Não é possivel cadastrar uma ação de ensino sem o número do ofício", "alert-danger");
+        //     return
+        // }
         $.ajax({
             url: "editarEnsino/"+ensinoId,
             data: JSON.stringify({"data":formData}),

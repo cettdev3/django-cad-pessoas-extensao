@@ -31,7 +31,6 @@ class ItinerarioItemApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print("dados dentro da api antes de salvar: ",request.data)
         cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -146,7 +145,6 @@ class ItinerarioItemDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, itinerario_item_id, *args, **kwargs):
-        print("itinerario_item_id dentro da: ", itinerario_item_id)
         itinerarioItem = self.get_object(ItinerarioItem, itinerario_item_id)
         if not itinerarioItem:
             return Response(

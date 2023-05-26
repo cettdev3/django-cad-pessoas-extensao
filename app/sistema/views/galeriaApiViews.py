@@ -98,7 +98,6 @@ class GaleriaDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = GaleriaSerializer(galeria)
-        print("serializer.data: ", serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, galeria_id, *args, **kwargs):

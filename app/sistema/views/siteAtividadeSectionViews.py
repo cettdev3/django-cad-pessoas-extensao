@@ -26,7 +26,6 @@ def atividadeSectionModal(request):
 @login_required(login_url='/auth-user/login-user')
 def atividadeSectionTable(request):
     evento_id = request.GET.get('evento_id')
-    print(f"Filters: {request.GET}")
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get(
@@ -79,7 +78,6 @@ def updateAtividadeSection(request, atividade_section_id):
     headers = {'Authorization': 'Token ' + token.key} 
     url = 'http://localhost:8000/atividade-section' + "/"+str(atividade_section_id)
     body = payload
-    print("dentro do site view", body)
     response = requests.put(url, json=body, headers=headers)
     
     atividadeSection = json.loads(response.content.decode())

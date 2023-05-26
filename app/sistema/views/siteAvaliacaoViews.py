@@ -32,7 +32,6 @@ def avaliacoesTable(request):
         avaliacoes = avaliacoes.filter(acao__id=acao_id) 
 
     avaliacoes = avaliacoes.all()
-    print(avaliacoes)
     return render(
         request, "avaliacoes/avaliacoes_table.html", {"avaliacoes": avaliacoes}
     )
@@ -45,7 +44,6 @@ def avaliacoesDpEventoTable(request):
     if evento_id:
         avaliacoes = avaliacoes.filter(evento__id=evento_id)
     avaliacoes = avaliacoes.all()
-    print(avaliacoes)
     return render(
         request, "avaliacoes/avaliacoes_table.html", {"avaliacoes": avaliacoes}
     )
@@ -66,7 +64,6 @@ def avaliacaoModal(request):
     title = request.GET.get("title")
     modalId = request.GET.get("modalId")
     avaliacao_id = request.GET.get("avaliacao_id")
-    print(modalId)
     data = {}
     if acao_id:
         acao = Acao.objects.get(id=acao_id)
@@ -99,7 +96,6 @@ def updateAvaliacao(request, id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {"Authorization": "Token " + token.key}
     body = json.loads(request.body)["data"]
-    print("dados para update avaliacao", body)
     response = requests.put(
         "http://localhost:8000/avaliacoes/" + str(id), json=body, headers=headers
     )
@@ -111,7 +107,6 @@ def updateAvaliacao(request, id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {"Authorization": "Token " + token.key}
     body = json.loads(request.body)["data"]
-    print("dados para update avaliacao", body)
     response = requests.put(
         "http://localhost:8000/avaliacoes/" + str(id), json=body, headers=headers
     )
@@ -189,9 +184,7 @@ def avaliacaoRelatorio(request, id):
             if value is None:
                 value = ''
             if attr in description:
-                print(f"atributo: {attr}")
                 if 'geral' in attr.lower() or 'qtdSalas' == attr:
-                    print(f"atributo em geral: {attr}")
                     attributesGeral.append((description[attr], value))
                 elif 'culinaria' in attr.lower():
                     attributesCulinaria.append((description[attr], value))

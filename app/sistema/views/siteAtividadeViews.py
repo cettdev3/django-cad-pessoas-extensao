@@ -44,12 +44,6 @@ def atividadesDpEventoTable(request):
     responsavel_id = request.GET.get('responsavel_id', None)
     data_fim = request.GET.get('data_fim', None)
     evento_id = request.GET.get('dp_evento_id')
-    print('evento_id', evento_id)
-    print('departamento_id', departamento_id)
-    print('nome', nome)
-    print('categoria', categoria)
-    print('responsavel_id', responsavel_id)
-    print('data_fim', data_fim)
     
     queryset = Atividade.objects.all()
     if departamento_id is not None and departamento_id != "":

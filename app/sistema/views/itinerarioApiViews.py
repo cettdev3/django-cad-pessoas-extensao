@@ -28,7 +28,6 @@ class ItinerarioApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print("body dentro da api: ", request.data)
         itinerarioData = {
             "color": request.data.get("color"),
         }
@@ -85,12 +84,9 @@ class ItinerarioDetailApiView(APIView):
         with transaction.atomic():
             itinerarioItems = ItinerarioItem.objects.filter(itinerario=itinerario)
             for itinerarioItem in itinerarioItems:
-                print("itinerarioItem deletaro: ", itinerarioItem.id)
                 itinerarioItem.delete()
             
-            print("todos itens de itineraio deletados: ", itinerario.id)
             itinerario.delete()
-            print("itinerario   deletado: ")
             return Response(
                 {"res": "itinerario deletada!"},
                 status=status.HTTP_200_OK
