@@ -46,15 +46,15 @@ class DpEvento(models.Model):
     @property
     def endereco_completo(self):
         enderecoCompleto = "" 
-        if self.cidade:
+        if self.cidade and self.cidade.nome != "None" and self.cidade.nome != "":
             enderecoCompleto += self.cidade.nome + " GO, "
-        if self.logradouro:
+        if self.logradouro and self.logradouro != "None" and self.logradouro != "":
             enderecoCompleto += self.logradouro
-        if self.bairro:
+        if self.bairro and self.bairro != "None" and self.bairro != "":
             enderecoCompleto += ", "+self.bairro
-        if self.complemento:
+        if self.complemento and self.complemento != "None" and self.complemento != "":
             enderecoCompleto += ", "+self.complemento
-        if self.cep:
+        if self.cep and self.cep != "None" and self.cep != "":
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
     

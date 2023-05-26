@@ -16,6 +16,26 @@
             <div class="modal-body">
                 <form id="filtrosRelatorioModal">
                     <div class="form-group row">
+                        <div class="col-sm-2">
+                            <label><b>Tipo do Relatório:</b></label>
+                            <select required 
+                            id="tipo_relatorio"
+                            class="form-control" 
+                            name="tipo_relatorio">
+                                <option
+                                value="">
+                                    Selecione uma opção
+                                </option>
+                                <option
+                                value="exel_sintetico">
+                                    EXCEL (SINTÉTICO)
+                                </option>
+                                <option 
+                                value="cirscunstanciado_word">
+                                    WORD (CIRSCUNSTANCIADO)
+                                </option>
+                            </select>
+                        </div>
                         <div class="col-sm-3" id="filtrorelatorioEventosDepartamentoSelect">
                         </div>
                         <div class="col-sm-3">
@@ -75,11 +95,11 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <label><b>Data de Inicio:</b></label>
                             <input type="date" class="form-control" id="data_inicio" name="data_inicio">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <label><b>Data de Fim:</b></label>
                             <input type="date" class="form-control" id="data_fim" name="data_fim">
                         </div>
@@ -126,7 +146,7 @@
         return filtros;
     }
 
-    function gerarRelatorio() {
+    function gerarRelatorioCircunstanciado() {
         filtros = getFiltroRelatorioEvento();
         console.log(filtros)
         const xhr = new XMLHttpRequest();
@@ -165,6 +185,56 @@
 
         xhr.send();
         console.log("filtros")
+    }
+
+    function gerarRelatorioSintetico() {
+        filtros = getFiltroRelatorioEvento(); // Ajuste isto se os filtros do novo relatório forem diferentes
+        console.log(filtros)
+        const xhr = new XMLHttpRequest();
+        let uri = '/relatorioSintetico' // Altere isto para o endpoint do novo relatório
+        let params = Object.keys(filtros).map(function (key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(filtros[key]);
+        }).join('&');
+        console.log(uri, "?"+params)
+        xhr.open('GET', uri+"?"+params, true);
+        xhr.addEventListener('progress', event => {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            console.log('Download progress:', percentComplete + '%');
+        }
+        });
+
+        xhr.responseType = 'blob';
+        
+        xhr.onload = event => {
+            if (xhr.status === 200) {
+                const blob = xhr.response;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'relatorio_sintetico.xlsx'; // Altere isto para o nome do novo relatório
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                $("#modalRelatorioEventos").modal("toggle"); // Ajuste isto se o id do modal for diferente
+            } else {
+                console.error('Download failed:', xhr.statusText);
+            }
+        };
+
+        xhr.send();
+        console.log("filtros")
+    };
+
+    function gerarRelatorio() {
+        filtroTipoRelatorio = $("#tipo_relatorio").val();   
+        if (filtroTipoRelatorio == "cirscunstanciado_word") {
+            gerarRelatorioCircunstanciado();
+        } else if (filtroTipoRelatorio == "exel_sintetico") {
+            gerarRelatorioSintetico();
+        }
     }
 
     $(document).ready(function () {
