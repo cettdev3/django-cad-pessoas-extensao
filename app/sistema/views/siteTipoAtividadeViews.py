@@ -53,9 +53,7 @@ def saveTipoAtividade(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    print("salvando tipo de atividade: ", body)
     response = requests.post('http://localhost:8000/tipos-atividades', json=body, headers=headers)
-    print(response.content)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
