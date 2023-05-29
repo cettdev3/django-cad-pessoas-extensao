@@ -15,6 +15,20 @@ from ..services.alfrescoApi import AlfrescoAPI
 from ..serializers.imagemSerializer import ImagemSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from PIL import Image
+import pyheif
+
+def convert_heic_to_jpeg(heic_path, jpeg_path):
+    heif_file = pyheif.read(heic_path)
+    image = Image.frombytes(
+        heif_file.mode, 
+        heif_file.size, 
+        heif_file.data,
+        "raw",
+        heif_file.mode,
+        heif_file.stride,
+    )
+    image.save(jpeg_path, format='JPEG');
 
 class ImagemApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -26,7 +40,6 @@ class ImagemApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print("dentro da api de imagem")
         data = json.loads(request.body)
         galeria_id = data.get('galeria_id')
         if not galeria_id:
@@ -34,23 +47,27 @@ class ImagemApiView(APIView):
         
         galeria = Galeria.objects.get(id=galeria_id)
 
-        print("dentro da api de imagem 2")
         alfresco = AlfrescoAPI()
         
         image_description = data.get('description', '')
 
-        # Process and save the image file to Alfresco
-        print("dentro da api de imagem 3")
+        print("dentro da api de imagem:  ", data.get('imagem_nome', ''))
 
         image_data_url = data.get('dataUrl', '')
         image_format, image_str = image_data_url.split(';base64,')
-        image_ext = image_format.split('/')[-1]
+        imagem_nome =  data.get('imagem_nome', '')
+        image_ext = imagem_nome.split('.')[-1]
         image_content_bytes = base64.b64decode(image_str)
         image_content = ContentFile(image_content_bytes)
-        image_name = f'{uuid.uuid4()}.jpg'
-        image_path = default_storage.save(f'tmp/{image_name}', image_content)
+        image_name = f'{uuid.uuid4()}'
+        temp_image_path  = default_storage.save(f'tmp/{image_name}.{image_ext}', image_content)
+        final_image_path = temp_image_path
 
-        alfrescoNode = alfresco.createNode(image_path, "cm:content", image_name)
+        if image_ext.lower() == 'heic':
+            final_image_path = f'tmp/{image_name}.jpg'
+            convert_heic_to_jpeg(temp_image_path, final_image_path)
+
+        alfrescoNode = alfresco.createNode(final_image_path, "cm:content", image_name)
         shared_link = alfresco.createSharedLink(alfrescoNode.entry_id)
         shared_link = json.loads( shared_link )
         entry = shared_link['entry']
@@ -64,12 +81,13 @@ class ImagemApiView(APIView):
             galeria=galeria,
             shared_link=shared_link_url
         )
+
         imagem.save()
-        default_storage.delete(image_path)
+        default_storage.delete(final_image_path)
         serializer = ImagemSerializer(imagem)
         print("saindo da api de imagem ", serializer.data)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED);
 
 class ImagemDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
