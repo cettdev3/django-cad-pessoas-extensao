@@ -66,6 +66,7 @@ data-uuid=""
             title="Descrição da imagem">
             <i style="border-radius: 50%;" class="fa-solid fa-edit fa-stack-1x "></i>
         </span>
+        <input type="text" hidden id="imagem_name" name="imagem_name">
         <textarea class="image-descricao-input" id="descricao" name="descricao" value="" rows="3" 
         {% if imagem %}
         data-uuid="{{imagem.id}}"

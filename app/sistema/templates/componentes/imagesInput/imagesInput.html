@@ -1,10 +1,8 @@
-<div 
-{% if thumbnailStyle %}
-class="d-flex justify-content-end"
-{% else %}
-class="d-flex justify-content-between"
-{% endif %}
->
+<div {% if thumbnailStyle %} 
+class="d-flex justify-content-end" 
+{% else %} 
+class="d-flex justify-content-between" 
+{% endif %}>
     {% if not thumbnailStyle %}
     <label for="galeria_images">Imagens:</label>
     {% endif %}
@@ -24,21 +22,13 @@ class="d-flex justify-content-between"
                     <input type="file" class="form-control d-none" id="galeria_images" name="galeria_images[]" multiple
                         required>
                 </div>
-                <i id="dropzone-icon" 
-                {% if imagens %}
-                class="fas fa-cloud-upload-alt drop-icon d-none"
-                {% else %}
-                class="fas fa-cloud-upload-alt drop-icon"
-                {% endif %}
-                ></i>
-                <p id="dropzone-text"
-                {% if imagens %}
-                class="d-none"
-                {% endif %}
-                >Você pode arrastar suas imagens para esta área</p>
+                <i id="dropzone-icon" {% if imagens %} class="fas fa-cloud-upload-alt drop-icon d-none" {% else %}
+                    class="fas fa-cloud-upload-alt drop-icon" {% endif %}></i>
+                <p id="dropzone-text" {% if imagens %} class="d-none" {% endif %}>Você pode arrastar suas imagens para
+                    esta área</p>
                 <div class="row mt-3" id="thumbnails-container">
                     {% for imagem in imagens %}
-                        {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id thumbnailStyle=thumbnailStyle %}
+                    {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id thumbnailStyle=thumbnailStyle %}
                     {% endfor %}
                 </div>
             </div>
@@ -49,7 +39,7 @@ class="d-flex justify-content-between"
 {% include "componentes/imagesInput/galleryModal.html" %}
 
 <template id="thumbnail-template">
-{% include "componentes/imagesInput/thumbnail.html" %}
+    {% include "componentes/imagesInput/thumbnail.html" %}
 </template>
 <script>
     function toggleDropZoneText(files) {
@@ -65,7 +55,7 @@ class="d-flex justify-content-between"
 
     function toggleLoadingThumbnail(thumbnailContainer, from = "teste") {
         console.log("from: ", from)
-        console.log("container da thumb: ",thumbnailContainer)
+        console.log("container da thumb: ", thumbnailContainer)
         var $imageContainer = thumbnailContainer.find('.image-container');
         console.log("image container: ", $imageContainer)
         if ($imageContainer.hasClass('loading')) {
@@ -79,7 +69,7 @@ class="d-flex justify-content-between"
 
     function bindEvents(thumbnail) {
         let inputDescricao = thumbnail.find("textarea");
-        inputDescricao.on("keyup", debounce(function() {
+        inputDescricao.on("keyup", debounce(function () {
             console.log("input descricao mudou dentro de input images");
             saveImage(thumbnail);
         }, 1000));
@@ -89,16 +79,17 @@ class="d-flex justify-content-between"
         let inputGaleriaId = thumbnail.find("#galeria_id");
         let imageTag = thumbnail.find("img")
         let imageDataUrl = imageTag.attr("src");
-
+        let imagemNome = thumbnail.find("#imagem_name").val()
         let inputImagemId = thumbnail.find("#imagem_id");
         if (!inputGaleriaId.val()) return;
-        console.log("salvando imagem pelo input images: ",{
+        console.log("salvando imagem pelo input images: ", {
             imagem_id: inputImagemId.val(),
             descricao: thumbnail.find(".image-descricao-input").val(),
             dataUrl: imageDataUrl,
-            galeria_id: inputGaleriaId.val()
+            galeria_id: inputGaleriaId.val(),
+            imagem_nome: imagemNome
         })
-        console.log("inputImagemId: ", inputImagemId)
+
         toggleLoadingThumbnail(thumbnail, "saveImage");
         $.ajax({
             url: "/saveImagem",
@@ -110,20 +101,23 @@ class="d-flex justify-content-between"
                 imagem_id: inputImagemId.val(),
                 descricao: thumbnail.find(".image-descricao-input").val(),
                 dataUrl: imageDataUrl,
-                galeria_id: inputGaleriaId.val()
+                galeria_id: inputGaleriaId.val(),
+                imagem_nome: imagemNome
             }),
-            success: function(response) {
+            success: function (response) {
                 console.log("response: ", response)
                 showFloatingMessage("Imagem atualizada com sucesso", "alert-success");
+                toggleLoadingThumbnail(thumbnail, "ajaxSuccess");
                 let imagem = JSON.parse(response.content);
+                console.log("imagem", imagem)
                 inputImagemId.val(imagem.id);
                 thumbnail.find(".custom-remove-img-button").attr("id", imagem.id);
-                toggleLoadingThumbnail(thumbnail, "ajaxSuccess");
+                thumbnail.find("img").attr("src", imagem.shared_link);
             },
-            error: function(error) {
+            error: function (error) {
                 console.log("error: ", error)
                 showFloatingMessage("Erro ao atualizar imagem", "alert-danger");
-                toggleLoadingThumbnail("ajaxError",thumbnail);
+                toggleLoadingThumbnail("ajaxError", thumbnail);
             }
         })
     }
@@ -142,6 +136,7 @@ class="d-flex justify-content-between"
                 const uuid = generateUUID();
                 const thumbnailTemplate = $("#thumbnail-template")[0].content;
                 const thumbnail = $(thumbnailTemplate).clone();
+                const importedFileName = file.name;
 
                 thumbnail.find(".col-md-4").attr("data-uuid", uuid);
                 thumbnail.find("img").attr("src", e.target.result);
@@ -151,29 +146,30 @@ class="d-flex justify-content-between"
                     .attr("name", `descricao_${i}`)
                     .attr("data-uuid", uuid);
 
-                    
-                    thumbnail.find("#galeria_id").val({{galeria_id}});
-                    thumbnail.find("#thumbnail-id").val(uuid);
-                    thumbnail.attr("id", `thumbnail-${uuid}`);
-                    
-                    
-                    thumbnailsContainer.append(thumbnail);
-                    galleryImages.push(e.target.result);
-                    galleryImagesFiles.push(file);
-                    
-                    const hiddenImageInput = $(`<input type="hidden" name="gallery_image_${i}">`);
-                    hiddenImageInput.val(e.target.result);
-                    $("#agenda-form").append(hiddenImageInput);
-                    let thumbnailDom = $('*[data-uuid="' + uuid + '"]');
-                    let galeriaIdValue = thumbnailDom.find("#galeria_id").val();
-                    if (galeriaIdValue) {
-                        bindEvents(thumbnailDom);
-                        saveImage(thumbnailDom);
-                    }
-                };
 
-            reader.readAsDataURL(file);
-        }
+                thumbnail.find("#galeria_id").val({{ galeria_id }});
+            thumbnail.find("#thumbnail-id").val(uuid);
+            thumbnail.find("#imagem_name").val(importedFileName)
+            thumbnail.attr("id", `thumbnail-${uuid}`);
+
+
+            thumbnailsContainer.append(thumbnail);
+            galleryImages.push(e.target.result);
+            galleryImagesFiles.push(file);
+
+            const hiddenImageInput = $(`<input type="hidden" name="gallery_image_${i}">`);
+            hiddenImageInput.val(e.target.result);
+            $("#agenda-form").append(hiddenImageInput);
+            let thumbnailDom = $('*[data-uuid="' + uuid + '"]');
+            let galeriaIdValue = thumbnailDom.find("#galeria_id").val();
+            if (galeriaIdValue) {
+                bindEvents(thumbnailDom);
+                saveImage(thumbnailDom);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    }
     }
 
     function generateUUID() {
@@ -188,7 +184,7 @@ class="d-flex justify-content-between"
         console.log("imagem contem id = " + imagemId + " e será deletada");
         return await $.ajax({
             url: `/deleteImagem/${imagemId}`,
-            headers: { "X-CSRFToken":  '{{ csrf_token }}' },
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
             type: 'DELETE',
             success: function (result) {
                 console.log("sucesso ao deletar", result);
