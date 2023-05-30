@@ -157,10 +157,10 @@
         console.log(uri, "?"+params)
         xhr.open('GET', uri+"?"+params, true);
         xhr.addEventListener('progress', event => {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            console.log('Download progress:', percentComplete + '%');
-        }
+            if (event.lengthComputable) {
+                const percentComplete = (event.loaded / event.total) * 100;
+                console.log('Download progress:', percentComplete + '%');
+            }
         });
 
         xhr.responseType = 'blob';

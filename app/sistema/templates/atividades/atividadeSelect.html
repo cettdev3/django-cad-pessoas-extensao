@@ -1,0 +1,30 @@
+<style>
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-space-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+</style>
+<div class="d-flex justify-content-space-between align-items-center">
+    <label><b>Atividade:</b></label>
+</div>
+<select class="form-control" 
+id="atividade_id" 
+name="atividade_id">
+    <option value="">Selecione uma Atividade</option>
+    {% for atividade in atividades %}
+        <option  
+        {% if selected == atividade.id %}
+        selected
+        {% endif %}
+        value="{{atividade.id}}">
+            {{atividade.tipoAtividade.nome}}
+        </option>
+    {% endfor %}
+</select>

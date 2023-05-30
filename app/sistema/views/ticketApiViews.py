@@ -162,7 +162,29 @@ class TicketApiView(APIView):
 
         status = request.data.get("status") if request.data.get("status") else Ticket().STATUS_CRIACAO_PENDENTE
         if len(id_protocolo) > 0:
-            # O ticket so pode ser atribuido a alguns status se tiver um protocolo
+            ticketFromIdProtocolo = Ticket.objects.filter(id_protocolo=id_protocolo).first()
+            if ticketFromIdProtocolo:
+                evento = None
+                mensagem = "Já existe um ticket com o protocolo informado: "+id_protocolo+". O id do ticket no Maestro é: "+str(ticketFromIdProtocolo.id)+"; "
+                membroExecucaoTicket = ticketFromIdProtocolo.membro_execucao
+                if membroExecucaoTicket:
+                    evento = membroExecucaoTicket.evento
+                    mensagem += "Membro da equipe de execução, "+ membroExecucaoTicket.pessoa.nome+";"
+                alocacaoTicket = ticketFromIdProtocolo.alocacao
+                if alocacaoTicket:
+                    evento = alocacaoTicket.acaoEnsino
+                    mensagem += "Alocação do professor, "+ alocacaoTicket.professor.nome +", no curso de: "+alocacaoTicket.curso.nome +";"
+                atividadeTicket = ticketFromIdProtocolo.atividade
+                if atividadeTicket:
+                    evento = atividadeTicket.evento
+                    mensagem += "Atividade, "+ atividadeTicket.tipoAtividade.nome +";"
+                if evento:
+                    mensagem += "evento: " + evento.tipo + " de " + evento.data_inicio_formatada + " a " + evento.data_fim_formatada
+                return Response(
+                    {"res": mensagem, "ticket_id": ticketFromIdProtocolo.id},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+
             if request.data.get("status") in [Ticket().STATUS_CRIADO, Ticket().STATUS_PRESTACAO_CONTAS_PENDENTE, Ticket().STATUS_PRESTACAO_CONTAS_CRIADA, Ticket().STATUS_CANCELADO]:
                 status = request.data.get("status")
             else:
@@ -177,6 +199,15 @@ class TicketApiView(APIView):
         valor_executado = None
         if request.data.get("valor_executado") and request.data.get("valor_executado") != "":
             valor_executado = request.data.get("valor_executado")
+
+        if request.data.get("tipo"):
+            tipo = request.data.get("tipo")
+            if tipo not in Ticket().TIPOS:
+                message = f"Tipo de inválido. Tipo fornecido: {tipo}. Tipos válidos: {Ticket().TIPOS}"
+                return Response(
+                    {"res": message},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
 
         ticketData = {
             "tipo": request.data.get("tipo"),
@@ -206,7 +237,6 @@ class TicketApiView(APIView):
 
         ticketData = Ticket.objects.create(**ticketData)
         ticketSerializer = TicketSerializer(ticketData)
-        print(ticketSerializer.data)
         return Response(ticketSerializer.data, status=st.HTTP_200_OK)
 
 class TicketDetailApiView(APIView):

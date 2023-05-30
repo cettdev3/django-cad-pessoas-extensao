@@ -78,18 +78,20 @@ function getAtividadeDrawer(atividade_id, callback = null) {
     });
 }
 
-// function atividadeSectionsTable(filters, callback=null) {
-//     toggleLoading("atividadeSectionsTable")
-//     return $.ajax({
-//         url: "/atividadeSectionTable",
-//         method: "GET",
-//         data: filters,
-//         success: function (data) {
-//             toggleLoading("atividadeSectionsTable after")
-//             if (callback) callback(data);
-//         },
-//         error: function (data) {
-//             showFloatingMessage("Erro ao buscar seções", "alert-danger");
-//         }
-//     });
-// }
+async function getAtividadeSelect(data, callback=null) {
+    toggleLoading("select atividade")
+    return await $.ajax({
+        url: "/atividadeSelect",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            toggleLoading("after get select atividade")
+            if (callback) callback(data);
+        },
+        error: function (data) {
+            toggleLoading("select atividade error")
+            showFloatingMessage("Erro ao carregar select atividades", "alert-danger");
+        }
+    });
+}

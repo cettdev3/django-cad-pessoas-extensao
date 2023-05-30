@@ -153,6 +153,10 @@ z-index: 4
             <input type="text" name="order_by" id="filterDpEventoOrderBy" hidden>
         </div>
         <div class="d-flex">
+            <button id="importarTickets"
+                class="btn-cadastrar rounded d-flex justify-content-between align-items-center mr-2">
+                <span>Importar</span>
+            </button>
             <button id="relatorioDpEvento" onclick="emitirRelatorio()"
                 class="btn-cadastrar rounded d-flex justify-content-between align-items-center mr-2">
                 <span>Emitir Relatório</span>
@@ -172,7 +176,11 @@ z-index: 4
 
     <div class="w-100" id="modalFiltrosRelatorioEventos">
     </div>
+    
+    <div class="w-100" id="modalImportarDemandas">
+    </div>
 
+    <input type="file" id="anexoFileInput" style="display: none;" />
 </div>
 <script>
     var filterPrefix = "filterDpEvento"
@@ -180,6 +188,11 @@ z-index: 4
     var idModal = "modalDpEvento"
     var rotaModalDpEvento = "/dpEventoModal"
     var rotaTableDpEvento = "/dpEventoTable"
+
+    function clearExportacaoModal() {
+        $('#importTicketsModal').remove();
+        $("#anexoFileInput").val("");
+    }
 
     function getDpEventoFilters() {
         let filtros = {}
@@ -255,6 +268,27 @@ z-index: 4
     }
 
     $(document).ready(function () {
+        $('#importarTickets').click(function() {
+            $('#anexoFileInput').click();
+        });
+        
+        $('#anexoFileInput').change(function() {
+            var file = this.files[0];
+            console.log("trigger change")
+            var formData = new FormData();
+            formData.append("file", file);
+            
+            modalImportDemanda(formData, function (html) {
+                $('#modalImportarDemandas').html(html);
+                $('#importTicketsModal').modal('show');
+            });
+        });
+
+        $(document).off('hidden.bs.modal', '#importTicketsModal').on('hidden.bs.modal', '#importTicketsModal', function (e) {
+            clearExportacaoModal()
+            console.log('Modal has been closed');
+        });
+        
         startFilterControl()
         carregarDpEventos()
     })
