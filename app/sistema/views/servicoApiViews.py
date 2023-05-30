@@ -24,7 +24,6 @@ class ServicoApiView(APIView):
         
     def get(self, request, *args, **kwargs):
         atividade_id = request.data.get('atividade_id')
-        print("dentro do get de serviços: ",atividade_id)
         servicos = Servico.objects
         if atividade_id:
             servicos = servicos.filter(atividade__id=atividade_id)
@@ -98,7 +97,6 @@ class ServicoDetailApiView(APIView):
 
     def put(self, request, servico_id, *args, **kwargs):
         servico = self.get_object(Servico, servico_id)
-        print("dentro do put de serviços: ",servico_id, request.data, servico)
         if not servico:
             return Response(
                 {"res": "Não existe servico com o id informado"}, 

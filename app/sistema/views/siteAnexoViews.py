@@ -26,7 +26,6 @@ def saveAnexo(request):
 
 @login_required(login_url='/auth-user/login-user')
 def deleteAnexo(request, anexo_id):
-    print("dentro do delete no site view")
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/anexos/' + str(anexo_id)

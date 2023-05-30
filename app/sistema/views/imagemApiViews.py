@@ -17,6 +17,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from PIL import Image
 import pyheif
+from decouple import config
 
 def convert_heic_to_jpeg(heic_path, jpeg_path):
     heif_file = pyheif.read(heic_path)
@@ -28,7 +29,7 @@ def convert_heic_to_jpeg(heic_path, jpeg_path):
         heif_file.mode,
         heif_file.stride,
     )
-    image.save(jpeg_path, format='JPEG');
+    image.save(jpeg_path, format='JPEG')
 
 class ImagemApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -52,7 +53,6 @@ class ImagemApiView(APIView):
         image_description = data.get('description', '')
 
         print("dentro da api de imagem:  ", data.get('imagem_nome', ''))
-
         image_data_url = data.get('dataUrl', '')
         image_format, image_str = image_data_url.split(';base64,')
         imagem_nome =  data.get('imagem_nome', '')
@@ -66,6 +66,7 @@ class ImagemApiView(APIView):
         if image_ext.lower() == 'heic':
             final_image_path = f'tmp/{image_name}.jpg'
             convert_heic_to_jpeg(temp_image_path, final_image_path)
+            default_storage.delete(temp_image_path)
 
         alfrescoNode = alfresco.createNode(final_image_path, "cm:content", image_name)
         shared_link = alfresco.createSharedLink(alfrescoNode.entry_id)
@@ -87,7 +88,7 @@ class ImagemApiView(APIView):
         serializer = ImagemSerializer(imagem)
         print("saindo da api de imagem ", serializer.data)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED);
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ImagemDetailApiView(APIView):
     permission_classes = [IsAuthenticated]

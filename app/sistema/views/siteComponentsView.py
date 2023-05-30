@@ -22,7 +22,6 @@ def confirmDeleteModal(request):
 
 @login_required(login_url='/auth-user/login-user')
 def filterMultipleSelect(request):
-    print("dentro da rota de componentes")
     route = request.GET.get('route')
     label = request.GET.get('label')
     placeholder = request.GET.get('placeholder')
@@ -40,7 +39,6 @@ def filterMultipleSelect(request):
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get('http://localhost:8000/'+route, headers=headers)
     items = json.loads(response.content)
-    print(response.content)
     return render(request,'componentes/selectMultipleFilter/selectMultipleFilter.html',{
         'items':items, 
         'label':label, 

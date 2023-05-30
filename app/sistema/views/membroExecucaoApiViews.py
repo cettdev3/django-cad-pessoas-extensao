@@ -33,7 +33,6 @@ class MembroExecucaoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         cidade = None
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -129,7 +128,6 @@ class MembroExecucaoApiView(APIView):
                         "complemento": ticket.get("complemento"),
                         "cidade": cidade,
                     }
-                    print("ticketData: ", ticketData)
                     ticketData = Ticket.objects.create(**ticketData)
             serializer = MembroExecucaoSerializer(membroExecucao)
         
@@ -211,7 +209,6 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.acao = acao
         
         itinerario = None
-        print("itinerario id na requisição: ",request.data.get("itinerario_id"))
         if request.data.get("itinerario_id"):
             itinerario = self.get_object(Itinerario, request.data.get("itinerario_id"))
             # TODO: Separar rotas em put e patch, dentro desta mesma rota itinerario tem comportamento de put e os outros atributos tem comportamento de patch
@@ -220,7 +217,6 @@ class MembroExecucaoDetailApiView(APIView):
             #         {"res": "Não existe itinerario com o id informado"},
             #         status=status.HTTP_400_BAD_REQUEST,
             #     )
-        print("itinerario apos processamenot: ",itinerario)
         membroExecucao.itinerario = itinerario
 
         membroExecucao.save()
@@ -228,7 +224,6 @@ class MembroExecucaoDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, membro_execucao_id, *args, **kwargs):
-        print("membro_execucao_id dentro da: ", membro_execucao_id)
         membroExecucao = self.get_object(MembroExecucao, membro_execucao_id)
         if not membroExecucao:
             return Response(
@@ -238,7 +233,6 @@ class MembroExecucaoDetailApiView(APIView):
 
         tickets = Ticket.objects.filter(membro_execucao=membroExecucao)
         for ticket in tickets:
-            print("deletando ticket: ", ticket.tipo)
             ticket.delete()
 
         membroExecucao.delete()

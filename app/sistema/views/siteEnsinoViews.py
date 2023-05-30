@@ -71,7 +71,6 @@ def eliminarEnsino(request,codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     response = requests.delete('http://localhost:8000/ensino/'+str(codigo), headers=headers)
-    print(response.content)
     if response.status_code == 204:
         messages.success(request, 'Ensino eliminado com sucesso!')
     else:

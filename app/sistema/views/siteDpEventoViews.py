@@ -229,7 +229,7 @@ def getFilteredEventos(filters, formatType="type 1"):
         result.setdefault(tipo, {})
 
         for atividade in evento.atividade_set.all():
-            tipo_atividade = atividade.tipoAtividade.nome
+            tipo_atividade = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
             result[tipo].setdefault(tipo_atividade, [])
             result[tipo][tipo_atividade].append(atividade)
 
@@ -254,7 +254,8 @@ def getCidade(doc, atividade):
     cidade = atividade.cidade
     cidadeParagraph = doc.add_paragraph()
     cidadeParagraph.add_run(f"cidade:").bold = True
-    cidadeParagraph.add_run(f" {cidade.nome}")
+    cidadeTexto = cidade.nome if cidade else "Não Informado"
+    cidadeParagraph.add_run(f" {cidadeTexto}")
     cidadeParagraphFormat = cidadeParagraph.paragraph_format
     cidadeParagraphFormat.space_after = Pt(0)
     return doc
@@ -336,11 +337,8 @@ def getEtapa(doc, atividade):
 
 
 def getSubAtividades(doc: Document, atividade):
-    print("dentro de subatividades: ", atividade.id, atividade.evento.id)
     eventoEnsino = DpEvento.objects.filter(id=atividade.evento.id).first()
-    print("dentro de subatividades eventoEnsino: ", eventoEnsino.acaoEnsino)
     if eventoEnsino.acaoEnsino:
-        print("atividade e suas subatividades", eventoEnsino.acaoEnsino.observacao)
         alocacoes = Alocacao.objects.filter(acaoEnsino=eventoEnsino.acaoEnsino)
         if alocacoes:
             subAtividadesParagraph = doc.add_paragraph()
@@ -425,7 +423,6 @@ def getAtividadeImage(doc: Document, atividade, counter):
 
 
 def getAtividade(doc, atividade, counter):
-    print("dentro de getAtividade: ", atividade.id)
     doc = getAtividadeLabel(doc, atividade, counter)
     doc = getCidade(doc, atividade)
     doc = getQuantitativo(doc, atividade)
@@ -463,8 +460,8 @@ def getRelatorioType1(doc, relatorioData):
                 if current_evento != old_evento:
                     doc = getSectionTitle(doc, f"{evento.tipo} - {evento.cidade.nome}")
                     old_evento = current_evento
-
-                doc = getSectionTitle(doc, f"{atividade.tipoAtividade.nome}")
+                tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
+                doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
                 counter = counter + 1
                 doc = getAtividade(doc, atividade, counter)
     return doc

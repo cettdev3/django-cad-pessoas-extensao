@@ -2,6 +2,7 @@ import json
 import requests
 from decouple import config
 from ..models.alfrescoNode import AlfrescoNode
+
 class AlfrescoAPI:
     def __init__(self):
         self.__auth_url = config("AUTH_URL")
@@ -23,9 +24,11 @@ class AlfrescoAPI:
         response = requests.post(url,json.dumps(credentials))
         if response.status_code == 200:
             response = json.loads(response.content)
+            print("login completo no alfresco com sucesso: %s", response)
             return response["data"]["ticket"]
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
+            response = json.loads(response.content)
+            print("Houve um erro com a requisição",response.status_code, response)
             return ""
     
     def createNode(self, file, type, name):
@@ -40,9 +43,10 @@ class AlfrescoAPI:
         url = self.__base_url+"nodes/"+self.__rootFolder+"/children?alf_ticket="+self.__alf_ticket
         response = requests.post(url, files=body, data=params)
         if response.status_code == 200 or response.status_code == 201:
-            # replace this by alfrescoNode class
+            print("no criado com sucesso: ", response.content)
             return AlfrescoNode.createAlfrescoNodeFromResponse(response.content)
         else: 
+            print("no criado com erro: ", response.content)
             print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
     
@@ -86,6 +90,7 @@ class AlfrescoAPI:
         response = requests.post(url, json=params)
 
         if response.status_code == 200 or response.status_code == 201:
+            print("shared link criado: ", response.content)
             return response.content
         else: 
             print("Houve um erro com a requisição",response.status_code, response.content)

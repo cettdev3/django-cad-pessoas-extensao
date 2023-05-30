@@ -21,7 +21,6 @@ class DataRemovidaApiView(APIView):
             return None
 
     def post(self, request, *args, **kwargs):
-        print("requisição : ", request.data)
         alocacao = None
         if request.data.get("alocacao_id"):
             alocacao = self.get_object(Alocacao, request.data.get("alocacao_id"))

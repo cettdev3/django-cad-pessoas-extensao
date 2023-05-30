@@ -119,7 +119,6 @@ class AcaoApiView(APIView):
                 itinerario = Itinerario.objects.create(
                     color=itinerarioData["color"] if itinerarioData["color"] else None,
                 )
-                print("criando itinerario", itinerario.id)
 
 
                 for postItinerarioItemData in itinerarioData["itens"]:
@@ -131,7 +130,6 @@ class AcaoApiView(APIView):
                                 {"res": "Não existe cidade com o id informado"},
                                 status=status.HTTP_400_BAD_REQUEST,
                             )
-                    print("dados vindos do post: ",postItinerarioItemData)
                     data = postItinerarioItemData["data"] if postItinerarioItemData.get("data") else None
                     if data:
                         data = datetime.strptime(data, '%Y-%m-%dT%H:%M')
@@ -159,7 +157,6 @@ class AcaoApiView(APIView):
                             membroExecucao.save()
 
             acaoSerializer = AcaoSerializer(acaoData)
-            print("dados salvos", acaoSerializer.data)
         return Response(acaoSerializer.data, status=status.HTTP_200_OK)
 
 class AcaoDetailApiView(APIView):

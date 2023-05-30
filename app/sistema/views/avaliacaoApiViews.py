@@ -34,7 +34,6 @@ class AvaliacaoApiView(APIView):
         # avaliacoes = Avaliacao.objects.filter(avaliador__pessoa__user__id=user.id)
         avaliacoes = Avaliacao.objects.select_related('avaliador__pessoa__user', 'evento', 'acao').exclude(evento=None)
         serializer = AvaliacaoSerializer(avaliacoes, many=True)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -117,17 +116,14 @@ class AvaliacaoDetailApiView(APIView):
             )
 
         serializer = AvaliacaoSerializer(avaliacao)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 4. Update
     def put(self, request, avaliacao_id, *args, **kwargs):
-        print("dentro do put", avaliacao_id, request.data)
         tmz = timezone.get_current_timezone()
         ntp_client = ntplib.NTPClient()
         # response = ntp_client.request("pool.ntp.br")
         current_time = datetime.now(tz=tmz)
-        print(current_time)
 
         avaliacao = self.get_object(Avaliacao, avaliacao_id)
         if not avaliacao:

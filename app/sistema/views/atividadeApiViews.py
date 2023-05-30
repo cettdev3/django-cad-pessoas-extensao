@@ -167,7 +167,6 @@ class AtividadeDetailApiView(APIView):
             return None
 
     def get(self, request, atividade_id, *args, **kwargs):
-        print("rota de get atividade")
         atividade = Atividade.objects.filter(id=atividade_id)
         atividade = atividade.select_related(
             "acao", 
