@@ -83,6 +83,7 @@
                 {% if show_edit %}
                 <!-- editar btn -->
                 <button class="btn btn-sm btn-outline-primary ml-1" 
+                id="ticketUpdateBtn-{{demanda.id}}"
                 onclick="updateTicket('{{demanda.id}}', '{{model}}')">
                     <i class="fa-solid fa-edit"></i>
                 </button>
@@ -117,7 +118,7 @@
                         $.ajax({
                         url: '/eliminarTicket/' + params.id,
                         success: function (data) {
-                            showFloatingMessage("Demanda deletada com sucesso!", "alert-danger");
+                            showFloatingMessage("Demanda deletada com sucesso!", "alert-success");
                             if (params.model == 'membro_execucao') {
                                 carregarMembrosExecucao()
                             } else if (params.model == 'alocacao') {

@@ -1,7 +1,7 @@
-async function createDemanda(data, callback=null) {
+async function createDemanda(route="/ticket_form_collapsable", data, callback=null) {
     toggleLoading("show")
     return await $.ajax({
-        url: "/ticket_form_collapsable",
+        url: route,
         data: JSON.stringify(data),
         headers: { "X-CSRFToken":  XCSRFToken },
         contentType: 'application/json',

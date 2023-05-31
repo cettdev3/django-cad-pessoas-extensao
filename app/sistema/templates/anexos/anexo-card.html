@@ -43,19 +43,19 @@ class="anexo-card position-relative">
             <i class="fas fa-file" style="font-size: 30px"></i>
         {% endif %}
         <span style=" display: inline-block;
-        max-width: 90%;
+        max-width: 85%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         margin-left: 4px" >{{ anexo.nome }}</span>
     </a>
     <span class="fa-stack position-absolute" 
-    style="top: 0; right: 0; margin: 5px; cursor: pointer; width: 15px; height: 15px; font-size: 10px; background-color: transparent; color: transparent"
+    style="top: -5px; right: 0; margin: 5px; cursor: pointer; width: 16px; height: 16px; font-size: 16px; background-color: transparent; color: transparent"
     data-toggle="tooltip" 
     data-placement="top"
     title="remover anexo"
     onclick="openDeleteModal(() => removeAnexoCard('{{anexo.id}}'))">
         <i style="border-radius: 50%;" class="fas fa-circle-thin fa-stack-2x"></i>
-        <i style="border-radius: 50%;color: #000"  class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
+        <i style="border-radius: 50%;color: #df4759"  class="fa-solid fas fa-times fa-stack-1x fa-inverse "></i>
     </span>
 </div>
