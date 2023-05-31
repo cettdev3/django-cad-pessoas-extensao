@@ -59,6 +59,11 @@
 
     <div id="form-section-{{ticket.id}}" class="collapse show" aria-labelledby="heading-1" data-parent=".accordion">
         <div class="card-body">
+            <div class="form-group row" id="ticketFormAnexos-{{ticket.id}}">
+                {% for anexo in ticket.anexos %}
+                    {% include 'anexos/anexo-card.html' with anexo=anexo %}
+                {% endfor %}
+            </div>
             <form id="cadastrarTicketForm{{ticket.id}}" action="/" method="POST">
                 <input type="text" hidden
                 id="model"
@@ -68,10 +73,14 @@
                 {% else %}
                 value="{{model}}"
                 {% endif %}>
+                <input type="file" 
+                hidden
+                id="anexoDmandaInput-{{ticket.id}}"
+                name="anexo"
+                value="anexo">
             
                 <div class="form-group row">
-                    <div
-                    class="col-sm-4 mb-1">
+                    <div class="col-sm-3">
                         <label><b>Tipo da demanda: </b></label>
                         <select required
                         onchange="updateDemandaForm('{{ticket.id}}', 'tipo', this.value, '{{ticket.tipo}}')"
@@ -140,8 +149,7 @@
                             </option>
                         </select>
                     </div>
-                    <div 
-                    class="col-sm-4 mb-1">
+                    <div class="col-sm-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <label><b>Data Início: {{ticket.nao_se_aplica_data_inicio}}</b></label>
                             <div class="form-group d-flex justify-content-start align-items-start" 
@@ -173,8 +181,7 @@
                         disabled
                         {% endif %}>
                     </div>
-                    <div 
-                    class="col-sm-4 mb-1">
+                    <div class="col-sm-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <label>
                                 <b>Data Fim:</b>
@@ -209,8 +216,22 @@
                         disabled
                         {% endif %}>
                     </div>
-                    <div 
-                    class="col-sm-6 mb-1">
+                    <div class="col-sm-1">
+                        <button id="add-anexo-button-{{ticket.id}}"
+                        type="button"
+                        {% if not ticket %}
+                        hidden
+                        {% endif %}
+                        data-toggle="tooltip" 
+                        data-placement="top" 
+                        title="Adicionar anexo"
+                        class="btn btn-light btn-sm">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
                         <label><b>Id da demanda:</b></label>
                         <input 
                         type="text" 
@@ -221,8 +242,7 @@
                         class="form-control" 
                         name="id_protocolo">
                     </div>
-                    <div 
-                    class="col-sm-6 mb-1">
+                    <div class="col-sm-6">
                         <label><b>Status:</b></label>
                         <select required 
                         id="status"
@@ -516,6 +536,36 @@
                 var title = selectedOption.text().trim();
                 $(`#ticket-form-container-${params.ticketId} #form-title`).html(title);
             });
+
+            let buttonId = `#add-anexo-button-${params.ticketId}`
+            let anexoInputId = `#anexoDmandaInput-${params.ticketId}`
+            $(buttonId).click(function() {
+                $(anexoInputId).click();
+            });
+    
+            $(anexoInputId).change(function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                
+                reader.onloadend = function() {
+                    var ticketId = params.ticketId
+                    var dataURL = reader.result;
+                    
+                    var data = {
+                        'id_model': ticketId, 
+                        'model': 'Ticket',
+                        'dataUrl': dataURL,
+                        "nome": file.name,
+                    };
+    
+                    createAnexo(data, function(html) {
+                        $("#ticketFormAnexos-"+params.ticketId).append(html);
+                    });
+                }
+    
+                reader.readAsDataURL(file);
+            });
+    
 
             loadSelects();
         })({ 
