@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from ..models.ticket import Ticket
 from ..models.alocacao import Alocacao
 from ..models.escola import Escola
+from ..models.departamento import Departamento
 from ..models.pessoa import Pessoas
 from ..models.atividade import Atividade
 from ..models.membroExecucao import MembroExecucao
@@ -72,6 +73,7 @@ class TicketApiView(APIView):
         escola = None
         cidade = None
         beneficiario = None
+        departamento = None
 
         if request.data.get("membro_execucao_id"):
             membro_execucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
@@ -126,6 +128,14 @@ class TicketApiView(APIView):
             if not beneficiario:
                 return Response(
                     {"res": "Não existe beneficiario com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+        
+        if request.data.get("departamento_id"):
+            departamento = self.get_object(Departamento, request.data.get("departamento_id"))
+            if not departamento:
+                return Response(
+                    {"res": "Não existe departamento com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
             
@@ -233,6 +243,8 @@ class TicketApiView(APIView):
             "valor_orcado": valor_orcado,
             "valor_executado": valor_executado,
             "beneficiario": beneficiario,
+            "rubrica": request.data.get("rubrica"),
+            "departamento": departamento,
         }
 
         ticketData = Ticket.objects.create(**ticketData)
@@ -279,7 +291,6 @@ class TicketDetailApiView(APIView):
             ticket.meta = request.data.get("meta")
         if  request.data.get("data_inicio"):
             if request.data.get("nao_se_aplica_data_inicio") not in ["on", True] and len(request.data.get("data_inicio")) > 0 :
-                print("anted salvando data inicio")
                 ticket.data_inicio = request.data.get("data_inicio")
         if request.data.get("data_fim"):
             if  request.data.get("nao_se_aplica_data_fim") not in ["on", True] and len(request.data.get("data_fim")) > 0:
@@ -296,6 +307,8 @@ class TicketDetailApiView(APIView):
             ticket.cep = request.data.get("cep")
         if request.data.get("complemento"):
             ticket.complemento = request.data.get("complemento")
+        if request.data.get("rubrica"):
+            ticket.rubrica = request.data.get("rubrica")
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:
@@ -335,8 +348,16 @@ class TicketDetailApiView(APIView):
                 )
             ticket.escola = escola
         
+        if request.data.get("departamento_id"):
+            departamento = self.get_object(Departamento, request.data.get("departamento_id"))
+            if not departamento:
+                return Response(
+                    {"res": "Não existe departamento com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+            ticket.departamento = departamento
+
         if request.data.get("beneficiario_id"):
-            print("dentro de beneficiario_id", request.data.get("beneficiario_id") )
             beneficiario = self.get_object(Pessoas, request.data.get("beneficiario_id"))
             if not beneficiario:
                 return Response(

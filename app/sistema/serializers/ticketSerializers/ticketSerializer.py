@@ -6,7 +6,7 @@ from .membroExecucaoTicketSerializer import MembroExecucaoTicketSerializer
 from ..anexoSerializer import AnexoSerializer
 from .alocacaoTicketSerializer import AlocacaoTicketSerializer
 from .escolaTicketSerializer import EscolaTicketSerializer
-from .pessoaTicketSerializer import PessoaTicketSerializer
+from ..departamentoSerializer import DepartamentoSerializer
 from .pessoaTicketSerializer import PessoaTicketSerializer
 from .atividadeTicketSerializer import AtividadeTicketSerializer
 class TicketSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class TicketSerializer(serializers.ModelSerializer):
     atividade = AtividadeTicketSerializer(many=False, read_only=True)
     beneficiario = PessoaTicketSerializer(many=False, read_only=True)
     anexos = serializers.SerializerMethodField()
-
+    departamento = DepartamentoSerializer(many=False, read_only=True)
     class Meta:
         model = Ticket
         fields = [
@@ -56,11 +56,12 @@ class TicketSerializer(serializers.ModelSerializer):
             "status_calculado",
             "valor_orcado",
             "valor_executado",
-            "anexos"
+            "anexos",
+            "departamento",
+            "rubrica",
         ]
         depth = 2
 
     def get_anexos(self, obj):
         anexos = Anexo.objects.filter(model='Ticket', id_model=obj.id)
-        print("anexos,", anexos)
         return AnexoSerializer(anexos, many=True).data
