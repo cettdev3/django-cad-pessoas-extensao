@@ -14,6 +14,7 @@ class DpEvento(models.Model):
     RECICLA_GOIAS  = 'recicla_goias'
     PAUTA_POSITIVA  = 'pauta_positiva'
     FEIRA_AGRO_CENTRO_OESTE  = 'feira_agro_centro_oeste'
+    DIA_MULHERES  = 'dia_mulheres'
     OUTRO = 'outro'
 
     MAPPED_TIPOS = [
@@ -108,4 +109,6 @@ class DpEvento(models.Model):
             return "Feira Agro Centro Oeste"
         elif self.tipo == self.PAUTA_POSITIVA:
             return "Pauta Positiva"
+        elif self.tipo == self.DIA_MULHERES:
+            return "Dias das Mulheres"
         return "Evento não identificado"

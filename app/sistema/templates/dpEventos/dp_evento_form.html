@@ -52,6 +52,11 @@
                         PAUTA POSITIVA
                     </option>
                     <option 
+                    {% if dpEvento and dpEvento.tipo == "dia_mulheres" %} selected {% endif %} 
+                    value="dia_mulheres">
+                        DIA DAS MULHERES
+                    </option>
+                    <option 
                     {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
                     value="outro">
                         OUTRO
