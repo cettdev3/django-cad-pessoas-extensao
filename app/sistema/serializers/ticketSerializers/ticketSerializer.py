@@ -1,7 +1,9 @@
 # todo/todo_api/serializers.py
 from rest_framework import serializers
 from ...models.ticket import Ticket
+from ...models.anexo import Anexo
 from .membroExecucaoTicketSerializer import MembroExecucaoTicketSerializer
+from ..anexoSerializer import AnexoSerializer
 from .alocacaoTicketSerializer import AlocacaoTicketSerializer
 from .escolaTicketSerializer import EscolaTicketSerializer
 from .pessoaTicketSerializer import PessoaTicketSerializer
@@ -17,6 +19,8 @@ class TicketSerializer(serializers.ModelSerializer):
     status_calculado = serializers.CharField(read_only=True)
     atividade = AtividadeTicketSerializer(many=False, read_only=True)
     beneficiario = PessoaTicketSerializer(many=False, read_only=True)
+    anexos = serializers.SerializerMethodField()
+
     class Meta:
         model = Ticket
         fields = [
@@ -52,5 +56,11 @@ class TicketSerializer(serializers.ModelSerializer):
             "status_calculado",
             "valor_orcado",
             "valor_executado",
+            "anexos"
         ]
         depth = 2
+
+    def get_anexos(self, obj):
+        anexos = Anexo.objects.filter(model='Ticket', id_model=obj.id)
+        print("anexos,", anexos)
+        return AnexoSerializer(anexos, many=True).data
