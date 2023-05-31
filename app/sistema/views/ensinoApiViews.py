@@ -109,6 +109,7 @@ class EnsinoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=str.HTTP_400_BAD_REQUEST
                 )
+
         with transaction.atomic():
             ensino = Ensino.objects.create(
                 data_inicio = data_inicio,
@@ -123,7 +124,8 @@ class EnsinoApiView(APIView):
                 cep = cep,
                 escola = escola,
                 numero_oficio = numero_oficio,
-                etapa = etapa
+                etapa = etapa,
+                has_credito_social = request.data.get("has_credito_social", False),
             )
 
             anexoService = AnexoService()
@@ -218,6 +220,8 @@ class EnsinoDetailApiView(APIView):
             ensino.cep = request.data.get("cep")
         if request.data.get("numero_oficio"):
             ensino.numero_oficio = request.data.get("numero_oficio")
+        if request.data.get("has_credito_social") in [True, False]:
+            ensino.has_credito_social = request.data.get("has_credito_social")
 
         if request.data.get("oficio_data_url"):
             anexoService = AnexoService()

@@ -294,7 +294,19 @@
                                         required>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label><b>Tipo: {{ensino.tipo}}</b></label>
+                                        <div class="d-flex justify-content-space-between align-items-center">
+                                            <label><b>Tipo:</b></label>
+                                            <div class="d-flex justify-content-space-between align-items-center">
+                                                <label class="mr-1" for="has_credito_social">Possui crédito social</label>
+                                                <input class="mb-1" 
+                                                {% if ensino.has_credito_social == True %}
+                                                checked
+                                                {% endif %}
+                                                type="checkbox" 
+                                                id="has_credito_social" 
+                                                name="has_credito_social">
+                                            </div>
+                                        </div>
                                         <select class="form-control"
                                         name="tipo">
                                             <option  
@@ -497,7 +509,7 @@
         values["endereco"] = endereco
         values["oficio_data_url"] = inputReaderDataUrl
         values["oficio_name"] = oficioName
-        
+        values["has_credito_social"] =  $("#has_credito_social").is(":checked")
         return values
     }
 

@@ -39,6 +39,7 @@ class Ensino(models.Model):
     numero_oficio = models.CharField(null = True, max_length=100)
     anexo_oficio = models.ForeignKey(Anexo, on_delete=models.SET_NULL, null=True) 
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True)
+    has_credito_social = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'ensino'
