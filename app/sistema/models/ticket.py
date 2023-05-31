@@ -4,6 +4,7 @@ from ..models.cidade import Cidade
 from ..models.alocacao import Alocacao
 from ..models.escola import Escola
 from ..models.dpEvento import DpEvento
+from ..models.departamento import Departamento
 from ..models.atividade import Atividade
 from ..models.pessoa import Pessoas
 from ..models.servicoContratado import ServicoContratado
@@ -25,7 +26,24 @@ class Ticket(models.Model):
     TIPO_VEICULO = "veiculo"
     TIPO_PASSAGEM = "passagem"
     TIPO_RPA = "rpa"
+    TIPO_PRODUTO = "produto"
+    TIPO_SERVICO = "servico"
+    TIPO_OUTRO = "outro"
     TIPO_NAO_SE_APLICA = "nao_se_aplica"
+
+    TIPOS = [
+        TIPO_DIARIA,
+        TIPO_ADIANTAMENTO,
+        TIPO_ADIANTAMENTO_INSUMO,
+        TIPO_ADIANTAMENTO_COMBUSTIVEL,
+        TIPO_VEICULO,
+        TIPO_PASSAGEM,
+        TIPO_RPA,
+        TIPO_PRODUTO,
+        TIPO_SERVICO,
+        TIPO_OUTRO,
+        TIPO_NAO_SE_APLICA
+    ]
 
     id = models.AutoField(primary_key=True)
     tipo = models.CharField(null = True, max_length=100)
@@ -52,7 +70,9 @@ class Ticket(models.Model):
     observacao = models.CharField(null = True, max_length=250, blank= True)
     valor_orcado = models.DecimalField(null = True, max_digits=10, decimal_places=2, blank= True)
     valor_executado = models.DecimalField(null = True, max_digits=10, decimal_places=2, blank= True)
-
+    from_export = models.BooleanField(default=False)
+    rubrica = models.CharField(null = True, max_length=250, blank= True)
+    departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         db_table = 'tickets'
 
@@ -125,7 +145,7 @@ class Ticket(models.Model):
             return "fa-bus"
         elif self.tipo == self.TIPO_RPA:
             return "fa-file-contract"
-        return ""
+        return "fa-circle-question"
     
     @property
     def tipo_formatado(self):
@@ -143,7 +163,13 @@ class Ticket(models.Model):
             return "Passagem"
         elif self.tipo == self.TIPO_RPA:
             return "RPA"
-        return ""
+        elif self.tipo == self.TIPO_PRODUTO:
+            return "Compra de produto(s)"
+        elif self.tipo == self.TIPO_SERVICO:
+            return "Contratação de serviço(s)"
+        elif self.tipo == self.TIPO_OUTRO:
+            return "Outros"
+        return "Não Informado"
     
     @property
     def status_class(self):

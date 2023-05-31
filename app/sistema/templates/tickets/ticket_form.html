@@ -23,14 +23,18 @@
     id="model"
     name="model"
     value="beneficiario">
-
+    <input type="file" 
+    hidden
+    id="anexoFileInput"
+    name="anexo"
+    value="anexo">
+    <div class="form-group row" id="ticketFormAnexos-{{ticket.id}}">
+        {% for anexo in anexos %}
+            {% include 'anexos/anexo-card.html' with anexo=anexo %}
+        {% endfor %}
+    </div>
     <div class="form-group row">
-        <div
-        {% if layout == '6' %}
-        class="col-sm-6 mb-1"
-        {% else %}
-        class="col-sm-3"
-        {% endif %}>
+        <div class="col-sm-3">
             <label><b>Tipo da demanda:</b></label>
             <select required 
             id="tipo_solicitacao"
@@ -90,6 +94,27 @@
                     RPA
                 </option>
                 <option
+                {% if ticket and ticket.tipo == 'produto' %}
+                selected
+                {% endif %}
+                value="servico">
+                    COMPRA DE PRODUTO(S)
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'servico' %}
+                selected
+                {% endif %}
+                value="servico">
+                    CONTRATAÇÂO DE SERVIÇO(S)
+                </option>
+                <option
+                {% if ticket and ticket.tipo == 'outro' %}
+                selecte
+                {% endif %}
+                value="outro">
+                    OUTRO
+                </option>
+                <option
                 {% if ticket and ticket.tipo == 'nao_se_aplica' %}
                 selected
                 {% endif %}
@@ -98,12 +123,7 @@
                 </option>
             </select>
         </div>
-        <div 
-        {% if layout == '6' %}
-        class="col-sm-6 mb-1"
-        {% else %}
-        class="col-sm-3"
-        {% endif %}>
+        <div class="col-sm-4">
             <div class="d-flex justify-content-between align-items-center">
                 <label><b>Data Início:</b></label>
                 <div class="form-group d-flex justify-content-start align-items-start" 
@@ -134,12 +154,7 @@
             disabled
             {% endif %}>
         </div>
-        <div 
-        {% if layout == '6' %}
-        class="col-sm-4"
-        {% else %}
-        class="col-sm-3"
-        {% endif %}>
+        <div class="col-sm-4">
             <div class="d-flex justify-content-between align-items-center">
                 <label>
                     <b>Data Fim:</b>
@@ -173,12 +188,22 @@
             disabled
             {% endif %}>
         </div>
-        <div 
-        {% if layout == '6' %}
-        class="col-sm-4"
-        {% else %}
-        class="col-sm-3"
-        {% endif %}>
+        <div class="col-sm-1">
+            <button id="add-anexo-button-{{ticket.id}}"
+            type="button"
+            {% if not ticket %}
+            hidden
+            {% endif %}
+            data-toggle="tooltip" 
+            data-placement="top" 
+            title="Adicionar anexo"
+            class="btn btn-light btn-sm">
+                <i class="fa-solid fa-paperclip"></i>
+            </button>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-3">
             <label><b>Id da demanda:</b></label>
             <input 
             type="text" 
@@ -188,12 +213,7 @@
             class="form-control" 
             name="id_protocolo">
         </div>
-        <div 
-        {% if layout == '6' %}
-        class="col-sm-4"
-        {% else %}
-        class="col-sm-3"
-        {% endif %}>
+        <div class="col-sm-3">
             <label><b>Status:</b></label>
             <select required 
             id="status"
@@ -253,9 +273,7 @@
                 </option>
             </select>
         </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <label><b>Valor Orçado:</b></label>
             <input 
             type="number"
@@ -266,7 +284,7 @@
             class="form-control" 
             name="valor_orcado">
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <label><b>Valor Executado:</b></label>
             <input 
             type="number"
@@ -285,7 +303,7 @@
         <div id="escolasSelectContainer" class="col-sm-6">
         </div>
     </div>
-    <div class="form-group d-flex justify-content-start align-items-start">
+    <div class="form-group row">
         <div class="col-sm-12">
             <label><b>Descrição:</b></label>
             <textarea 
@@ -297,19 +315,6 @@
     </div>
 
     <div class="form-group row">
-        <div id="cidadesSelectContainer" class="col-sm-2">
-        </div>
-        <div class="col-sm-3">
-            <label><b>Complemento:</b></label>
-            <input 
-            type="text" 
-            id="complemento"
-            name="complemento" 
-            class="form-control" 
-            {% if ticket %}
-            value="{{ticket.complemento|default_if_none:''}}"
-            {% endif %}>
-        </div>
         <div class="col-sm-2">
             <label><b>CEP:</b></label>
             <input 
@@ -320,6 +325,8 @@
             {% if ticket %}
             value="{{ticket.cep|default_if_none:''}}"
             {% endif %}>
+        </div>
+        <div id="cidadesSelectContainer" class="col-sm-3">
         </div>
         <div class="col-sm-3">
             <label><b>Bairro:</b></label>
@@ -332,7 +339,7 @@
             value="{{ticket.bairro|default_if_none:''}}"
             {% endif %}>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-4">
             <label><b>Logradouro:</b></label>
             <input 
             type="text" 
@@ -344,12 +351,19 @@
             {% endif %}>
         </div>
     </div>
-
-    <!-- <input type="text" name="parent_entity_bairro" id="parent_entity_bairro" hidden value="{{parent_entity.bairro|default_if_none:''}}">
-    <input type="text" name="parent_entity_logradouro" id="parent_entity_logradouro" hidden value="{{parent_entity.logradouro|default_if_none:''}}">
-    <input type="text" name="parent_entity_cep" id="parent_entity_cep" hidden value="{{parent_entity.cep|default_if_none:''}}">
-    <input type="text" name="parent_entity_complemento" id="parent_entity_complemento" hidden value="{{parent_entity.complemento|default_if_none:''}}">
-    <input type="text" name="parent_entity_cidade" id="parent_entity_cidade" hidden value="{{parent_entity.cidade.id|default_if_none:''}}"> -->
+    <div class="form-group row">
+        <div class="col-sm-12">
+            <label><b>Complemento:</b></label>
+            <input 
+            type="text" 
+            id="complemento"
+            name="complemento" 
+            class="form-control" 
+            {% if ticket %}
+            value="{{ticket.complemento|default_if_none:''}}"
+            {% endif %}>
+        </div>
+    </div>
 
     {% if ticket %}
     <input type="text" name="membro_execucao_id" id="membro_execucao_id" hidden value="{{ticket.membro_execucao.id}}">
@@ -441,9 +455,46 @@
         }
     }
 
-    $(document).ready(function() {     
-        carregarSelectCidades();
-        carregarSelectBeneficiario();
-        carregarSelectEscolas();
+    function removeAnexoCard(anexoId) {
+        deleteAnexo(anexoId, function () {
+            $('#anexo-card-'+anexoId).remove();
+        })
+    }
+
+    $(document).ready(function() {   
+        (function (params) {
+            console.log("dentro do formulario: ", params)
+            let buttonId = `#add-anexo-button-${params.id}`
+            $(buttonId).click(function() {
+                $('#anexoFileInput').click();
+            });
+    
+            $('#anexoFileInput').change(function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                
+                reader.onloadend = function() {
+                    var ticketId = params.id
+                    var dataURL = reader.result;
+                    
+                    var data = {
+                        'id_model': ticketId, 
+                        'model': 'Ticket',
+                        'dataUrl': dataURL,
+                        "nome": file.name,
+                    };
+    
+                    createAnexo(data, function(html) {
+                        $("#ticketFormAnexos-"+params.id).append(html);
+                    });
+                }
+    
+                reader.readAsDataURL(file);
+            });
+    
+            carregarSelectCidades();
+            carregarSelectBeneficiario();
+            carregarSelectEscolas();
+        })({"id": '{{ticket.id}}'})
     });
 </script>

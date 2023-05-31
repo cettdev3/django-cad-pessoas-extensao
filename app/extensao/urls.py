@@ -52,12 +52,12 @@ from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, 
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
-from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, deleteAtividade, getAtividadeDrawer, editarAtividade
+from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, deleteAtividade, getAtividadeDrawer, editarAtividade, atividadeSelect
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteServicosContratadosViews import servicoContratadoModal, servicoContratadoTable, saveServicoContratado, deleteServicoContratado
 from sistema.views.siteUserViews import usersSelect
-from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela
+from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
 from sistema.views.siteGaleriaViews import (
     galeriaModal,
@@ -186,6 +186,9 @@ urlpatterns = [
     # ROTAS PARA DEMANDAS
     path("gerencia_demandas",gerencia_demandas),
     path("demandas_tabela",demandas_tabela),
+    path("relatorio_sintetico",relatorio_sintetico),
+    path("importDemandaModal",importDemandaModal),
+    path("saveBatchDemanda",saveBatchDemanda),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
@@ -248,6 +251,7 @@ urlpatterns = [
     path("getAtividadeDrawer/<atividade_id>", getAtividadeDrawer),
     path("editarAtividade/<atividade_id>", editarAtividade),
     path("atividadesDpEventoTable", atividadesDpEventoTable),
+    path("atividadeSelect", atividadeSelect),
     
     # ROTAS PARA MEMBROS DE EXECUCAO
     path("membrosExecucaoTable",membrosExecucaoTable),

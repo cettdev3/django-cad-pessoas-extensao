@@ -3,7 +3,7 @@
 id="dp_evento_id" 
 name="dp_evento_id">
     <option value="">Selecione um evento</option>
-    {% for dpEvento in dpEventos %}
-        <option value="{{dpEvento.id}}">{{dpEvento.nome}}</option>
+    {% for dpEvento in dp_eventos %}
+        <option value="{{dpEvento.id}}">{{dpEvento.id}} {{dpEvento.tipo_formatado}}: {{dpEvento.cidade.nome}} (de {{dpEvento.data_inicio_formatada}} ate {{dpEvento.data_fim_formatada}})</option>
     {% endfor %}
 </select>

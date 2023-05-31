@@ -4,14 +4,11 @@ from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
 from sistema.models.departamento import Departamento
 from sistema.models.ensino import Ensino
-from sistema.models.tipoAtividade import TipoAtividade
 from sistema.services.alfrescoApi import AlfrescoAPI
 from sistema.models.atividade import Atividade
 from sistema.models.departamento import Departamento
 from sistema.models.alocacao import Alocacao
-from sistema.services.camunda import CamundaAPI
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
 from PIL import Image
 import requests
 from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH
@@ -30,13 +27,12 @@ from django.db.models import Prefetch
 from collections import defaultdict
 from docx.image.exceptions import UnrecognizedImageError
 from docx import Document
-from datetime import datetime, date
+from datetime import date
 from collections import Counter
 import xlsxwriter
 from io import BytesIO
 from xlsxwriter.workbook import Worksheet
 from xlsxwriter.format import Format
-from typing import Tuple
 
 
 @login_required(login_url="/auth-user/login-user")
@@ -165,7 +161,7 @@ def editarDpEvento(request, codigo):
 def dp_eventosSelect(request):
     dp_eventos = DpEvento.objects.all()
     return render(
-        request, "dpEventos/dp-eventos_select.html", {"dp_eventos": dp_eventos}
+        request, "dpEventos/dp_evento_select.html", {"dp_eventos": dp_eventos}
     )
 
 
@@ -938,96 +934,3 @@ def relatorioSintetico(request):
     response = HttpResponse(output.getvalue(), content_type="application/vnd.ms-excel")
     response["Content-Disposition"] = "attachment; filename=RelatorioSintetico.xlsx"
     return response
-
-
-# @login_required(login_url='/auth-user/login-user')
-# def relatorioSintetico(request):
-#     output = BytesIO()
-#     workbook = xlsxwriter.Workbook(output)
-#     worksheet = workbook.add_worksheet()
-#     centered = workbook.add_format()
-#     centered.set_align('center')
-#     centered.set_align('vcenter')
-#     headers = [
-#         'Evento',
-#         "Quantidade de Ações",
-#         "Ação de Extensão",
-#         "Horas Executadas",
-#         "Descrição da Ação",
-#         "COTEC/RESPONSÁVEL",
-#         "Etapa",
-#         "Local",
-#         "Data de Início (Atividade)",
-#         "Data de Fim (Atividade)",
-#         "Curso"
-#     ]
-#     max_len_headers = [len(header) for header in headers]
-
-#     for i, header in enumerate(headers):
-#         worksheet.write(0, i, header, centered)
-
-#     eventos = DpEvento.objects.all().prefetch_related('atividade_set')
-
-#     row = 1
-#     atividadeCounter = 1
-#     for evento in eventos:
-#         atividades = Atividade.objects.filter(evento=evento)
-
-#         if len(atividades) == 0:
-#             continue
-
-#         atividadesCount = len(atividades)
-#         if atividadesCount == 1:
-#             cursosCount = 0
-#             worksheet = getEventoRow(worksheet, evento, row, headers.index("Evento"), centered)
-#             atividadeCounter += 1
-#             worksheet = getAtividadeCountRow(worksheet, atividadeCounter, row, headers.index("Quantidade de Ações"), centered)
-#             atividade = atividades[0]
-#             worksheet = getTipoAtividadeRow(worksheet, atividade, row, headers.index("Ação de Extensão"), centered)
-#             worksheet = getAtividadeHorasRow(worksheet, atividade, row, headers.index("Horas Executadas"), centered)
-#             worksheet = getAtividadeDescricaoRow(worksheet, atividade, row, headers.index("Descrição da Ação"), centered)
-#             worksheet = getAtividadeEscolaRow(worksheet, atividade, row, headers.index("COTEC/RESPONSÁVEL"), centered)
-#             worksheet = getAtividadeEventoEtapa(worksheet, atividade, row, headers.index("Etapa"), centered)
-#             worksheet = getAtividadeLocal(worksheet, atividade, row, headers.index("Local"), centered)
-#             worksheet = getAtividadeDataInicio(worksheet, atividade, row, headers.index("Data de Início (Atividade)"), centered)
-#             worksheet = getAtividadeDataFim(worksheet, atividade, row, headers.index("Data de Fim (Atividade)"), centered)
-#             if evento.acaoEnsino:
-#                 acaoEnsino = evento.acaoEnsino
-#                 cursos = Alocacao.objects.filter(acaoEnsino=acaoEnsino).select_related('curso').all()
-#                 cursosCount = len(cursos)
-#                 if cursosCount == 1:
-#                     curso = cursos[0]
-#                     worksheet = getAtividadeCurso(worksheet, curso, row, headers.index("Curso"), centered)
-#                     row += 1
-#                 elif cursosCount > 1:
-#                     for curso in cursos:
-#                         row += 1
-#                         worksheet = getAtividadeCurso(worksheet, curso, row, headers.index("Curso"), centered)
-#             row += 1
-#         else:
-#             worksheet = getEventoRow(worksheet, evento, row, headers.index("Evento"), centered)
-#             for atividade in atividades:
-#                 atividadeCounter += 1
-#                 worksheet = getAtividadeCountRow(worksheet, atividadeCounter, row, headers.index("Quantidade de Ações"), centered)
-#                 worksheet = getTipoAtividadeRow(worksheet, atividade, row, headers.index("Ação de Extensão"), centered)
-#                 worksheet = getAtividadeHorasRow(worksheet, atividade, row, headers.index("Horas Executadas"), centered)
-#                 worksheet = getAtividadeDescricaoRow(worksheet, atividade, row, headers.index("Descrição da Ação"), centered)
-#                 worksheet = getAtividadeEscolaRow(worksheet, atividade, row, headers.index("COTEC/RESPONSÁVEL"), centered)
-#                 worksheet = getAtividadeEventoEtapa(worksheet, atividade, row, headers.index("Etapa"), centered)
-#                 worksheet = getAtividadeLocal(worksheet, atividade, row, headers.index("Local"), centered)
-#                 worksheet = getAtividadeDataInicio(worksheet, atividade, row, headers.index("Data de Início (Atividade)"), centered)
-#                 worksheet = getAtividadeDataFim(worksheet, atividade, row, headers.index("Data de Fim (Atividade)"), centered)
-#                 row += 1
-#             worksheet.merge_range(row - atividadesCount, 0, row -1, 0, str(evento.tipo_formatado), centered)
-
-#     for i, header in enumerate(headers):
-#         worksheet.set_column(i, i, max_len_headers[i] + 5)
-#     worksheet.autofit()
-#     # Fecha o objeto do tipo Workbook. Isso é necessário antes de passar o objeto para a HttpResponse
-#     workbook.close()
-
-#     # Crie uma resposta HTTP com o xls
-#     response = HttpResponse(output.getvalue(), content_type='application/vnd.ms-excel')
-#     response['Content-Disposition'] = 'attachment; filename=RelatorioSintetico.xlsx'
-
-#     return response

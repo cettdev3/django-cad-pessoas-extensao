@@ -69,18 +69,18 @@
     }
 
     function criarTicket(membro_execucao_id) {
-        $.ajax({
-            url: "/ticketModal",
-            data: { 
-                membro_execucao_id: membro_execucao_id, 
-                model: "membro_execucao",
-                layout: 6 
-            },
-            success: function (data) {
-                $("#" + "modalTicketContainer").html(data);
-                $('#' + "cadastrarTicketModal").modal('toggle');
-            }
-        });
+        createDemanda("/saveTicket",
+        { 
+            membro_execucao_id: membro_execucao_id, 
+            model: "membro_execucao",
+            layout: 6 
+        }, function (ticket) {
+            console.log(ticket)
+            carregarMembrosExecucao()
+            setTimeout(function () {
+                $(`#ticketUpdateBtn-${ticket.id}`).click()
+            }, 500)
+        })
     }
 
     $(document).ready(function () {

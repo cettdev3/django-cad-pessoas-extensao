@@ -91,6 +91,17 @@ def atividadeModal(request):
     return render(request,'atividades/atividadesModal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
+def atividadeSelect(request):
+    evento_id = request.GET.get('evento_id')
+    data = {}
+    if evento_id:
+        evento = DpEvento.objects.get(id=evento_id)
+        data['atividades'] = Atividade.objects.filter(evento=evento)
+    else:
+        data['atividades'] = Atividade.objects.all()
+    return render(request,'atividades/atividadeSelect.html',data)
+
+@login_required(login_url='/auth-user/login-user')
 def deleteAtividade(request, atividade_id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}

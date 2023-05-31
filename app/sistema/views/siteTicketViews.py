@@ -9,6 +9,7 @@ from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.ticket import Ticket
 from sistema.models.escola import Escola
 from sistema.models.atividade import Atividade
+from sistema.models.anexo import Anexo
 from sistema.models.alocacao import Alocacao
 from sistema.models.dpEvento import DpEvento
 from sistema.models.pessoa import Pessoas
@@ -60,26 +61,20 @@ def ticketModal(request):
     data['escolas'] = EscolaSerializer(escolas, many=True).data
     return render(request,'tickets/ticket_modal.html',data)
 
+
+@login_required(login_url='/auth-user/login-user')
 def ticketModalEdit(request, ticket_id):
+    print("dentro de modal edit")
     layout = request.GET.get('layout')
     data = {}
     model = request.GET.get('model')
     ticket = Ticket.objects.get(id=ticket_id)
     data['ticket'] = ticket
-    data['model'] = model
-    if model == 'membro_execucao':
-        data['entity'] = ticket.membro_execucao
-        data['parent_entity'] = ticket.membro_execucao.evento
-    if model == 'alocacao':
-        data['entity'] = ticket.alocacao
-        data['parent_entity'] = ticket.alocacao.acaoEnsino
-    if model == 'pessoa':
-        data['entity'] = ticket.pessoa
-        data['parent_entity'] = Escola.objects.get(id=ticket.escola.id)
-    if layout:
-        data['layout'] = layout
+    data['model'] = model   
     escolas = Escola.objects.all()
+    anexos = Anexo.objects.filter(model='ticket', id_model=ticket_id)
     data['escolas'] = EscolaSerializer(escolas, many=True).data
+    data['anexos'] = anexos
     return render(request,'tickets/ticket_modal.html',data)
 
 @login_required(login_url='/auth-user/login-user')
@@ -111,8 +106,8 @@ def ticket_form_collapsable(request):
     context = {}
     # print(response.content)
     context['ticket'] = json.loads(response.content)
-    context['atividade_id'] = body['atividade_id']
-    context['evento_id'] = body['evento_id']
+    context['atividade_id'] = body.get('atividade_id')
+    context['evento_id'] = body.get('evento_id')
     
     return render(request,'tickets/ticket_form_collapsable_atividade.html', context)
 
@@ -120,7 +115,7 @@ def ticket_form_collapsable(request):
 def saveTicket(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
+    body = json.loads(request.body)
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
