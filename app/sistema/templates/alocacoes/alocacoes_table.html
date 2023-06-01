@@ -120,7 +120,22 @@
     <tbody>
         {% for alocacao in alocacoes %}
         {% if show_column_professor %}
-        <td class="alocacao-w-15 text-left">{{alocacao.professor.nome}}</td>
+        <td class="alocacao-w-15 text-left">
+            <div class="d-flex"> 
+                <div class="mr-1 d-flex align-items-start"> 
+                    {% if not alocacao.quantidade_matriculas or not alocacao.codigo_siga %}
+                    <i class="fa-solid fa-circle-info d-inline info-danger" 
+                    data-toggle="tooltip" 
+                    data-placement="top" 
+                    title="Pendências no cadastro de informações">
+                    </i>
+                    {% endif %}
+                </div>
+                <div style="line-height: 1rem;">
+                    {{alocacao.professor.nome}}
+                </div>
+            </div>
+        </td>
         {% endif %}
         {% if show_column_escola %}
         <td class="alocacao-w-15 text-left">

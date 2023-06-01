@@ -50,3 +50,16 @@
 .scroll-custom::-ms-scrollbar-button {
     display: none;
 }
+
+    
+.info-danger {
+    color: #dc3545;
+}
+
+.info-success {
+    color: #28a745;
+}
+
+.info-warning {
+    color: #ffc107;
+}
