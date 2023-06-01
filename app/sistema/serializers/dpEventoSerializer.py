@@ -35,6 +35,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "data_inicio_formatada",
             "data_fim_formatada",
             "tipo_formatado",
-            "membroexecucao_set"
+            "membroexecucao_set",
+            "membro_execucao_status"
         ]
         depth = 5

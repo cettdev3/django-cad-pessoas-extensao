@@ -112,3 +112,11 @@ class DpEvento(models.Model):
         elif self.tipo == self.DIA_MULHERES:
             return "Dias das Mulheres"
         return "Evento não identificado"
+    
+    @property
+    def membro_execucao_status(self):
+        membrosEquipeExecucao = self.membroexecucao_set.all()
+        for membro in membrosEquipeExecucao:
+            if membro.ticket_status == "pendente":
+                return "pendente"
+        return "concluido"

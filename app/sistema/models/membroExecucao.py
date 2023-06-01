@@ -5,7 +5,7 @@ from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.itinerario import Itinerario
 
-class MembroExecucao(models.Model):
+class MembroExecucao(models.Model):    
     id = models.AutoField(primary_key=True)
     data_inicio = models.DateField(null = True, blank= True)
     data_fim = models.DateField(null = True, blank= True)
@@ -40,3 +40,11 @@ class MembroExecucao(models.Model):
             enderecoCompleto += ". "+self.cep+"."
         return enderecoCompleto
     
+    @property
+    def ticket_status(self):
+        tickets = self.ticket_set.all()
+        if tickets:
+            for ticket in tickets:
+                if ticket.status == "CRIACAO_PENDENTE":
+                    return "pendente"
+        return "criado"
