@@ -298,5 +298,4 @@ class PessoaViewSets(viewsets.ModelViewSet):
         pessoa = Pessoas.objects.filter(user=user).select_related('user').first()
         if not pessoa: return Response({"res": "Não existe pessoa cadastrada com o usuário informado"}, status=st.HTTP_400_BAD_REQUEST)
         serializer = PessoaSerializer(pessoa)
-        print(serializer.data)
         return Response(data=serializer.data, status=st.HTTP_201_CREATED, content_type="application/json")

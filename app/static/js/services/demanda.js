@@ -102,3 +102,21 @@ async function saveBatchDemanda(data, callback=null) {
         }
     });
 }
+
+async function getDemandasSelect(data, callback=null) {
+    toggleLoading("select demandas")
+    return await $.ajax({
+        url: "/demandasSelect",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            toggleLoading("after get select demandas")
+            if (callback) callback(data);
+        },
+        error: function (data) {
+            toggleLoading("select demandas error")
+            showFloatingMessage("Erro ao carregar demandas", "alert-danger");
+        }
+    });
+}

@@ -50,11 +50,9 @@ def membro_execucao_por_pessoa(dpevento):
                 })
                 
                 for membroExecucao in membrosExecucao:
-                    print("membro execucao id: ", membroExecucao.id)
                     ticketCreated = None
                     membroExecucaoId = membroExecucao.id
                     for ticket in membroExecucao.ticket_set.all():
-                        print("ticket id: ", ticket.id)
                         ticketCreated = Ticket.objects.create(**{
                             'tipo': membroExecucao.tipo,
                             'status': ticket.status if ticket else "CREATED",
@@ -70,12 +68,9 @@ def membro_execucao_por_pessoa(dpevento):
                             'cidade': membroExecucao.cidade,
                         })
                         ticket.delete()
-                    print(membroExecucaoCreated.id)
-                    print("membro execucao id antes delete: ", membroExecucaoId, membroExecucao)
                     membroExecucao.delete()
                     try:
                         membroExecucao = MembroExecucao.objects.get(id=membroExecucaoId)    
-                        print("membro execucao id depois delete: ", membroExecucaoId, membroExecucao)
                     except MembroExecucao.DoesNotExist:
                         membroExecucao = None
                     finally:
@@ -111,7 +106,6 @@ class MigrationsViewSets(viewsets.ModelViewSet):
 
     @action(methods=["POST"], detail=False, url_path="migrate-acoes")
     def migratreAcoes(self, *args, **kwargs):
-        print("migratreAcoes")
         for acao in Acao.objects.all():
             create_dp_evento(acao)
         return Response(data={}, status=st.HTTP_201_CREATED, content_type="application/json")
@@ -119,14 +113,10 @@ class MigrationsViewSets(viewsets.ModelViewSet):
     
     @action(methods=["POST"], detail=False, url_path="migrate-tickets")
     def migratreTickets(self, *args, **kwargs):
-        print("migratreTickets")
         for ticket in Ticket.objects.all():
-            print("ticket status: ", ticket.status)
             if ticket.status == "EM_DIAS":
-                print("ticket status if 1: ", ticket.status)
                 ticket.status = ticket.STATUS_CRIACAO_PENDENTE
             if ticket.status == "CREATED":
-                print("ticket status if 2: ", ticket.status)
                 ticket.status = ticket.STATUS_CRIADO
             ticket.save()
 
@@ -134,7 +124,6 @@ class MigrationsViewSets(viewsets.ModelViewSet):
     
     @action(methods=["POST"], detail=False, url_path="migrate-membro-execucao")
     def migratreMembroExecucao(self, *args, **kwargs):
-        print("migratreMembroExecucao")
         for evento in DpEvento.objects.all():
             membro_execucao_por_pessoa(evento)
         return Response(data={}, status=st.HTTP_201_CREATED, content_type="application/json")

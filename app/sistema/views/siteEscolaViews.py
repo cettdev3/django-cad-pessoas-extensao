@@ -78,6 +78,5 @@ def escolasSelect(request):
     escolas = json.loads(escolas.content)
     if selected:
         selected = int(selected) if selected.isdigit() else None 
-    print(request.GET)
     showEscolaEndereco = request.GET.get("showEscolaEndereco", "True").lower() == "true"
     return render(request,'escolas/escolas_select.html',{'escolas':escolas, "escola_id": selected, "showEscolaEndereco": showEscolaEndereco})

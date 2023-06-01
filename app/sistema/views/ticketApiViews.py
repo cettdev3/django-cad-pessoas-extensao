@@ -82,6 +82,7 @@ class TicketApiView(APIView):
                     {"res": "Não existe membro da equipe de execução com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+            beneficiario = membro_execucao.pessoa
 
         if request.data.get("alocacao_id"):
             alocacao = self.get_object(Alocacao, request.data.get("alocacao_id"))
@@ -90,6 +91,7 @@ class TicketApiView(APIView):
                     {"res": "Não existe alocação com o id informado"},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+            beneficiario = alocacao.professor
             
         if request.data.get("pessoa_id"):
             pessoa = self.get_object(Pessoas, request.data.get("pessoa_id"))
@@ -330,13 +332,19 @@ class TicketDetailApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST,
                 )
             ticket.pessoa = pessoa
+        
         if request.data.get("atividade_id"):
-            atividade = self.get_object(Atividade, request.data.get("atividade_id"))
-            if not atividade:
-                return Response(
-                    {"res": "Não existe atividade com o id informado"},
-                    status=st.HTTP_400_BAD_REQUEST,
-                )
+            atividate_id = request.data.get("atividade_id") if type(request.data.get("atividade_id")) == int else int(request.data.get("atividade_id"))
+
+            if atividate_id > 0:
+                atividade = self.get_object(Atividade, request.data.get("atividade_id"))
+                if not atividade:
+                    return Response(
+                        {"res": "Não existe atividade com o id informado"},
+                        status=st.HTTP_400_BAD_REQUEST,
+                    )
+            else: 
+                atividade = None
             ticket.atividade = atividade
 
         if request.data.get("escola_id"):
@@ -357,7 +365,7 @@ class TicketDetailApiView(APIView):
                 )
             ticket.departamento = departamento
 
-        if request.data.get("beneficiario_id"):
+        if request.data.get("beneficiario_id") or request.data.get("membro_execucao_id"):
             beneficiario = self.get_object(Pessoas, request.data.get("beneficiario_id"))
             if not beneficiario:
                 return Response(
@@ -397,22 +405,10 @@ class TicketDetailApiView(APIView):
                 {"res": "Não existe ticket com o id informado"}, 
                 status=st.HTTP_400_BAD_REQUEST
             )
+        
         ticket.delete()
         return Response(
             {"res": "ticket deletado!"},
             status=st.HTTP_200_OK
         )
     
-# class TicketViewSets(viewsets.ModelViewSet):
-#     @action(methods=["POST"], detail=False, url_path="complete-prestacao-contas")
-#     def migratreTickets(self, request, ticket_id, *args, **kwargs):
-#         ticket = self.get_object(Ticket, ticket_id)
-#         if not ticket:
-#                 return Response(
-#                     {"res": "Não existe ticket com o id informado"}, 
-#                     status=st.HTTP_400_BAD_REQUEST
-#                 )
-#         if request.data.get("status"):
-#             ticket.status = request.data.get("status")
-#         ticket.save()
-#         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

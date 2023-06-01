@@ -17,35 +17,28 @@ from ..serializers.escolaSerializer import EscolaSerializer
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
-    print("ticket_form")
-    print(request.GET)
     id = request.GET.get('id')
     layout = request.GET.get('layout')
     model = request.GET.get('model')
     ticket = None
     data = {}
-    print("model na abertura da modal: ", model, request.GET.get('alocacao_id'))
     if request.GET.get('membro_execucao_id') and model == 'membro_execucao':
-        print("membro_execucao_id: ", request.GET.get('membro_execucao_id'))
         membroExecucao = MembroExecucao.objects.get(id=request.GET.get('membro_execucao_id'))
         parent_entity = membroExecucao.evento
         data['membroExecucao'] = membroExecucao
         data['evento'] = parent_entity
         data['beneficiario_id'] = membroExecucao.pessoa.id
     if request.GET.get('alocacao_id'):
-        print("alocacao_id: ", request.GET.get('alocacao_id'))
         alocacao = Alocacao.objects.get(id=request.GET.get('alocacao_id'))
         acaoEnsino = alocacao.acaoEnsino
         data['alocacao'] = alocacao
         data['acaoEnsino'] = acaoEnsino
         data['beneficiario_id'] = alocacao.professor.id
     if request.GET.get('pessoa_id') and model == 'pessoa':
-        print("pessoa_id: ", request.GET.get('pessoa_id'))
         pessoa = Pessoas.objects.get(id=request.GET.get('pessoa_id'))
         data['entity'] = pessoa
         data['parent_entity'] = None
     if request.GET.get('atividade_id') and model == 'atividade':
-        print("atividade_id: ", request.GET.get('atividade_id'))
         atividade = Atividade.objects.get(id=request.GET.get('atividade_id'))
         data['entity'] = atividade
         parent_entity = atividade.evento
@@ -64,7 +57,6 @@ def ticketModal(request):
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModalEdit(request, ticket_id):
-    print("dentro de modal edit")
     layout = request.GET.get('layout')
     data = {}
     model = request.GET.get('model')
@@ -104,7 +96,7 @@ def ticket_form_collapsable(request):
     body = json.loads(request.body)
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     context = {}
-    # print(response.content)
+
     context['ticket'] = json.loads(response.content)
     context['atividade_id'] = body.get('atividade_id')
     context['evento_id'] = body.get('evento_id')

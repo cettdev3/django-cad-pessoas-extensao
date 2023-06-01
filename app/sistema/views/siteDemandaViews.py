@@ -2,11 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import requests
 import json
+from itertools import chain
 from django.http import HttpResponse, JsonResponse
 from rest_framework.authtoken.models import Token
 from sistema.models.ticket import Ticket
 from sistema.models.escola import Escola
 from sistema.models.pessoa import Pessoas
+from sistema.models.ensino import Ensino
+from sistema.models.membroExecucao import MembroExecucao
+from sistema.models.atividade import Atividade
+from sistema.models.alocacao import Alocacao
 import xlsxwriter
 import pandas as pd
 import io
@@ -40,7 +45,6 @@ def demandas_tabela(request):
     demandas = json.loads(response.content)
     return render(request,'demandas/demandas_tabela.html',
     {'demandas':demandas})
-
 @login_required(login_url='/auth-user/login-user')
 def saveBatchDemanda(request):
     if request.method == 'POST':
@@ -59,6 +63,34 @@ def saveBatchDemanda(request):
         return render(request,'demandas/demandas_extrato_importacao.html', {'extrato': extrato})
     else:
         return JsonResponse({'error': 'Invalid POST request'})
+
+@login_required(login_url='/auth-user/login-user')
+def demandasSelect(request):
+    demandas = None
+    evento_id = request.GET.get('evento_id')
+    atividade_id = request.GET.get('atividade_id')
+    if evento_id:
+        membro_execucao_objs = MembroExecucao.objects.filter(evento__id=evento_id)
+        ensino_objs = Ensino.objects.filter(dpevento__id=evento_id)
+        alocacao_objs = Alocacao.objects.filter(acaoEnsino__in=ensino_objs)
+        atividade_objs = Atividade.objects.filter(evento__id=evento_id)
+
+        tickets_membro_execucao = Ticket.objects.filter(membro_execucao__in=membro_execucao_objs)
+        tickets_alocacao = Ticket.objects.filter(alocacao__in=alocacao_objs)
+        tickets_atividade = Ticket.objects.filter(atividade__in=atividade_objs)
+
+        demandas = list(chain(tickets_membro_execucao, tickets_alocacao, tickets_atividade))
+
+    demandasFiltradas = []
+    if atividade_id:
+        for ticket in demandas:
+            if not ticket.atividade:
+                demandasFiltradas.append(ticket)
+            elif ticket.atividade.id != int(atividade_id):
+                demandasFiltradas.append(ticket)
+
+    return render(request,'demandas/demandas_select.html',
+    {'demandas':demandasFiltradas})
 
 @login_required(login_url='/auth-user/login-user')
 def relatorio_sintetico(request):
@@ -89,28 +121,6 @@ def relatorio_sintetico(request):
     worksheet.write(0, headers.index("COTEC Responsável"), "COTEC Responsável", centered)
     
     tickets = Ticket.objects.all()
-
-    # for i, ticket in enumerate(tickets):
-    #     worksheet.write(i+1, headers.index("Ação/Evento"), ticket.acao.nome, centered)
-    #     worksheet.write(i+1, headers.index("ID Protocolo"), ticket.id_protocolo, centered)
-    #     worksheet.write(i+1, headers.index("Descrição"), ticket.descricao, centered)
-    #     worksheet.write(i+1, headers.index("Valor Previsto"), ticket.valor_previsto, centered)
-    #     worksheet.write(i+1, headers.index("Valor Executado"), ticket.valor_executado, centered)
-    #     worksheet.write(i+1, headers.index("COTEC Responsável"), ticket.cotec_responsavel, centered)
-
-    #     for j, header in enumerate(headers):
-    #         if len(str(ticket.acao.nome)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.acao.nome))
-    #         if len(str(ticket.id_protocolo)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.id_protocolo))
-    #         if len(str(ticket.descricao)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.descricao))
-    #         if len(str(ticket.valor_previsto)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.valor_previsto))
-    #         if len(str(ticket.valor_executado)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.valor_executado))
-    #         if len(str(ticket.cotec_responsavel)) > max_len_headers[j]:
-    #             max_len_headers[j] = len(str(ticket.cotec_responsavel))
 
     for i, header in enumerate(headers):
         worksheet.set_column(i, i, max_len_headers[i])

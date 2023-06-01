@@ -37,7 +37,6 @@ def gerencia_pessoas(request):
 @login_required(login_url='/auth-user/login-user')
 def pessoasTable(request):
     token, created = Token.objects.get_or_create(user=request.user)
-    print(request.GET)
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get('http://localhost:8000/pessoas', params={
         'nome': request.GET.get('nome'),
@@ -61,7 +60,6 @@ def visualizarPessoa(request,codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def pessoasModalCadastrar(request):
-    print("request",request)
     id = request.GET.get('id')
     pessoa = None
     cursos = None
@@ -76,8 +74,6 @@ def pessoasModalCadastrar(request):
         if pessoa["cursos"]:
             pessoa = pessoa
             cursos = pessoa["cursos"]
-        print(pessoa)
-    print("usuarios", UserSerializer(users, many=True).data)
     return render(request,'pessoas/modal_cadastrar_pessoa.html',{'pessoa':pessoa, 'cursos':cursos, 'users':users})
 
 @login_required(login_url='/auth-user/login-user')
@@ -108,7 +104,6 @@ def pessoasSelect(request):
     input_id = request.GET.get('input_id')
     input_name = request.GET.get('input_name')
     label = request.GET.get('label', 'Pessoa')
-    print("selected",selected)
     if selected:
         selected = int(selected) if selected.isdigit() else None 
     pessoas = Pessoas.objects.all() 

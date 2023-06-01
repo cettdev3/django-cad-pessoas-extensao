@@ -105,7 +105,6 @@ def saveMembroExecucao(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    print("dentro da view do site", body)
     response = requests.post('http://localhost:8000/membroExecucao', json=body, headers=headers)
     return JsonResponse(json.loads(response.content.decode()),status=response.status_code, safe=False)
 
@@ -114,13 +113,11 @@ def editarMembroExecucao(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     body = json.loads(request.body)['data']
-    print("dentro da view do site",body)
     response = requests.put('http://localhost:8000/membroExecucao/'+str(codigo), json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
 def eliminarMembroExecucao(request,codigo):
-    print("membro de equipe a ser deletado: ", codigo)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.delete('http://localhost:8000/membroExecucao/'+str(codigo), headers=headers)
@@ -130,9 +127,7 @@ def eliminarMembroExecucao(request,codigo):
 
 @login_required(login_url='/auth-user/login-user')
 def membrosExecucaoSelect(request):
-    print(request.GET)
     data = {}
-    print("print dentro do select de membro de execução: ",request.GET)
     if request.GET.get('membro_execucao_id'):
         data['membro_execucao_id'] = int(request.GET.get('membro_execucao_id'))
     acao_id = request.GET.get('acao_id')

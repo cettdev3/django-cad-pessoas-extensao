@@ -1,0 +1,19 @@
+<div class="w-100">
+    <div class="">
+        <label><b>Vincule outras Demandas:</b></label>
+    </div>
+    <select class="form-control" 
+    id="ticket_id" 
+    name="ticket_id">
+        <option value="">Selecione uma demanda</option>
+        {% for demanda in demandas %}
+            <option  
+            {% if selected == demanda.id %}
+            selected
+            {% endif %}
+            value="{{demanda.id}}">
+            {{demanda.tipo_formatado}}: {{demanda.beneficiario.nome}} - {{demanda.id_protocolo}}
+            </option>
+        {% endfor %}
+    </select>
+</div>

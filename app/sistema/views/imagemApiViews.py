@@ -52,7 +52,6 @@ class ImagemApiView(APIView):
         
         image_description = data.get('description', '')
 
-        print("dentro da api de imagem:  ", data.get('imagem_nome', ''))
         image_data_url = data.get('dataUrl', '')
         image_format, image_str = image_data_url.split(';base64,')
         imagem_nome =  data.get('imagem_nome', '')
@@ -86,7 +85,6 @@ class ImagemApiView(APIView):
         imagem.save()
         default_storage.delete(final_image_path)
         serializer = ImagemSerializer(imagem)
-        print("saindo da api de imagem ", serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

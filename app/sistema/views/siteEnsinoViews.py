@@ -82,7 +82,6 @@ def saveEnsino(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)['data']
-    print(body)
     response = requests.post('http://localhost:8000/ensino', json=body, headers=headers)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 

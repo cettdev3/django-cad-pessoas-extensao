@@ -24,11 +24,9 @@ class AlfrescoAPI:
         response = requests.post(url,json.dumps(credentials))
         if response.status_code == 200:
             response = json.loads(response.content)
-            print("login completo no alfresco com sucesso: %s", response)
             return response["data"]["ticket"]
         else: 
             response = json.loads(response.content)
-            print("Houve um erro com a requisição",response.status_code, response)
             return ""
     
     def createNode(self, file, type, name):
@@ -43,11 +41,8 @@ class AlfrescoAPI:
         url = self.__base_url+"nodes/"+self.__rootFolder+"/children?alf_ticket="+self.__alf_ticket
         response = requests.post(url, files=body, data=params)
         if response.status_code == 200 or response.status_code == 201:
-            print("no criado com sucesso: ", response.content)
             return AlfrescoNode.createAlfrescoNodeFromResponse(response.content)
         else: 
-            print("no criado com erro: ", response.content)
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
     
     def getNodeContent(self, path, nodeId):
@@ -58,7 +53,6 @@ class AlfrescoAPI:
             open(path, 'wb').write(response.content)
             return response.status_code
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
     
     def getNodeInfo(self, nodeId):
@@ -68,7 +62,6 @@ class AlfrescoAPI:
         if response.status_code == 200 or response.status_code == 201:
             return response
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
 
     def nodeChildrens(self, nodeId=""):
@@ -78,7 +71,6 @@ class AlfrescoAPI:
         if response.status_code == 200 or response.status_code == 201:
             return json.loads(response.content)
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
     
     def createSharedLink(self, nodeId):
@@ -90,10 +82,8 @@ class AlfrescoAPI:
         response = requests.post(url, json=params)
 
         if response.status_code == 200 or response.status_code == 201:
-            print("shared link criado: ", response.content)
             return response.content
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""
         
     def deleteNode(self, nodeId):
@@ -103,5 +93,4 @@ class AlfrescoAPI:
         if response.status_code == 200 or response.status_code == 201 or response.status_code == 204:
             return response
         else: 
-            print("Houve um erro com a requisição",response.status_code, response.content)
             return ""

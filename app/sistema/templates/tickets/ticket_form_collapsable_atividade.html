@@ -24,16 +24,6 @@
         padding: 6px;
         background-color: white;
     }
-
-    .btn-delete i {
-        font-size: 18px;
-        color: #dc3545;
-    }
-    
-    .btn-delete:hover i {
-        font-size: 18px;
-        color: white;
-    }
 </style>
 <div class="accordion" id="ticket-form-container-{{ticket.id}}">
   <div class="card">
@@ -44,6 +34,7 @@
     aria-controls="form-section-{{ticket.id}}"
     style="cursor: pointer">
         <div class="d-flex justify-content-start align-items-center">
+            {% if ticket.can_delete %}
             <button 
             type="button" 
             class="btn btn-danger btn-delete" 
@@ -54,6 +45,18 @@
                 <i class="fas fa-trash"></i>
             </button>
             <h5 class="mb-0 ml-2" id="form-title">{{ticket.tipo_formatado|default_if_none:''}}</h5>
+            {% else %}
+            <button
+            type="button"
+            class="btn btn-danger btn-delete"
+            data-toggle="tooltip"
+            data-placement="top"
+            onclick="updateDemandaForm('{{ticket.id}}', 'atividade_id', -1, '{{ticket.atividade.id}}')"
+            title="Desvincular ticket">
+                <i class="fa-solid fa-circle-minus"></i>
+            </button>
+            <h5 class="mb-0 ml-2" id="form-title">{{ticket.tipo_formatado|default_if_none:''}} (Equipe de Execução)</h5>
+            {% endif %}
         </div>
     </div>
 
@@ -496,7 +499,19 @@
 
         data[field] = value
         console.log("data to update: ", data)
-        updateDemanda(ticketId, data)
+        updateDemanda(ticketId, data, function () {
+            if (field == "atividade_id" && value == -1) {
+                $(`#ticket-form-container-${ticketId}`).remove()
+                getDemandasSelect({
+                    evento_id: "{{evento_id}}",
+                    atividade_id: "{{ticket.atividade.id}}",
+                }, function(html) {
+                    console.log("demanda removida da atividade")
+                    $('#demandasSelectContainer').html("");
+                    $('#demandasSelectContainer').html(html);
+                });
+            }
+        })
     }
 
     $(document).ready(function() {

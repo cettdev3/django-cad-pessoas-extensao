@@ -21,7 +21,6 @@ class GPSProcessService:
 
         if response.status_code != 200 and response.status_code != 201:
             return
-        # print("rota", route, "metodo", method, "request", request, "response", response)
         if route == "/ensino" and method == "POST":
             self.iniciarProcesso(response)
         elif route == "/alocacoes" and method == "POST":

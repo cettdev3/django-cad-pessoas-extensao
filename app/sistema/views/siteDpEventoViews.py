@@ -454,7 +454,6 @@ def getRelatorioType1(doc, relatorioData):
         doc = getSectionTitle(doc, nomeEvento)
         old_evento = 0
         for evento in eventos:
-            print("evento id", evento.id)
             current_evento = evento.id
             for atividade in evento.atividade_set.all():
                 if current_evento != old_evento:

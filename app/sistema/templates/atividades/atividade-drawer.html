@@ -416,10 +416,16 @@
                                         {% include 'tickets/ticket_form_collapsable_atividade.html' with ticket=demanda atividade_id=atividade.id evento_id=atividade.evento.id %}
                                     {% endfor %}
                                 </div>
-                                <button onclick="addAtividadeDemanda('{{atividade.id}}')"
-                                id="add-ticket-form-btn"
-                                type="button"
-                                class="disable-on-loading btn btn-outline-success ml-3 my-2">Adicionar Demanda</button>
+                                <div class="row d-flex justify-content-between align-items-end px-3">
+                                    <div id="demandasSelectContainer" class="col-sm-6">
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button onclick="addAtividadeDemanda('{{atividade.id}}')"
+                                        id="add-ticket-form-btn"
+                                        type="button"
+                                        class="disable-on-loading btn btn-outline-success ml-3 my-2">Adicionar Demanda</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -456,9 +462,16 @@
 
 <script>
     var galleryImagesFiles = [];
-    function addAtividadeDemanda(atividade_id) {
+    async function addAtividadeDemanda(atividade_id, demanda_id = null) {
+        if (demanda_id) {
+            await updateDemanda(demanda_id, {atividade_id: atividade_id}, function (html) {
+                $('#ticket-form-container').append(html);
+            })
+            return
+        }
+
         let evento_id = $('#evento_id').val();
-        createDemanda({atividade_id: atividade_id, evento_id: evento_id}, function (html) {
+        await createDemanda("/ticket_form_collapsable", {atividade_id: atividade_id, evento_id: evento_id}, function (html) {
             $('#ticket-form-container').append(html);
         })
     }
@@ -545,6 +558,16 @@
                 });
             }
             
+            function loadSelectDemandas(number = 0) {
+                getDemandasSelect({
+                    evento_id: $('#evento_id').val(),
+                    atividade_id: params.atividadeId,
+                }, function(html) {
+                    $('#demandasSelectContainer').html('');
+                    $('#demandasSelectContainer').html(html);
+                });
+            }
+            
             $('#close-drawer-button').click(function() {
                 $('#activity-drawer').hide();
             });
@@ -579,6 +602,12 @@
             loadSelectDepartamento()
             loadSelectTipoAtividade()
             loadSelectCidade()
+            loadSelectDemandas()
+
+            $(document).off("change", "#demandasSelectContainer select").on("change", "#demandasSelectContainer select", async function() {
+                await addAtividadeDemanda(params.atividadeId, $(this).val());
+                loadSelectDemandas(1);
+            });
         })({
             atividadeId: "{{atividade.id}}", 
             responsavelId: "{{atividade.responsavel.id}}",

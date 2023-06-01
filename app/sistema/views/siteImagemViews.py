@@ -16,7 +16,6 @@ def saveImagem(request):
     response = None
     if galeria_id:
         response = requests.put(url, json=body, headers=headers)
-        print(response.content)
     else:
         response = requests.post(url, json=body, headers=headers)
     return JsonResponse({'status': response.status_code, 'content': response.content.decode()})
@@ -24,8 +23,6 @@ def saveImagem(request):
 
 @login_required(login_url='/auth-user/login-user')
 def deleteImagem(request, imagem_id):
-    print("dentro do delete no site view")
-    print(imagem_id)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/imagens/' + str(imagem_id)

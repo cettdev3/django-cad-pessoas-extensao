@@ -201,7 +201,6 @@ class Ticket(models.Model):
             return "demanda criada no protocolo"
         elif self.status == self.STATUS_CANCELADO:
             return "demanda cancelada"
-        print("Status não identificado")
         return "Status não identificado"
 
     @property

@@ -57,7 +57,7 @@ from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createData
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteServicosContratadosViews import servicoContratadoModal, servicoContratadoTable, saveServicoContratado, deleteServicoContratado
 from sistema.views.siteUserViews import usersSelect
-from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda
+from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda, demandasSelect
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
 from sistema.views.siteGaleriaViews import (
     galeriaModal,
@@ -189,6 +189,8 @@ urlpatterns = [
     path("relatorio_sintetico",relatorio_sintetico),
     path("importDemandaModal",importDemandaModal),
     path("saveBatchDemanda",saveBatchDemanda),
+    path("saveBatchDemanda",saveBatchDemanda),
+    path("demandasSelect",demandasSelect),
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),

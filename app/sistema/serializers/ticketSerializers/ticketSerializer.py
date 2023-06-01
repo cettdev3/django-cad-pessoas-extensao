@@ -21,6 +21,7 @@ class TicketSerializer(serializers.ModelSerializer):
     beneficiario = PessoaTicketSerializer(many=False, read_only=True)
     anexos = serializers.SerializerMethodField()
     departamento = DepartamentoSerializer(many=False, read_only=True)
+    can_delete = serializers.SerializerMethodField()
     class Meta:
         model = Ticket
         fields = [
@@ -59,9 +60,20 @@ class TicketSerializer(serializers.ModelSerializer):
             "anexos",
             "departamento",
             "rubrica",
+            "can_delete"
         ]
         depth = 2
 
     def get_anexos(self, obj):
         anexos = Anexo.objects.filter(model='Ticket', id_model=obj.id)
         return AnexoSerializer(anexos, many=True).data
+    
+    def get_can_delete(self, obj):
+        modelsCount = 0
+        if obj.membro_execucao:
+            modelsCount += 1
+        if obj.alocacao:
+            modelsCount += 1
+        if obj.atividade:
+            modelsCount += 1
+        return modelsCount == 1

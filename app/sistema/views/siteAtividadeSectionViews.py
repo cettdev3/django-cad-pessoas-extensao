@@ -35,7 +35,6 @@ def atividadeSectionTable(request):
         },
         headers=headers
     )
-    # print(f"Response: {response.content}")
     atividadeSections = json.loads(response.content)
     return render(
         request,
