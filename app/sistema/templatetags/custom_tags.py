@@ -17,3 +17,4 @@ def is_in(value, list_obj):
     else:
         raise ValueError("Invalid input type. Expected ReturnList or QuerySet.")
     return response
+

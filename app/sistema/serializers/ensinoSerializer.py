@@ -37,7 +37,10 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "first_dp_evento",
             "numero_oficio",
             "anexo_oficio",
-            "has_credito_social"
+            "has_credito_social",
+            "alocacao_status",
+            "alocacao_status_class",
+            "alocacao_status_formatado",
         ]
         depth = 2
         

@@ -10,6 +10,10 @@ class Ensino(models.Model):
     STATUS_ADIADO = "adiado"
     STATUS_CANCELADO = "cancelado"
 
+    STATUS_ALOCACAO_NENHUMA_CADASTRADA = "nenhuma_cadastrada"
+    STATUS_ALOCACAO_CONCLUIDA = "cadastrada"
+    STATUS_ALOCACAO_PENDENCIA = "alocacao_pendencia"
+
     EMPRESTIMO = 'emprestimo'
     OUTROS = 'outros'
     GPS = 'gps'
@@ -95,3 +99,33 @@ class Ensino(models.Model):
         if self.etapa:
             return "Etapa "+self.etapa
         return ""
+    
+    @property
+    def alocacao_status(self):
+        alocacoes = self.alocacao_set.all()
+        if len(alocacoes) == 0:
+            return self.STATUS_ALOCACAO_NENHUMA_CADASTRADA
+        for alocacao in alocacoes:
+            if not alocacao.quantidade_matriculas or not alocacao.codigo_siga:
+                return self.STATUS_ALOCACAO_PENDENCIA
+        return self.STATUS_ALOCACAO_CONCLUIDA
+    
+    @property
+    def alocacao_status_formatado(self):
+        if self.alocacao_status == self.STATUS_ALOCACAO_NENHUMA_CADASTRADA:
+            return "Nenhuma alocação cadastrada"
+        elif self.alocacao_status == self.STATUS_ALOCACAO_PENDENCIA:
+            return "Alocação com dados pendentes"
+        elif self.alocacao_status == self.STATUS_ALOCACAO_CONCLUIDA:
+            return "Alocação concluída"
+        return "Não definido"
+    
+    @property
+    def alocacao_status_class(self):
+        if self.alocacao_status == self.STATUS_ALOCACAO_NENHUMA_CADASTRADA:
+            return "info-danger"
+        elif self.alocacao_status == self.STATUS_ALOCACAO_PENDENCIA:
+            return "info-warning"
+        elif self.alocacao_status == self.STATUS_ALOCACAO_CONCLUIDA:
+            return "info-success"
+        return "info-secondary"
