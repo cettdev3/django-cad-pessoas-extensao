@@ -31,7 +31,8 @@ class TicketApiView(APIView):
         favorecido = request.GET.get("favorecido")
         escola = request.GET.get("escola")
         order_by = request.GET.get("order_by")
-
+        id_protocolo = request.GET.get("id_protocolo")
+        print("dentro da rota de tickets: ", id_protocolo)
         tickets = Ticket.objects.select_related("membro_execucao", "alocacao", "pessoa", "atividade")
         if favorecido:
             tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
@@ -41,6 +42,8 @@ class TicketApiView(APIView):
                 Q(alocacao__acaoEnsino__escola__nome__icontains=escola) | 
                 Q(escola__nome__icontains=escola)
             )
+        if id_protocolo:
+            tickets = tickets.filter(id_protocolo=id_protocolo)
         
         if order_by and order_by == "favorecido":
             tickets = tickets.annotate(
