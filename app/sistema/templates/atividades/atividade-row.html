@@ -1,15 +1,20 @@
-<div id="atividade-row-container-{{atividade.id}}"  class="w-100 d-flex" >
+<div id="atividade-row-container-{{atividade.id}}"  class="w-100 d-flex align-items-start" >
     <div class="d-flex w-35" id="atividade-row-nome-{{atividade.id}}" >
-        <div id="atividade-row-status-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
-           {% include 'atividades/atividade-btn-status.html' with atividade=atividade %}
+        <div>
+            <div id="atividade-row-status-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
+               {% include 'atividades/atividade-btn-status.html' with atividade=atividade replaceContainerId='atividade-row-status-' %}
+            </div>
         </div>
-        <div id="atividade-row-categoria-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
-           {% include 'atividades/atividade-btn-categoria.html' with atividade=atividade categorias=categorias %}
+        <div id="atividade-row-categoria-{{atividade.id}}" class="d-flex align-items-center" style="box-sizing: border-box;">
+           {% include 'atividades/atividade-btn-categoria.html' with atividade=atividade categorias=categorias replaceContainerId='atividade-row-categoria-' containerId='atividade-row' %}
         </div>
-        <input type="text" 
-        class="input-hover-highlight w-95 bg-light ml-1"
-        placeholder="Escreva o nome da tarefa"
-        value="{{atividade.nome|default_if_none:''}}">
+        <div>
+            <input type="text" 
+            id="input-nome-atividade-{{atividade.id}}"
+            class="input-hover-highlight w-95 bg-light ml-1"
+            placeholder="Escreva o nome da tarefa"
+            value="{{atividade.nome|default_if_none:''}}">
+        </div>
     </div>
     <div class="w-20 d-flex align-items-center" style="box-sizing: border-box;">
         <div id="select-membro-execucao-atividade-{{atividade.id}}">
@@ -48,7 +53,7 @@
         (function(params) {    
             let oldName = "{{atividade.nome|default_if_none:''}}"        
             function setNomeInputBehaviour(data) {
-                let nomeInput = $("#atividade-row-nome-" + params.atividadeId + " input")
+                let nomeInput = $("#atividade-row-nome-" + params.atividadeId + " #input-nome-atividade-" + params.atividadeId)
                 if (params.fromCreate == "True") {
                     nomeInput.focus()
                 }
@@ -64,7 +69,7 @@
                     let data = {
                         "nome": nome
                     }
-
+                    console.log("update nome", data)
                     updateAtividade(params.atividadeId, data)
                 })
             }
@@ -74,6 +79,7 @@
                 let data = {
                     "status": status
                 }
+                
                 updateAtividade(params.atividadeId, data)
             })
 

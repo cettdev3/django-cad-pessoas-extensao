@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from sistema.models.atividade import Atividade
 from sistema.models.acao import Acao
 from sistema.models.atividadeSection import AtividadeSection
+from sistema.models.atividadeCategoria import AtividadeCategoria
 from sistema.models.dpEvento import DpEvento
 from sistema.models.departamento import Departamento
 from sistema.models.membroExecucao import MembroExecucao
@@ -71,7 +72,7 @@ def atividadesDpEventoTable(request):
         atividadeSections.order_by("order").all().prefetch_related(prefetch)
     )
 
-    categorias = Atividade().CATEGORY_CHOICES
+    categorias = AtividadeCategoria.objects.all()
 
     data = {}
     data["membrosExecucao"] = MembroExecucao.objects.filter(evento__id=evento_id).all()
@@ -131,7 +132,7 @@ def saveAtividade(request):
         "http://localhost:8000/atividades", json=body, headers=headers
     )
     atividade = json.loads(response.content)
-    categorias = Atividade().CATEGORY_CHOICES
+    categorias = AtividadeCategoria.objects.all()
     thumbnailStyle = True
 
     data = {}
@@ -151,6 +152,8 @@ def editarAtividade(request, atividade_id):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {"Authorization": "Token " + token.key}
     body = json.loads(request.body)
+    replaceContainerId = body.get("replaceContainerId", None)
+    containerId = body.get("containerId", None)
     template = body.get("template") if body.get("template") else "atividade-row.html"
     response = requests.put(
         "http://localhost:8000/atividades/" + str(atividade_id),
@@ -158,7 +161,7 @@ def editarAtividade(request, atividade_id):
         headers=headers,
     )
     atividade = json.loads(response.content)
-    categorias = Atividade().CATEGORY_CHOICES
+    categorias = AtividadeCategoria.objects.all()
     thumbnailStyle = True
     data = {}
 
@@ -169,6 +172,8 @@ def editarAtividade(request, atividade_id):
     data["categorias"] = categorias
     data["thumbnailStyle"] = thumbnailStyle
     data["departamentos"] = Departamento.objects.all()
+    data['replaceContainerId'] = replaceContainerId
+    data['containerId'] = containerId
     return render(request, "atividades/" + template, data)
 
 
@@ -180,7 +185,7 @@ def getAtividadeDrawer(request, atividade_id):
         "http://localhost:8000/atividades/" + str(atividade_id), headers=headers
     )
     atividade = json.loads(response.content)
-    categorias = Atividade().CATEGORY_CHOICES
+    categorias = AtividadeCategoria.objects.all()
     thumbnailStyle = True
 
     return render(

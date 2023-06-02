@@ -107,7 +107,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button onclick="gerarRelatorio()" 
+                <button onclick="gerarRelatorioFiltrado()" 
                 id="confimarModalCalendario" 
                 type="button" 
                 class="btn btn-primary">
@@ -228,7 +228,7 @@
         console.log("filtros")
     };
 
-    function gerarRelatorio() {
+    function gerarRelatorioFiltrado() {
         filtroTipoRelatorio = $("#tipo_relatorio").val();   
         if (filtroTipoRelatorio == "cirscunstanciado_word") {
             gerarRelatorioCircunstanciado();

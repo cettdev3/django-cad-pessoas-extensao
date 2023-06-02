@@ -23,3 +23,4 @@ from .imagem import Imagem
 from .dpEventoEscola import DpEventoEscola
 from .atividadeSection import AtividadeSection
 from .anexo import Anexo
+from .atividadeCategoria import AtividadeCategoria

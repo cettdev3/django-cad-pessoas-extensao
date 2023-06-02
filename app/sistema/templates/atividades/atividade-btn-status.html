@@ -1,4 +1,8 @@
-<div class="dropdown mr-1">
+<div  id="{{containerId}}-dropdown-{{atividade.id}}" 
+data-toggle="tooltip"
+data-placement="top"
+title="Alterar status"
+class="dropdown mr-1">
     <button 
     {% if atividade.status == 'pendente' %}
     class="btn btn-sm btn-outline-warning rounded-circle"
@@ -51,15 +55,25 @@
     $(document).ready(function() {
         (function(params) {    
             $(".btn-status-atividade-"+params.atividadeId).on('click', function() {
+                if (params.oldStatus == $(this).attr('data-status')) {
+                    return
+                }
                 let status = $(this).attr('data-status')
                 let data = {
                     status: status,
-                    template: "atividade-btn-status.html"
+                    template: "atividade-btn-status.html",
+                    containerId: params.containerId,
+                    replaceContainerId: params.replaceContainerId
                 }
                 updateAtividade(params.atividadeId, data, function(html) {
-                    $("#atividade-row-status-"+params.atividadeId).html(html)
+                    $("#"+params.replaceContainerId+params.atividadeId).html(html)
                 })
             })
-        })({atividadeId: "{{atividade.id}}"});
+        })({
+            atividadeId: "{{atividade.id}}", 
+            oldStatus: "{{atividade.status}}",
+            replaceContainerId: '{{replaceContainerId}}',
+            containerId: '{{containerId}}'
+        });
     });
 </script>

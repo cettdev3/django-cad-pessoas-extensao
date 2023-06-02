@@ -23,44 +23,12 @@
 <div class="d-flex flex-column w-100 h-100 bg-light border" style="overflow-x: hidden">
     <div class="d-flex justify-content-between px-3 py-2" style="border-bottom: 1px solid #ccc">
         <div class="d-flex position-relative">
-            <div class="multilevel-dropdown mr-1">
-                <button class="btn btn-sm btn-outline-success custom-dropdown-toggle" type="button">
-                    <span>{{atividade.categoria_label|default_if_none:'Atividade'}}</span>
-                </button>
-                <div id="dropdown-categorias" class="multilevel-dropdown-menu">
-                    {% for categoria in categorias %}
-                    <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2"
-                    onclick="updateAtividadeDrawer('{{atividade.id}}', {'categoria': '{{categoria.0}}'})">
-                        <span>{{categoria.1}}</span>
-                    </button>
-                    {% endfor %}
-                </div>
+            <div id="atividade-drawer-status-container-{{atividade.id}}">
+                {% include 'atividades/atividade-btn-status.html' with atividade=atividade replaceContainerId='atividade-drawer-status-container-' %}
             </div>
-            <button data-toggle="tooltip" data-placement="top" 
-            {% if atividade.status == 'pendente' %}
-            title="Marcar como concluído" 
-            class="btn btn-sm btn-outline-warning"
-            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'concluido'})"
-            {% elif atividade.status == 'concluido' %}
-            title="Marcar como cancelada"
-            class="btn btn-sm btn-outline-success"
-            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'cancelada'})"
-            {% elif atividade.status == 'cancelada' %}
-            title="Marcar como pendente"
-            class="btn btn-sm btn-outline-secondary"
-            onclick="updateAtividadeDrawer('{{atividade.id}}', {'status': 'pendente'})"
-            {% endif %}>
-                {% if atividade.status == 'pendente' %}
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                {% elif atividade.status == 'concluido' %}
-                <i class="fa-solid fa-check"></i>
-                {% elif atividade.status == 'cancelada' %}
-                <i class="fa-solid fa-ban"></i>
-                {% endif %}
-                <span>
-                    {{atividade.status}}
-                </span>
-            </button>
+            <div id="atividade-drawer-atividade-categorias-container-{{atividade.id}}">
+                {% include 'atividades/atividade-btn-categoria.html' with atividade=atividade categorias=categorias replaceContainerId='atividade-drawer-atividade-categorias-container-' containerId='atividade-drawer'%}
+            </div>
         </div>
         <div>
             <button id="add-anexo-button-{{atividade.id}}"
@@ -483,6 +451,7 @@
     }
 
     function updateAtividadeDrawer(atividadeId, data, field = null, oldValue = null) {
+        console.log("chamando update atividade drawer")
         data.template = 'atividade-drawer.html';
         if (field && oldValue == data[field]) return
         updateAtividade(
@@ -570,6 +539,7 @@
             
             $('#close-drawer-button').click(function() {
                 $('#activity-drawer').hide();
+                carregarAtividades()
             });
 
             $('#add-anexo-button-'+params.atividadeId).click(function() {

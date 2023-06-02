@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from sistema.models.dpEvento import DpEvento
+from sistema.models.atividadeCategoria import AtividadeCategoria
 from sistema.models.membroExecucao import MembroExecucao
 from sistema.models.escola import Escola
 from sistema.models.departamento import Departamento
@@ -163,7 +164,7 @@ def visualizarDpEvento(request, codigo):
     departamentos = Departamento.objects.all()
     path_back = "gerencia_dp_eventos"
     dpEvento = DpEventoSerializer(dpEvento).data
-    categoriaAtividades = Atividade().CATEGORY_CHOICES
+    categoriaAtividades = AtividadeCategoria.objects.all()
     return render(
         request,
         "dpEventos/visualizar_dp_evento.html",

@@ -128,8 +128,8 @@ style="height: calc(100vh - 75px);">
                             class="form-control-sm border-secondary">
                                 <option value="">Selecione uma Categoria</option>
                                 {% for categoria in categoriaAtividades %}
-                                <option value="{{categoria.0}}">
-                                    <span>{{categoria.1}}</span>
+                                <option value="{{categoria.id}}">
+                                    <span>{{categoria.name}}</span>
                                 </option>
                                 {% endfor %}
                             </select>
@@ -195,6 +195,14 @@ style="height: calc(100vh - 75px);">
             </div> {% endcomment %}
             <div id="atividades" class="tab-pane " >
                 <div id="atividadesTableContainer"></div>
+                <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
+                    <div class="loading-container"
+                    style="display: none; position: relative">
+                        <div class="spinner-border text-primary " role="status">
+                        </div>
+                    </div>
+                    <h3>Carregando...</h3>
+                </div>
             </div>
             <div id="avaliacao" class="tab-pane" >
                 <div id="avaliacaoLocalTableContainer"></div>
@@ -323,14 +331,21 @@ style="height: calc(100vh - 75px);">
     }
 
     function carregarAtividades(data = null) {
-
+        toggleLoading("show");
+        $("#atividadesTableContainer").html("");
         $.ajax({
             url: "/atividadesDpEventoTable",
             data: data == null ? {dp_evento_id: dpEventoId} : data,
             success: function (data) {
+                toggleLoading("hide");
                 $("#atividadesTableContainer").html(data);
+            },
+            error: function (data) {
+                showFloatingMessage("Erro ao carregar atividades", "alert-danger");
+                toggleLoading("hide");
             }
         });
+
     }
     
     function carregarServicosContratados() {

@@ -5,6 +5,7 @@ from ..models.cidade import Cidade
 from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.pessoa import Pessoas
+from ..models.atividadeCategoria import AtividadeCategoria
 from ..models.ticket import Ticket
 from ..models.atividadeSection import AtividadeSection
 from ..models.galeria import Galeria
@@ -202,6 +203,43 @@ class MigrationsViewSets(viewsets.ModelViewSet):
                 if atividade.atividade_meta:
                     atividade.categoria = atividade.CATEGORIA_META_EXTENSAO
                     atividade.nome = atividade.descricao
+                    atividade.save()
+
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+
+    @action(methods=["POST"], detail=False, url_path="create-atividade-categorias")
+    def updateAtividadesExtensao(self, *args, **kwargs):
+        CATEGORIA_TAREFA = 'tarefa'
+        CATEGORIA_PROGRAMACAO = 'programacao'
+        CATEGORIA_META_EXTENSAO = 'meta_extensao'
+        CATEGORIA_REUNIAO = 'reuniao'
+        CATEGORIA_MARCO = 'marco'
+        CATEGORIA_SUBTAREFAS = 'subtarefa'
+        CATEGORIA_ATIVIDADE = 'atividade'
+        categories = [
+            ('Tarefa', 'badge-categoria-tarefa', CATEGORIA_TAREFA),
+            ('Programação', 'badge-categoria-programacao', CATEGORIA_PROGRAMACAO),
+            ('Meta de Extensão', 'badge-categoria-meta-extensao', CATEGORIA_META_EXTENSAO),
+            ('Reunião', 'badge-categoria-reuniao', CATEGORIA_REUNIAO),
+            ('Marco', 'badge-categoria-marco', CATEGORIA_MARCO),
+            ('Subtarefa', 'badge-categoria-subtarefas', CATEGORIA_SUBTAREFAS),
+            ('Atividade', 'badge-categoria-atividade', CATEGORIA_ATIVIDADE),
+        ]
+
+        for name, badge, slug in categories:
+            AtividadeCategoria.objects.get_or_create(name=name, badge=badge, slug=slug)
+
+        return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")
+
+    @action(methods=["POST"], detail=False, url_path="set-atividade-categorias")
+    def setAtividadesExtensao(self, *args, **kwargs):
+        atividades = Atividade.objects.all()
+        atividadeCategorias = AtividadeCategoria.objects.all()
+
+        for atividade in atividades:
+            for categoria in atividadeCategorias:
+                if atividade.categoria == categoria.slug:
+                    atividade.atividadeCategorias.add(categoria)
                     atividade.save()
 
         return Response(data={}, status=st.HTTP_200_OK, content_type="application/json")

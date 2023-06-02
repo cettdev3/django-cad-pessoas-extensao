@@ -111,6 +111,8 @@ router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 # router.register(r'migrations', MigrationsViewSets, 'create-secao-atividades')
 # router.register(r'migrations', MigrationsViewSets, 'update-beneficiario-tickets')
 # router.register(r'migrations', MigrationsViewSets, 'update-atividades-extensao')
+router.register(r'migrations', MigrationsViewSets, 'create-atividade-categorias')
+router.register(r'migrations', MigrationsViewSets, 'set-atividade-categorias')
 
 # router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 

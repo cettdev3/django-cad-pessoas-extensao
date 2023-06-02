@@ -10,6 +10,7 @@ from ..serializers.cidadeSerializer import CidadeSerializer
 from ..serializers.dpEventoSerializer import DpEventoSerializer
 from ..serializers.anexoSerializer import AnexoSerializer
 from ..serializers.servicoSerializer import ServicoSerializer
+from ..serializers.atividadeCategoriaSerializer import AtividadeCategoriaSerializer
 from ..serializers.galeriaSerializer import GaleriaSerializer
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer
 
@@ -24,6 +25,9 @@ class AtividadeSerializer(serializers.ModelSerializer):
     galeria = GaleriaSerializer(many=False, read_only=True)
     ticket_set = TicketSerializer(many=True, read_only=True)
     anexos = AnexoSerializer(many=True, read_only=True)
+    atividadeCategorias = AtividadeCategoriaSerializer(many=True, read_only=True)
+    atividadeCategorias_ids = serializers.SerializerMethodField()
+
     class Meta:
         model = Atividade
         fields = [
@@ -58,7 +62,12 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "atividade_meta",
             "categoria",
             "categoria_label",
-            "categoria_badge"
+            "categoria_badge",
+            "atividadeCategorias",
+            "atividadeCategorias_ids"
         ]
         
         depth = 4
+
+    def get_atividadeCategorias_ids(self, obj):
+        return [categoria.id for categoria in obj.atividadeCategorias.all()]

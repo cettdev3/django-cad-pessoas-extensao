@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import Prefetch, OuterRef
 from ..models.acao import Acao
 from ..models.tipoAtividade import TipoAtividade
+from ..models.atividadeCategoria import AtividadeCategoria
 from ..models.cidade import Cidade
 from ..models.atividade import Atividade
 from ..models.servico import Servico
@@ -290,8 +291,12 @@ class AtividadeDetailApiView(APIView):
             galeria.save()
             atividade.nome = data.get("nome", atividade.nome)
 
-        categoria = data.get("categoria", atividade.categoria)
-        if categoria == atividade.CATEGORIA_META_EXTENSAO:
+        categorias_ids = data.get('categorias', [])
+        if categorias_ids:
+            atividade.atividadeCategorias.set(categorias_ids)  
+            
+        atividadeMetaCategoria = AtividadeCategoria.objects.filter(slug=atividade.CATEGORIA_META_EXTENSAO).first()
+        if str(atividadeMetaCategoria.id) in categorias_ids:
             atividade.atividade_meta = True
         else:
             atividade.atividade_meta = False
@@ -305,7 +310,6 @@ class AtividadeDetailApiView(APIView):
         atividade.complemento = data.get("complemento", atividade.complemento)
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio", atividade.data_realizacao_inicio)
         atividade.data_realizacao_fim = data.get("data_realizacao_fim", atividade.data_realizacao_fim)
-        atividade.categoria = categoria
         atividade.save()
 
         anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)

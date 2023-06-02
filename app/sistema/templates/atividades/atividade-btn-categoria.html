@@ -1,33 +1,114 @@
-<div class="dropdown mr-1">
-    <button data-toggle="dropdown"
-    id="dropdownMenuButton-categoria-{{atividade.id}}"
-    class="custom-badge custom-badge-sm {{atividade.categoria_badge|default_if_none:''}}"
-    type="button">
-        <span><strong>{{atividade.categoria_label|default_if_none:'Atividade'}}</strong></span>
-    </button>
-    <div id="dropdown-categorias" class="dropdown-menu" aria-labelledby="dropdownMenuButton-categoria-{{atividade.id}}">
-        {% for categoria in categorias %}
-        <button class="btn-categoria-atividade-{{atividade.id}} btn btn-success btn-sm dropdown-item m-0 px-1 py-2 {{categoria.2}}"
-        data-category="{{categoria.0}}">
-            <span><strong>{{categoria.1}}</strong></span>
-        </button>
+<div id="{{containerId}}-dropdown-{{atividade.id}}" class="dropdown mr-1">
+    <div id="atividade-categoria-badges-{{atividade.id}}" class="">
+        {% for categoria in atividade.atividadeCategorias %}
+        <span class="custom-badge custom-badge-sm {{categoria.badge|default_if_none:''}}">{{categoria.name}}</span>
         {% endfor %}
+        <button data-toggle="dropdown"
+        id="dropdownMenuButton-categoria-{{atividade.id}}"
+        class="btn btn-sm btn-outline-primary rounded-circle"
+        data-toggle="tooltip" data-placement="top" title="Adicionar/Remover categoria"
+        type="button">
+            <span><strong>
+                <i class="fa-solid fa-plus"></i>
+            </strong></span>
+        </button>
+        <div id="dropdown-categorias-{{atividade.id}}" class="dropdown-menu" aria-labelledby="dropdownMenuButton-categoria-{{atividade.id}}">
+            {% for categoria in categorias %}
+            <div class="position-relative p-0 {% if categoria.id in atividade.atividadeCategorias_ids %}custom-dropdown-multiple-selected-item{% endif %}"
+            id="custom-multiple-drop-item-{{categoria.id}}-atividade-{{atividade.id}}"
+            style="
+                width: 100%; 
+                height: 32px;
+            ">
+                <input type="checkbox" 
+                style="width: 100%; height: 100%; opacity: 0;"
+                class="category-checkbox custom-dropdown-multiple-input btn-categoria-atividade-{{atividade.id}}" 
+                name="categories" 
+                {% if categoria.id in atividade.atividadeCategorias_ids %}
+                checked
+                {% endif %}
+                value="{{categoria.id}}"> 
+                <div 
+                class="custom-dropdown-multiple-item position-absolute w-100 h-100 d-flex align-items-center justify-content-start pl-2" 
+                style="top: 0; left: 0; pointer-events: none;">
+                    <div class="w-100 h-100 d-flex align-items-center">
+                        <strong>{{categoria.name}}</strong>
+                    </div>    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
 <script>
     $(document).ready(function () {
         (function (params) {
-            $(".btn-categoria-atividade-" + params.atividadeId).on('click', function () {
-                let status = $(this).attr('data-category')
-                let data = {
-                    categoria: status,
-                    template: "atividade-btn-categoria.html"
+            let previousDisplay = $('#dropdown-categorias-' + params.atividadeId).css('display');
+
+            $("div[id^=custom-multiple-drop-item-]").hover(
+                function() {
+                    let element = $(this).find(".custom-dropdown-multiple-item")
+                    element.addClass("custom-dropdown-multiple-item-hover");
+                }, function() {
+                    let elemento = $(this).find(".custom-dropdown-multiple-item")
+                    elemento.removeClass("custom-dropdown-multiple-item-hover");
                 }
-                updateAtividade(params.atividadeId, data, function (html) {
-                    $("#atividade-row-categoria-" + params.atividadeId).html(html)
-                })
+            );
+
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutationRecord) {
+                    if(mutationRecord.attributeName === 'style') {
+                        let currentDisplay = $(`#${params.containerId}-dropdown-${params.atividadeId} #dropdown-categorias-${params.atividadeId}`).css('display');
+                        if (previousDisplay !== 'none' && currentDisplay === 'none') {
+                            let selectedItems = $(`#${params.containerId}-dropdown-${params.atividadeId} #dropdown-categorias-${params.atividadeId}`).find("input[type=checkbox]:checked").map(function(){
+                                return $(this).val();
+                            }).get();
+
+                            if (selectedItems.length === params.categorias.length) return
+                            
+                            let different = false;
+                            for (let i = 0; i < selectedItems.length; i++) {
+                                if (selectedItems[i] !== params.categorias[i]) {
+                                    different = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!different) return 
+                            
+                            let data = {
+                                categorias: selectedItems,
+                                template: "atividade-btn-categoria.html",
+                                replaceContainerId: params.replaceContainerId,
+                                containerId: params.containerId
+                            }
+
+                            updateAtividade(params.atividadeId, data, function (html) {
+                                let container = $(`#${params.replaceContainerId}-` + params.atividadeId)
+                                $(`#${params.replaceContainerId}` + params.atividadeId).html(html)
+                            })
+                        }
+                        previousDisplay = currentDisplay;
+                    }
+                });    
+            });
+
+            observer.observe($(`#${params.containerId}-dropdown-${params.atividadeId} #dropdown-categorias-${params.atividadeId}`)[0], { attributes : true, attributeFilter : ['style'] });
+
+            $(".btn-categoria-atividade-" + params.atividadeId).on('change', function () {
+                let selectedClass = "custom-dropdown-multiple-selected-item"
+                if ($(this).is(":checked")) {
+                    $(this).parent().addClass(selectedClass)
+                } else {
+                    $(this).parent().removeClass(selectedClass)
+                }
             })
-        })({ atividadeId: "{{atividade.id}}" });
+        })({ 
+            atividadeId: "{{atividade.id}}", 
+            categorias: {{atividade.atividadeCategorias_ids}}, 
+            replaceContainerId: '{{replaceContainerId}}',
+            containerId: '{{containerId}}'
+        });
     });
 </script>

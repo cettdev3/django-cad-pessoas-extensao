@@ -24,11 +24,9 @@ class="d-flex align-items-center justify-content-start mt-4"
     </button>
 </div>
 <script>
-    let atividadeSectionEventoId = '{{evento_id}}'
-
     async function addAtividadeToSection(sectionId) {
         return await createAtividade({
-            evento_id: atividadeSectionEventoId,
+            evento_id: '{{evento_id}}',
             atividade_section_id: sectionId
         }, function(html) {
             console.log(html)
@@ -44,7 +42,7 @@ class="d-flex align-items-center justify-content-start mt-4"
     }
 
     async function addAtividadeSection(sectionId, position = null) {
-        await createAtividadeSection({evento_id: atividadeSectionEventoId}, function(html) {
+        await createAtividadeSection({evento_id: '{{evento_id}}'}, function(html) {
             if (position === 'above') {
                 $("#atividade-section-" + sectionId).before(html);
             } else if (position === 'below') {

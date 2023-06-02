@@ -6,6 +6,7 @@ from .membroExecucao import MembroExecucao
 from .cidade import Cidade
 from .departamento import Departamento
 from .atividadeSection import AtividadeSection
+from .atividadeCategoria import AtividadeCategoria
 from .galeria import Galeria
 class Atividade(models.Model):
     STATUS_PENDENTE = 'pendente'
@@ -57,6 +58,7 @@ class Atividade(models.Model):
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     atividade_meta = models.BooleanField(default=False, null = True, blank= True)
     categoria = models.CharField(null = True, blank=True, max_length=100)
+    atividadeCategorias = models.ManyToManyField(AtividadeCategoria, blank=True, null=True)
     atividadeSection = models.ForeignKey(AtividadeSection, on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         db_table = 'atividades'
