@@ -119,10 +119,17 @@ class AtividadeApiView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
-        categoria = data.get("categoria", "tarefa")
+        categoriaTarefa = AtividadeCategoria.objects.filter(slug=Atividade.CATEGORIA_TAREFA).first()
+        categorias_ids = data.get('categorias', [])
+        if len(categorias_ids) == 0:
+            categorias_ids.append(str(categoriaTarefa.id))
+    
+        atividadeMetaCategoria = AtividadeCategoria.objects.filter(slug=Atividade.CATEGORIA_META_EXTENSAO).first()
         atividade_meta = False
-        if categoria == 'meta_extensao':
+        if str(atividadeMetaCategoria.id) in categorias_ids:
             atividade_meta = True
+        else:
+            atividade_meta = False
 
         galeria = Galeria.objects.create(nome="Galeria sem titulo ", evento=evento)
         atividadeData = {
@@ -154,6 +161,9 @@ class AtividadeApiView(APIView):
         }
 
         atividade = Atividade.objects.create(**atividadeData)
+        if len(categorias_ids) > 0:
+            atividade.atividadeCategorias.set(categorias_ids)
+
         serializer = AtividadeSerializer(atividade)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
