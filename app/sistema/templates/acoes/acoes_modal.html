@@ -295,11 +295,10 @@
     }
 
     function cadastrarAcao() {
-        console.log("itinerario: ",getItinerarioData())
         console.log("formulario: ",getFormData())
         $.ajax({
             url: "/saveAcao",
-            data: JSON.stringify({"data": getFormData(), "itinerarios": getItinerarioData()}),
+            data: JSON.stringify({"data": getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',

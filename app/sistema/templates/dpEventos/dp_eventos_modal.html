@@ -130,18 +130,7 @@
             <ul class="nav nav-tabs row" style="height: 100%;">
                 <li id="dpEventoTabs1" class="col mx-2 active-dpEvento-form-tab ">
                     <a id="dpEventosTabLink1" data-toggle="tab" style="display: none;" role="tab" href="#home">1</a>
-                    {% comment %} <span>1 Dados Gerais</span> {% endcomment %}
                 </li>
-                {% comment %} {% if not dpEvento %}
-                <li id="dpEventoTabs2" class="col mx-2">
-                    <a id="dpEventosTabLink2" data-toggle="tab" style="display: none;" role="tab" href="#pessoas">2</a>
-                    <span>2 Equipe de Execução</span>
-                </li>
-                <li id="dpEventoTabs3" class="col mx-2">
-                    <a id="dpEventosTabLink3" data-toggle="tab" style="display: none;" role="tab" href="#itinerarios">3</a>
-                    <span>3 Itinerários</span>
-                </li>
-                {% endif %} {% endcomment %}
             </ul>
         </div>
     </div>
@@ -151,45 +140,6 @@
                 <div id="home" class="tab-pane active">
                     {% include "dpEventos/dp_evento_form.html" with dpEvento=dpEvento selectedEscolas=selectedEscolas %}
                 </div>
-                {% if not dpEvento %}
-                <div id="pessoas" class="tab-pane">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="h3">Adicionar Equipe de Execução</span>
-                        <div class="d-flex justify-content-end">
-                            <div class="form-group d-flex justify-content-start align-items-start">
-                                <input name="use_dpEvento_endereco"  
-                                id="use_dpEvento_endereco" 
-                                style="width: 10%; cursor: pointer" 
-                                type="checkbox">
-                                <label for="use_dpEvento_endereco" 
-                                style="line-height: 1rem;white-space: nowrap;">
-                                    <b>Usar endereço do Evento</b>
-                                </label>
-                            </div>
-                            <button id="btn-add-pessoa-0"
-                            type="button"
-                            class="btn btn-primary d-inline-flex ml-2" style="height: 50%" 
-                            onclick="addPessoa()">
-                            Adicionar Membro
-                            </button>
-                        </div>
-                    </div>
-                    <hr>
-                    {% if dpEvento %}
-                    modo edicao
-                    <div id="pessoas_tickets" class="w-100">
-                    </div>
-                    {% else %}
-                    <div id="pessoas_tickets" class="w-100">
-                    </div>
-                    {% endif %}
-                </div>
-                <div id="itinerarios" class="tab-pane">
-                    <div class="dpEvento-modal-itinerario-container">
-                        {% include "itinerarios/itinerario_input.html" %}
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </form>
         <div id="loading-container" class="spinner-container" style="display: none">
@@ -314,7 +264,7 @@
         toggleModalLoadingBehavior()
         $.ajax({
             url: "/saveDpEvento",
-            data: JSON.stringify({"data": getFormData(), "itinerarios": getItinerarioData()}),
+            data: JSON.stringify({"data": getFormData()}),
             headers: { "X-CSRFToken":  '{{ csrf_token }}' },
             dataType: "json",
             contentType: 'application/json',

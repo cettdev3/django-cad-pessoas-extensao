@@ -108,6 +108,18 @@ class DpEventoApiView(APIView):
         dataFim = None
         if postDpEventoData["data_fim"]:
             dataFim = parse_date(postDpEventoData["data_fim"], date_formats)
+        
+        horarioInicio = None
+        if postDpEventoData["horarioInicio"]:
+            horarioInicio = datetime.strptime(postDpEventoData["horarioInicio"], '%H:%M').time()
+
+        horarioFim = None
+        if postDpEventoData["horarioFim"]: 
+            horarioFim = datetime.strptime(postDpEventoData["horarioFim"], '%H:%M').time()
+        
+        edicao = None
+        if postDpEventoData["edicao"]:
+            edicao = postDpEventoData["edicao"]
 
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
@@ -120,6 +132,9 @@ class DpEventoApiView(APIView):
             "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
             "cidade": cidade,
             "acaoEnsino": acaoEnsino,
+            "horarioInicio": horarioInicio,
+            "horarioFim": horarioFim,
+            "edicao": edicao,
         }
 
         with transaction.atomic():
@@ -177,6 +192,12 @@ class DpEventoDetailApiView(APIView):
             dp_evento.data_inicio = request.data.get("data_inicio")
         if request.data.get("data_fim"):
             dp_evento.data_fim = request.data.get("data_fim")
+        if request.data.get("horarioInicio"):
+            dp_evento.horarioInicio = request.data.get("horarioInicio")
+        if request.data.get("horarioFim"):
+            dp_evento.horarioFim = request.data.get("horarioFim")
+        if request.data.get("edicao"):
+            dp_evento.edicao = request.data.get("edicao")
         if request.data.get("bairro"):
             dp_evento.bairro = request.data.get("bairro")
         if request.data.get("logradouro"):

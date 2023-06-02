@@ -139,12 +139,14 @@ cellspacing="0">
                         <span class="px-2 py-1 boxed">{{dpEvento.id}}: {{ dpEvento.tipo_formatado}}</span>
                         <span class="font-weight-bold">de {{dpEvento.data_inicio_formatada}} até {{dpEvento.data_fim_formatada}}</span>
                     </div>
+                    {% if dpEvento.acaoEnsino %}
                     <span>
                         Ação de ensino: {{dpEvento.acaoEnsino.observacao|default_if_none:"nao possui ação de ensino"}}
                     </span>
-                    <span>{{dpEvento.endereco_completo}}</span>
+                    {% endif %}
+                    <span class="text-justify">{{dpEvento.endereco_completo}}</span>
                 </div>
-                <div><span class="font-weight-bold">{{dpEvento.descricao|default_if_none:"Nenhum descrição fornecida para este evento"}}</span></div>
+                <div><span class="font-weight-bold text-justify">{{dpEvento.descricao|default_if_none:"Nenhum descrição fornecida para este evento"}}</span></div>
             </td>
             <td  class="dpEvento-vw-50 text-left position-relative">
                 <div class="d-flex flex-wrap py-1">
@@ -173,6 +175,7 @@ cellspacing="0">
                 class="btn-group-custom">
                     <a id="linkVisualizarDpEvento{{dpEvento.id}}" href="/visualizarDpEvento/({{dpEvento.id}})"></a>
                     <button onclick="visualizarDpEvento('{{dpEvento.id}}')">Visualizar</button> 
+                    <button onclick="gerarRelatorio('{{dpEvento.id}}')">Relatório</button> 
                     <button onclick="carregarDpEventoModalEditar('{{dpEvento.id}}')">Editar</button> 
                     <button onclick="openDeleteModal(() => deleteDpEvento('{{dpEvento.id}}'))" >Excluir</button>
                 </div>
@@ -201,6 +204,42 @@ cellspacing="0">
     var wrappedItemWidth = []
     var wrapperContainerWidth = []
     
+    function gerarRelatorio(evento_id) {
+        const xhr = new XMLHttpRequest();
+        let uri = '/relatorioPorEvento/'+evento_id;
+
+        xhr.open('GET', uri, true);
+        xhr.addEventListener('progress', event => {
+            if (event.lengthComputable) {
+                const percentComplete = (event.loaded / event.total) * 100;
+                console.log('Download progress:', percentComplete + '%');
+            }
+        });
+
+        xhr.responseType = 'blob';
+        
+        xhr.onload = event => {
+            if (xhr.status === 200) {
+                const blob = xhr.response;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'relatorio_eventos.docx';
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                $("#modalRelatorioEventos").modal("toggle");
+            } else {
+                console.error('Download failed:', xhr.statusText);
+            }
+        };
+
+        xhr.send();
+        console.log("filtros")
+    }
+
     function visualizarDpEvento(id) {
         location.href = "visualizarDpEvento/" + id
     }

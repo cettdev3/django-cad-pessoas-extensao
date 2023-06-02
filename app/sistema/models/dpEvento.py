@@ -15,6 +15,7 @@ class DpEvento(models.Model):
     PAUTA_POSITIVA  = 'pauta_positiva'
     FEIRA_AGRO_CENTRO_OESTE  = 'feira_agro_centro_oeste'
     DIA_MULHERES  = 'dia_mulheres'
+    OPEN_DAY  = 'open_day'
     OUTRO = 'outro'
 
     MAPPED_TIPOS = [
@@ -40,7 +41,9 @@ class DpEvento(models.Model):
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True)
     escolas = models.ManyToManyField(Escola, through='DpEventoEscola', blank=True, related_name='escolas')
     acaoEnsino = models.ForeignKey(Ensino, on_delete=models.SET_NULL, null=True, blank= True)
-    
+    horarioInicio = models.TimeField(null = True, blank= True)
+    horarioFim = models.TimeField(null = True, blank= True)
+    edicao = models.CharField(null = True, max_length=100, blank= True)
     class Meta:
         db_table = 'dp_eventos'
 
@@ -111,6 +114,8 @@ class DpEvento(models.Model):
             return "Pauta Positiva"
         elif self.tipo == self.DIA_MULHERES:
             return "Dias das Mulheres"
+        elif self.tipo == self.OPEN_DAY:
+            return "Open Day"
         return "Evento não identificado"
     
     @property

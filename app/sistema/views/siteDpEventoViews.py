@@ -11,7 +11,7 @@ from sistema.models.alocacao import Alocacao
 from django.contrib.auth.decorators import login_required
 from PIL import Image
 import requests
-from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH, WD_PARAGRAPH_ALIGNMENT
 from docx.shared import Pt, Inches
 import json
 import os
@@ -125,23 +125,6 @@ def saveDpEvento(request):
     dpEventoResponseStatusCode = dpEventoResponse.status_code
     dpEventoResponse = json.loads(dpEventoResponse.content.decode())
     dpEvento = DpEvento.objects.get(id=dpEventoResponse["id"])
-
-    # if dpEvento.tipo in DpEvento.MAPPED_TIPOS:
-    #     dados = {
-    #         "variables": {
-    #             "processDescription": {"value": dpEvento.tipo + ", " + dpEvento.cidade.nome, "type": "String"},
-    #             "dpEvento_id": {"value": dpEvento.id, "type": "String"},
-    #             "extrato": {"value": dpEvento.extrato, "type": "String"},
-    #         },
-    #         "withVariablesInReturn": True
-    #     }
-
-    #     camunda = CamundaAPI()
-    #     camundaResponse = camunda.startProcess("ProcessoDeEmprestimoDeIntensProcess",dados)
-    #     dpEvento.process_instance = camundaResponse['id']
-    #     if dpEvento.tipo == DpEvento.EMPRESTIMO:
-    #         dpEvento.status = DpEvento.STATUS_WAITING_TICKET
-    #     dpEvento.save()
 
     return JsonResponse(dpEventoResponse, status=dpEventoResponseStatusCode)
 
@@ -580,7 +563,6 @@ def getEventoRow(
     worksheet.merge_range(startRow, column, endRow, column, str(evento.tipo_formatado), style)
     return worksheet
 
-
 def getAtividadeCountRow(
     worksheet: Worksheet, atividadeCount: int, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
@@ -606,7 +588,6 @@ def getTipoAtividadeRow(
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
 
-
 def getAtividadeHorasRow(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
@@ -620,7 +601,6 @@ def getAtividadeHorasRow(
             worksheet.write(startRow, column, "N/I", style)
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
-
 
 def getAtividadeDescricaoRow(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
@@ -636,7 +616,6 @@ def getAtividadeDescricaoRow(
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
 
-
 def getAtividadeEscolaRow(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
@@ -651,7 +630,6 @@ def getAtividadeEscolaRow(
             worksheet.write(startRow, column, "N/I", style)
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
-
 
 def getAtividadeEventoEtapa(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
@@ -672,7 +650,6 @@ def getAtividadeEventoEtapa(
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
 
-
 def getAtividadeLocal(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
@@ -687,7 +664,6 @@ def getAtividadeLocal(
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
 
-
 def getAtividadeDataInicio(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
@@ -701,7 +677,6 @@ def getAtividadeDataInicio(
             worksheet.write(startRow, column, "N/I", style)
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
     return worksheet
-
 
 def getAtividadeDataFim(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
@@ -746,7 +721,6 @@ def getAtividadeAtendimentosRow(
         worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
 
     return worksheet
-
 
 def getAtividadeCurso(
     worksheet: Worksheet, alocacao: Alocacao, row: int, column: int, style: Format
@@ -794,7 +768,6 @@ def getAtividadeCursoTurno(
     else:
         worksheet.write(row, column, "N/I", style)
     return worksheet
-
 
 @login_required(login_url="/auth-user/login-user")
 def relatorioSintetico(request):
@@ -932,4 +905,78 @@ def relatorioSintetico(request):
 
     response = HttpResponse(output.getvalue(), content_type="application/vnd.ms-excel")
     response["Content-Disposition"] = "attachment; filename=RelatorioSintetico.xlsx"
+    return response
+
+
+
+def addHeading(document, text, style):
+    heading = document.add_paragraph()
+    run = heading.add_run(text)
+    run.font.size = Pt(style.get("size"))
+    run.font.underline = style.get("underline")
+    heading.alignment = style.get("alignment")
+    return document
+
+def addParagraph(document, text, style):
+    paragraph = document.add_paragraph()
+    run = paragraph.add_run(text)
+    run.font.size = Pt(style.get("size"))
+    paragraph.alignment = style.get("alignment")
+    return document
+
+def addTable(document, rowsCount, colsCount, rowsContent, title):
+    table = document.add_table(rows=rowsCount+1, cols=colsCount)
+    table.style = "Table Grid"
+    title_cell = table.rows[0].cells[0].merge(table.rows[0].cells[1])
+    title_cell.text = title
+    title_cell.paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    for i in range(0, rowsCount):
+        for j in range(colsCount):
+            table.rows[i+1].cells[j].text = rowsContent[i][j]
+
+    return document
+
+@login_required(login_url="/auth-user/login-user")
+def relatorioPorEvento(request, evento_id):
+    evento = DpEvento.objects.get(id=evento_id) 
+    doc = docx.Document()
+    headingStyle = {
+        "size": 16,
+        "alignment": WD_ALIGN_PARAGRAPH.CENTER,
+        "underline": False,
+    }
+
+    paragraphStyle = {
+        "size": 12,
+        "alignment": WD_ALIGN_PARAGRAPH.JUSTIFY,
+    }
+
+    heading_text = f"prestação de contas - {evento.tipo_formatado} {evento.edicao}º edição".upper()
+    doc = addHeading(doc, heading_text, headingStyle)
+    doc = addParagraph(doc, f"{evento.descricao}", paragraphStyle)
+    local = ""
+    escolas = evento.escolas.all()
+    for escola in escolas:
+        local += f"{escola.nome}\n"
+
+    tableData = [
+        ["Nome do Evento", f"{evento.tipo_formatado}"],
+        ["Data", f"de {evento.data_inicio.strftime('%d/%m/%Y')} até {evento.data_fim.strftime('%d/%m/%Y')}"],
+        ["Horário", f"{evento.horarioInicio.strftime('%H:%M')} até {evento.horarioFim.strftime('%H:%M')}"],
+        ["Local", local],
+    ]
+    
+    rowsCount = len(tableData)
+    colsCount = len(tableData[0])
+    doc = addTable(doc, rowsCount, colsCount, tableData, "FICHA TÉCNICA")
+    with open("tmp/relatorio_evento.docx", "wb") as f:
+        doc.save(f)
+
+    response = FileResponse(open("tmp/relatorio_evento.docx", "rb"))
+    response[
+        "Content-Type"
+    ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    response["Content-Disposition"] = 'attachment; filename="relatorio_evento.docx"'
+
+    os.remove("tmp/relatorio_evento.docx")
     return response

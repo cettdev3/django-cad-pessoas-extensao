@@ -44,7 +44,7 @@ from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escola
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
 from sistema.views.siteTurnoViews import gerencia_turnos, turnoTable, turnoModal, turnosSelect, saveTurno, eliminarTurno, editarTurno, turnosSelect
 from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, acoesSelect, saveAcao, eliminarAcao, editarAcao, visualizarAcao
-from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento, relatorioSintetico
+from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento, relatorioSintetico, relatorioPorEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal, filterMultipleSelect
 from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
@@ -287,6 +287,7 @@ urlpatterns = [
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
     path("visualizarDpEvento/<codigo>", visualizarDpEvento),
+    path("relatorioPorEvento/<evento_id>", relatorioPorEvento),
     path("relatorioDpEvento", relatorioDpEvento),
     path("relatorioSintetico", relatorioSintetico),
    

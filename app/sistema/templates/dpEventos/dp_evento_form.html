@@ -1,8 +1,8 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-6">
-                <label><b>Tipo:</b></label>
+            <div class="col-sm-5">
+                <label><b>Nome:</b></label>
                 <select required 
                 id="tipo"
                 class="form-control" 
@@ -57,13 +57,30 @@
                         DIA DAS MULHERES
                     </option>
                     <option 
+                    {% if dpEvento and dpEvento.tipo == "open_day" %} selected {% endif %} 
+                    value="open_day">
+                        OPEN DAY
+                    </option>
+                    <option 
                     {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
                     value="outro">
                         OUTRO
                     </option>
                 </select>
             </div>
-            <div id="acao-ensino-select-container" class="col-sm-6">
+            <div class="col-sm-2">
+                <label><b>Edição:</b></label>
+                <input 
+                type="number"
+                step="1"     
+                name="edicao" 
+                id="edicao" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.edicao|default_if_none:""}}"
+                {% endif %}>
+            </div>
+            <div id="acao-ensino-select-container" class="col-sm-5">
                 {% if dpEvento %}
                 {% include 'ensinos/ensino_select.html' with selected=selected_ensino ensinos=ensinos %}
                 {% else %}
@@ -85,7 +102,7 @@
             <div class="col-sm-12">
                 <label><b>Descrição:</b></label>
                 <textarea 
-                rows="4"
+                rows="3"
                 name="descricao" 
                 class="form-control">{% if dpEvento %}{{dpEvento.descricao|default_if_none:""}}{% endif %}</textarea>
             </div>
@@ -111,9 +128,29 @@
                 value="{{dpEvento.data_fim}}"
                 {% endif %}>
             </div>
-            <div id="select_cidade" class="col-sm-3">
+            <div class="col-sm-3">
+                <label><b>Horario Início:</b></label>
+                <input 
+                type="time" 
+                name="horarioInicio" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.horarioInicio}}"
+                {% endif %}>
             </div>
             <div class="col-sm-3">
+                <label><b>Horario Fim:</b></label>
+                <input 
+                type="time" 
+                name="horarioFim" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.horarioFim}}"
+                {% endif %}>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-4">
                 <label><b>CEP:</b></label>
                 <input 
                 type="text" 
@@ -124,8 +161,8 @@
                 value="{{dpEvento.cep|default_if_none:""}}"
                 {% endif %}>
             </div>
-        </div>
-        <div class="form-group row">
+            <div id="select_cidade" class="col-sm-4">
+            </div>
             <div class="col-sm-4">
                 <label><b>Bairro:</b></label>
                 <input 
@@ -148,7 +185,7 @@
                 value="{{dpEvento.logradouro|default_if_none:""}}"
                 {% endif %}>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-8">
                 <label><b>Complemento:</b></label>
                 <input 
                 type="text" 
