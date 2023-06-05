@@ -7,6 +7,9 @@ from sistema.models.departamento import Departamento
 from sistema.models.ensino import Ensino
 from sistema.services.alfrescoApi import AlfrescoAPI
 from sistema.models.atividade import Atividade
+from sistema.models.galeria import Galeria
+from sistema.models.imagem import Imagem
+from sistema.models.anexo import Anexo
 from sistema.models.departamento import Departamento
 from sistema.models.alocacao import Alocacao
 from django.contrib.auth.decorators import login_required
@@ -366,11 +369,11 @@ def getAtividadeLabel(doc, atividade, counter):
     atividadeLabelFormat.space_after = Pt(0)
     return doc
 
-
 def getAtividadeImage(doc: Document, atividade, counter):
     imagem = atividade.galeria.imagem_set.first()
     if not imagem:
         return doc
+    
     alfresco_api = AlfrescoAPI()
     image_path = f"tmp/{imagem.id_alfresco}.jpg"
     alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
@@ -937,6 +940,43 @@ def addTable(document, rowsCount, colsCount, rowsContent, title):
 
     return document
 
+def processImagemRelatorioEvento(doc: Document, imagem: Imagem, anexo: Anexo):
+    id_alfresco = imagem.id_alfresco if imagem else anexo.id_alfresco
+    descricao = imagem.descricao if imagem else ""
+
+    if not id_alfresco:
+        return doc
+
+    alfresco_api = AlfrescoAPI()
+    image_path = f"tmp/{id_alfresco}.jpg"
+    alfresco_api.getNodeContent(image_path, id_alfresco)
+
+    try:
+        img = Image.open(image_path)
+        img.save(image_path)
+    except IOError:
+        print("Error: Unable to read or save the image using Pillow")
+
+    try:
+        img_paragraph = doc.add_paragraph()
+        img_run = img_paragraph.add_run()
+        img_run.add_picture(image_path, width=Inches(4.0))
+        img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    except UnrecognizedImageError:
+        error_message = (
+            f"Error: Unable to recognize the image format for {descricao}."
+        )
+        p = doc.add_paragraph()
+        p.add_run(error_message)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    finally:
+        try:
+            os.remove(image_path)
+        except OSError as e:
+            print(f"Error: Unable to delete the image file: {e}")
+
+    return doc
+
 @login_required(login_url="/auth-user/login-user")
 def relatorioPorEvento(request, evento_id):
     evento = DpEvento.objects.get(id=evento_id) 
@@ -970,6 +1010,34 @@ def relatorioPorEvento(request, evento_id):
     rowsCount = len(tableData)
     colsCount = len(tableData[0])
     doc = addTable(doc, rowsCount, colsCount, tableData, "FICHA TÉCNICA")
+
+    departamentoComunicacao = Departamento.objects.get(nome__icontains="Comunicação")
+    atividadesComunicacao = Atividade.objects.filter(evento=evento, departamento=departamentoComunicacao)
+    doc = addHeading(doc, "Artes do Evento", headingStyle)
+    for i, atividadeComunicacao in enumerate(atividadesComunicacao):
+        anexos = Anexo.objects.filter(model="Atividade", id_model=atividadeComunicacao.id)
+        for anexo in anexos:
+            mimeTypeIsImage = "image" in anexo.mime_type or "jpeg" in anexo.mime_type or "png" in anexo.mime_type or "jpg" in anexo.mime_type
+            if (mimeTypeIsImage):
+                doc = processImagemRelatorioEvento(doc, None, anexo)
+            else:
+                print("Anexo não é imagem", anexo.mime_type)
+
+    doc = addHeading(doc, "Imagens do Evento", headingStyle)
+    geleriaGeral = Galeria.objects.filter(evento=evento, nome="galeria geral do evento").first()
+    imagensGaleriaGeral = Imagem.objects.filter(galeria=geleriaGeral)
+    for imagem in imagensGaleriaGeral:
+        doc = processImagemRelatorioEvento(doc, imagem, None)
+
+    atividadeCategoriaProgramacao = AtividadeCategoria.objects.get(name__icontains="programação")
+    atividadesProgramacao = Atividade.objects.filter(evento=evento, atividadeCategorias__id=atividadeCategoriaProgramacao.id)
+    doc = addHeading(doc, "Programação do evento", headingStyle)
+    for i, atividadeProgramacao in enumerate(atividadesProgramacao):
+        galeria = atividadeProgramacao.galeria
+        imagens = Imagem.objects.filter(galeria=galeria)
+        for imagem in imagens:
+            doc = processImagemRelatorioEvento(doc, imagem, None)
+
     with open("tmp/relatorio_evento.docx", "wb") as f:
         doc.save(f)
 

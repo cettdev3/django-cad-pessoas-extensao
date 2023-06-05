@@ -144,11 +144,25 @@
                                 RPA
                             </option>
                             <option
-                            {% if ticket and ticket.tipo == 'nao_se_aplica' %}
+                            {% if ticket and ticket.tipo == 'produto' %}
                             selected
                             {% endif %}
-                            value="nao_se_aplica">
-                                NÃO HAVERÁ SOLICITAÇÂO
+                            value="servico">
+                                COMPRA DE PRODUTO(S)
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'servico' %}
+                            selected
+                            {% endif %}
+                            value="servico">
+                                CONTRATAÇÂO DE SERVIÇO(S)
+                            </option>
+                            <option
+                            {% if ticket and ticket.tipo == 'outro' %}
+                            selecte
+                            {% endif %}
+                            value="outro">
+                                OUTRO
                             </option>
                         </select>
                     </div>

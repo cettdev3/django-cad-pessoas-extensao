@@ -57,7 +57,7 @@ def atividadesDpEventoTable(request):
         queryset = queryset.filter(nome__icontains=nome)
 
     if categoria is not None and categoria != "":
-        queryset = queryset.filter(categoria=categoria)
+        queryset = queryset.filter(atividadeCategorias__id=categoria)
 
     if responsavel_id is not None and responsavel_id != "":
         queryset = queryset.filter(responsavel_id=responsavel_id)

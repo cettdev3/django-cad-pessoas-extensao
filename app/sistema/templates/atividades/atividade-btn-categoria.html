@@ -64,8 +64,6 @@
                             let selectedItems = $(`#${params.containerId}-dropdown-${params.atividadeId} #dropdown-categorias-${params.atividadeId}`).find("input[type=checkbox]:checked").map(function(){
                                 return $(this).val();
                             }).get();
-
-                            if (selectedItems.length === params.categorias.length) return
                             
                             let different = false;
                             for (let i = 0; i < selectedItems.length; i++) {
