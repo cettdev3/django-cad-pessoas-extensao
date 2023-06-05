@@ -9,14 +9,16 @@ from sistema.services.alfrescoApi import AlfrescoAPI
 from sistema.models.atividade import Atividade
 from sistema.models.galeria import Galeria
 from sistema.models.imagem import Imagem
+from sistema.models.ticket import Ticket
 from sistema.models.anexo import Anexo
+from itertools import chain
 from sistema.models.departamento import Departamento
 from sistema.models.alocacao import Alocacao
 from django.contrib.auth.decorators import login_required
 from PIL import Image
 import requests
 from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH, WD_PARAGRAPH_ALIGNMENT
-from docx.shared import Pt, Inches
+from docx.shared import Pt, Inches, RGBColor
 import json
 import os
 from django.http import FileResponse, HttpResponse
@@ -37,7 +39,6 @@ import xlsxwriter
 from io import BytesIO
 from xlsxwriter.workbook import Worksheet
 from xlsxwriter.format import Format
-
 
 @login_required(login_url="/auth-user/login-user")
 def gerencia_dp_eventos(request):
@@ -931,9 +932,15 @@ def addParagraph(document, text, style):
 def addTable(document, rowsCount, colsCount, rowsContent, title):
     table = document.add_table(rows=rowsCount+1, cols=colsCount)
     table.style = "Table Grid"
-    title_cell = table.rows[0].cells[0].merge(table.rows[0].cells[1])
-    title_cell.text = title
-    title_cell.paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    if type(title) is str:
+        title_cell = table.rows[0].cells[0].merge(table.rows[0].cells[1])
+        title_cell.text = title
+        title_cell.paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    if type(title) is list:
+        for i, t in enumerate(title):
+            title_cell = table.rows[0].cells[i]
+            title_cell.text = t
+            title_cell.paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
     for i in range(0, rowsCount):
         for j in range(colsCount):
             table.rows[i+1].cells[j].text = rowsContent[i][j]
@@ -962,6 +969,7 @@ def processImagemRelatorioEvento(doc: Document, imagem: Imagem, anexo: Anexo):
         img_run = img_paragraph.add_run()
         img_run.add_picture(image_path, width=Inches(4.0))
         img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        img_paragraph.paragraph_format.space_after = Pt(0)
     except UnrecognizedImageError:
         error_message = (
             f"Error: Unable to recognize the image format for {descricao}."
@@ -992,10 +1000,13 @@ def relatorioPorEvento(request, evento_id):
         "alignment": WD_ALIGN_PARAGRAPH.JUSTIFY,
     }
 
+    figuraCounter = 1
+    tabelaCounter = 1
     heading_text = f"prestação de contas - {evento.tipo_formatado} {evento.edicao}º edição".upper()
     doc = addHeading(doc, heading_text, headingStyle)
     doc = addParagraph(doc, f"{evento.descricao}", paragraphStyle)
     local = ""
+    
     escolas = evento.escolas.all()
     for escola in escolas:
         local += f"{escola.nome}\n"
@@ -1010,33 +1021,162 @@ def relatorioPorEvento(request, evento_id):
     rowsCount = len(tableData)
     colsCount = len(tableData[0])
     doc = addTable(doc, rowsCount, colsCount, tableData, "FICHA TÉCNICA")
+    captionText = f"Tabela {tabelaCounter}: Ficha técnica do {evento.tipo_formatado}"
+    if evento.edicao:
+        captionText += f" {evento.edicao}º edição"
+    caption = doc.add_paragraph(captionText, 'Caption')
+    caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    caption.paragraph_format.space_before = Pt(0)
+    doc.add_paragraph()
+    for run in caption.runs:
+        run.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+    tabelaCounter += 1
 
+    headingStyle["alignment"] = WD_ALIGN_PARAGRAPH.LEFT
     departamentoComunicacao = Departamento.objects.get(nome__icontains="Comunicação")
     atividadesComunicacao = Atividade.objects.filter(evento=evento, departamento=departamentoComunicacao)
-    doc = addHeading(doc, "Artes do Evento", headingStyle)
+    
+    doc.add_paragraph()
+    doc = addHeading(doc, "ARTES DO EVENTO", headingStyle)
+    doc.add_paragraph()
+    
     for i, atividadeComunicacao in enumerate(atividadesComunicacao):
         anexos = Anexo.objects.filter(model="Atividade", id_model=atividadeComunicacao.id)
         for anexo in anexos:
             mimeTypeIsImage = "image" in anexo.mime_type or "jpeg" in anexo.mime_type or "png" in anexo.mime_type or "jpg" in anexo.mime_type
             if (mimeTypeIsImage):
+                captionText = f"Figura {figuraCounter}: "
+                if anexo.descricao:
+                    captionText = f" {anexo.descricao}"
+                else:
+                    captionText += f"Nenhuma descrição disponível"
                 doc = processImagemRelatorioEvento(doc, None, anexo)
+                caption = doc.add_paragraph(captionText, 'Caption')
+                caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                caption.paragraph_format.space_before = Pt(0)
+                doc.add_paragraph()
+                for run in caption.runs:
+                    run.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+                figuraCounter += 1
             else:
                 print("Anexo não é imagem", anexo.mime_type)
 
-    doc = addHeading(doc, "Imagens do Evento", headingStyle)
+    doc = addHeading(doc, "IMAGENS DO EVENTO", headingStyle)
+    doc.add_paragraph()
     geleriaGeral = Galeria.objects.filter(evento=evento, nome="galeria geral do evento").first()
     imagensGaleriaGeral = Imagem.objects.filter(galeria=geleriaGeral)
     for imagem in imagensGaleriaGeral:
         doc = processImagemRelatorioEvento(doc, imagem, None)
+        captionText = f"Figura {figuraCounter}: "
+        if imagem.descricao:
+            captionText = f"{imagem.descricao}"
+        else:
+            captionText += f"Nenhuma descrição disponível."
+        caption = doc.add_paragraph(captionText, 'Caption')
+        caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        caption.paragraph_format.space_before = Pt(0)
+        doc.add_paragraph()
+        for run in caption.runs:
+            run.font.color.rgb = RGBColor(0x00, 0x00, 0x00) 
+        figuraCounter += 1
+
 
     atividadeCategoriaProgramacao = AtividadeCategoria.objects.get(name__icontains="programação")
     atividadesProgramacao = Atividade.objects.filter(evento=evento, atividadeCategorias__id=atividadeCategoriaProgramacao.id)
-    doc = addHeading(doc, "Programação do evento", headingStyle)
+    
+    doc = addHeading(doc, "PROGRAMAÇÃO DO EVENTO", headingStyle)
+    doc.add_paragraph()
     for i, atividadeProgramacao in enumerate(atividadesProgramacao):
         galeria = atividadeProgramacao.galeria
         imagens = Imagem.objects.filter(galeria=galeria)
         for imagem in imagens:
+            captionText = f"Figura {figuraCounter}: "
+            if imagem.descricao:
+                captionText = f"{imagem.descricao}"
+            else: 
+                captionText += f"Nenhuma descrição disponível"
             doc = processImagemRelatorioEvento(doc, imagem, None)
+            caption = doc.add_paragraph(captionText, 'Caption')
+            caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            caption.paragraph_format.space_before = Pt(0)
+            doc.add_paragraph()
+            for run in caption.runs:
+                run.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+            figuraCounter += 1
+
+    doc = addHeading(doc, "EXECUÇÂO FINANCEIRA", headingStyle)
+    doc.add_paragraph()
+    membro_execucao_objs = MembroExecucao.objects.filter(evento__id=evento.id)
+    ensino_objs = Ensino.objects.filter(dpevento__id=evento.id)
+    alocacao_objs = Alocacao.objects.filter(acaoEnsino__in=ensino_objs)
+    atividade_objs = Atividade.objects.filter(evento__id=evento.id)
+
+    tickets_membro_execucao = Ticket.objects.filter(membro_execucao__in=membro_execucao_objs)
+    tickets_alocacao = Ticket.objects.filter(alocacao__in=alocacao_objs)
+    tickets_atividade = Ticket.objects.filter(atividade__in=atividade_objs)
+
+    demandas = list(chain(tickets_membro_execucao, tickets_alocacao, tickets_atividade))
+    execucaoFinanceiraHeader = ["ID","Data da Demanda","solicitante", "Assunto", "Beneficiário/Destinatário", "Tipo", "Valor"]
+    execucaoFinanceiraData = []
+    for demanda in demandas:
+        solicitante = demanda.solicitante.nome if demanda.solicitante else "Não informado"
+        beneficiario = demanda.beneficiario.nome if demanda.beneficiario else None
+        if not beneficiario:
+            beneficiario = demanda.escola.nome if demanda.escola else None
+        if not beneficiario:
+            beneficiario = "Não informado"
+        execucaoFinanceiraData.append([
+            demanda.id_protocolo, 
+            demanda.data_criacao_formatada, 
+            solicitante,
+            demanda.observacao, 
+            beneficiario,
+            demanda.tipo_formatado,
+            str(demanda.valor_executado) if demanda.valor_executado else "Não informado"
+        ])
+    
+    doc = addTable(doc, len(execucaoFinanceiraData), len(execucaoFinanceiraHeader), execucaoFinanceiraData, execucaoFinanceiraHeader)
+    captionText = f"Tabela {tabelaCounter}: Execução financeira {evento.tipo_formatado}"
+    if evento.edicao:
+        captionText += f" {evento.edicao}º edição"
+    caption = doc.add_paragraph(captionText, 'Caption')
+    caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    caption.paragraph_format.space_before = Pt(0)
+    doc.add_paragraph()
+    for run in caption.runs:
+        run.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+    tabelaCounter += 1
+
+    valorTotalHeader = ["Escola", "Valor Total (R$)"]
+    valorTotalData = {}
+    for demanda in demandas:
+        if demanda.escola.nome not in valorTotalData:
+            valorTotalData[demanda.escola.nome] = 0
+        
+        valorTotalData[demanda.escola.nome] += demanda.valor_executado if demanda.valor_executado else 0
+    
+    doc.add_paragraph()
+    dataValorTotal = []
+    doc = addHeading(doc, "VALOR TOTAL POR ESCOLA", headingStyle)
+    doc.add_paragraph()
+    for key, value in valorTotalData.items():
+        dataValorTotal.append([key, str(value)])
+    
+    for escola in evento.escolas.all():
+        if escola.nome not in valorTotalData:
+            dataValorTotal.append([escola.nome, "0"])
+    
+    doc = addTable(doc, len(dataValorTotal), len(valorTotalHeader), dataValorTotal, valorTotalHeader)
+    captionText = f"Tabela {tabelaCounter}: Execução financeira - valor por escola {evento.tipo_formatado}"
+    if evento.edicao:
+        captionText += f" {evento.edicao}º edição"
+    caption = doc.add_paragraph(captionText, 'Caption')
+    caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    caption.paragraph_format.space_before = Pt(0)
+    doc.add_paragraph()
+    for run in caption.runs:
+        run.font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+    tabelaCounter += 1
 
     with open("tmp/relatorio_evento.docx", "wb") as f:
         doc.save(f)

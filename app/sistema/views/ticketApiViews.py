@@ -16,6 +16,9 @@ from ..models.cidade import Cidade
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+
 class TicketApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, JWTAuthentication]
@@ -32,7 +35,7 @@ class TicketApiView(APIView):
         escola = request.GET.get("escola")
         order_by = request.GET.get("order_by")
         id_protocolo = request.GET.get("id_protocolo")
-        print("dentro da rota de tickets: ", id_protocolo)
+
         tickets = Ticket.objects.select_related("membro_execucao", "alocacao", "pessoa", "atividade")
         if favorecido:
             tickets = tickets.filter(Q(membro_execucao__pessoa__nome__icontains=favorecido) | Q(alocacao__professor__nome__icontains=favorecido) | Q(pessoa__nome__icontains=favorecido))
@@ -223,6 +226,19 @@ class TicketApiView(APIView):
                     {"res": message},
                     status=st.HTTP_400_BAD_REQUEST,
                 )
+        
+        solicitante = None
+        if request.data.get("solicitante_id"):
+            solicitante = self.get_object(Pessoas, request.data.get("solicitante_id"))
+            if not solicitante:
+                return Response(
+                    {"res": "Não existe solicitante com o id informado"},
+                    status=st.HTTP_400_BAD_REQUEST,
+                )
+        
+        dataCriacao = None
+        if request.data.get("data_criacao") and request.data.get("data_criacao") != "":
+            dataCriacao = request.data.get("data_criacao")
 
         ticketData = {
             "tipo": request.data.get("tipo"),
@@ -250,6 +266,8 @@ class TicketApiView(APIView):
             "beneficiario": beneficiario,
             "rubrica": request.data.get("rubrica"),
             "departamento": departamento,
+            "solicitante": solicitante,
+            "data_criacao": dataCriacao,
         }
 
         ticketData = Ticket.objects.create(**ticketData)

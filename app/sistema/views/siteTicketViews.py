@@ -14,6 +14,9 @@ from sistema.models.alocacao import Alocacao
 from sistema.models.dpEvento import DpEvento
 from sistema.models.pessoa import Pessoas
 from ..serializers.escolaSerializer import EscolaSerializer
+import datetime
+from django.utils import timezone
+import ntplib
 
 @login_required(login_url='/auth-user/login-user')
 def ticketModal(request):
@@ -94,6 +97,16 @@ def ticket_form_collapsable(request):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     body = json.loads(request.body)
+    solicitante = None
+    try:
+        solicitante = Pessoas.objects.get(user__id=request.user.id)
+    except:
+        return JsonResponse({'error': 'Para fazer solicitações você precisa estar vinculado a um usuario do sistema'}, status=400)
+    solicitante = Pessoas.objects.get(user__id=request.user.id)
+    tmz = timezone.get_current_timezone()
+    dataCriacao = datetime.datetime.now(tz=tmz)
+    body['solicitante_id'] = solicitante.id
+    body['data_criacao'] = dataCriacao.strftime("%Y-%m-%dT%H:%M:%S%z")
     response = requests.post('http://localhost:8000/tickets', json=body, headers=headers)
     context = {}
 

@@ -57,6 +57,7 @@
             </button>
             <h5 class="mb-0 ml-2" id="form-title">{{ticket.tipo_formatado|default_if_none:''}} (Equipe de Execução)</h5>
             {% endif %}
+            <h5 class="mb-0 ml-2">Solicitante: (<span><strong>{{ticket.solicitante.nome}}</strong></span> <span>{{ticket.data_criacao_formatada}}</span>)</h5>
         </div>
     </div>
 

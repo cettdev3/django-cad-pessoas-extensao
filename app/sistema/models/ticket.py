@@ -73,6 +73,8 @@ class Ticket(models.Model):
     from_export = models.BooleanField(default=False)
     rubrica = models.CharField(null = True, max_length=250, blank= True)
     departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True)
+    solicitante = models.ForeignKey(Pessoas, on_delete=models.SET_NULL, null=True, blank=True, related_name="solicitante")
+    data_criacao = models.DateTimeField(null=True, blank=True)
     class Meta:
         db_table = 'tickets'
 
@@ -211,3 +213,9 @@ class Ticket(models.Model):
     def data_fim_formatada(self):
         return self.data_fim.strftime("%d/%m/%Y")
     
+    @property
+    def data_criacao_formatada(self):
+        data_criacao_local = timezone.localtime(self.data_criacao)
+
+        data_criacao_form = data_criacao_local.strftime("%d/%m/%Y %H:%M:%S")
+        return data_criacao_form if self.data_criacao else "Não informado"

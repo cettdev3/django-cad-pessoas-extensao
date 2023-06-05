@@ -14,6 +14,7 @@ class TicketSerializer(serializers.ModelSerializer):
     membro_execucao = MembroExecucaoTicketSerializer(many=False, read_only=True)
     alocacao = AlocacaoTicketSerializer(many=False, read_only=True)
     pessoa = PessoaTicketSerializer(many=False, read_only=True)
+    solicitante = PessoaTicketSerializer(many=False, read_only=True)
     escola = EscolaTicketSerializer(many=False, read_only=True)
     status_formatado = serializers.CharField(read_only=True)
     status_calculado = serializers.CharField(read_only=True)
@@ -60,7 +61,10 @@ class TicketSerializer(serializers.ModelSerializer):
             "anexos",
             "departamento",
             "rubrica",
-            "can_delete"
+            "can_delete",
+            "solicitante",
+            "data_criacao",
+            "data_criacao_formatada",
         ]
         depth = 2
 
