@@ -43,8 +43,10 @@ class MembroExecucao(models.Model):
     @property
     def ticket_status(self):
         tickets = self.ticket_set.all()
-        if tickets:
+        if tickets and len(tickets) > 0:
             for ticket in tickets:
                 if ticket.status == "CRIACAO_PENDENTE":
                     return "pendente"
+        else: 
+            return "sem_tickets"
         return "criado"

@@ -130,7 +130,7 @@ cellspacing="0">
                 <div class="d-flex flex-column justify-content-start align-items-start">
                     <div>
                         {% if dpEvento.membro_execucao_status == 'pendente' %}
-                        <i class="fa-solid fa-circle-info d-inline info-danger" 
+                        <i class="fa-solid fa-circle-info d-inline info-warning" 
                         data-toggle="tooltip" 
                         data-placement="top" 
                         title="Pendências nos tickets do membro da equipe de execução">
@@ -153,9 +153,11 @@ cellspacing="0">
                     {% for membro in dpEvento.membroexecucao_set %}
                         <span 
                         {% if membro.ticket_status == 'pendente' %}
-                        class="badge badge-pill badge-danger mr-2 mb-1 btn btn-danger" 
+                        class="badge badge-pill badge-warning mr-2 mb-1 btn btn-warning" 
+                        {% elif membro.ticket_status == 'sem_tickets' %}
+                        class="badge badge-pill badge-secondary mr-2 mb-1 btn btn-secondary" 
                         {% else %}
-                        class="badge badge-pill badge-primary mr-2 mb-1 btn btn-primary" 
+                        class="badge badge-pill badge-success mr-2 mb-1 btn btn-success" 
                         {% endif %}
                         data-toggle="tooltip" data-placement="top" title="Clique para visualizar as demandas"
                         onclick="openMembroExecucaoDemandasModal('{{membro.id}}')"
