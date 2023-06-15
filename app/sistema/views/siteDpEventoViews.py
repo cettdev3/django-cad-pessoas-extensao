@@ -42,7 +42,7 @@ from xlsxwriter.format import Format
 
 @login_required(login_url="/auth-user/login-user")
 def gerencia_dp_eventos(request):
-    page_title = "Eventos"
+    page_title = "Projetos"
     dp_eventos = DpEvento.objects.all()
     count = dp_eventos.count()
     return render(

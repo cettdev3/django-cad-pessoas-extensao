@@ -1,9 +1,9 @@
 from django.db import models
 from .cidade import Cidade
 from .escola import Escola
-from .pessoa import Pessoas
+from .alocacao import Alocacao
 from .ensino import Ensino
-from datetime import datetime
+from itertools import chain
 
 class DpEvento(models.Model):
     EMPRESTIMO = 'emprestimo'
@@ -125,3 +125,40 @@ class DpEvento(models.Model):
             if membro.ticket_status == "pendente":
                 return "pendente"
         return "concluido"
+    
+    @property
+    def valor_total(self):
+        membro_execucao_objs = self.membroexecucao_set.all()
+        ensino_objs = Ensino.objects.filter(dpevento__id=self.id)
+        alocacao_objs = Alocacao.objects.filter(acaoEnsino__in=ensino_objs)
+        atividade_objs = self.atividade_set.all()
+
+        tickets_membro_execucao = []
+        valor_total_membro_execucao = 0
+        tickets_alocacao = []
+        valor_total_alocacao = 0
+        tickets_atividade = []
+        valor_total_atividade = 0
+        processedIds = []
+        for membro_execucao in membro_execucao_objs:
+            tickets_membro_execucao = membro_execucao.ticket_set.all()
+            for ticket in tickets_membro_execucao:
+                if ticket.id in processedIds:
+                    continue
+                valor_total_membro_execucao += ticket.valor_executado if ticket.valor_executado else 0
+                processedIds.append(ticket.id)
+        for alocacao in alocacao_objs:
+            tickets_alocacao = alocacao.ticket_set.all()
+            for ticket in tickets_alocacao:
+                if ticket.id in processedIds:
+                    continue
+                valor_total_alocacao += ticket.valor_executado if ticket.valor_executado else 0
+                processedIds.append(ticket.id)
+        for atividade in atividade_objs:
+            tickets_atividade = atividade.ticket_set.all()
+            for ticket in tickets_atividade:
+                if ticket.id in processedIds:
+                    continue
+                valor_total_atividade += ticket.valor_executado if ticket.valor_executado else 0
+                processedIds.append(ticket.id)
+        return valor_total_membro_execucao + valor_total_alocacao + valor_total_atividade

@@ -145,6 +145,10 @@ cellspacing="0">
                     </span>
                     {% endif %}
                     <span class="text-justify">{{dpEvento.endereco_completo}}</span>
+                    {% comment %} valor_total {% endcomment %}
+                    {% if dpEvento.valor_total %}
+                    <span class="font-weight-bold">Valor total: R$ {{dpEvento.valor_total}}</span>
+                    {% endif %}
                 </div>
                 <div><span class="font-weight-bold text-justify">{{dpEvento.descricao|default_if_none:"Nenhum descrição fornecida para este evento"}}</span></div>
             </td>

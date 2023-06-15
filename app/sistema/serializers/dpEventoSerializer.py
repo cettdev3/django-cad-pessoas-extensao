@@ -39,6 +39,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "membro_execucao_status",
             "horarioInicio",
             "horarioFim",
+            "valor_total",
             "edicao"
         ]
         depth = 5
