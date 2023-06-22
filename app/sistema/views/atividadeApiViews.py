@@ -44,12 +44,6 @@ class AtividadeApiView(APIView):
             "cidade",
         ).prefetch_related("servico_set", "ticket_set").all()
 
-        atividades = atividades.prefetch_related(Prefetch(
-            'anexo_set',
-            queryset=Anexo.objects.filter(model='Atividade', id_model=OuterRef('pk')),
-            to_attr='anexos'
-        ))
-
         serializer = AtividadeSerializer(atividades, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
