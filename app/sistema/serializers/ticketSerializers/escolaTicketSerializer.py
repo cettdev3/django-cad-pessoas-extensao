@@ -7,5 +7,6 @@ class EscolaTicketSerializer(serializers.ModelSerializer):
         model = Escola
         fields = [
             "id",
+            "id_siga",
             "nome"
         ]

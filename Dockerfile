@@ -14,7 +14,7 @@ ARG APP_GID
 #Set the locale
 RUN apt update && apt dist-upgrade -y
 RUN apt install -y locales libc-bin locales-all
-RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev pkg-config libcairo2-dev
+RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev-is-python3 pkg-config libcairo2-dev
 RUN apt-get install -y default-mysql-client libmariadb-dev-compat libmariadb-dev 
 
 RUN sed -i '/pt_BR.UTF-8/s/^#//g' /etc/locale.gen \

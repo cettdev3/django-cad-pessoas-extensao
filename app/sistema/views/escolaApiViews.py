@@ -38,14 +38,7 @@ class EscolaApiView(APIView):
             cep = request.data.get("cep") 
             complemento = request.data.get("complemento") 
             cidade = Cidade.objects.get(id = request.data.get("cidade_id"))
-            
-            endereco = Endereco.objects.create(
-                cidade = cidade,
-                bairro = bairro,
-                logradouro = logradouro,
-                cep = cep,
-                complemento = complemento,
-            )
+            id_siga = request.data.get("id_siga") if request.data.get("id_siga") else None
 
             nome = request.data.get("nome")
             escola = Escola.objects.create(
@@ -55,6 +48,7 @@ class EscolaApiView(APIView):
                 logradouro = logradouro,
                 cep = cep,
                 complemento = complemento,
+                id_siga = id_siga
             )
 
             serializer = EscolaSerializer(escola)
@@ -102,6 +96,8 @@ class EscolaDetailApiView(APIView):
             escola.complemento = request.data.get("complemento") 
         if request.data.get("cidade_id"):
             escola.cidade = Cidade.objects.get(id = request.data.get("cidade_id"))
+        if request.data.get("id_siga"):
+            escola.id_siga = request.data.get("id_siga")
         
         escola.save()
         serializer = EscolaSerializer(escola)

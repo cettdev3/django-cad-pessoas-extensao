@@ -57,6 +57,19 @@
                                         placeholder=""
                                         required>
                                     </div>
+                                    <div class="col-sm-4">
+                                        <label><b>ID SIGA:</b></label>
+                                        <input 
+                                        type="text" 
+                                        {% if escola %}
+                                        value="{{escola.id_siga|default_if_none:''}}" 
+                                        {% endif %}
+                                        class="form-control" 
+                                        id="id_siga" 
+                                        name="id_siga" 
+                                        placeholder=""
+                                        required>
+                                    </div>
                                 </div>
                             </div>
                             <div id="endereco" class="tab-pane py-3">

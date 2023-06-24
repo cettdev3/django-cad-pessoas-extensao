@@ -12,6 +12,7 @@ class EscolaSerializer(serializers.ModelSerializer):
             "logradouro",
             "cep",
             "complemento",
-            "cidade"
+            "cidade",
+            "id_siga"
         ]
         depth = 2
