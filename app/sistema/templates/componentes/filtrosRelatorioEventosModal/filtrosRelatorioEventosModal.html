@@ -111,7 +111,11 @@
                 id="confimarModalCalendario" 
                 type="button" 
                 class="btn btn-primary">
-                    <span>Gerar Relatorio</span>
+                    <span id="text-gerar-relatorio">Gerar Relatório</span>
+                    <span id="text-gerando-relatorio" style="display: none;">Gerando Relatório...</span>
+                    <div id="spinner-gerar-relatorio" class="spinner-border text-light" role="status" style="display: none;">
+                        <span class="sr-only">Gerando Relatório...</span>
+                    </div>
                 </button>
             </div>
         </div>
@@ -119,6 +123,12 @@
 </div>
 
 <script>
+    function toggleLoadingRelatorio() {
+        $("#text-gerar-relatorio").toggle();
+        $("#text-gerando-relatorio").toggle();
+        $("#spinner-gerar-relatorio").toggle();
+    }
+
     function loadEventoRelatorioDepartamentoSelect() {
         $.ajax({
             url: "/departamentosSelect",
@@ -147,6 +157,7 @@
     }
 
     function gerarRelatorioCircunstanciado() {
+        toggleLoadingRelatorio();
         filtros = getFiltroRelatorioEvento();
         console.log(filtros)
         const xhr = new XMLHttpRequest();
@@ -178,8 +189,10 @@
                 a.remove();
                 window.URL.revokeObjectURL(url);
                 $("#modalRelatorioEventos").modal("toggle");
+                toggleLoadingRelatorio();
             } else {
                 console.error('Download failed:', xhr.statusText);
+                toggleLoadingRelatorio();
             }
         };
 
@@ -188,6 +201,7 @@
     }
 
     function gerarRelatorioSintetico() {
+        $("#modalRelatorioEventos").modal("toggle");
         filtros = getFiltroRelatorioEvento(); // Ajuste isto se os filtros do novo relatório forem diferentes
         console.log(filtros)
         const xhr = new XMLHttpRequest();
@@ -219,8 +233,10 @@
                 a.remove();
                 window.URL.revokeObjectURL(url);
                 $("#modalRelatorioEventos").modal("toggle"); // Ajuste isto se o id do modal for diferente
+                $("#modalRelatorioEventos").modal("toggle");
             } else {
                 console.error('Download failed:', xhr.statusText);
+                $("#modalRelatorioEventos").modal("toggle");
             }
         };
 
@@ -229,7 +245,7 @@
     };
 
     function gerarRelatorioFiltrado() {
-        filtroTipoRelatorio = $("#tipo_relatorio").val();   
+        filtroTipoRelatorio = $("#tipo_relatorio").val();  
         if (filtroTipoRelatorio == "cirscunstanciado_word") {
             gerarRelatorioCircunstanciado();
         } else if (filtroTipoRelatorio == "exel_sintetico") {

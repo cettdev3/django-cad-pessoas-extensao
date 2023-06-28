@@ -213,7 +213,7 @@ def getFilteredEventos(filters, formatType="type 1"):
     for evento in eventos:
         if evento.atividade_set.count() == 0:
             continue
-        tipo = evento.tipo
+        tipo = evento.tipo_formatado
         result.setdefault(tipo, {})
 
         for atividade in evento.atividade_set.all():
@@ -223,7 +223,7 @@ def getFilteredEventos(filters, formatType="type 1"):
 
     report = defaultdict(list)
     for dp_evento in eventos:
-        report[dp_evento.tipo].append(dp_evento)
+        report[dp_evento.tipo_formatado].append(dp_evento)
     if True:
         return report
     return result
@@ -445,7 +445,7 @@ def getRelatorioType1(doc, relatorioData):
             current_evento = evento.id
             for atividade in evento.atividade_set.all():
                 if current_evento != old_evento:
-                    tipoTexto = evento.tipo if evento.tipo else "Não Informado"
+                    tipoTexto = evento.tipo_formatado if evento.tipo else "Não Informado"
                     cidadeNomeTexto = evento.cidade.nome if evento.cidade else "Não Informado"
                     doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
                     old_evento = current_evento
