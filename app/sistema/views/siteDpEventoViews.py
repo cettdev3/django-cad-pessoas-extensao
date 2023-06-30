@@ -217,7 +217,7 @@ def getFilteredEventos(filters, formatType="type 1"):
         result.setdefault(tipo, {})
 
         for atividade in evento.atividade_set.all():
-            tipo_atividade = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
+            tipo_atividade = atividade.tipoAtividade.nome if atividade.tipoAtividade else atividade.nome
             result[tipo].setdefault(tipo_atividade, [])
             result[tipo][tipo_atividade].append(atividade)
 
