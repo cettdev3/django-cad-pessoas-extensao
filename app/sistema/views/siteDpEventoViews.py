@@ -33,7 +33,7 @@ from django.db.models import Prefetch
 from collections import defaultdict
 from docx.image.exceptions import UnrecognizedImageError
 from docx import Document
-from datetime import date
+from datetime import date, datetime
 from collections import Counter
 import xlsxwriter
 from io import BytesIO
@@ -184,11 +184,13 @@ def visualizarDpEvento(request, codigo):
 def getFilteredEventos(filters, formatType="type 1"):
     eventos = None
     if "departamento_id" in filters and filters["departamento_id"]:
+        categorias = AtividadeCategoria.objects.filter(slug='meta_extensao')
         eventos = DpEvento.objects.prefetch_related(
             Prefetch(
                 "atividade_set",
                 queryset=Atividade.objects.select_related("tipoAtividade").filter(
-                    departamento=filters["departamento_id"], atividade_meta=True
+                    departamento=filters["departamento_id"], 
+                    atividadeCategorias__in=categorias 
                 ),
             )
         )
@@ -199,11 +201,14 @@ def getFilteredEventos(filters, formatType="type 1"):
                 queryset=Atividade.objects.select_related("tipoAtividade"),
             )
         ).filter(tipo=DpEvento.CURSO_GPS)
-
-    if "data_inicio" in filters:
-        eventos = eventos.filter(data_inicio__gte=filters["data_inicio"])
-    if "data_fim" in filters:
-        eventos = eventos.filter(data_fim__lte=filters["data_fim"])
+    start_date = datetime.strptime(filters["data_inicio"], '%Y-%m-%d').date() if "data_inicio" in filters else None
+    end_date = datetime.strptime(filters["data_fim"], '%Y-%m-%d').date() if "data_fim" in filters else None
+    if start_date and end_date:
+        eventos = eventos.filter(data_inicio__range=(start_date, end_date))
+    elif start_date:
+        eventos = eventos.filter(data_inicio__gte=start_date)
+    elif end_date:
+        eventos = eventos.filter(data_inicio__lte=end_date)
     if "tipo" in filters and filters["tipo"]:
         eventos = eventos.filter(tipo=filters["tipo"])
     result = {}
@@ -211,6 +216,7 @@ def getFilteredEventos(filters, formatType="type 1"):
     if formatType == "type 2":
         return eventos
     for evento in eventos:
+        print(evento.id, evento.atividade_set.count())
         if evento.atividade_set.count() == 0:
             continue
         tipo = evento.tipo_formatado
@@ -372,6 +378,10 @@ def getAtividadeLabel(doc, atividade, counter):
     return doc
 
 def getAtividadeImage(doc: Document, atividade, counter):
+    galeria = atividade.galeria 
+    if not galeria:
+        return doc
+
     imagem = atividade.galeria.imagem_set.first()
     if not imagem:
         return doc
@@ -450,7 +460,7 @@ def getRelatorioType1(doc, relatorioData):
                     cidadeNomeTexto = evento.cidade.nome if evento.cidade else "Não Informado"
                     # doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
                     old_evento = current_evento
-                tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
+                tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else atividade.nome
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
                 counter = counter + 1
                 doc = getAtividade(doc, atividade, counter)
