@@ -32,7 +32,7 @@ class Ensino(models.Model):
     tipo = models.CharField(null = True, max_length=100)
     etapa = models.CharField(null = True, max_length=100)
     process_instance = models.CharField(null = True, max_length=100)
-    observacao = models.CharField(null = True, max_length=500)
+    observacao = models.CharField(null = True, max_length=1500)
     status = models.CharField(null = True, max_length=100)
     bairro = models.CharField(null = True, max_length=100) 
     logradouro = models.CharField(null = True, max_length=250) 
@@ -129,3 +129,7 @@ class Ensino(models.Model):
         elif self.alocacao_status == self.STATUS_ALOCACAO_CONCLUIDA:
             return "info-success"
         return "info-secondary"
+    
+    @property
+    def select_option(self):
+        return self.observacao[0:50]

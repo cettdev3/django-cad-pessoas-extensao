@@ -41,6 +41,7 @@ class EnsinoSerializer(serializers.ModelSerializer):
             "alocacao_status",
             "alocacao_status_class",
             "alocacao_status_formatado",
+            "select_option"
         ]
         depth = 2
         
