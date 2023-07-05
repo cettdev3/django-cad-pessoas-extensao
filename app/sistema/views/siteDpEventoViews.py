@@ -241,7 +241,7 @@ def getSectionTitle(doc, nomeEvento):
 def getCidade(doc, atividade):
     cidade = atividade.cidade
     cidadeParagraph = doc.add_paragraph()
-    cidadeParagraph.add_run(f"cidade:").bold = True
+    cidadeParagraph.add_run(f"Cidade:").bold = True
     cidadeTexto = cidade.nome if cidade else "Não Informado"
     cidadeParagraph.add_run(f" {cidadeTexto}")
     cidadeParagraphFormat = cidadeParagraph.paragraph_format
@@ -363,9 +363,10 @@ def getSubAtividades(doc: Document, atividade):
 
 
 def getAtividadeLabel(doc, atividade, counter):
-    cargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else ""
+    cargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
+    cargaHoraria = int(cargaHoraria) if cargaHoraria > 0 else ""
     atividadeLabel = doc.add_paragraph()
-    atividadeLabel.add_run(f"Ação {counter} - {cargaHoraria}").bold = True
+    atividadeLabel.add_run(f"Ação {counter} - {cargaHoraria}h").bold = True
     atividadeLabelFormat = atividadeLabel.paragraph_format
     atividadeLabelFormat.space_after = Pt(0)
     return doc
@@ -394,7 +395,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
         img_run = img_paragraph.add_run()
         img_run.add_picture(image_path, width=Inches(4.0))
         img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    except UnrecognizedImageError:
+    except Exception as e:
         error_message = (
             f"Error: Unable to recognize the image format for {imagem.descricao}."
         )
@@ -404,7 +405,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
     finally:
         try:
             os.remove(image_path)
-        except OSError as e:
+        except Exception as e:
             print(f"Error: Unable to delete the image file: {e}")
 
     return doc
@@ -447,7 +448,7 @@ def getRelatorioType1(doc, relatorioData):
                 if current_evento != old_evento:
                     tipoTexto = evento.tipo_formatado if evento.tipo else "Não Informado"
                     cidadeNomeTexto = evento.cidade.nome if evento.cidade else "Não Informado"
-                    doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
+                    # doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
                     old_evento = current_evento
                 tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else "Não Informado"
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
