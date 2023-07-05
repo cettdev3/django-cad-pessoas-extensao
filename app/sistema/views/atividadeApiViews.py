@@ -120,10 +120,11 @@ class AtividadeApiView(APIView):
     
         atividadeMetaCategoria = AtividadeCategoria.objects.filter(slug=Atividade.CATEGORIA_META_EXTENSAO).first()
         atividade_meta = False
-        if str(atividadeMetaCategoria.id) in categorias_ids:
-            atividade_meta = True
-        else:
-            atividade_meta = False
+        if atividadeMetaCategoria:
+            if str(atividadeMetaCategoria.id) in categorias_ids:
+                atividade_meta = True
+            else:
+                atividade_meta = False
 
         galeria = Galeria.objects.create(nome="Galeria sem titulo ", evento=evento)
         atividadeData = {
@@ -300,10 +301,11 @@ class AtividadeDetailApiView(APIView):
             atividade.atividadeCategorias.set(categorias_ids)  
             
         atividadeMetaCategoria = AtividadeCategoria.objects.filter(slug=atividade.CATEGORIA_META_EXTENSAO).first()
-        if str(atividadeMetaCategoria.id) in categorias_ids:
-            atividade.atividade_meta = True
-        else:
-            atividade.atividade_meta = False
+        if atividadeMetaCategoria:
+            if str(atividadeMetaCategoria.id) in categorias_ids:
+                atividade.atividade_meta = True
+            else:
+                atividade.atividade_meta = False
 
         atividade.descricao = data.get("descricao", atividade.descricao)
         atividade.status = data.get("status", atividade.status)
