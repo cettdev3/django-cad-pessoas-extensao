@@ -46,7 +46,7 @@
                                 name="evento_id">
                                     {% for evento in eventos %}
                                     <option value="{{evento.id}}">
-                                        {{evento.observacao}}
+                                        {{evento.select_option}}
                                     </option>
                                     {% endfor %}
                                 </select>
