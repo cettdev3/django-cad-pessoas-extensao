@@ -398,7 +398,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
 
     p = doc.add_paragraph()
     p.add_run(f"Figura {counter}: {imagem.descricao}")
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
 
     try:
         img_paragraph = doc.add_paragraph()
