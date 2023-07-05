@@ -174,7 +174,6 @@ class EnsinoDetailApiView(APIView):
         return Response(serializer.data, status=str.HTTP_200_OK)
 
     def put(self, request, ensino_id, *args, **kwargs):
-
         ensino = self.get_object(Ensino, ensino_id)
         if not ensino:
             return Response(
