@@ -18,811 +18,144 @@
             </div>
             <div class="modal-body">
                 <div class="w-100">
-                    <ul class="nav nav-tabs row">
-                        <li id="pessoasList1" class="col py-2 active-form-tab">
-                            <a id="pessoaMenuLink1" style="display: none;" href="#home">1</a>
-                            <span>Dados Pessoais</span>
-                        </li>
-                        <li id="pessoasList2" class="col py-2">
-                            <a id="pessoaMenuLink2" style="display: none;" href="#menu1">2</a>
-                            <span>Endereco</span>
-                        </li>
-                        <li id="pessoasList3" class="col py-2">
-                            <a id="pessoaMenuLink3" style="display: none;" href="#menu2">3</a>
-                            <span>Dados Bancários</span>
-                        </li>
-                        <li id="pessoasList4" class="col py-2">
-                            <a id="pessoaMenuLink4" style="display: none;" href="#menu3">4</a>
-                            <span>Dados Gerenciais</span>
-                        </li>
-                    </ul>
                     <form id="cadastrarPessoaForm" action="/" method="POST">
-                        <div class="tab-content">
-                            <div id="home" class="tab-pane py-3 active">
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Nome Completo:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.nome}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="nome" 
-                                        name="nome" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Email:</b></label>
-                                        <input 
-                                        type="email" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.email}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="email"
-                                        name="email"
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Data de Nascimento:</b></label>
-                                        <input 
-                                        type="date" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.data_nascimento_formatted|date:'Y-m-d'}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="data_nascimento"
-                                        name="data_nascimento"
-                                        placeholder=""
-                                        required>
-                                    </div>
+                        <div id="home" class="py-3">
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <label><b>Nome Completo:</b></label>
+                                    <input 
+                                    type="text" 
+                                    {% if pessoa %}
+                                    value="{{pessoa.nome}}" 
+                                    {% endif %}
+                                    class="form-control" 
+                                    id="nome" 
+                                    name="nome" 
+                                    placeholder=""
+                                    required>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Sexo:</b></label>
-                                        {% if pessoa %}
-                                            <select required
-                                            class="form-control"
-                                            {% if pessoa.sexo == 'masculino' or pessoa.sexo == 'feminino' or not pessoa.sexo %}
-                                            {% else %}
-                                            style="display: none;"
-                                            {% endif %}
-                                            id="sexo_select" 
-                                            name="sexo">
-                                                <option 
-                                                {% if pessoa %}
-                                                    {% if pessoa.sexo == 'masculino' %}
-                                                        selected
-                                                    {% endif %}
-                                                {% endif %}
-                                                value="masculino">Masculino</option>
-                                                <option 
-                                                {% if pessoa %}
-                                                    {% if pessoa.sexo == 'feminino' %}
-                                                        selected
-                                                    {% endif %}
-                                                {% endif %}
-                                                value="feminino">Feminino</option>
-                                                <option 
-                                                value="outro">Outro</option>
-                                            </select>
-                                            <input 
-                                            type="text" 
-                                            {% if pessoa.sexo == 'masculino' or pessoa.sexo == 'feminino' or not pessoa.sexo %}
-                                            style="display: none;"
-                                            {% else %}
-                                            value="{{pessoa.sexo}}" 
-                                            {% endif %}
-                                            class="form-control" 
-                                            id="sexo_input" 
-                                            name="sexo"
-                                            placeholder="" 
-                                            required>
-                                        {% else %}
-                                        <select required class="form-control" 
-                                        id="sexo_select" 
-                                        name="sexo">
-                                            <option 
-                                            value="masculino">Masculino</option>
-                                            <option 
-                                            value="feminino">Feminino</option>
-                                            <option 
-                                            value="outro">Outro</option>
-                                        </select>
-                                        <input 
-                                        type="text" 
-                                        style="display: none;"
-                                        class="form-control" 
-                                        id="sexo_input" 
-                                        name="sexo"
-                                        placeholder="" 
-                                        required>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Telefone:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.telefone}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="telefone" 
-                                        name="telefone"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Telefone (Recado):</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.telefone_recado}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="telefone_recado" 
-                                        name="telefone_recado"
-                                        placeholder="" 
-                                        required>
-                                    </div>
+                                <div class="col-sm-3">
+                                    <label><b>Email:</b></label>
+                                    <input 
+                                    type="email" 
+                                    {% if pessoa %}
+                                    value="{{pessoa.email}}" 
+                                    {% endif %}
+                                    class="form-control" 
+                                    id="email"
+                                    name="email"
+                                    placeholder=""
+                                    required>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-3">
-                                        <label><b>CPF:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.cpf}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="cpf" 
-                                        name="cpf" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>RG:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.rg}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="rg" 
-                                        name="rg" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Data de Emissão (RG):</b></label>
-                                        <input 
-                                        type="date" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.data_emissao|date:'Y-m-d'}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="data_emissao"
-                                        name="data_emissao"
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Orgão Emissor:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.orgao_emissor}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="orgao_emissor" 
-                                        name="orgao_emissor"
-                                        placeholder="" 
-                                        required>
-                                    </div>
+                                <div class="col-sm-3">
+                                    <label><b>Telefone:</b></label>
+                                    <input 
+                                    type="text" 
+                                    {% if pessoa %}
+                                    value="{{pessoa.telefone}}" 
+                                    {% endif %}
+                                    class="form-control" 
+                                    id="telefone" 
+                                    name="telefone"
+                                    placeholder="" 
+                                    required>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-3">
-                                        <label><b>PIS/PASEP:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.pis_pasep}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="pis_pasep" 
-                                        name="pis_pasep"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Nome da Mãe:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.nome_mae}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="nome_mae" 
-                                        name="nome_mae"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Nome do Pai:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.nome_pai}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        id="nome_pai" 
-                                        name="nome_pai"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Estado Civil:</b></label>
-                                        <select required
-                                        class="form-control" 
-                                        id="estado_civil" 
-                                        name="estado_civil">
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado_civil == 'solteiro(a)' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="solteiro(a)">SOLTEIRO(a)</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado_civil == 'divorciado(a)' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="divorciado(a)">DIVORCIADO(a)</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado_civil == 'casado(a)' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="casado(a)">CASADO(a)</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado_civil == 'viuvo(a)' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="viuvo(a)">VIÚVO(a)</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado_civil == 'uniao_estavel' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="uniao_estavel">UNIÃO ESTÁVEL</option>
-                                            <option 
-                                            value="outro">Outro</option>
-                                        </select>
-                                    </div>
+                                <div class="col-sm-3">
+                                    <label><b>CPF:</b></label>
+                                    <input 
+                                    type="text" 
+                                    {% if pessoa %}
+                                    value="{{pessoa.cpf}}" 
+                                    {% endif %}
+                                    class="form-control" 
+                                    id="cpf" 
+                                    name="cpf" 
+                                    placeholder=""
+                                    required>
                                 </div>
                             </div>
-                            <div id="menu1" class="tab-pane py-3 fade">
-                                <div class="form-group row">
-                                    <div class="col-sm-3">
-                                        <label><b>Cidade:</b></label>
-                                        <input type="text" 
-                                        class="form-control" 
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <label><b>Cargo:</b></label>
+                                    <select required class="form-control" id="cargo" name="cargo">
+                                        <option 
                                         {% if pessoa %}
-                                        value="{{pessoa.cidade}}" 
+                                            {% if pessoa.cargo == 'estoquista' %}
+                                                selected
+                                            {% endif %}
                                         {% endif %}
-                                        id="cidade" 
-                                        name="cidade" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Bairro:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
+                                        value="estoquista">Estoquista</option>
+                                        <option 
                                         {% if pessoa %}
-                                        value="{{pessoa.bairro}}" 
+                                            {% if pessoa.cargo == 'professor' %}
+                                                selected
+                                            {% endif %}
                                         {% endif %}
-                                        id="bairro" 
-                                        name="bairro" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Logradouro:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
+                                        value="professor">Professor</option>
+                                        <option 
                                         {% if pessoa %}
-                                        value="{{pessoa.rua}}" 
+                                            {% if pessoa.cargo == 'auxiliar' %}
+                                                selected
+                                            {% endif %}
                                         {% endif %}
-                                        id="rua" 
-                                        name="rua" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Número:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
+                                        value="auxiliar">auxiliar</option>
+                                        <option 
                                         {% if pessoa %}
-                                        value="{{pessoa.numero_endereco}}" 
+                                            {% if pessoa.cargo == 'assistente' %}
+                                                selected
+                                            {% endif %}
                                         {% endif %}
-                                        id="numero_endereco" 
-                                        name="numero_endereco" 
-                                        placeholder=""
-                                        required>
-                                    </div>
+                                        value="assistente">Assistente</option>
+                                        <option 
+                                        {% if pessoa %}
+                                            {% if pessoa.cargo == 'coordenador' %}
+                                                selected
+                                            {% endif %}
+                                        {% endif %}
+                                        value="coordenador">Coordenador</option>
+                                        <option 
+                                        {% if pessoa %}
+                                            {% if pessoa.cargo == 'gerente' %}
+                                                selected
+                                            {% endif %}
+                                        {% endif %}
+                                        value="gerente">Gerente</option>
+                                        <option 
+                                        {% if pessoa %}
+                                            {% if pessoa.cargo == 'outro' %}
+                                                selected
+                                            {% endif %}
+                                        {% endif %}
+                                        value="outro">Outro</option>
+                                    </select>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>CEP:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
+                                <div class="col-sm-3">
+                                    <label><b>Instituição:</b></label>
+                                    <select required class="form-control" id="instituicao" name="instituicao">
+                                        <option value="">Selecione uma Opção</option>
+                                        {% for instituicao in instituicoes %}
+                                        <option 
                                         {% if pessoa %}
-                                        value="{{pessoa.cep}}" 
+                                            {% if pessoa.instituicao == instituicao.0 %}
+                                                selected
+                                            {% endif %}
                                         {% endif %}
-                                        id="cep" 
-                                        name="cep" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Complemento:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.complemento}}" 
-                                        {% endif %}
-                                        id="complemento" 
-                                        name="complemento"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Estado:</b></label>
-                                        <select class="form-control" 
-                                        id="estado" 
-                                        name="estado">
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'AC' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="AC">Acre</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'AL' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="AL">Alagoas</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'AP' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="AP">Amapá</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'AM' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="AM">Amazonas</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'BA' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="BA">Bahia</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'CE' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="CE">Ceará</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'DF' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="DF">Distrito Federal</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'ES' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="ES">Espírito Santo</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'GO' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="GO">Goiás</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'MA' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="MA">Maranhão</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'MT' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="MT">Mato Grosso</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'MS' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="MS">Mato Grosso do Sul</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'MG' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="MG">Minas Gerais</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'PA' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="PA">Pará</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'PB' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="PB">Paraíba</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'PR' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="PR">Paraná</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'PE' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="PE">Pernambuco</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'PI' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="PI">Piauí</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'RJ' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="RJ">Rio de Janeiro</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'RN' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="RN">Rio Grande do Norte</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'RS' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="RS">Rio Grande do Sul</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'RO' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="RO">Rondônia</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'RR' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="RR">Roraima</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'SC' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="SC">Santa Catarina</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'SP' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="SP">São Paulo</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'SE' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="SE">Sergipe</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'TO' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="TO">Tocantins</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.estado == 'EX' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %} 
-                                            value="EX">Estrangeiro</option>
-                                        </select>
-                                    </div>
+                                        value="{{instituicao.0}}">{{instituicao.1}}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
-                            </div>
-                            <div id="menu2" class="tab-pane py-3 fade">
-                                <div class="form-group row">
-                                    <div class="col-sm-4">
-                                        <label><b>Banco:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.banco}}" 
-                                        {% endif %}
-                                        id="banco" 
-                                        name="banco" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Agência:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.agencia}}" 
-                                        {% endif %}
-                                        id="agencia" 
-                                        name="agencia"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <label><b>Conta:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.conta}}" 
-                                        {% endif %}
-                                        id="conta" 
-                                        name="conta" 
-                                        placeholder=""
-                                        required>
-                                    </div>
+                                <div class="col-sm-3" id="pessoaFormSelectEscola" 
+                                {% if pessoa.instituicao == 'escola' %}
+                                    style="display: block;"
+                                {% else %}
+                                    style="display: none;"
+                                {% endif %}>
+                                    {% include 'escolas/escolas_select.html' with escolas=escolas escola_id=pessoa.escola.id %}
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-6">
-                                        <label><b>Pix:</b></label>
-                                        <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.pix}}" 
-                                        {% endif %}
-                                        id="pix" 
-                                        name="pix" 
-                                        placeholder=""
-                                        required>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <label><b>Tipo de Conta:</b></label>
-                                        <select required class="form-control" 
-                                        id="tipo_conta" 
-                                        name="tipo_conta">
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo_conta == 'corrente' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="corrente">Corrente</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo_conta == 'poupanca' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="poupanca">Poupança</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo_conta == 'salario' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="salario">Salário</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo_conta == 'conjunta' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="conjunta">Conjunta</option>
-                                        </select>
-                                    </div>
+                                <div class="col-sm-3">
+                                    {% include 'users/users_select.html' with users=users selected=pessoa.user.id current_user=pessoa.user.username %}
                                 </div>
-                            </div>
-                            <div id="menu3" class="tab-pane py-3 fade">
-                                <div class="form-group row">
-                                    <div class="col-sm-3">
-                                        <label><b>Cargo:</b></label>
-                                        <select required class="form-control" id="cargo" name="cargo">
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'estoquista' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="estoquista">Estoquista</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'professor' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="professor">Professor</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'auxiliar' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="auxiliar">auxiliar</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'assistente' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="assistente">Assistente</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'coordenador' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="coordenador">Coordenador</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'gerente' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="gerente">Gerente</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.cargo == 'outro' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="outro">Outro</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Tipo de Contratação:</b></label>
-                                        <select required class="form-control" id="tipo" name="tipo">
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo == 'rpa' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="rpa">RPA</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo == 'clt' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="clt">CLT</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo == 'bolsista' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="bolsista">Bolsista</option>
-                                            <option 
-                                            {% if pessoa %}
-                                                {% if pessoa.tipo == 'outro' %}
-                                                    selected
-                                                {% endif %}
-                                            {% endif %}
-                                            value="outro">Outros</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>Qtd de Contratações:</b></label>
-                                        <input 
-                                        min="0" 
-                                        type="number" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.qtd_contratacoes}}" 
-                                        {% endif %}
-                                        class="form-control" 
-                                        value="0"
-                                        id="qtd_contratacoes" 
-                                        name="qtd_contratacoes" 
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        {% include 'users/users_select.html' with users=users selected=pessoa.user.id %}
-                                    </div>
-
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-3">
-                                        <label><b>Usuário do Camunda:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.user_camunda}}" 
-                                        {% endif %}
-                                        class="form-control" id="user_camunda" name="user_camunda"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label><b>id protocolo:</b></label>
-                                        <input 
-                                        type="text" 
-                                        {% if pessoa %}
-                                        value="{{pessoa.id_protocolo}}" 
-                                        {% endif %}
-                                        class="form-control" id="id_protocolo" name="id_protocolo"
-                                        placeholder="" 
-                                        required>
-                                    </div>
-                                    <div id="selectCursosCadastrarPessoa" class="col-sm-4">
-                                    </div>
+                                <div id="selectCursosCadastrarPessoa" class="col-sm-3">
                                 </div>
                             </div>
                         </div>
@@ -830,16 +163,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="formPessoaPrev" style="display: none;" type="button" class="btn btn-secondary prev">
-                    <span id="prevPessoaLink" class=""></span>
-                    <span>Anterior</span>
-                </button>
-                <button id="formPessoaNext" type="button" class="btn btn-primary">
-                    <span id="nextPessoaLink" class="pessoaMenuLink2">
-                    </span>
-                    <span>Próximo</span>
-                </button>
-                <button style="display: none;" 
+                <button 
                 {% if pessoa %}
                     onclick="editarPessoa({{pessoa.id}})" 
                 {% else %}
@@ -878,17 +202,6 @@
 
         if (changedResource) pessoaModificadaEventProxy.modificado = changedResource
         if (changedResource) $("#dismissCadastrarPessoa").click()
-        
-        nextLinkElement = $('#nextPessoaLink')
-        nextPessoaLink = nextLinkElement.attr('class')
-        currentLinkNumber = parseInt(nextPessoaLink.slice(-1)) - 1
-        let clickcount = 4 - (currentLinkNumber -1)
-
-        let reloadButtons = setInterval(function () {
-            if ( clickcount <= 3 ) $("#formPessoaPrev").click()
-            else clearInterval(reloadButtons)
-            clickcount++
-        },200);
     }
 
     function cadastrarPessoa() {
@@ -957,114 +270,10 @@
 
     $(document).ready(function () {
         let cursos = JSON.parse(document.getElementById('cursos').textContent)
-        nextBtnControl = ["pessoaMenuLink1", "pessoaMenuLink2", "pessoaMenuLink3", "pessoaMenuLink4"]
         tabsQuantity = 4
         item = 1
         $(".nav-tabs a").click(function () {
             $(this).tab('show');
-        });
-
-        $("#formPessoaNext").click(function () {
-            // buscar os botoes de proximo e anterior
-            prevLinkElement = $("#formPessoaPrev").children('#prevPessoaLink')
-            nextLinkElement = $(this).children('#nextPessoaLink')
-
-            // buscar nome do proximo link
-            nextPessoaLink = nextLinkElement.attr('class')
-            $("#" + nextPessoaLink).trigger("click")
-            nextLinkElement.removeClass(nextPessoaLink)
-            currentLinkNumber = parseInt(nextPessoaLink.slice(-1))
-            proximoLink = currentLinkNumber % 4 + 1
-            proximoLink = nextPessoaLink.slice(0, -1) + proximoLink
-            nextLinkElement.addClass(proximoLink)
-
-            // mudar a cor da aba
-            if (currentLinkNumber <= 0) currentLinkNumber = 1
-            $("li[id^='pessoasList']").each(function (i, el) {
-                currentId = "pessoasList" + currentLinkNumber
-                if ($(this).attr('id') == currentId) $(this).addClass("active-form-tab")
-                else $(this).removeClass("active-form-tab")
-            })
-
-            // salvar o link anterior
-            classes = prevLinkElement.attr('class')
-            if (classes) {
-                prevLinkElement.removeClass(classes)
-                currentClassNumber = parseInt(nextPessoaLink.slice(-1))
-                prevLink = currentClassNumber % 4 == 0 ? 3 : currentClassNumber % 4 - 1
-                prevLink = nextPessoaLink.slice(0, -1) + prevLink
-                prevLinkElement.addClass(prevLink)
-            } else {
-                currentClassNumber = parseInt(nextPessoaLink.slice(-1))
-                prevLink = currentClassNumber % 4 - 1
-                prevLink = nextPessoaLink.slice(0, -1) + prevLink
-                prevLinkElement.addClass(prevLink)
-            }
-
-            // mostrar o botao de cadastrar
-            if (proximoLink == "pessoaMenuLink1") {
-                $("#formPessoaNext").hide()
-                $("#finishCadastroPessoa").show()
-            }
-
-            // mostrar o botao de anterior
-            if (
-                proximoLink == "pessoaMenuLink3" ||
-                proximoLink == "pessoaMenuLink1" ||
-                proximoLink == "pessoaMenuLink4"
-            ) {
-                $("#formPessoaPrev").show()
-            } else $("#formPessoaPrev").hide()
-        });
-
-        $("#formPessoaPrev").click(function () {
-            // buscar os botoes de proximo e anterior
-            prevLinkElement = $("#formPessoaPrev").children('#prevPessoaLink')
-            nextLinkElement = $("#formPessoaNext").children('#nextPessoaLink')
-
-            // buscar nome do link anterior
-            prevPessoaLink = prevLinkElement.attr('class')
-            $("#" + prevPessoaLink).trigger("click")
-            currentLinkNumber = parseInt(prevPessoaLink.slice(-1))
-            prevLinkElement.removeClass(prevPessoaLink)
-            prevLinkAtualizado = currentLinkNumber % 4 - 1
-            prevLinkAtualizado = prevPessoaLink.slice(0, -1) + prevLinkAtualizado
-            prevLinkElement.addClass(prevLinkAtualizado)
-
-            // mudar a cor da aba
-            if (currentLinkNumber <= 0) currentLinkNumber = 1
-            if (currentLinkNumber > 4) currentLinkNumber = 4
-            $("li[id^='pessoasList']").each(function (i, el) {
-                currentId = "pessoasList" + currentLinkNumber
-                if ($(this).attr('id') == currentId) $(this).addClass("active-form-tab")
-                else $(this).removeClass("active-form-tab")
-            })
-
-            // salvar o proximo link
-            classes = nextLinkElement.attr('class')
-            if (classes == "pessoaMenuLink1") {
-                nextLinkElement.removeClass(classes)
-                nextink = classes.slice(0, -1) + 4
-                nextLinkElement.addClass(nextink)
-            } else {
-                nextLinkElement.removeClass(classes)
-                currentClassNumber = parseInt(classes.slice(-1))
-                nextink = currentClassNumber - 1
-                nextink = classes.slice(0, -1) + nextink
-                nextLinkElement.addClass(nextink)
-            }
-
-            // mostrar o botao de cadastrar
-            if (prevLinkAtualizado != "pessoaMenuLink3") {
-                $("#formPessoaNext").show()
-                $("#finishCadastroPessoa").hide()
-            }
-            // esconder o botao de anterior
-            if (
-                prevLinkAtualizado == "pessoaMenuLink0"
-            ) {
-                $("#formPessoaPrev").hide()
-            } else $("#formPessoaPrev").show()
         });
         
         $("#cadastrarPessoaModal").on('hide.bs.modal', function(){
@@ -1081,6 +290,14 @@
                 $("#sexo_input").attr("placeholder", "Digite um valor para o sexo...")
             } 
         });
+
+        pessoaFormSelectEscola = $("#pessoaFormSelectEscola")
+        $("#instituicao").on('change', function(evt){
+            let instituicaoValue = $(this).val()
+            if (instituicaoValue == 'escola') pessoaFormSelectEscola.show()
+            else pessoaFormSelectEscola.hide()
+        });
+
         buscarCursos(cursos)
         maskValues()
     });

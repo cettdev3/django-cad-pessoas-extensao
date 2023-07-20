@@ -1,9 +1,17 @@
 from datetime import datetime
 from django.db import models
 from ..models.curso import Curso
+from ..models.escola import Escola
 from django.contrib.auth.models import User
 # Create your models here.
 class Pessoas(models.Model):
+
+    INSTITUICAO_CHOICES = (
+        ('escola', 'Escola'),
+        ('cett', 'CETT'),
+        ('outros', 'Outros'),
+    )
+
     id = models.AutoField(primary_key=True)
     email = models.CharField(null = True, max_length=50)
     nome = models.CharField(null = True, max_length=50)
@@ -39,6 +47,8 @@ class Pessoas(models.Model):
     id_protocolo = models.CharField(null = True, max_length=50)
     cursos = models.ManyToManyField(Curso, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank= True)
+    instituicao = models.CharField(max_length=50, choices=INSTITUICAO_CHOICES, null=True, blank=True)
+    escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'processo_gps_professor'
@@ -69,3 +79,18 @@ class Pessoas(models.Model):
         if not self.user:
             return ""
         return self.user.password
+    
+    @property
+    def instituicoes(self):
+        return self.INSTITUICAO_CHOICES
+    
+    @property
+    def instituicao_formatada(self):
+        instituicao = self.instituicao
+        if not instituicao:
+            return "Não informado"
+        
+        for i in self.INSTITUICAO_CHOICES:
+            if i[0] == instituicao:
+                return i[1]
+        return "Não informado"

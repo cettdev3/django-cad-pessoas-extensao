@@ -16,6 +16,7 @@ from sistema.serializers.turnoSerializer import TurnoSerializer
 from sistema.models.pessoa import Pessoas
 from rest_framework.authtoken.models import Token
 from sistema.models.curso import Curso
+from sistema.models.escola import Escola
 from sistema.models.ensino import Ensino
 from sistema.models.turno import Turno
 from sistema.models.alocacao import Alocacao
@@ -63,8 +64,8 @@ def pessoasModalCadastrar(request):
     id = request.GET.get('id')
     pessoa = None
     cursos = None
-    users = User.objects.all()
-
+    users = User.objects.exclude(pessoas__isnull=False)
+    instituicoes = Pessoas.INSTITUICAO_CHOICES
     if id:
         token, created = Token.objects.get_or_create(user=request.user)
     
@@ -74,7 +75,14 @@ def pessoasModalCadastrar(request):
         if pessoa["cursos"]:
             pessoa = pessoa
             cursos = pessoa["cursos"]
-    return render(request,'pessoas/modal_cadastrar_pessoa.html',{'pessoa':pessoa, 'cursos':cursos, 'users':users})
+    escolas = Escola.objects.all()
+    return render(request,'pessoas/modal_cadastrar_pessoa.html',{
+        'pessoa':pessoa, 
+        'cursos':cursos, 
+        'users':users, 
+        'instituicoes':instituicoes, 
+        'escolas': escolas
+    })
 
 @login_required(login_url='/auth-user/login-user')
 def pessoasModalAlocar(request):

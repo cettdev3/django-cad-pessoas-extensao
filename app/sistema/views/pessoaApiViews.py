@@ -5,6 +5,7 @@ from django.db.models import Q, Count
 from rest_framework import status as st, viewsets
 from ..models.pessoa import Pessoas
 from ..models.curso import Curso
+from ..models.escola import Escola
 from ..serializers.pessoaSerializer import PessoaSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -98,11 +99,20 @@ class PessoaApiView(APIView):
         tipo = request.data.get("tipo")
         qtd_contratacoes = request.data.get("qtd_contratacoes")
         user_camunda = request.data.get("user_camunda")
-        
+        instituicao = request.data.get("instituicao")
         user = None
         if request.data.get("user_id"):
-            user = User.objects.get(id=request.data.get("user_id"))
-
+            user_to_validate = User.objects.get(id=request.data.get("user_id"))
+            existing_pessoas = Pessoas.objects.filter(user=user_to_validate)
+            if existing_pessoas.exists():
+                return Response(
+                    {"res": f"O usuário {user_to_validate.username} já está associado a outra pessoa"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            user = user_to_validate
+        escola = None
+        if request.data.get("escola_id"):
+            escola = Escola.objects.get(id=request.data.get("escola_id"))
         pessoa = Pessoas.objects.create(
             nome = nome,
             email = email,
@@ -135,7 +145,9 @@ class PessoaApiView(APIView):
             tipo = tipo,
             qtd_contratacoes = qtd_contratacoes,
             user_camunda = user_camunda,
-            user = user
+            user = user,
+            instituicao = instituicao,
+            escola = escola
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
@@ -256,16 +268,20 @@ class PessoaDetailApiView(APIView):
         if request.data.get("estado"):
             pessoa.estado = request.data.get("estado")
         if request.data.get("user_id"):
-            user = User.objects.get(id=request.data.get("user_id"))
-            
-            try:
-                existing_pessoas = Pessoas.objects.filter(user=user)
-                if existing_pessoas.exists() and existing_pessoas.first().pk != pessoa.pk:
-                    existing_pessoa.user = None
-                    existing_pessoa.save()
-            except Pessoa.DoesNotExist:
-                pass 
-            pessoa.user = user
+            user_to_validate = User.objects.get(id=request.data.get("user_id"))
+            existing_pessoas = Pessoas.objects.filter(user=user_to_validate)
+            if existing_pessoas.exists():
+                return Response(
+                    {"res": f"O usuário {user_to_validate.username} já está associado a outra pessoa"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            pessoa.user = user_to_validate
+        escola = None
+        if request.data.get("escola_id"):
+            escola = Escola.objects.get(id=request.data.get("escola_id"))
+            pessoa.escola = escola
+        if request.data.get("instituicao"):
+            pessoa.instituicao = request.data.get("instituicao") 
         
         pessoa.save()
         serializer = PessoaSerializer(pessoa)

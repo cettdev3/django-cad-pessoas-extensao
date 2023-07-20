@@ -50,6 +50,9 @@ class PessoaSerializer(serializers.ModelSerializer):
             "username",
             "user",
             "password",
-            "is_admin"
+            "is_admin",
+            "instituicao",
+            'instituicao_formatada',
+            'escola'
         ]
         depth = 2
