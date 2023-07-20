@@ -1,0 +1,144 @@
+
+<div class="w-100" id="pessoas-form-container-{{id}}">
+    <form id="cadastrarPessoaForm" action="/" method="POST">
+        <div id="home" class="py-3">
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <label><b>Nome Completo:</b></label>
+                    <input 
+                    type="text" 
+                    {% if pessoa %}
+                    value="{{pessoa.nome}}" 
+                    {% endif %}
+                    class="form-control" 
+                    id="nome" 
+                    name="nome" 
+                    placeholder=""
+                    required>
+                </div>
+                <div class="col-sm-6">
+                    <label><b>Email:</b></label>
+                    <input 
+                    type="email" 
+                    {% if pessoa %}
+                    value="{{pessoa.email}}" 
+                    {% endif %}
+                    class="form-control" 
+                    id="email"
+                    name="email"
+                    placeholder=""
+                    required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <label><b>Telefone:</b></label>
+                    <input 
+                    type="text" 
+                    {% if pessoa %}
+                    value="{{pessoa.telefone}}" 
+                    {% endif %}
+                    class="form-control" 
+                    id="telefone" 
+                    name="telefone"
+                    placeholder="" 
+                    required>
+                </div>
+                <div class="col-sm-6">
+                    <label><b>CPF:</b></label>
+                    <input 
+                    type="text" 
+                    {% if pessoa %}
+                    value="{{pessoa.cpf}}" 
+                    {% endif %}
+                    class="form-control" 
+                    id="cpf" 
+                    name="cpf" 
+                    placeholder=""
+                    required>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{{ cursos|json_script:"cursos" }}
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            function updateSelectedCursos(cursos) {
+                setTimeout(() => {  
+                    $("input[name='cursos']").each(function (i, elem) {
+                        for (let index = 0; index < cursos.length; index++) {
+                            const selectedId = cursos[index]["id"];
+                            if ($(elem).val() == selectedId) $(elem).trigger("click");
+                        }
+                    })
+                }, 200);
+            }
+        
+           
+            function buscarCursos(selectedCursos = null) {
+                $.ajax({
+                    url: "cursosSelect",
+                    data: {},
+                    success: function (data) {
+                        $("#selectCursosCadastrarPessoa").html(data);
+                        if (selectedCursos) updateSelectedCursos(selectedCursos)
+                    }
+                });
+            }
+        
+            function getFormData() {
+                if ($("#sexo_select").length) {
+                    if ($("#sexo_input").val()) {
+                        $("#sexo_select").remove()
+                    } else $("#sexo_input").remove()
+                }
+        
+                let form = $('#cadastrarPessoaForm')
+                var unindexed_array = form.serializeArray();
+                var values = {};
+        
+                $.map(unindexed_array, function (n, i) {
+                    values[n['name']] = n['value'];
+                });
+        
+                return values
+            }
+
+            let cursos = JSON.parse(document.getElementById('cursos').textContent)
+            tabsQuantity = 4
+            item = 1
+            $(".nav-tabs a").click(function () {
+                $(this).tab('show');
+            });
+            
+            $("#cadastrarPessoaModal").on('hide.bs.modal', function(){
+                let pessoaId = $("#modelId").text()
+                if (pessoaId) {
+                    clearModalForm()
+                }
+            });
+
+            $("#sexo_select").on('change', function(evt){
+                if ($(this).val() == "outro") {
+                    $("#sexo_select").remove()
+                    $("#sexo_input").toggle()
+                    $("#sexo_input").focus()
+                    $("#sexo_input").attr("placeholder", "Digite um valor para o sexo...")
+                } 
+            });
+    
+            pessoaFormSelectEscola = $("#pessoaFormSelectEscola")
+            $("#instituicao").on('change', function(evt){
+                let instituicaoValue = $(this).val()
+                if (instituicaoValue == 'escola') pessoaFormSelectEscola.show()
+                else pessoaFormSelectEscola.hide()
+            });
+    
+            $("#cadastrarPessoaForm")[0].getFormData = getFormData
+            buscarCursos(cursos)
+            maskValues()
+        })({id: '{{id}}}'})
+    });
+</script>

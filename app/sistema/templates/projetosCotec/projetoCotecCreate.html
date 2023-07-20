@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="width: 100%;" class="container">
+    <div class="progress" style="margin-bottom: 15px;">
+        <div class="progress-bar" role="progressbar" style="width: 0%;" id="progressBar">0%</div>
+    </div>
+    <form id="create-projeto-cotec-form">
+        <div id="step-dados-gerais">
+            <h2>Dados Gerais</h2>
+            <button type="button" id="getSelectedValuesButton">Get selected values</button>
+            <div class="form-group">
+                <label for="proponente">Proponente</label>
+                {% include 'projetosCotec/customSelectMultiple.html' with options=pessoas id='pessoas' modal_label="Adicionar Pessoa" select_label='Selecione o Proponente' multiple='True' %}
+            </div>
+            <div class="form-group">
+                <label for="proponente">Proponente</label>
+                {% include 'projetosCotec/customSelectMultiple.html' with options=cursos id='cursos'  modal_label="Adicionar Curso"  select_label='Selecione o Curso' multiple='False' %}
+            </div>
+            <div class="form-group">
+                <label for="responsavel">Responsável (coordenadores)</label>
+                <input type="text" class="form-control" id="responsavel">
+            </div>
+            <div class="form-group">
+                <label for="titulo-do-projeto">Título do projeto</label>
+                <input type="text" class="form-control" id="titulo-do-projeto">
+            </div>
+            <div class="form-group">
+                <label for="periodo-de-realizacao">Período de realização</label>
+                <input type="date" class="form-control" id="periodo-de-realizacao">
+            </div>
+            <div class="form-group">
+                <label for="resumo-da-proposta">Resumo da proposta</label>
+                <textarea class="form-control" id="resumo-da-proposta"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="objetivos-gerais">Objetivos gerais</label>
+                <textarea class="form-control" id="objetivos-gerais"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="objetivos-especificos">Objetivos específicos</label>
+                <textarea class="form-control" id="objetivos-especificos"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="metodologia">Metodologia</label>
+                <textarea class="form-control" id="metodologia"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="formato-e-conteudo">Formato e conteúdo do produto a ser entregue</label>
+                <textarea class="form-control" id="formato-e-conteudo"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="justificativas">Justificativas</label>
+                <textarea class="form-control" id="justificativas"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="resultados-esperados">Resultados esperados</label>
+                <textarea class="form-control" id="resultados-esperados"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="fontes-de-apoio">Fontes de apoio e patrocínio utilizadas para realização da ação</label>
+                <textarea class="form-control" id="fontes-de-apoio"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="informacoes-adicionais">Informações adicionais</label>
+                <textarea class="form-control" id="informacoes-adicionais"></textarea>
+            </div>
+        </div>
+
+        <div id="step-cronograma">
+            <h2>Cronograma</h2>
+            <div class="form-group">
+                <label for="cronograma">Cronograma</label>
+                <textarea class="form-control" id="cronograma"></textarea>
+            </div>
+        </div>
+
+        <div id="step-equipe">
+            <h2>Equipe</h2>
+            <!-- Repeat the div below for each member of the team. -->
+            <div class="form-group">
+                <label for="equipe">Equipe executora</label>
+                <input type="text" class="form-control" id="equipe">
+            </div>
+        </div>
+
+        <div id="step-orcamento">
+            <h2>Orçamento</h2>
+            <div class="form-group">
+                <label for="orcamento">Orçamento</label>
+                <input type="number" class="form-control" id="orcamento">
+            </div>
+        </div>
+
+       <div class="text-right">
+            <button type="button" class="btn btn-primary" id="backBtn" style="display: none;">Back</button>
+            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Submit</button>
+        </div>
+    </form>
+</div>
+<script>
+    function getSelectedValues() {
+        console.log($('#custom-select-multiple-pessoas')[0].getSelectedOptions());
+        console.log($('#custom-select-multiple-cursos')[0].getSelectedOptions());
+    }
+       $(document).ready(function () {
+        var currentStep = 0;
+        var steps = ['step-dados-gerais', 'step-cronograma', 'step-equipe', 'step-orcamento'];
+        
+        function showStep(step) {
+            $('#' + steps[step]).show();
+            var progress = (step + 1) / steps.length * 100;
+            $('#progressBar').css('width', progress + '%').text(progress + '%');
+            if (step === steps.length - 1) {
+                $('#nextBtn').hide();
+                $('#submitBtn').show();
+            }
+            if (step > 0) {
+                $('#backBtn').show();
+            } else {
+                $('#backBtn').hide();
+            }
+        }
+        
+        function hideAllSteps() {
+            for (var step of steps) {
+                $('#' + step).hide();
+            }
+        }
+        
+        $('#nextBtn').click(function () {
+            if (currentStep < steps.length - 1) {
+                hideAllSteps();
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+        
+        $('#backBtn').click(function () {
+            if (currentStep > 0) {
+                hideAllSteps();
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        hideAllSteps();
+        showStep(currentStep);
+
+        $(document).ready(function() {
+            $('#getSelectedValuesButton').on('click', getSelectedValues);
+        });
+    });
+</script>
+{% endblock content %}

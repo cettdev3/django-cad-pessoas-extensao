@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="scroll-custom">
 
 <head>
 
@@ -96,6 +96,12 @@
 
             {% if user.is_authenticated %}
             <li class="nav-item">
+                <a class="nav-link" href="/gerencia_dp_eventos">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Projetos</span></a>
+            </li>
+            {% if user.pessoa.instituicao == "cett" %}
+            <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-pessoas">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Pessoas</span></a>
@@ -135,21 +141,12 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Tipos de Atividades</span></a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="/gerencia_acoes">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Ações</span></a>
-            </li> -->
-            <li class="nav-item">
-                <a class="nav-link" href="/gerencia_dp_eventos">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Projetos</span></a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link" href="/gerencia_demandas">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Demandas</span></a>
             </li>
+            {% endif %}
             {% endif %}
 
             {% if user.is_authenticated %}
@@ -272,6 +269,7 @@
     <script src="{% static 'js/services/pessoa.js' %}"></script>
     <script src="{% static 'js/services/ensino.js' %}"></script>
     <script src="{% static 'js/services/evento.js' %}"></script>
+    <script src="{% static 'js/services/projetosCotec.js' %}"></script>
 
     <!-- Page level custom scripts -->
     <script src="{% static 'js/demo/datatables-demo.js' %}"></script>

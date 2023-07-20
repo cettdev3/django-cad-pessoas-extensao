@@ -15,3 +15,36 @@ async function getPessoaSelect(data, callback=null) {
         }
     });
 }
+
+
+function pessoaForm(data, callback = null) {
+    $.ajax({
+        url: '/pessoa-modal',
+        contentType: 'application/json',
+        method: "GET",
+        data: data,
+        success: function(response) {
+            if (callback) callback(response);
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+async function pessoaCreate(data, onSuccess, onError) {
+    return await $.ajax({
+        url: '/pessoa-create',
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        method: "POST",
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (onSuccess) onSuccess(response);
+        },
+        error: function(response) {
+            if (onError) onError(response);
+            console.log(response);
+        }
+    });
+};

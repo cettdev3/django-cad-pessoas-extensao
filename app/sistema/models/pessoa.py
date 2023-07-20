@@ -46,7 +46,7 @@ class Pessoas(models.Model):
     estado = models.CharField(null = True, max_length=50)
     id_protocolo = models.CharField(null = True, max_length=50)
     cursos = models.ManyToManyField(Curso, blank=True)
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank= True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank= True, related_name="pessoa")
     instituicao = models.CharField(max_length=50, choices=INSTITUICAO_CHOICES, null=True, blank=True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True)
 

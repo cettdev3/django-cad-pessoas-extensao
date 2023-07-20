@@ -1,1 +1,2 @@
 from .camundaMiddleware import CamundaMiddleware
+from .instituicaoMiddleware import InstituicaoMiddleware

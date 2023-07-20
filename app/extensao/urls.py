@@ -59,6 +59,7 @@ from sistema.views.siteServicosContratadosViews import servicoContratadoModal, s
 from sistema.views.siteUserViews import usersSelect
 from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda, demandasSelect
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
+from sistema.views.cotecViews.projetosCotecViews import projetoCotecForm, projetoCotecIndex, pessoaModal, pessoaCreate
 from sistema.views.siteGaleriaViews import (
     galeriaModal,
     galeriaTable,
@@ -127,16 +128,22 @@ urlpatterns = [
     path("editarPessoa/<codigo>", editarPessoa),
     path("edicaoPessoa",edicaoPessoa),
     path("registrar",registrar),
+    
+    # ROTAS DO COTEC
+    path("cotec-projeto-index", projetoCotecIndex, name="cotec-projeto-index"),
+    path("cotec-projeto-form", projetoCotecForm, name="cotec-projeto-form"),
+    path("pessoa-modal", pessoaModal, name="pessoa-modal"),
+    path("pessoa-create", pessoaCreate, name="pessoa-create"),
 
     # ROTAS PARA PESSOAS
-    path("",gerencia_pessoas),
-    path("home",gerencia_pessoas),
+    path("",gerencia_dp_eventos),
+    path("home",gerencia_dp_eventos, name="home"),
     path("gerenciar-pessoas",gerencia_pessoas),
     path("pessoasTable",pessoasTable),
     path("pessoasSelect",pessoasSelect),
     path("pessoasModalCadastrar",pessoasModalCadastrar),
     path("pessoasModalAlocar",pessoasModalAlocar),
-    path("cursosSelect", cursosSelect),
+    path("cursosSelect", cursosSelect, name="cursos-select"),
     path("cadastrar-pessoas",cadastrar_pessoas),
     path("savePessoa", savePessoa),
     path("editarPessoa/<codigo>", editarPessoa),
@@ -331,7 +338,7 @@ urlpatterns = [
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
     path("filtrosRelatorioEventosModal",filtrosRelatorioEventosModal),
-    path("confirmDeleteModal",confirmDeleteModal),
+    path("confirmDeleteModal",confirmDeleteModal, name="confirm-delete-modal"),
     path("filterMultipleSelect", filterMultipleSelect),
 
     # ROTAS PARA SERVICOS CONTRATADOS

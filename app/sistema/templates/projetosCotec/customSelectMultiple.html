@@ -1,0 +1,196 @@
+<style>
+    #custom-select-multiple-{{id}} .scroll-custom {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+</style>
+<div class="container" id="custom-select-multiple-{{id}}" data-options="{{options|escapejs|safe}}">
+    <div id="custom-select-multiple">
+        <div class="dropdown">
+            <div id="badges-container" class="d-flex">
+            </div>
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{select_label}}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownMenu" style="z-index: 2">
+                <div class="d-flex px-2 sticky-top">
+                    <input type="text" id="filterInput" class="form-control" placeholder="Filter options" style="margin-right: 8px; width: 90%;">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createOptionModal-{{id}}">+</button>
+                </div>
+                <div class="scroll-custom">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createOptionModal-{{id}}" tabindex="-1" role="dialog" aria-labelledby="createOptionModal-{{id}}Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createOptionModal-{{id}}Label">{{modal_label}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="createOptionBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>$(document).ready(function() {
+    (function (params) {
+        let multiple = params.multiple === 'True';
+        var callbackMap = {
+            'pessoas': function(newOption, onSuccess, onError) {
+                pessoaCreate(newOption, onSuccess, onError);
+            },
+            'cursos': function(newOption, onSuccess, onError) {
+                // TODO: função para criar curso
+            }
+        };
+
+        var formLoadMap = {
+            'pessoas': function(modalBody) {
+                pessoaForm({}, function(response) {
+                    modalBody.html(response);
+                    modalBody.find('script').each(function() {
+                        eval($(this).text());
+                    });
+                });
+            },
+            'cursos': function(modalBody) {
+                // TODO: adicionar formulario de curso
+            }
+        };
+
+
+        let container = $('#custom-select-multiple-' + params.id);
+        let modal = container.find('#createOptionModal-' + params.id);
+
+        var options = container.data('options');
+        options = options.replace(/\\u0022/g, '\"');
+        var allOptions = JSON.parse(options);
+        var selectedOptions = [];
+
+        function createOptions(options) {
+            container.find('.scroll-custom').find('.dropdown-item').remove();
+            for (var option of options) {
+                var isChecked = selectedOptions.includes(option.id) ? 'checked' : '';
+                var item = $('<a class="dropdown-item" href="#"><input type="checkbox" data-id="'+option.id+'" ' + isChecked + '> ' + option.nome + '</a>');
+                container.find('.scroll-custom').append(item);
+            }
+        }
+
+        function createBadges() {
+            container.find('#badges-container').empty();
+            for (var id of selectedOptions) {
+                var option = allOptions.find(option => option.id === id);
+                var badge = $('<span class="badge badge-primary mr-1 d-flex align-items-center" style="font-size: 1.2em; padding: 10px 15px; line-height: 1; align-items: flex-start;">' 
+                            + option.nome 
+                            + ' <button type="button" class="close ml-2" aria-label="Close" data-id="'+option.id+'" style="color: white; line-height: 0.8;"><span aria-hidden="true">&times;</span></button></span>');
+                container.find('#badges-container').append(badge);
+            }
+        }
+
+        container.find('#filterInput').on('keyup', function() {
+            var filter = $(this).val().toLowerCase();
+            var filteredOptions = allOptions.filter(function(option) {
+                if (option.nome) {
+                    return option.nome.toLowerCase().includes(filter)
+                }
+            });
+            createOptions(filteredOptions);
+        });
+
+        container.find('#dropdownMenu').on('click', '.dropdown-item', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var checkbox = $(this).find('input');
+            var id = checkbox.data('id');
+            if (multiple || (!multiple && !checkbox.prop('checked'))) {
+                if (!multiple) {
+                    // If multiple selections are not allowed, clear all previous selections
+                    container.find('.dropdown-item input:checked').prop('checked', false);
+                    selectedOptions = [];
+                }
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                if (checkbox.prop('checked')) {
+                    selectedOptions.push(id);
+                } else {
+                    var index = selectedOptions.indexOf(id);
+                    if (index > -1) {
+                        selectedOptions.splice(index, 1);
+                    }
+                }
+                createBadges();
+            } else {
+                checkbox.prop('checked', true);
+            }
+        });
+
+        container.find('#dropdownMenu').on('click', function(event) {
+            if (!$(event.target).is('button, button *')) {
+                event.stopPropagation();
+            }
+        });
+
+        container.find('#badges-container').on('click', 'button.close', function(event) {
+            var id = $(this).data('id');
+            var index = selectedOptions.indexOf(id);
+            if (index > -1) {
+                selectedOptions.splice(index, 1);
+            }
+            createBadges();
+            createOptions(allOptions);
+        });
+
+        container.find('#createOptionBtn').on('click', function() {
+            var formData = modal.find("form")[0].getFormData();
+            if (formData) {
+                var newId = Math.max.apply(Math, allOptions.map(function(o) { return o.id; })) + 1;
+
+                formData.id = newId;
+
+                if (callbackMap[params.id]) {
+                    callbackMap[params.id](formData, function(successfulNewOption) {
+                        console.log('New option created successfully:', successfulNewOption);
+                        allOptions.push(successfulNewOption);
+                        selectedOptions.push(successfulNewOption.id);
+                        createOptions(allOptions);
+                        createBadges();
+                        modal.find("form")[0].reset();
+                        container.find('#createOptionModal-' + params.id).modal('hide');
+                    }, function(error) {
+                        console.log('Failed to create new option:', error);
+                    });
+                }
+            }
+        });
+
+        createOptions(allOptions);
+
+        container[0].getSelectedOptions = function() {
+            return selectedOptions;
+        };
+
+        container.find('#createOptionModal-' + params.id).on('show.bs.modal', function() {
+            var modalBody = $(this).find('.modal-body');
+            if (formLoadMap[params.id]) {
+                formLoadMap[params.id](modalBody);
+            }
+        });
+
+
+    })({
+        id: '{{id}}',
+        multiple: '{{multiple}}',
+    }) 
+});
+
+</script>
