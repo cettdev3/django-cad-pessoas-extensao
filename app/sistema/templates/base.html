@@ -100,6 +100,11 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Projetos</span></a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{%  url 'cotec-projeto-index'  %}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Propostas</span></a>
+            </li>
             {% if user.pessoa.instituicao == "cett" %}
             <li class="nav-item">
                 <a class="nav-link" href="/gerenciar-pessoas">

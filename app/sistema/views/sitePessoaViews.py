@@ -64,7 +64,7 @@ def pessoasModalCadastrar(request):
     id = request.GET.get('id')
     pessoa = None
     cursos = None
-    users = User.objects.exclude(pessoas__isnull=False)
+    users = User.objects.exclude(pessoa__isnull=False)
     instituicoes = Pessoas.INSTITUICAO_CHOICES
     if id:
         token, created = Token.objects.get_or_create(user=request.user)

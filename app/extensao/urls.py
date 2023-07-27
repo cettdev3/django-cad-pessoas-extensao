@@ -78,7 +78,8 @@ from sistema.views.cotecViews.projetosCotecViews import (
     removeItemOrcamento,
     projetoCotecSuccess,
     updatePropostaProjeto,
-    removePropostaProjeto
+    removePropostaProjeto,
+    showPropostaProjeto
 )
 
 from sistema.views.siteGaleriaViews import (
@@ -160,6 +161,7 @@ urlpatterns = [
     path("create-proposta-projeto", createPropostaProjeto, name="create-proposta-projeto"),
     path("update-proposta-projeto/<pk>", updatePropostaProjeto, name="update-proposta-projeto"),
     path("remove-proposta-projeto/<pk>", removePropostaProjeto, name="remove-proposta-projeto"),
+    path("show-proposta-projeto/<pk>", showPropostaProjeto, name="show-proposta-projeto"),
     path("proposta-projeto-table", propostasTable, name="proposta-projeto-table"),
     path("update-atividade/<pk>", updateAtividade, name="update-atividade"),
     path("create-atividade", createAtividade, name="create-atividade"),

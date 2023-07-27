@@ -39,3 +39,7 @@ class PropostaProjeto(models.Model):
     @property
     def proponentes(self):
         return self.equipe.filter(role='proponente')
+
+    @property
+    def status_formatado(self):
+        return dict(self.STATUS_CHOICES)[self.status]

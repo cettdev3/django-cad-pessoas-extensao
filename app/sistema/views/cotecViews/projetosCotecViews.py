@@ -204,9 +204,24 @@ def updatePropostaProjeto(request, pk):
         proposta_projeto.informacoes_adicionais = data.get("informacoes_adicionais")
     if data.get("publico_alvo"):
         proposta_projeto.publico_alvo = data.get("publico_alvo")
+    if data.get("status"):
+        proposta_projeto.status = data.get("status")
+    if data.get("justificativa"):
+        proposta_projeto.justificativas = data.get("justificativa")
     proposta_projeto.save() 
     proposta_projeto = model_to_dict(proposta_projeto)
     return JsonResponse(proposta_projeto)
+
+@login_required(login_url="/auth-user/login-user")
+def showPropostaProjeto(request, pk): 
+    proposta_projeto = PropostaProjeto.objects.get(pk=pk)
+    return render(
+        request,
+        "projetosCotec/projetosCotecPropostaShow.html",
+        {
+            "proposta_projeto": proposta_projeto,
+        },
+    )
 
 @login_required(login_url="/auth-user/login-user")
 def removePropostaProjeto(request, pk):
