@@ -1,7 +1,16 @@
 from django.db import models
 from itertools import chain
+from django.utils import timezone
 
 class PropostaProjeto(models.Model):
+    STATUS_CHOICES = [
+        ('em_analise', 'Em análise'),
+        ('devolvida', 'Devolvida'),
+        ('aprovada', 'Aprovada'),
+        ('reprovada', 'Reprovada'),
+        ('cancelada', 'Cancelada'),
+    ]
+
     titulo_projeto = models.CharField(max_length=255, null=True, blank=True)
     data_inicio = models.DateField(null=True, blank=True)
     data_fim = models.DateField(null=True, blank=True)
@@ -16,6 +25,9 @@ class PropostaProjeto(models.Model):
     informacoes_adicionais = models.TextField(null=True, blank=True)
     publico_alvo = models.TextField(null=True, blank=True)
     orcamento = models.ForeignKey("Orcamento", on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='em_analise')
   
     class Meta:
         db_table = 'propostas_projeto'
