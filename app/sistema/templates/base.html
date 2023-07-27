@@ -50,6 +50,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom_photo_gallery.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/spinner-container.css' %}">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         #accordionSidebar::-webkit-scrollbar {
             width: 0.2em;
@@ -274,6 +276,7 @@
     <script src="{% static 'js/services/evento.js' %}"></script>
     <script src="{% static 'js/services/projetosCotec.js' %}"></script>
     <script src="{% static 'js/services/itemOrcamento.js' %}"></script>
+    <script src="{% static 'js/services/comentario.js' %}"></script>
 
     <!-- Page level custom scripts -->
     <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
@@ -291,6 +294,7 @@
         integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="{% static 'js/ticket.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script type="text/javascript">
         let XCSRFToken = "{{ csrf_token }}";

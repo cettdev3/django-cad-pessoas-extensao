@@ -11,7 +11,7 @@
             <tbody id="tbody">
                 {% for proposta in propostas %}
                 <tr>
-                    <td class="text-left">{{ proposta.titulo_projeto }}</td>
+                    <td class="text-left">{{ proposta.id }} - {{ proposta.titulo_projeto }}</td>
                     <td class="text-left">{{ proposta.created_at|date:"d/m/Y" }}</td>
                     <td class="text-left">
                         {% if proposta.status == 'devolvida' %}

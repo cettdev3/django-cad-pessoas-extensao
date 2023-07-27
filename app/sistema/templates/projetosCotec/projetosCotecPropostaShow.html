@@ -4,14 +4,18 @@
 <div class="container">
 
     <div class="dropdown position-fixed" style="right: 10px;">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="btn btn-primary" type="button" id="commentsButton" data-bs-toggle="offcanvas"
+            data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
+            <i class="fa fa-comment"></i>
+        </button>
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
             Opções
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {% for status, display_status in proposta_projeto.STATUS_CHOICES %}
-                <button type="button"
-                class="dropdown-item"
-                {% if status == 'devolvida' %}data-toggle="modal" data-target="#devolverModal"{% endif %}>
+            <button type="button" class="dropdown-item" {% if status == 'devolvida' %}data-toggle="modal"
+                data-target="#devolverModal" {% endif %}>
                 {% if status == 'em_analise'%}
                 <span>Colocar Em Análise</span>
                 {% endif %}
@@ -27,133 +31,176 @@
                 {% if status == 'cancelada'%}
                 <span>Cancelar</span>
                 {% endif %}
-                </button>
+            </button>
             {% endfor %}
         </div>
     </div>
-    
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="commentsOffcanvas" aria-labelledby="commentsOffcanvasLabel"
+        style="width: 30%;">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="commentsOffcanvasLabel">Comentários</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" style="height: 90%; overflow-y: auto;">
+            {% for comment in proposta_projeto.comentarios.all %}
+        <div class="card mb-3">
+                <div class="card-header">
+                    {{ comment.autor.nome }} <small class="text-muted float-right">{{ comment.created_at|date:"d M Y, H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ comment.conteudo }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>Nenhum comentário ainda</p>
+            {% endfor %}
+        </div>
+
+        <!-- Add your new textarea and button here -->
+        <div class="p-3">
+            <div class="input-group">
+                <textarea class="form-control" id="newComment" rows="3" placeholder="Adicione um comentário..."></textarea>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>            
+        </div>
+    </div>
+
     <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form id="justificativaForm">
-                <div class="form-group">
-                  <label for="justificativa">Justificativa</label>
-                  <textarea class="form-control" id="justificativa" name="justificativa" rows="3"></textarea>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-              </form>
+                <div class="modal-body">
+                    <form id="justificativaForm">
+                        <div class="form-group">
+                            <label for="justificativa">Justificativa</label>
+                            <textarea class="form-control" id="justificativa" name="justificativa" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="submitJustificativa" class="btn btn-primary">Save changes</button>
+                </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" id="submitJustificativa" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
         </div>
-      </div>
-<h2>{{ proposta_projeto.titulo_projeto }}</h2>
-{% for proponente in proposta_projeto.proponentes %}
+    </div>
+    <h2>{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
+    {% for proponente in proposta_projeto.proponentes %}
     <p>Proponente: {{ proponente.pessoa.nome }}</p>
-{% endfor %}
-<p>Data de Início: {{ proposta_projeto.data_inicio|date:"d/m/Y" }}</p>
-<p>Data de Término: {{ proposta_projeto.data_fim|date:"d/m/Y" }}</p>
-<p>Resumo Proposta: {{ proposta_projeto.resumo_proposta }}</p>
-<p>Objetivos Gerais: {{ proposta_projeto.objetivos_gerais }}</p>
-<p>Objetivos Específicos: {{ proposta_projeto.objetivos_especificos }}</p>
-<p>Metodologia: {{ proposta_projeto.metodologia }}</p>
-<p>Formato Conteúdo: {{ proposta_projeto.formato_conteudo }}</p>
-<p>Justificativas: {{ proposta_projeto.justificativas }}</p>
-<p>Resultados Esperados: {{ proposta_projeto.resultados_esperados }}</p>
-<p>Fontes Apoio: {{ proposta_projeto.fontes_apoio }}</p>
-<p>Informações Adicionais: {{ proposta_projeto.informacoes_adicionais }}</p>
-<p>Público Alvo: {{ proposta_projeto.publico_alvo }}</p>
-
-<h3>Orçamento</h3>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Descricao</th>
-            <th>Tipo</th>
-            <th>Quantidade</th>
-            <th>Unidade</th>
-            <th>Valor</th>
-            <th>Valor Total</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for item in proposta_projeto.orcamento.items.all %}
-        <tr>
-            <td>{{ item.descricao }}</td>
-            <td>{{ item.tipo }}</td>
-            <td>{{ item.quantidade }}</td>
-            <td>{{ item.unidade }}</td>
-            <td>{{ item.valor }}</td>
-            <td>{{ item.valor_total }}</td>
-        </tr>
     {% endfor %}
-    </tbody>
-</table>
+    <p>Data de Início: {{ proposta_projeto.data_inicio|date:"d/m/Y" }}</p>
+    <p>Data de Término: {{ proposta_projeto.data_fim|date:"d/m/Y" }}</p>
+    <p>Resumo Proposta: {{ proposta_projeto.resumo_proposta }}</p>
+    <p>Objetivos Gerais: {{ proposta_projeto.objetivos_gerais }}</p>
+    <p>Objetivos Específicos: {{ proposta_projeto.objetivos_especificos }}</p>
+    <p>Metodologia: {{ proposta_projeto.metodologia }}</p>
+    <p>Formato Conteúdo: {{ proposta_projeto.formato_conteudo }}</p>
+    <p>Justificativas: {{ proposta_projeto.justificativas }}</p>
+    <p>Resultados Esperados: {{ proposta_projeto.resultados_esperados }}</p>
+    <p>Fontes Apoio: {{ proposta_projeto.fontes_apoio }}</p>
+    <p>Informações Adicionais: {{ proposta_projeto.informacoes_adicionais }}</p>
+    <p>Público Alvo: {{ proposta_projeto.publico_alvo }}</p>
 
-<h3>Equipe</h3>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Função</th>
-            <th>Instituicao</th>
-            <th>Pessoa</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for membro in proposta_projeto.equipe.all %}
-        <tr>
-            <td>{{ membro.role }}</td>
-            <td>{{ membro.instituicao }}</td>
-            <td>{{ membro.pessoa.nome }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <h3>Orçamento</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Descricao</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Unidade</th>
+                <th>Valor</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in proposta_projeto.orcamento.items.all %}
+            <tr>
+                <td>{{ item.descricao }}</td>
+                <td>{{ item.tipo }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>{{ item.unidade }}</td>
+                <td>{{ item.valor }}</td>
+                <td>{{ item.valor_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h3>Atividades</h3>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Data Realizacao</th>
-            <th>Horario Inicio</th>
-            <th>Local</th>
-            <th>Publico Esperado</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for atividade in proposta_projeto.atividades.all %}
-        <tr>
-            <td>{{ atividade.nome }}</td>
-            <td>{{ atividade.data_realizacao_inicio }}</td>
-            <td>{{ atividade.horario_inicio }}</td>
-            <td>{{ atividade.local }}</td>
-            <td>{{ atividade.publico_esperado }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <h3>Equipe</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Função</th>
+                <th>Instituicao</th>
+                <th>Pessoa</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for membro in proposta_projeto.equipe.all %}
+            <tr>
+                <td>{{ membro.role }}</td>
+                <td>{{ membro.instituicao }}</td>
+                <td>{{ membro.pessoa.nome }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Atividades</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Data Realizacao</th>
+                <th>Horario Inicio</th>
+                <th>Local</th>
+                <th>Publico Esperado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atividade in proposta_projeto.atividades.all %}
+            <tr>
+                <td>{{ atividade.nome }}</td>
+                <td>{{ atividade.data_realizacao_inicio }}</td>
+                <td>{{ atividade.horario_inicio }}</td>
+                <td>{{ atividade.local }}</td>
+                <td>{{ atividade.publico_esperado }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 <script>
-    $("#submitJustificativa").click(function(e) {
+    $("#submitJustificativa").click(function (e) {
         e.preventDefault();
-        var justificativa = $("#justificativa").val();
-        var data = { justificativa: justificativa, status: 'devolvida' };
-    
-        updatePropostaProjeto('{{ proposta_projeto.id }}', data, function(response) {
+        var conteudo = $("#justificativa").val();
+        var data = { status: 'devolvida' };
+
+        updatePropostaProjeto('{{ proposta_projeto.id }}', data, function (response) {
             $('#devolverModal').modal('hide');
-        }, function(error) {
+        }, function (error) {
+            console.error(error);
+        });
+
+        createComentario({
+            conteudo: conteudo,
+            proposta_projeto_id: '{{ proposta_projeto.id }}'
+        }, function (response) {
+            console.log(response);
+        }, function (error) {
             console.error(error);
         });
     });
-    </script>
+</script>
 {% endblock content %}

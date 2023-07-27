@@ -27,3 +27,4 @@ from .dpEventoEscola import DpEventoEscola
 from .atividadeSection import AtividadeSection
 from .anexo import Anexo
 from .atividadeCategoria import AtividadeCategoria
+from .comentario import Comentario

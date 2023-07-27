@@ -107,6 +107,13 @@ from sistema.views.siteAnexoViews import (
     saveAnexo
 )
 
+
+from sistema.views.siteComentarioViews import (
+    # updateComentario, 
+    createComentario, 
+    # removeComentario
+)
+
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -118,6 +125,7 @@ from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiVie
 from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 from sistema.views.atividadeSectionApiViews import AtividadeSectionApiView, AtividadeSectionDetailApiView
 from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
+from sistema.views.comentarioApiViews import ComentarioApiView, ComentarioDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -173,6 +181,11 @@ urlpatterns = [
     path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
+    
+    # ROTAS PARA COMENTARIOS
+    # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
+    path("create-comentario", createComentario, name="create-comentario"),
+    # path("remove-comentario/<pk>", removeComentario, name="remove-comentario"),
 
     # ROTAS PARA PESSOAS
     path("",gerencia_dp_eventos),
@@ -484,6 +497,9 @@ urlpatterns = [
 
     path("anexos", AnexoApiView.as_view()),
     path('anexos/<int:anexo_id>', AnexoDetailApiView.as_view()),
+    
+    path("comentarios", ComentarioApiView.as_view()),
+    path('comentarios/<int:comentario_id>', ComentarioDetailApiView.as_view()),
     
 
     # ROTAS DE AUTENTICAÇÂO
