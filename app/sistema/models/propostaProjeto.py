@@ -28,6 +28,7 @@ class PropostaProjeto(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='em_analise')
+    escola = models.ForeignKey("Escola", on_delete=models.SET_NULL, null=True, blank=True)
   
     class Meta:
         db_table = 'propostas_projeto'

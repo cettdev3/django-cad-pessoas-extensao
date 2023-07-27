@@ -14,14 +14,19 @@
                     <td class="text-left">{{ proposta.titulo_projeto }}</td>
                     <td class="text-left">{{ proposta.created_at|date:"d/m/Y" }}</td>
                     <td class="text-left">
-                        {{ proposta.status_formatado }}
                         {% if proposta.status == 'devolvida' %}
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" 
+                        <button class="btn btn-outline-warning btn-sm" 
+                        style="border-radius: 50%" 
+                        data-toggle="modal" 
                         data-target="#justificativaModal" 
                         data-justificativa="{{ proposta.justificativas }}">
-                            Info
+                            <i data-toggle="tooltip" 
+                            data-placement="top" 
+                            title="Ver Justificativa"
+                             class="fas fa-info-circle"></i>
                         </button>
                         {% endif %}
+                        {{ proposta.status_formatado }}
                     </td>
                     <td class="text-left">
                         <div class="d-flex justify-content-end">

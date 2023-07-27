@@ -9,10 +9,11 @@ from django.db import transaction
 import requests
 from rest_framework.authtoken.models import Token
 from django.contrib import messages
+from django.urls import reverse
 
 @login_required(login_url="/auth-user/login-user")
 def projetoCotecIndex(request):
-    page_title = "Projetos de Extensão"
+    page_title = "Propostas de Projetos"
     return render(                  
         request,
         "projetosCotec/projetosCotecIndex.html",
@@ -102,6 +103,11 @@ def selectMultipleComponent(request):
 @login_required(login_url="/auth-user/login-user")
 def createPropostaProjeto(request): 
     data = json.loads(request.body.decode())
+    user = request.user
+    pessoa = Pessoas.objects.get(user=user)
+    if not pessoa.escola:
+        return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter propostas!"}, status=400)
+
     with transaction.atomic():
         orcamento = Orcamento()
         orcamento.save()
@@ -120,6 +126,7 @@ def createPropostaProjeto(request):
         proposta_projeto.informacoes_adicionais = data.get("informacoes_adicionais")
         proposta_projeto.publico_alvo = data.get("publico_alvo")
         proposta_projeto.orcamento = orcamento
+        proposta_projeto.escola = pessoa.escola
         proposta_projeto.save() 
 
         for atividade in data.get("cronograma"):
@@ -245,7 +252,17 @@ def removePropostaProjeto(request, pk):
 
 @login_required(login_url="/auth-user/login-user")
 def propostasTable(request):
-    propostas = PropostaProjeto.objects.prefetch_related('orcamento', 'equipe', 'atividades').all()
+    user = request.user
+    pessoa = Pessoas.objects.get(user=user)
+    
+    propostas = PropostaProjeto.objects.prefetch_related(
+        'orcamento', 
+        'equipe', 
+        'atividades'
+        )
+    if pessoa.instituicao != "cett" and pessoa.escola:
+        propostas = propostas.filter(escola=pessoa.escola)
+    propostas = propostas.all()
     return render(
         request,
         "projetosCotec/projetosCotecPropostaTable.html",
