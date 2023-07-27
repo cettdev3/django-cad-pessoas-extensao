@@ -5,15 +5,16 @@
     }
 
 </style>
-<div class="container" id="custom-select-multiple-{{id}}" data-options="{{options|escapejs|safe}}">
+<div class="container" id="custom-select-multiple-{{id}}" 
+data-options="{{options|escapejs|safe}}">
     <div id="custom-select-multiple">
-        <div class="dropdown">
-            <div id="badges-container" class="d-flex">
+        <div class="dropdown d-flex flex-wrap">
+            <div id="badges-container" class="d-flex flex-wrap">
             </div>
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{select_label}}
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownMenu" style="z-index: 2">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownMenu" style="z-index: 21">
                 <div class="d-flex px-2 sticky-top">
                     <input type="text" id="filterInput" class="form-control" placeholder="Filter options" style="margin-right: 8px; width: 90%;">
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createOptionModal-{{id}}">+</button>
@@ -69,31 +70,49 @@
             }
         };
 
-
         let container = $('#custom-select-multiple-' + params.id);
         let modal = container.find('#createOptionModal-' + params.id);
 
         var options = container.data('options');
         options = options.replace(/\\u0022/g, '\"');
         var allOptions = JSON.parse(options);
-        var selectedOptions = [];
+        var selectedOptions = params.selected_values ? params.selected_values.map(Number) : [];
+        var oldSelectedOptions = selectedOptions
+        let eventTarget = new EventTarget();
+
+        function updateSelectedOptions(newSelectedOptions, announceChange = true) {  
+            if (announceChange) {
+                let event = new Event('change');
+                event.selectedOptions = newSelectedOptions;
+                event.oldSelectedOptions = oldSelectedOptions;
+                eventTarget.dispatchEvent(event);
+            } else {
+                oldSelectedOptions = selectedOptions;
+            }
+
+            selectedOptions = newSelectedOptions;
+        }
 
         function createOptions(options) {
+            console.log("container for options", container);
             container.find('.scroll-custom').find('.dropdown-item').remove();
             for (var option of options) {
                 var isChecked = selectedOptions.includes(option.id) ? 'checked' : '';
-                var item = $('<a class="dropdown-item" href="#"><input type="checkbox" data-id="'+option.id+'" ' + isChecked + '> ' + option.nome + '</a>');
+                let nome = JSON.parse('"' + option.nome + '"');
+                var item = $('<a class="dropdown-item" href="#"><input type="checkbox" data-id="'+option.id+'" ' + isChecked + '> ' + nome + '</a>');
                 container.find('.scroll-custom').append(item);
             }
         }
 
         function createBadges() {
             container.find('#badges-container').empty();
+            console.log("selectedOptions", selectedOptions);
             for (var id of selectedOptions) {
-                var option = allOptions.find(option => option.id === id);
+                var option = allOptions.find(option => option.id == id);
+                var name = JSON.parse('"' + option.nome + '"');
                 var badge = $('<span class="badge badge-primary mr-1 d-flex align-items-center" style="font-size: 1.2em; padding: 10px 15px; line-height: 1; align-items: flex-start;">' 
-                            + option.nome 
-                            + ' <button type="button" class="close ml-2" aria-label="Close" data-id="'+option.id+'" style="color: white; line-height: 0.8;"><span aria-hidden="true">&times;</span></button></span>');
+                    + name
+                    + ' <button type="button" class="close ml-2" aria-label="Close" data-id="'+option.id+'" style="color: white; line-height: 0.8;"><span aria-hidden="true">&times;</span></button></span>');
                 container.find('#badges-container').append(badge);
             }
         }
@@ -117,16 +136,13 @@
                 if (!multiple) {
                     // If multiple selections are not allowed, clear all previous selections
                     container.find('.dropdown-item input:checked').prop('checked', false);
-                    selectedOptions = [];
+                    updateSelectedOptions([], false); 
                 }
                 checkbox.prop('checked', !checkbox.prop('checked'));
                 if (checkbox.prop('checked')) {
-                    selectedOptions.push(id);
+                    updateSelectedOptions(selectedOptions.concat([id])); // Changed this line
                 } else {
-                    var index = selectedOptions.indexOf(id);
-                    if (index > -1) {
-                        selectedOptions.splice(index, 1);
-                    }
+                    updateSelectedOptions(selectedOptions.filter(function(optionId) { return optionId !== id; })); // Changed this line
                 }
                 createBadges();
             } else {
@@ -142,10 +158,7 @@
 
         container.find('#badges-container').on('click', 'button.close', function(event) {
             var id = $(this).data('id');
-            var index = selectedOptions.indexOf(id);
-            if (index > -1) {
-                selectedOptions.splice(index, 1);
-            }
+            updateSelectedOptions(selectedOptions.filter(function(optionId) { return optionId !== id; })); // Changed this line
             createBadges();
             createOptions(allOptions);
         });
@@ -154,14 +167,15 @@
             var formData = modal.find("form")[0].getFormData();
             if (formData) {
                 var newId = Math.max.apply(Math, allOptions.map(function(o) { return o.id; })) + 1;
-
                 formData.id = newId;
 
-                if (callbackMap[params.id]) {
-                    callbackMap[params.id](formData, function(successfulNewOption) {
-                        console.log('New option created successfully:', successfulNewOption);
+                if (callbackMap[params.model]) {
+                    callbackMap[params.model](formData, function(successfulNewOption) {
                         allOptions.push(successfulNewOption);
-                        selectedOptions.push(successfulNewOption.id);
+                        if (!multiple) {
+                            updateSelectedOptions([], false); // Clear all previous selections when multiple is False. Changed this line
+                        }
+                        updateSelectedOptions(selectedOptions.concat([successfulNewOption.id])); // Changed this line
                         createOptions(allOptions);
                         createBadges();
                         modal.find("form")[0].reset();
@@ -174,23 +188,38 @@
         });
 
         createOptions(allOptions);
+        createBadges(); 
 
-        container[0].getSelectedOptions = function() {
-            return selectedOptions;
+        container[0].getValue = function() {
+            if (multiple) {
+                return selectedOptions;
+            } 
+            return selectedOptions[0];
         };
 
         container.find('#createOptionModal-' + params.id).on('show.bs.modal', function() {
             var modalBody = $(this).find('.modal-body');
-            if (formLoadMap[params.id]) {
-                formLoadMap[params.id](modalBody);
+            if (formLoadMap[params.model]) {
+                formLoadMap[params.model](modalBody);
             }
         });
 
+        container[0].addEventListener = eventTarget.addEventListener.bind(eventTarget);
+        container[0].setValue = function(values) {
+            if (multiple) {
+                updateSelectedOptions(values, false);
+            } else {
+                updateSelectedOptions([values], false);
+            }
+            createOptions(allOptions);
+            createBadges();
+        };
 
     })({
         id: '{{id}}',
         multiple: '{{multiple}}',
+        model: '{{model}}',
+        selected_values: '{{selected_values}}' ? JSON.parse('{{selected_values|escapejs}}') : []
     }) 
-});
+});</script>
 
-</script>

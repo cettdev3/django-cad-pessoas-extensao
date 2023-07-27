@@ -59,7 +59,28 @@ from sistema.views.siteServicosContratadosViews import servicoContratadoModal, s
 from sistema.views.siteUserViews import usersSelect
 from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda, demandasSelect
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
-from sistema.views.cotecViews.projetosCotecViews import projetoCotecForm, projetoCotecIndex, pessoaModal, pessoaCreate
+from sistema.views.cotecViews.projetosCotecViews import (
+    projetoCotecForm, 
+    projetoCotecIndex, 
+    pessoaModal, 
+    pessoaCreate, 
+    selectMultipleComponent, 
+    createPropostaProjeto, 
+    propostasTable, 
+    updateAtividade, 
+    createAtividade, 
+    removeAtividade, 
+    updateMembroEquipe, 
+    createMembroEquipe, 
+    removeMembroEquipe,
+    updateItemOrcamento, 
+    createItemOrcamento, 
+    removeItemOrcamento,
+    projetoCotecSuccess,
+    updatePropostaProjeto,
+    removePropostaProjeto
+)
+
 from sistema.views.siteGaleriaViews import (
     galeriaModal,
     galeriaTable,
@@ -72,7 +93,7 @@ from sistema.views.siteAtividadeSectionViews import (
     saveAtividadeSection,
     deleteAtividadeSection,
     updateAtividadeSection,
-    atividadeSectionComponent
+    atividadeSectionComponent,
 )
 
 from sistema.views.siteImagemViews import (
@@ -131,9 +152,24 @@ urlpatterns = [
     
     # ROTAS DO COTEC
     path("cotec-projeto-index", projetoCotecIndex, name="cotec-projeto-index"),
+    path("cotec-projeto-success", projetoCotecSuccess, name="cotec-projeto-success"),
     path("cotec-projeto-form", projetoCotecForm, name="cotec-projeto-form"),
     path("pessoa-modal", pessoaModal, name="pessoa-modal"),
     path("pessoa-create", pessoaCreate, name="pessoa-create"),
+    path("select-multiple-component", selectMultipleComponent, name="select-multiple-component"),
+    path("create-proposta-projeto", createPropostaProjeto, name="create-proposta-projeto"),
+    path("update-proposta-projeto/<pk>", updatePropostaProjeto, name="update-proposta-projeto"),
+    path("remove-proposta-projeto/<pk>", removePropostaProjeto, name="remove-proposta-projeto"),
+    path("proposta-projeto-table", propostasTable, name="proposta-projeto-table"),
+    path("update-atividade/<pk>", updateAtividade, name="update-atividade"),
+    path("create-atividade", createAtividade, name="create-atividade"),
+    path("remove-atividade/<pk>", removeAtividade, name="remove-atividade"),
+    path("update-membro-equipe/<pk>", updateMembroEquipe, name="update-membro-equipe"),
+    path("create-membro-equipe", createMembroEquipe, name="create-membro-equipe"),
+    path("remove-membro-equipe/<pk>", removeMembroEquipe, name="remove-membro-equipe"),
+    path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
+    path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
+    path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
 
     # ROTAS PARA PESSOAS
     path("",gerencia_dp_eventos),
@@ -408,8 +444,8 @@ urlpatterns = [
     path("acoes", AcaoApiView.as_view()),
     path('acoes/<int:acao_id>', AcaoDetailApiView.as_view()),
    
-    path("membroExecucao", MembroExecucaoApiView.as_view()),
-    path('membroExecucao/<int:membro_execucao_id>', MembroExecucaoDetailApiView.as_view()),
+    path("membroExecucao", MembroExecucaoApiView.as_view(), name="membroExecucao"),
+    path('membroExecucao/<int:membro_execucao_id>', MembroExecucaoDetailApiView.as_view(), name="membroExecucaoDetail"),
     
     path("tickets", TicketApiView.as_view()),
     path('tickets/<int:ticket_id>', TicketDetailApiView.as_view()),

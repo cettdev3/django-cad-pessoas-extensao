@@ -40,10 +40,25 @@
             </a>
         </div>
     </div>
-
+    <div class="w-100">
+        <div id="itemsTable">
+        </div>
+    </div>
 </div>
 <script>
+    function loadPropostasTable() {
+        getPropostaTable(
+            {},
+            function(propostaTable) {
+                $('#itemsTable').html(propostaTable)
+            },
+            function(error) {
+                console.log(error)
+            }
+        );
+    }
     $(document).ready(function () {
+        loadPropostasTable()
     })
 </script>
 {% endblock content %}

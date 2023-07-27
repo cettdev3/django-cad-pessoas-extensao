@@ -11,6 +11,7 @@ from ..models.cidade import Cidade
 from ..models.ticket import Ticket
 from ..models.itinerario import Itinerario
 from ..models.membroExecucao import MembroExecucao
+from ..models.propostaProjeto import PropostaProjeto
 from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -41,6 +42,15 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            
+        proposta_projeto = None
+        if request.data.get("proposta_projeto_id"):
+            proposta_projeto = self.get_object(PropostaProjeto, request.data.get("proposta_projeto_id"))
+            if not proposta_projeto:
+                return Response(
+                    {"res": "Não existe proposta de projeto com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         
         pessoa = None
         if request.data.get("pessoa_id"):
@@ -50,11 +60,6 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe pessoa com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        else:
-            return Response(
-                {"res": "Informe o id da pessoa"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         
         acao = None
         if request.data.get("acao_id"):
@@ -72,9 +77,9 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe evento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        if not acao and not evento:
+        if not acao and not evento and not proposta_projeto:
             return Response(
-                {"res": "É necessário informar a ação ou o evento para o membro de execução"},
+                {"res": "É necessário informar a ação, o evento ou a proposta de projeto para adicionar o membro a equipe"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
@@ -87,10 +92,13 @@ class MembroExecucaoApiView(APIView):
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "tipo": request.data.get("tipo") if request.data.get("tipo") else None,
             "avaliador": request.data.get("avaliador") if request.data.get("avaliador") else None,
+            "role": request.data.get("role"),
+            "instituicao": request.data.get("instituicao"),
             "cidade": cidade,
             "pessoa": pessoa,
             "acao": acao,
             "evento": evento,
+            "proposta_projeto": proposta_projeto,
         }
         with transaction.atomic():
             membroExecucao = MembroExecucao.objects.create(**data)
@@ -176,11 +184,24 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.cep = request.data.get("cep")
         if request.data.get("complemento"):
             membroExecucao.complemento = request.data.get("complemento")
+        if request.data.get("role"):
+            membroExecucao.role = request.data.get("role")
+        if request.data.get("instituicao"):
+            membroExecucao.instituicao = request.data.get("instituicao")
         if request.data.get("avaliador"):
             membroExecucao.avaliador = request.data.get("avaliador")
         else:
             membroExecucao.avaliador = False
-            
+        
+        if request.data.get("proposta_projeto_id"):
+            proposta_projeto = self.get_object(PropostaProjeto, request.data.get("proposta_projeto_id"))
+            if not proposta_projeto:
+                return Response(
+                    {"res": "Não existe proposta de projeto com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            membroExecucao.proposta_projeto = proposta_projeto
+
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
             if not cidade:

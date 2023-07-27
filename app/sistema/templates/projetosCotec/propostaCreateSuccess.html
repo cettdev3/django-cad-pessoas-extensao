@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding-top: 20px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.07.022L7.477 9.417 5.384 7.323A.75.75 0 0 0 4.616 8.03l2.363 2.394a.75.75 0 0 0 1.06 0l4.85-4.976a.75.75 0 0 0-.01-1.05z"/>
+    </svg>
+    <h1 style="color: green; margin-top: 20px;">Proposta de projeto criada com sucesso</h1>
+    <p style="text-align: center; margin-top: 20px;">Sua proposta será enviada para aprovação, você pode acompanhar o progresso da avaliação na sua página de projetos.</p>
+    <a href="{% url 'cotec-projeto-index' %}" 
+       id="btn-proposta-success"
+       class="btn btn-success" 
+       style="margin-top: 20px;">Retornar a página de projetos</a>
+</div>
+{% endblock content %}
+

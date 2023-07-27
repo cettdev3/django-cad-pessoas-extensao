@@ -8,6 +8,7 @@ from .departamento import Departamento
 from .atividadeSection import AtividadeSection
 from .atividadeCategoria import AtividadeCategoria
 from .galeria import Galeria
+from .propostaProjeto import PropostaProjeto
 class Atividade(models.Model):
     STATUS_PENDENTE = 'pendente'
     STATUS_CONCLUIDO = 'concluido'
@@ -54,12 +55,18 @@ class Atividade(models.Model):
     id_protocolo = models.CharField(null = True, blank=True, max_length=100)
     data_realizacao_inicio = models.DateField(null = True, blank=True)
     data_realizacao_fim = models.DateField(null = True, blank=True)
+    horario_inicio = models.TimeField(null = True, blank=True)
+    horario_fim = models.TimeField(null = True, blank=True)
     valor = models.FloatField(null = True, blank=True)
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     atividade_meta = models.BooleanField(default=False, null = True, blank= True)
     categoria = models.CharField(null = True, blank=True, max_length=100)
-    atividadeCategorias = models.ManyToManyField(AtividadeCategoria, blank=True, null=True)
+    atividadeCategorias = models.ManyToManyField(AtividadeCategoria, blank=True)
     atividadeSection = models.ForeignKey(AtividadeSection, on_delete=models.SET_NULL, null=True, blank=True)
+    publico_esperado = models.IntegerField(null = True, blank=True)
+    local = models.CharField(null = True, blank=True, max_length=500)
+    proposta_projeto = models.ForeignKey(PropostaProjeto, on_delete=models.SET_NULL, null=True, blank=True, related_name='atividades')
+
     class Meta:
         db_table = 'atividades'
     

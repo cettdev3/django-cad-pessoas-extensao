@@ -1,120 +1,258 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="width: 100%;" class="container">
-    <div class="progress" style="margin-bottom: 15px;">
-        <div class="progress-bar" role="progressbar" style="width: 0%;" id="progressBar">0%</div>
+<style>
+    #step-indicators {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center;
+        padding: 1em 0;
+        width: 87%;
+        background-color: #f8f9fc;
+        z-index: 1000; /* Ensure it stays on top of other elements */
+        position: fixed;
+        top: 75px; /* Adjust this value based on the actual height of your navigation bar */
+        z-index: 10;
+    }
+    
+    .step-line {
+        flex-grow: 1;
+        border-top: 3px solid #ddd; /* Increase the pixel size for a thicker line */
+        position: relative;
+    }
+    
+    .step-line.line-primary {
+        border-color: #007bff;
+    }
+
+    .step-badge {
+        font-size: 2em; 
+        width: 2em; 
+        height: 2em; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%; 
+        z-index: 2;
+        position: relative;
+        background: #ddd; /* grey background for not completed steps */
+    }
+    
+    .step-badge.badge-primary {
+        background: #007bff; /* blue background for completed steps */
+        color: #fff; /* white text for completed steps */
+    }
+
+    #form-container {
+        margin-top: 100px; /* Adjust as needed */
+    }
+
+    .step-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        position: relative;
+    }
+    
+    .step-container .step {
+        flex: 1 0 auto;
+        text-align: center;
+    }
+</style>
+<div style="width: 100%;" class="w-100">
+    <div class="step-container">
+        <div id="step-indicators" class="text-center px-1">
+            <span class="badge badge-secondary step-badge" id="step-1-badge">1</span>
+            <div class="step-line" id="line-1"></div>
+            <span class="badge badge-secondary step-badge" id="step-2-badge">2</span>
+            <div class="step-line" id="line-2"></div>
+            <span class="badge badge-secondary step-badge" id="step-3-badge">3</span>
+            <div class="step-line" id="line-3"></div>
+            <span class="badge badge-secondary step-badge" id="step-4-badge">4</span>
+        </div>
     </div>
-    <form id="create-projeto-cotec-form">
-        <div id="step-dados-gerais">
-            <h2>Dados Gerais</h2>
-            <button type="button" id="getSelectedValuesButton">Get selected values</button>
-            <div class="form-group">
-                <label for="proponente">Proponente</label>
-                {% include 'projetosCotec/customSelectMultiple.html' with options=pessoas id='pessoas' modal_label="Adicionar Pessoa" select_label='Selecione o Proponente' multiple='True' %}
+    
+    <div id="form-container" class="container">
+        <form id="create-projeto-cotec-form">
+            <div id="step-dados-gerais">
+                <h2>Dados Gerais</h2>
+                <div data-membro-equipe-id="{{proposta_projeto.proponente.id}}"
+                class="form-group">
+                {% if proposta_projeto.id %}
+                {% include 'projetosCotec/EquipeSectionInput.html' with hide_funcao='True' hide_remove='True'  card_label='Proponente' id='proponente' equipe=proposta_projeto.proponentes hide_add_button='True' propostaId=proposta_projeto.id %}
+                {% else %}
+                {% include 'projetosCotec/EquipeSectionInput.html' with createOne='True' hide_funcao='True' hide_remove='True'  card_label='Proponente' id='proponente' equipe=proposta_projeto.proponentes hide_add_button='True' propostaId=proposta_projeto.id %}
+                {% endif %}
+                </div>
+                <div data-membro-equipe-id="{{proposta_projeto.responsavel.id}}"
+                class="form-group">
+                    <label for="responsavel">Responsáveis</label>
+                    {% include 'projetosCotec/EquipeSectionInput.html' with card_placeholder_label="Clique no botão acima para adicionar um Responsável" hide_funcao='True' add_button_label="Adicionar Responsável" card_label='Responsável' id='responsaveis' equipe=proposta_projeto.responsaveis propostaId=proposta_projeto.id %}
+                </div>
+                <div class="form-group">
+                    <label for="titulo-do-projeto">Título do projeto</label>
+                    <input type="text" 
+                    class="form-control proposta-field" 
+                    id="titulo_projeto" 
+                    name="titulo_projeto"
+                    value="{{proposta_projeto.titulo_projeto|default_if_none:''}}">
+                </div>
+                <div class="form-group">
+                    <label for="periodo-de-realizacao"><b>Período de realização</b></label>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <label for="data_inicio">Data de início</label>
+                            <input type="date" class="form-control proposta-field" id="data_inicio" 
+                            value="{{proposta_projeto.data_inicio|date:'Y-m-d'|default_if_none:''}}"
+                            name="data_inicio">
+                        </div>
+                        <div class="col-6">
+                            <label for="data_fim">Data de Término</label>
+                            <input type="date" class="form-control proposta-field" id="data_fim" 
+                            value="{{proposta_projeto.data_fim|date:'Y-m-d'|default_if_none:''}}"
+                            name="data_fim">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="resumo-da-proposta">Resumo da proposta</label>
+                    <textarea class="form-control proposta-field" rows="5" id="resumo_proposta" 
+                    name="resumo_proposta">{{proposta_projeto.resumo_proposta|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="objetivos-gerais">Objetivos gerais</label>
+                    <textarea class="form-control proposta-field" rows="5" id="objetivos_gerais" 
+                    name="objetivos_gerais">{{proposta_projeto.objetivos_gerais|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="objetivos-especificos">Objetivos específicos</label>
+                    <textarea class="form-control proposta-field" id="objetivos_especificos" 
+                    name="objetivos_especificos"
+                    rows="5">{{proposta_projeto.objetivos_especificos|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="metodologia">Metodologia</label>
+                    <textarea class="form-control proposta-field" id="metodologia" 
+                    name="metodologia" rows="5">{{proposta_projeto.metodologia|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="formato-e-conteudo">Formato e conteúdo do produto a ser entregue</label>
+                    <textarea class="form-control proposta-field" id="formato_conteudo"
+                    name="formato_conteudo"
+                    rows="5">{{proposta_projeto.formato_conteudo|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="justificativas">Justificativas</label>
+                    <textarea class="form-control proposta-field" id="justificativas" 
+                    name="justificativas" rows="5">{{proposta_projeto.justificativas|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="resultados-esperados">Resultados esperados</label>
+                    <textarea class="form-control proposta-field" id="resultados_esperados" 
+                    name="resultados_esperados"
+                    rows="5">{{proposta_projeto.resultados_esperados|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="fontes-de-apoio">Fontes de apoio e patrocínio utilizadas para realização da ação</label>
+                    <textarea class="form-control proposta-field" id="fontes_apoio" 
+                    name="fontes_apoio" rows="5">{{proposta_projeto.fontes_apoio|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="informacoes-adicionais">Informações adicionais</label>
+                    <textarea class="form-control proposta-field" id="informacoes_adicionais" 
+                    name="informacoes_adicionais"
+                    rows="5">{{proposta_projeto.informacoes_adicionais|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="publico_alvo">Público alvo</label>
+                    <textarea class="form-control proposta-field" id="publico_alvo" 
+                    name="publico_alvo"
+                    rows="5">{{proposta_projeto.publico_alvo|default_if_none:''}}</textarea>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="proponente">Proponente</label>
-                {% include 'projetosCotec/customSelectMultiple.html' with options=cursos id='cursos'  modal_label="Adicionar Curso"  select_label='Selecione o Curso' multiple='False' %}
+    
+            <div id="step-cronograma">
+                <h2>Cronograma geral das atividades</h2>
+                {% include 'projetosCotec/atividadeSectionInput.html' with id='cronograma-geral' cronograma=proposta_projeto.atividades.all propostaId=proposta_projeto.id %}
             </div>
-            <div class="form-group">
-                <label for="responsavel">Responsável (coordenadores)</label>
-                <input type="text" class="form-control" id="responsavel">
+    
+            <div id="step-equipe">
+                <h2>Equipe</h2>
+                {% include 'projetosCotec/EquipeSectionInput.html' with pessoas=pessoas id='equipe-executora' equipe=proposta_projeto.equipe.all propostaId=proposta_projeto.id %}
             </div>
-            <div class="form-group">
-                <label for="titulo-do-projeto">Título do projeto</label>
-                <input type="text" class="form-control" id="titulo-do-projeto">
+    
+            <div id="step-orcamento">
+                <h2>Orçamento</h2>
+                {% include 'projetosCotec/orcamentoSectionInput.html' with id='orcamento' orcamento_items=proposta_projeto.orcamento.items.all orcamentoId=proposta_projeto.orcamento.id %}
             </div>
-            <div class="form-group">
-                <label for="periodo-de-realizacao">Período de realização</label>
-                <input type="date" class="form-control" id="periodo-de-realizacao">
+    
+            <div class="text-right pb-2">
+                <button type="button" class="btn btn-primary" id="backBtn" style="display: none;">Anterior</button>
+                <button type="button" class="btn btn-primary" id="nextBtn">Próximo</button>
+                {% if proposta_projeto.id %}
+                <a 
+                href="{% url 'cotec-projeto-index' %}" 
+                class="btn btn-success" 
+                id="editBtn" 
+                style="display: none;">Salvar alterações</a>
+                {% else %}
+                <button type="button" class="btn btn-primary" id="submitBtn" style="display: none;">Submeter
+                    Proposta</button>
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label for="resumo-da-proposta">Resumo da proposta</label>
-                <textarea class="form-control" id="resumo-da-proposta"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="objetivos-gerais">Objetivos gerais</label>
-                <textarea class="form-control" id="objetivos-gerais"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="objetivos-especificos">Objetivos específicos</label>
-                <textarea class="form-control" id="objetivos-especificos"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="metodologia">Metodologia</label>
-                <textarea class="form-control" id="metodologia"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="formato-e-conteudo">Formato e conteúdo do produto a ser entregue</label>
-                <textarea class="form-control" id="formato-e-conteudo"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="justificativas">Justificativas</label>
-                <textarea class="form-control" id="justificativas"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="resultados-esperados">Resultados esperados</label>
-                <textarea class="form-control" id="resultados-esperados"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="fontes-de-apoio">Fontes de apoio e patrocínio utilizadas para realização da ação</label>
-                <textarea class="form-control" id="fontes-de-apoio"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="informacoes-adicionais">Informações adicionais</label>
-                <textarea class="form-control" id="informacoes-adicionais"></textarea>
-            </div>
-        </div>
-
-        <div id="step-cronograma">
-            <h2>Cronograma</h2>
-            <div class="form-group">
-                <label for="cronograma">Cronograma</label>
-                <textarea class="form-control" id="cronograma"></textarea>
-            </div>
-        </div>
-
-        <div id="step-equipe">
-            <h2>Equipe</h2>
-            <!-- Repeat the div below for each member of the team. -->
-            <div class="form-group">
-                <label for="equipe">Equipe executora</label>
-                <input type="text" class="form-control" id="equipe">
-            </div>
-        </div>
-
-        <div id="step-orcamento">
-            <h2>Orçamento</h2>
-            <div class="form-group">
-                <label for="orcamento">Orçamento</label>
-                <input type="number" class="form-control" id="orcamento">
-            </div>
-        </div>
-
-       <div class="text-right">
-            <button type="button" class="btn btn-primary" id="backBtn" style="display: none;">Back</button>
-            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
-            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Submit</button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 <script>
-    function getSelectedValues() {
-        console.log($('#custom-select-multiple-pessoas')[0].getSelectedOptions());
-        console.log($('#custom-select-multiple-cursos')[0].getSelectedOptions());
+    function getOrcamentoValues() {
+        return $('#orcamento')[0].getValue()
     }
-       $(document).ready(function () {
+
+    function getCronogramaValues() {
+        return $('#cronograma-geral')[0].getValue()
+    }
+
+    function getEquipeExecucao() {
+        console.log($('#equipe-executora')[0])
+        return $('#equipe-executora')[0].getValue()
+    }
+
+    function getSelectedValues() {
+        let proponente = $('#proponente')[0].getValue()
+        let responssavel = $('#responsaveis')[0].getValue()
+
+        let form = $('#create-projeto-cotec-form');
+        let data = form.serializeArray();
+
+        data.push({ name: 'proponente', value: proponente });
+        data.push({ name: 'responsavel', value: responssavel });
+        data.push({ name: 'equipe', value: getEquipeExecucao() });
+        data.push({ name: 'cronograma', value: getCronogramaValues() });
+        data.push({ name: 'orcamento', value: getOrcamentoValues() });
+        
+        let result = data.reduce(function (obj, item) {
+            obj[item.name] = item.value;
+            return obj;
+        }, {});
+    
+        return result;
+    }
+
+    $(document).ready(function () {
+        let propostaId = '{{proposta_projeto.id}}'
         var currentStep = 0;
         var steps = ['step-dados-gerais', 'step-cronograma', 'step-equipe', 'step-orcamento'];
-        
+
         function showStep(step) {
             $('#' + steps[step]).show();
-            var progress = (step + 1) / steps.length * 100;
-            $('#progressBar').css('width', progress + '%').text(progress + '%');
+            $('#step-' + (step + 1) + '-badge').removeClass('badge-secondary').addClass('badge-primary');
+            if (step > 0) {
+                $('#line-' + step).addClass('line-primary');
+            }
             if (step === steps.length - 1) {
                 $('#nextBtn').hide();
                 $('#submitBtn').show();
+                $('#editBtn').show();
             }
             if (step > 0) {
                 $('#backBtn').show();
@@ -123,12 +261,17 @@
             }
         }
         
+
         function hideAllSteps() {
             for (var step of steps) {
                 $('#' + step).hide();
             }
         }
-        
+
+        function resetStepBadges() {
+            $('.step-badge').removeClass('badge-primary').addClass('badge-secondary');
+        }
+
         $('#nextBtn').click(function () {
             if (currentStep < steps.length - 1) {
                 hideAllSteps();
@@ -136,21 +279,58 @@
                 showStep(currentStep);
             }
         });
-        
+
         $('#backBtn').click(function () {
             if (currentStep > 0) {
                 hideAllSteps();
+                $('#step-' + (currentStep + 1) + '-badge').removeClass('badge-primary').addClass('badge-secondary');
+                $('#line-' + currentStep).removeClass('line-primary');
                 currentStep--;
                 showStep(currentStep);
             }
+            if (currentStep < steps.length - 1) {
+                $('#nextBtn').show();
+                $('#submitBtn').hide();
+                $('#editBtn').hide();
+            }
         });
+        
 
         hideAllSteps();
+        resetStepBadges();
         showStep(currentStep);
 
-        $(document).ready(function() {
-            $('#getSelectedValuesButton').on('click', getSelectedValues);
+        $('#submitBtn').on('click', function () {
+            let values = getSelectedValues()
+            createPropostaProjeto(values, 
+            function (data) {
+                $(location).attr('href', "{% url 'cotec-projeto-success' %}");
+            }, function (error) {
+                console.log(error)
+            })
         });
+
+        if (propostaId) {
+            $(".proposta-field").each(function () {
+                $(this).on('focusout', function () {
+                    let name = $(this).attr('name')
+                    let value = $(this).val()
+                    let data = {}
+    
+                    data[name] = value
+                    updatePropostaProjeto(
+                        propostaId,
+                        data,
+                        function (data) {
+                            showFloatingMessage("Proposta atualizada com sucesso", "alert-success");
+                        },
+                        function (error) {
+                            showFloatingMessage("Erro ao atualizar proposta", "alert-danger");
+                        }
+                    )
+                })
+            })
+        }
     });
 </script>
 {% endblock content %}

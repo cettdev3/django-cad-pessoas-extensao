@@ -1,0 +1,65 @@
+<div class="w-100">
+        <table class="table table-hover table-sm table-responsive-md">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-left">Nome</th>
+                    <th scope="col" class="text-left">Data de envio</th>
+                    <th scope="col" class="text-left">status</th>
+                    <th scope="col" class="text-left"></th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                {% for proposta in propostas %}
+                <tr>
+                    <td class="text-left">{{ proposta.titulo_projeto }}</td>
+                    <td class="text-left">{{ proposta.data_inicio|date:"d/m/Y" }}</td>
+                    <td class="text-left">{{ proposta.data_fim|date:"d/m/Y" }}</td>
+                    <td class="text-left">
+                        <div class="d-flex justify-content-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn-remove-default btn-circle btn-outline-secondary"
+                                data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                    <a href="{% url 'cotec-projeto-form' %}?proposta_id={{ proposta.id }}"
+                                    class="dropdown-item cursor-pointer">
+                                        <span> Editar Proposta</span>
+                                    </a>
+                                    <button class="dropdown-item cursor-pointer" 
+                                    type="button"
+                                    id="btn-excluir-proposta"
+                                    data-proposta-projeto-id="{{ proposta.id }}">
+                                        Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        (function(params) {
+            $('#btn-excluir-proposta').click(function () {
+                var proposta_projeto_id = $(this).data('proposta-projeto-id')
+                console.log(proposta_projeto_id)
+                removePropostaProjeto(
+                    proposta_projeto_id,
+                    function (response) {
+                        showFloatingMessage("Proposta de projeto removida com sucesso", "alert-success");
+                        loadPropostasTable()
+                    },
+                    function (error) {
+                        console.log("erro")
+                        console.log(error)
+                    }
+                )
+            })
+        })({})
+    })
+</script>

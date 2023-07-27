@@ -18,3 +18,16 @@ def is_in(value, list_obj):
         raise ValueError("Invalid input type. Expected ReturnList or QuerySet.")
     return response
 
+@register.filter
+def to_str(value):
+    return str(value)
+
+@register.filter
+def concat(value, arg):
+    return f"{value}{arg}"
+
+@register.filter
+def to_list(value):
+    if value:
+        return [value]
+    return []
