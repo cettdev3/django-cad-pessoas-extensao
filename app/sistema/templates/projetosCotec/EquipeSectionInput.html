@@ -83,7 +83,6 @@
                     data-current-value="{{ membroEquipe.pessoa.id }}"
                     id="input-pessoa-{{membroEquipe.pessoa.id}}">
                         <label class="form-label">Nome:</label>
-                        {{ membroEquipe.pessoa.id }}
                         {% with membroEquipe.pessoa.id|to_list as selected_values %}
                         {% include 'projetosCotec/customSelectMultiple.html' with selected_values=selected_values options=pessoas model='pessoas' id='pessoa-equipe-'|concat:id|concat:'-'|concat:membroEquipe.id modal_label="Adicionar Pessoa" select_label='Selecione o membro da equipe' multiple='False'%}
                         {% endwith %}

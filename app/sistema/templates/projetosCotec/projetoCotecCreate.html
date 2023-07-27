@@ -173,7 +173,7 @@
     
             <div id="step-cronograma">
                 <h2>Cronograma geral das atividades</h2>
-                {% include 'projetosCotec/atividadeSectionInput.html' with id='cronograma-geral' cronograma=proposta_projeto.atividades.all propostaId=proposta_projeto.id %}
+                {% include 'projetosCotec/atividadeSectionInput.html' with cidades=cidades id='cronograma-geral' cronograma=proposta_projeto.atividades.all propostaId=proposta_projeto.id %}
             </div>
     
             <div id="step-equipe">
@@ -213,7 +213,6 @@
     }
 
     function getEquipeExecucao() {
-        console.log($('#equipe-executora')[0])
         return $('#equipe-executora')[0].getValue()
     }
 

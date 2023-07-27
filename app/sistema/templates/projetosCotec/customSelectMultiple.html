@@ -16,7 +16,7 @@ data-options="{{options|escapejs|safe}}">
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownMenu" style="z-index: 21">
                 <div class="d-flex px-2 sticky-top">
-                    <input type="text" id="filterInput" class="form-control" placeholder="Filter options" style="margin-right: 8px; width: 90%;">
+                    <input type="text" id="filterInput" class="form-control" placeholder="Buscar" style="margin-right: 8px; width: 90%;">
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createOptionModal-{{id}}">+</button>
                 </div>
                 <div class="scroll-custom">
@@ -53,6 +53,9 @@ data-options="{{options|escapejs|safe}}">
             },
             'cursos': function(newOption, onSuccess, onError) {
                 // TODO: função para criar curso
+            },
+            'cidades': function(newOption, onSuccess, onError) {
+                // TODO: função para criar cidade
             }
         };
 
@@ -67,6 +70,9 @@ data-options="{{options|escapejs|safe}}">
             },
             'cursos': function(modalBody) {
                 // TODO: adicionar formulario de curso
+            },
+            'cidades': function(modalBody) {
+                // TODO: adicionar formulario de cidade
             }
         };
 
@@ -94,7 +100,6 @@ data-options="{{options|escapejs|safe}}">
         }
 
         function createOptions(options) {
-            console.log("container for options", container);
             container.find('.scroll-custom').find('.dropdown-item').remove();
             for (var option of options) {
                 var isChecked = selectedOptions.includes(option.id) ? 'checked' : '';
@@ -106,7 +111,6 @@ data-options="{{options|escapejs|safe}}">
 
         function createBadges() {
             container.find('#badges-container').empty();
-            console.log("selectedOptions", selectedOptions);
             for (var id of selectedOptions) {
                 var option = allOptions.find(option => option.id == id);
                 var name = JSON.parse('"' + option.nome + '"');

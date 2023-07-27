@@ -39,6 +39,9 @@ def projetoCotecForm(request):
     if proposta_id:
         proposta_projeto = PropostaProjeto.objects.get(pk=proposta_id)
 
+    cidades = Cidade.objects.all()
+    cidades_list = list(cidades.values('id', 'nome'))
+    cidades_json = json.dumps(cidades_list)
     cursos = Curso.objects.all()
     cursos_list = list(cursos.values('id', 'nome'))
     cursos_json = json.dumps(cursos_list)
@@ -49,6 +52,7 @@ def projetoCotecForm(request):
             "page_title": page_title,
             "pessoas": pessoas_json,
             "cursos": cursos_json,
+            "cidades": cidades_json,
             "proposta_projeto": proposta_projeto,
         },
     )
@@ -89,16 +93,25 @@ def selectMultipleComponent(request):
     context["select_label"] = request.GET.get("select_label")
     context["multiple"] = request.GET.get("multiple")
 
+    pessoas = None
     if context["model"] == "pessoas":
         pessoas = Pessoas.objects.all()
         pessoas_list = list(pessoas.values('id', 'nome')) 
         pessoas_json = json.dumps(pessoas_list, ensure_ascii=False)
         context["options"] = pessoas_json
-        return render(
-            request,
-            "projetosCotec/customSelectMultiple.html",
-            context,
-        )
+    
+    cidades = None
+    if context["model"] == "cidade":
+        cidades = Cidade.objects.all()
+        cidades_list = list(cidades.values('id', 'nome')) 
+        cidades_json = json.dumps(cidades_list, ensure_ascii=False)
+        context["options"] = cidades_json
+
+    return render(
+        request,
+        "projetosCotec/customSelectMultiple.html",
+        context,
+    )
     
 @login_required(login_url="/auth-user/login-user")
 def createPropostaProjeto(request): 
@@ -131,7 +144,8 @@ def createPropostaProjeto(request):
 
         for atividade in data.get("cronograma"):
             db_atividade = Atividade()
-            db_atividade.cidade = Cidade.objects.all().first()
+            if atividade.get("cidade_id"):
+                db_atividade.cidade = Cidade.objects.get(pk=atividade.get("cidade_id"))
             db_atividade.data_realizacao_inicio = atividade.get("data")
             db_atividade.horario_inicio = atividade.get("hora")
             db_atividade.local = atividade.get("local")
@@ -285,8 +299,11 @@ def updateAtividade(request, pk):
         atividade.nome = data.get("nome")
     if data.get("publico_esperado"):
         atividade.publico_esperado = data.get("publico_esperado")
+    if data.get("cidade_id"):
+        atividade.cidade = Cidade.objects.get(pk=data.get("cidade_id"))
     atividade.save()
-    return JsonResponse(data)
+    atividade = model_to_dict(atividade)
+    return JsonResponse(atividade)
 
 @login_required(login_url="/auth-user/login-user")
 def createAtividade(request):
@@ -303,7 +320,8 @@ def createAtividade(request):
     if data.get("publico_esperado"):
         atividade.publico_esperado = data.get("publico_esperado")
     atividade.proposta_projeto = PropostaProjeto.objects.get(pk=data.get("proposta_projeto_id"))
-    atividade.cidade = Cidade.objects.all().first()
+    if data.get("cidade_id"):
+        atividade.cidade = Cidade.objects.get(pk=data.get("cidade_id"))
     atividade.save()
     atividade = model_to_dict(atividade)
     return JsonResponse(atividade)
