@@ -402,30 +402,30 @@ def removeItemOrcamento(request, pk):
     itemOrcamento.delete()
     return JsonResponse({"message": "Atividade removida com sucesso!"})
 
-def deleteAll():
-    with transaction.atomic():
-        propostas_projeto = PropostaProjeto.objects.all()
-        print("propostas: ", propostas_projeto)
-        for proposta_projeto in propostas_projeto:
-            print("proposta: ", proposta_projeto)
-            atividades = Atividade.objects.filter(proposta_projeto=proposta_projeto)
-            print("atividades: ", atividades)
-            for atividade in atividades:
-                atividade.delete()
-                print("atividade deletada")
+# def deleteAll():
+#     with transaction.atomic():
+#         propostas_projeto = PropostaProjeto.objects.all()
+#         print("propostas: ", propostas_projeto)
+#         for proposta_projeto in propostas_projeto:
+#             print("proposta: ", proposta_projeto)
+#             atividades = Atividade.objects.filter(proposta_projeto=proposta_projeto)
+#             print("atividades: ", atividades)
+#             for atividade in atividades:
+#                 atividade.delete()
+#                 print("atividade deletada")
 
-            equipe = MembroExecucao.objects.filter(proposta_projeto=proposta_projeto)
-            print("equipe: ", equipe)
-            for membro in equipe:
-                membro.delete()
-                print("membro deletado")
+#             equipe = MembroExecucao.objects.filter(proposta_projeto=proposta_projeto)
+#             print("equipe: ", equipe)
+#             for membro in equipe:
+#                 membro.delete()
+#                 print("membro deletado")
 
-            orcamento = Orcamento.objects.get(pk=proposta_projeto.orcamento.id)
-            print("orcamento: ", orcamento)
-            orcamento.delete()
-            print("orcamento deletado")
-            proposta_projeto.delete()
-            print("proposta deletada")
+#             orcamento = Orcamento.objects.get(pk=proposta_projeto.orcamento.id)
+#             print("orcamento: ", orcamento)
+#             orcamento.delete()
+#             print("orcamento deletado")
+#             proposta_projeto.delete()
+#             print("proposta deletada")
     # print(terminou)
 
 
