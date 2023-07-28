@@ -52,7 +52,7 @@ class Pessoas(models.Model):
 
     class Meta:
         db_table = 'processo_gps_professor'
-    
+  
     @property
     def data_nascimento_formatted(self):
         if not self.data_nascimento:

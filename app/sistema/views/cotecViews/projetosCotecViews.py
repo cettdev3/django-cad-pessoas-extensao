@@ -9,6 +9,7 @@ from django.db import transaction
 import requests
 from rest_framework.authtoken.models import Token
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
 @login_required(login_url="/auth-user/login-user")
@@ -433,8 +434,10 @@ def removeItemOrcamento(request, pk):
 def createProjetoFromProposta(request, pk):
     with transaction.atomic():
         proposta_projeto = PropostaProjeto.objects.get(pk=pk)
-        
-        if not proposta_projeto.evento:
+        try:
+            evento = proposta_projeto.evento
+            return JsonResponse({"message": "Projeto já criado!"}, status=400)
+        except ObjectDoesNotExist:
             escola = Escola.objects.get(pk=proposta_projeto.escola.id)
             proposta_projeto = proposta_projeto
             tipo = proposta_projeto.titulo_projeto

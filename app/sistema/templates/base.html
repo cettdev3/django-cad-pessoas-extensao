@@ -99,6 +99,7 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Propostas</span></a>
             </li>
+           
             {% if user.pessoa.instituicao == "cett" %}
             <li class="nav-item">
                 <a class="nav-link" href="/gerencia_dp_eventos">
@@ -201,7 +202,7 @@
                         {% endif %}
                     </div>
                     {% if user.is_authenticated %}
-                    <span>Bem vindo {{ user.get_username }}</span>
+                    <span>Bem vindo(a) {{ user.get_username }}</span>
                     {% endif %}
                 </div>
             </nav>
