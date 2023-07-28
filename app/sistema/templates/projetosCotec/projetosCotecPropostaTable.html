@@ -36,6 +36,12 @@
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu">
+                                    {% if proposta.evento %}
+                                    <a class="dropdown-item cursor-pointer"
+                                    href="{% url 'visualizar-dp-evento' proposta.evento.id %}">
+                                    Ver Projeto
+                                    </a>
+                                    {% endif %}
                                     {% if user.pessoa.instituicao == "cett" %}
                                     <a href="{% url 'show-proposta-projeto' proposta.id %}"
                                     class="dropdown-item cursor-pointer">

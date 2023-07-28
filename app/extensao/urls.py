@@ -349,7 +349,7 @@ urlpatterns = [
     path("eliminarDpEvento/<codigo>", eliminarDpEvento), 
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
-    path("visualizarDpEvento/<codigo>", visualizarDpEvento),
+    path("visualizarDpEvento/<codigo>", visualizarDpEvento, name="visualizar-dp-evento"),
     path("relatorioPorEvento/<evento_id>", relatorioPorEvento),
     path("relatorioDpEvento", relatorioDpEvento),
     path("relatorioSintetico", relatorioSintetico),

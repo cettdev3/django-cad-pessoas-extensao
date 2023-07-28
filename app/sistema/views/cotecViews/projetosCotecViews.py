@@ -433,40 +433,42 @@ def removeItemOrcamento(request, pk):
 def createProjetoFromProposta(request, pk):
     with transaction.atomic():
         proposta_projeto = PropostaProjeto.objects.get(pk=pk)
-        escola = Escola.objects.get(pk=proposta_projeto.escola.id)
-        proposta_projeto = proposta_projeto
-        tipo = proposta_projeto.titulo_projeto
-        descricao = proposta_projeto.resumo_proposta
-        evento = DpEvento.objects.create(
-            escola=escola,
-            proposta_projeto=proposta_projeto,
-            tipo=tipo,
-            descricao=descricao,
-        )
-
-        eventoEscola = DpEventoEscola.objects.create(escola=escola, dp_evento=evento) 
-        eventoEscola.save()
-        atividadeSection = AtividadeSection()
-        atividadeSection.nome = "Cronograma de Atividades"
-        atividadeSection.order = 1
-        atividadeSection.evento = evento
-        atividadeSection.save()
-
-        atividade_categoria_slug = "tarefa"
-        atividade_categoria = AtividadeCategoria.objects.get(slug=atividade_categoria_slug)
-        atividades = Atividade.objects.filter(proposta_projeto=proposta_projeto)
-        for atividade in atividades:
-            atividade.evento = evento
-            atividade.atividadeSection = atividadeSection
-            atividade.status = "pendente"
-            atividade.atividadeCategorias.set([atividade_categoria.id])
-            atividade.save()
         
-        equipe = MembroExecucao.objects.filter(proposta_projeto=proposta_projeto)
-        for membro in equipe:
-            membro.evento = evento
-            membro.save()
-        galeria = Galeria.objects.create(nome="galeria geral do evento ", evento=evento) 
+        if not proposta_projeto.evento:
+            escola = Escola.objects.get(pk=proposta_projeto.escola.id)
+            proposta_projeto = proposta_projeto
+            tipo = proposta_projeto.titulo_projeto
+            descricao = proposta_projeto.resumo_proposta
+            evento = DpEvento.objects.create(
+                escola=escola,
+                proposta_projeto=proposta_projeto,
+                tipo=tipo,
+                descricao=descricao,
+            )
+
+            eventoEscola = DpEventoEscola.objects.create(escola=escola, dp_evento=evento) 
+            eventoEscola.save()
+            atividadeSection = AtividadeSection()
+            atividadeSection.nome = "Cronograma de Atividades"
+            atividadeSection.order = 1
+            atividadeSection.evento = evento
+            atividadeSection.save()
+
+            atividade_categoria_slug = "tarefa"
+            atividade_categoria = AtividadeCategoria.objects.get(slug=atividade_categoria_slug)
+            atividades = Atividade.objects.filter(proposta_projeto=proposta_projeto)
+            for atividade in atividades:
+                atividade.evento = evento
+                atividade.atividadeSection = atividadeSection
+                atividade.status = "pendente"
+                atividade.atividadeCategorias.set([atividade_categoria.id])
+                atividade.save()
+            
+            equipe = MembroExecucao.objects.filter(proposta_projeto=proposta_projeto)
+            for membro in equipe:
+                membro.evento = evento
+                membro.save()
+            galeria = Galeria.objects.create(nome="galeria geral do evento ", evento=evento) 
         proposta_projeto.status = "aprovada"
         proposta_projeto.save()
     return JsonResponse({"message": "Projeto criado com sucesso!"})
