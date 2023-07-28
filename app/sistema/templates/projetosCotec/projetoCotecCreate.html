@@ -194,7 +194,13 @@
                 href="{% url 'cotec-projeto-index' %}" 
                 class="btn btn-success" 
                 id="editBtn" 
-                style="display: none;">Salvar alterações</a>
+                style="display: none;">
+                    {% if proposta_projeto.status == 'devolvida' %}
+                    <span>Submeter proposta</span>
+                    {% else %}
+                    <span>Salvar alterações</span>
+                    {% endif %}
+                </a>
                 {% else %}
                 <button type="button" class="btn btn-primary" id="submitBtn" style="display: none;">Submeter
                     Proposta</button>
@@ -303,7 +309,7 @@
             let values = getSelectedValues()
             createPropostaProjeto(values, 
             function (data) {
-                $(location).attr('href', "{% url 'cotec-projeto-success' %}");
+                $(location).attr('href', "{% url 'cotec-projeto-success' %}?proposta_id={{proposta_projeto.id}}");
             }, function (error) {
                 console.log(error)
             })
@@ -330,6 +336,23 @@
                 })
             })
         }
+
+        let propostaStatus = '{{proposta_projeto.status}}'
+        $('#editBtn').on('click', function () {
+            if (propostaStatus == 'devolvida') {
+                console.log('devolvida')
+                let values = {
+                    status : 'em_analise'
+                }
+
+                updatePropostaProjeto(propostaId, values, 
+                function (data) {
+                    $(location).attr('href', "{% url 'cotec-projeto-success' %}");
+                }, function (error) {
+                    console.log(error)
+                })
+            }
+        });
     });
 </script>
 {% endblock content %}

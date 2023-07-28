@@ -45,6 +45,22 @@ async function updatePropostaProjeto(proposta_id, data, onSuccess=null, onError=
     });
 }
 
+async function createProjetoFromProposta(proposta_id, data, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/create-projeto-proposta/"+proposta_id,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        method: "POST",
+        data: JSON.stringify(data),
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}
+
 async function removePropostaProjeto(proposta_projeto_id, onSuccess=null, onError=null) {
     return await $.ajax({
         url: "/remove-proposta-projeto/"+proposta_projeto_id,

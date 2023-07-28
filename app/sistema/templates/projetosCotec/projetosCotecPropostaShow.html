@@ -14,8 +14,14 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {% for status, display_status in proposta_projeto.STATUS_CHOICES %}
-            <button type="button" class="dropdown-item" {% if status == 'devolvida' %}data-toggle="modal"
-                data-target="#devolverModal" {% endif %}>
+            {% if proposta_projeto.status != status %}
+            <button type="button" 
+            class="dropdown-item" 
+            data-status="{{ status }}"
+            {% if status == 'devolvida' %}
+            data-toggle="modal"
+            data-target="#devolverModal" 
+            {% endif %}>
                 {% if status == 'em_analise'%}
                 <span>Colocar Em Análise</span>
                 {% endif %}
@@ -32,6 +38,7 @@
                 <span>Cancelar</span>
                 {% endif %}
             </button>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -88,8 +95,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" id="submitJustificativa" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" id="submitJustificativa" class="btn btn-primary">Devolver ao autor</button>
                 </div>
             </div>
         </div>
@@ -185,22 +192,53 @@
     $("#submitJustificativa").click(function (e) {
         e.preventDefault();
         var conteudo = $("#justificativa").val();
-        var data = { status: 'devolvida' };
+        var data = { 
+            status: 'devolvida',
+            justificativa: conteudo
+        };
 
-        updatePropostaProjeto('{{ proposta_projeto.id }}', data, function (response) {
+        updatePropostaProjeto('{{ proposta_projeto.id }}', 
+        data, 
+        function (response) {
             $('#devolverModal').modal('hide');
-        }, function (error) {
-            console.error(error);
-        });
+                createComentario({
+                    conteudo: conteudo,
+                    proposta_projeto_id: '{{ proposta_projeto.id }}'
+                }, function (response) {
+                    console.log(response);
+                    $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                }, function (error) {
+                    console.error(error);
+                });
+            }, function (error) {
+                console.error(error);
+            }
+        );
+    });
 
-        createComentario({
-            conteudo: conteudo,
-            proposta_projeto_id: '{{ proposta_projeto.id }}'
-        }, function (response) {
-            console.log(response);
-        }, function (error) {
-            console.error(error);
-        });
+    $(".dropdown-item").on("click", function (e) {
+        var status = $(this).data("status");
+        if (status == 'aprovada') {
+            createProjetoFromProposta(
+                '{{ proposta_projeto.id }}',
+                {},
+                function (response) {
+                    $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                }, function (error) {
+                    console.error(error);
+                }
+            );
+        }
+
+        if (status == 'reprovada' || status == 'cancelada') {
+            updatePropostaProjeto('{{ proposta_projeto.id }}', {
+                status: status
+            }, function (response) {
+                $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+            }, function (error) {
+                console.error(error);
+            });
+        }
     });
 </script>
 {% endblock content %}
