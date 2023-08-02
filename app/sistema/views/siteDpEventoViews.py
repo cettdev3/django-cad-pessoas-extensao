@@ -370,7 +370,7 @@ def getSubAtividades(doc: Document, atividade):
 
 def getAtividadeLabel(doc, atividade, counter):
     cargaHoraria = atividade.cargaHoraria if atividade.cargaHoraria else 0
-    cargaHoraria = int(cargaHoraria) if cargaHoraria > 0 else ""
+    cargaHoraria = int(cargaHoraria) if cargaHoraria > 0 else "Não Informado"
     atividadeLabel = doc.add_paragraph()
     atividadeLabel.add_run(f"Ação {counter} - {cargaHoraria}h").bold = True
     atividadeLabelFormat = atividadeLabel.paragraph_format
