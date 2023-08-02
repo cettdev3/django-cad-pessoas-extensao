@@ -11,11 +11,19 @@
         align-items: center;
     }
 </style>
+{% if current_user %}
+<label><b>Usuário atual: {{current_user}}</b></label>
+{% else %}
 <label><b>Usuário:</b></label>
+{% endif %}
 <select class="form-control" 
 id="user_id" 
 name="user_id">
+    {% if current_user %}
+    <option value="">Trocar usuário</option>
+    {% else %}
     <option value="">Selecione um usuário</option>
+    {% endif %}
     {% for user in users %}
         <option  
         {% if selected == user.id %}

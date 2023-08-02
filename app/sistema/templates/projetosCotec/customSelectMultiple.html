@@ -1,0 +1,229 @@
+<style>
+    #custom-select-multiple-{{id}} .scroll-custom {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+</style>
+<div class="container" id="custom-select-multiple-{{id}}" 
+data-options="{{options|escapejs|safe}}">
+    <div id="custom-select-multiple">
+        <div class="dropdown d-flex flex-wrap">
+            <div id="badges-container" class="d-flex flex-wrap">
+            </div>
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{select_label}}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownMenu" style="z-index: 21">
+                <div class="d-flex px-2 sticky-top">
+                    <input type="text" id="filterInput" class="form-control" placeholder="Buscar" style="margin-right: 8px; width: 90%;">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createOptionModal-{{id}}">+</button>
+                </div>
+                <div class="scroll-custom">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createOptionModal-{{id}}" tabindex="-1" role="dialog" aria-labelledby="createOptionModal-{{id}}Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createOptionModal-{{id}}Label">{{modal_label}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="createOptionBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>$(document).ready(function() {
+    (function (params) {
+        let multiple = params.multiple === 'True';
+        var callbackMap = {
+            'pessoas': function(newOption, onSuccess, onError) {
+                pessoaCreate(newOption, onSuccess, onError);
+            },
+            'cursos': function(newOption, onSuccess, onError) {
+                // TODO: função para criar curso
+            },
+            'cidades': function(newOption, onSuccess, onError) {
+                // TODO: função para criar cidade
+            }
+        };
+
+        var formLoadMap = {
+            'pessoas': function(modalBody) {
+                pessoaForm({}, function(response) {
+                    modalBody.html(response);
+                    modalBody.find('script').each(function() {
+                        eval($(this).text());
+                    });
+                });
+            },
+            'cursos': function(modalBody) {
+                // TODO: adicionar formulario de curso
+            },
+            'cidades': function(modalBody) {
+                // TODO: adicionar formulario de cidade
+            }
+        };
+
+        let container = $('#custom-select-multiple-' + params.id);
+        let modal = container.find('#createOptionModal-' + params.id);
+
+        var options = container.data('options');
+        options = options.replace(/\\u0022/g, '\"');
+        var allOptions = JSON.parse(options);
+        var selectedOptions = params.selected_values ? params.selected_values.map(Number) : [];
+        var oldSelectedOptions = selectedOptions
+        let eventTarget = new EventTarget();
+
+        function updateSelectedOptions(newSelectedOptions, announceChange = true) {  
+            if (announceChange) {
+                let event = new Event('change');
+                event.selectedOptions = newSelectedOptions;
+                event.oldSelectedOptions = oldSelectedOptions;
+                eventTarget.dispatchEvent(event);
+            } else {
+                oldSelectedOptions = selectedOptions;
+            }
+
+            selectedOptions = newSelectedOptions;
+        }
+
+        function createOptions(options) {
+            container.find('.scroll-custom').find('.dropdown-item').remove();
+            for (var option of options) {
+                var isChecked = selectedOptions.includes(option.id) ? 'checked' : '';
+                let nome = JSON.parse('"' + option.nome + '"');
+                var item = $('<a class="dropdown-item" href="#"><input type="checkbox" data-id="'+option.id+'" ' + isChecked + '> ' + nome + '</a>');
+                container.find('.scroll-custom').append(item);
+            }
+        }
+
+        function createBadges() {
+            container.find('#badges-container').empty();
+            for (var id of selectedOptions) {
+                var option = allOptions.find(option => option.id == id);
+                var name = JSON.parse('"' + option.nome + '"');
+                var badge = $('<span class="badge badge-primary mr-1 d-flex align-items-center" style="font-size: 1.2em; padding: 10px 15px; line-height: 1; align-items: flex-start;">' 
+                    + name
+                    + ' <button type="button" class="close ml-2" aria-label="Close" data-id="'+option.id+'" style="color: white; line-height: 0.8;"><span aria-hidden="true">&times;</span></button></span>');
+                container.find('#badges-container').append(badge);
+            }
+        }
+
+        container.find('#filterInput').on('keyup', function() {
+            var filter = $(this).val().toLowerCase();
+            var filteredOptions = allOptions.filter(function(option) {
+                if (option.nome) {
+                    return option.nome.toLowerCase().includes(filter)
+                }
+            });
+            createOptions(filteredOptions);
+        });
+
+        container.find('#dropdownMenu').on('click', '.dropdown-item', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var checkbox = $(this).find('input');
+            var id = checkbox.data('id');
+            if (multiple || (!multiple && !checkbox.prop('checked'))) {
+                if (!multiple) {
+                    // If multiple selections are not allowed, clear all previous selections
+                    container.find('.dropdown-item input:checked').prop('checked', false);
+                    updateSelectedOptions([], false); 
+                }
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                if (checkbox.prop('checked')) {
+                    updateSelectedOptions(selectedOptions.concat([id])); // Changed this line
+                } else {
+                    updateSelectedOptions(selectedOptions.filter(function(optionId) { return optionId !== id; })); // Changed this line
+                }
+                createBadges();
+            } else {
+                checkbox.prop('checked', true);
+            }
+        });
+
+        container.find('#dropdownMenu').on('click', function(event) {
+            if (!$(event.target).is('button, button *')) {
+                event.stopPropagation();
+            }
+        });
+
+        container.find('#badges-container').on('click', 'button.close', function(event) {
+            var id = $(this).data('id');
+            updateSelectedOptions(selectedOptions.filter(function(optionId) { return optionId !== id; })); // Changed this line
+            createBadges();
+            createOptions(allOptions);
+        });
+
+        container.find('#createOptionBtn').on('click', function() {
+            var formData = modal.find("form")[0].getFormData();
+            if (formData) {
+                var newId = Math.max.apply(Math, allOptions.map(function(o) { return o.id; })) + 1;
+                formData.id = newId;
+
+                if (callbackMap[params.model]) {
+                    callbackMap[params.model](formData, function(successfulNewOption) {
+                        allOptions.push(successfulNewOption);
+                        if (!multiple) {
+                            updateSelectedOptions([], false); // Clear all previous selections when multiple is False. Changed this line
+                        }
+                        updateSelectedOptions(selectedOptions.concat([successfulNewOption.id])); // Changed this line
+                        createOptions(allOptions);
+                        createBadges();
+                        modal.find("form")[0].reset();
+                        container.find('#createOptionModal-' + params.id).modal('hide');
+                    }, function(error) {
+                        console.log('Failed to create new option:', error);
+                    });
+                }
+            }
+        });
+
+        createOptions(allOptions);
+        createBadges(); 
+
+        container[0].getValue = function() {
+            if (multiple) {
+                return selectedOptions;
+            } 
+            return selectedOptions[0];
+        };
+
+        container.find('#createOptionModal-' + params.id).on('show.bs.modal', function() {
+            var modalBody = $(this).find('.modal-body');
+            if (formLoadMap[params.model]) {
+                formLoadMap[params.model](modalBody);
+            }
+        });
+
+        container[0].addEventListener = eventTarget.addEventListener.bind(eventTarget);
+        container[0].setValue = function(values) {
+            if (multiple) {
+                updateSelectedOptions(values, false);
+            } else {
+                updateSelectedOptions([values], false);
+            }
+            createOptions(allOptions);
+            createBadges();
+        };
+
+    })({
+        id: '{{id}}',
+        multiple: '{{multiple}}',
+        model: '{{model}}',
+        selected_values: '{{selected_values}}' ? JSON.parse('{{selected_values|escapejs}}') : []
+    }) 
+});</script>
+

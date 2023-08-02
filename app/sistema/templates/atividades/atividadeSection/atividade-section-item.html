@@ -5,7 +5,8 @@ class="w-100">
         <div class="visible-handle drag-handle pr-2 pl-1" style="cursor: grab; color: white">   <!-- Add this div as a drag handle -->
             <i class="fas fa-bars"></i>   <!-- This is a 'drag' icon from Font Awesome. You can replace it with your own icon -->
         </div>
-        <button class="btn btn-success btn-sm" 
+        <button type="button" 
+            class="btn btn-success btn-sm" 
             id="btn-collapse-{{atividadeSection.id}}"
             data-toggle="collapse" 
             data-target="#collapsable-{{atividadeSection.id}}" 
@@ -33,32 +34,36 @@ class="w-100">
                     <i class="fas fa-ellipsis-h visible-handle"></i>
                 </button>
                 <div class="multilevel-dropdown-menu">
-                    <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2"
+                    <button type="button" class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2"
                     onclick="renameAtividadeSection('{{atividadeSection.id}}')">
                         <i class="fas fa-pen mx-1"></i>
                         <span>Renomear seção</span>
                     </button>
                     <div class="nested-multilevel-dropdown">
-                        <button class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2" 
+                        <button type="button"
+                        class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2" 
                         data-toggle="dropdown">
                             <i class="fa-sharp fa-solid fa-bars-staggered"></i>
                             <span>Adicionar uma sessão</span>
                             <i class="fas fa-chevron-right"></i>
                         </button>
                         <div class="nested-dropdown-menu">
-                            <button onclick="addAtividadeSection('{{atividadeSection.id}}', 'above')" 
+                            <button type="button"
+                            onclick="addAtividadeSection('{{atividadeSection.id}}', 'above')" 
                             class="dropdown-item btn btn-success btn-sm dropdown-item m-0 px-1 py-2">
                                 <i class="fas fa-arrow-up"></i>
                                 <span>Adicionar sessão acima</span>
                             </button>
-                            <button onclick="addAtividadeSection('{{atividadeSection.id}}', 'below')" 
+                            <button type="button"
+                            onclick="addAtividadeSection('{{atividadeSection.id}}', 'below')" 
                             class="dropdown-item btn btn-success btn-sm dropdown-item m-0 px-1 py-2">
                                 <i class="fas fa-arrow-down"></i>
                                 <span>Adicionar sessão abaixo</span>
                             </button>
                         </div>
                     </div>
-                    <button  onclick="openDeleteModal(() => removeAtividadeSection('{{atividadeSection.id}}'))"
+                    <button  type="button"
+                    onclick="openDeleteModal(() => removeAtividadeSection('{{atividadeSection.id}}'))"
                     class="btn btn-success btn-sm dropdown-item m-0 px-1 py-2 text-danger">
                         <i class="fas fa-trash mx-1"></i>
                         <span>Excluir</span>

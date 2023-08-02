@@ -25,6 +25,9 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "pessoa",
             "ticket_set",
             "itinerario",
-            "ticket_status"
+            "ticket_status",
+            "role",
+            "instituicao",
+            "proposta_projeto"
         ]
         depth = 4

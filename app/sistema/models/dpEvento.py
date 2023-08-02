@@ -3,6 +3,7 @@ from .cidade import Cidade
 from .escola import Escola
 from .alocacao import Alocacao
 from .ensino import Ensino
+from .propostaProjeto import PropostaProjeto
 from itertools import chain
 
 class DpEvento(models.Model):
@@ -44,6 +45,7 @@ class DpEvento(models.Model):
     horarioInicio = models.TimeField(null = True, blank= True)
     horarioFim = models.TimeField(null = True, blank= True)
     edicao = models.CharField(null = True, max_length=100, blank= True)
+    proposta_projeto = models.OneToOneField(PropostaProjeto, on_delete=models.SET_NULL, null=True, blank= True, related_name='evento')
     class Meta:
         db_table = 'dp_eventos'
 
@@ -116,6 +118,8 @@ class DpEvento(models.Model):
             return "Dias das Mulheres"
         elif self.tipo == self.OPEN_DAY:
             return "Open Day"
+        elif self.tipo:
+            return self.tipo
         return "Evento não identificado"
     
     @property

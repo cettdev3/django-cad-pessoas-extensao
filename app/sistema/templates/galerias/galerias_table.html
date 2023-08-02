@@ -57,7 +57,7 @@ cellspacing="0">
                             id="hiddenMenuContainer{{galeria.id}}" 
                             class="btn-group-custom">
                                 <button onclick="openGaleriaModal('{{galeria.id}}')">Editar</button> 
-                                <button onclick="openDeleteModal(() => deletarGaleria('{{galeria.id}}'))" >Excluir</button>
+                                {% comment %} <button onclick="openDeleteModal(() => deletarGaleria('{{galeria.id}}'))" >Excluir</button> {% endcomment %}
                             </div>
                         </div>
                     </div>

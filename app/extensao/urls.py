@@ -59,6 +59,30 @@ from sistema.views.siteServicosContratadosViews import servicoContratadoModal, s
 from sistema.views.siteUserViews import usersSelect
 from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda, demandasSelect
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
+from sistema.views.cotecViews.projetosCotecViews import (
+    projetoCotecForm, 
+    projetoCotecIndex, 
+    pessoaModal, 
+    pessoaCreate, 
+    selectMultipleComponent, 
+    createPropostaProjeto, 
+    propostasTable, 
+    updateAtividade, 
+    createAtividade, 
+    removeAtividade, 
+    updateMembroEquipe, 
+    createMembroEquipe, 
+    removeMembroEquipe,
+    updateItemOrcamento, 
+    createItemOrcamento, 
+    removeItemOrcamento,
+    projetoCotecSuccess,
+    updatePropostaProjeto,
+    removePropostaProjeto,
+    showPropostaProjeto,
+    createProjetoFromProposta
+)
+
 from sistema.views.siteGaleriaViews import (
     galeriaModal,
     galeriaTable,
@@ -71,7 +95,7 @@ from sistema.views.siteAtividadeSectionViews import (
     saveAtividadeSection,
     deleteAtividadeSection,
     updateAtividadeSection,
-    atividadeSectionComponent
+    atividadeSectionComponent,
 )
 
 from sistema.views.siteImagemViews import (
@@ -82,6 +106,13 @@ from sistema.views.siteImagemViews import (
 from sistema.views.siteAnexoViews import (
     deleteAnexo,
     saveAnexo
+)
+
+
+from sistema.views.siteComentarioViews import (
+    # updateComentario, 
+    createComentario, 
+    # removeComentario
 )
 
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
@@ -95,6 +126,7 @@ from sistema.views.dpEventoApiViews import DpEventoApiView, DpEventoDetailApiVie
 from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 from sistema.views.atividadeSectionApiViews import AtividadeSectionApiView, AtividadeSectionDetailApiView
 from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
+from sistema.views.comentarioApiViews import ComentarioApiView, ComentarioDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -113,6 +145,7 @@ router.register(r'auth-pessoas', PessoaViewSets, 'pessoas')
 # router.register(r'migrations', MigrationsViewSets, 'update-atividades-extensao')
 # router.register(r'migrations', MigrationsViewSets, 'create-atividade-categorias')
 # router.register(r'migrations', MigrationsViewSets, 'set-atividade-categorias')
+router.register(r'migrations', MigrationsViewSets, 'create-cidades')
 
 # router.register(r'tickets', TicketViewSets, 'complete-prestacao-contas')
 
@@ -127,16 +160,44 @@ urlpatterns = [
     path("editarPessoa/<codigo>", editarPessoa),
     path("edicaoPessoa",edicaoPessoa),
     path("registrar",registrar),
+    
+    # ROTAS DO COTEC
+    path("cotec-projeto-index", projetoCotecIndex, name="cotec-projeto-index"),
+    path("cotec-projeto-success", projetoCotecSuccess, name="cotec-projeto-success"),
+    path("cotec-projeto-form", projetoCotecForm, name="cotec-projeto-form"),
+    path("pessoa-modal", pessoaModal, name="pessoa-modal"),
+    path("pessoa-create", pessoaCreate, name="pessoa-create"),
+    path("select-multiple-component", selectMultipleComponent, name="select-multiple-component"),
+    path("create-proposta-projeto", createPropostaProjeto, name="create-proposta-projeto"),
+    path("update-proposta-projeto/<pk>", updatePropostaProjeto, name="update-proposta-projeto"),
+    path("remove-proposta-projeto/<pk>", removePropostaProjeto, name="remove-proposta-projeto"),
+    path("create-projeto-proposta/<pk>", createProjetoFromProposta, name="create-projeto-proposta"),
+    path("show-proposta-projeto/<pk>", showPropostaProjeto, name="show-proposta-projeto"),
+    path("proposta-projeto-table", propostasTable, name="proposta-projeto-table"),
+    path("update-atividade/<pk>", updateAtividade, name="update-atividade"),
+    path("create-atividade", createAtividade, name="create-atividade"),
+    path("remove-atividade/<pk>", removeAtividade, name="remove-atividade"),
+    path("update-membro-equipe/<pk>", updateMembroEquipe, name="update-membro-equipe"),
+    path("create-membro-equipe", createMembroEquipe, name="create-membro-equipe"),
+    path("remove-membro-equipe/<pk>", removeMembroEquipe, name="remove-membro-equipe"),
+    path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
+    path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
+    path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
+    
+    # ROTAS PARA COMENTARIOS
+    # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
+    path("create-comentario", createComentario, name="create-comentario"),
+    # path("remove-comentario/<pk>", removeComentario, name="remove-comentario"),
 
     # ROTAS PARA PESSOAS
-    path("",gerencia_pessoas),
-    path("home",gerencia_pessoas),
+    path("",gerencia_dp_eventos),
+    path("home",gerencia_dp_eventos, name="home"),
     path("gerenciar-pessoas",gerencia_pessoas),
     path("pessoasTable",pessoasTable),
     path("pessoasSelect",pessoasSelect),
     path("pessoasModalCadastrar",pessoasModalCadastrar),
     path("pessoasModalAlocar",pessoasModalAlocar),
-    path("cursosSelect", cursosSelect),
+    path("cursosSelect", cursosSelect, name="cursos-select"),
     path("cadastrar-pessoas",cadastrar_pessoas),
     path("savePessoa", savePessoa),
     path("editarPessoa/<codigo>", editarPessoa),
@@ -288,7 +349,7 @@ urlpatterns = [
     path("eliminarDpEvento/<codigo>", eliminarDpEvento), 
     path("editarDpEvento/<codigo>", editarDpEvento), 
     path("acoesSelect", acoesSelect),
-    path("visualizarDpEvento/<codigo>", visualizarDpEvento),
+    path("visualizarDpEvento/<codigo>", visualizarDpEvento, name="visualizar-dp-evento"),
     path("relatorioPorEvento/<evento_id>", relatorioPorEvento),
     path("relatorioDpEvento", relatorioDpEvento),
     path("relatorioSintetico", relatorioSintetico),
@@ -331,7 +392,7 @@ urlpatterns = [
     # ROTAS PARA COMPONENTES
     path("calendario",calendario),
     path("filtrosRelatorioEventosModal",filtrosRelatorioEventosModal),
-    path("confirmDeleteModal",confirmDeleteModal),
+    path("confirmDeleteModal",confirmDeleteModal, name="confirm-delete-modal"),
     path("filterMultipleSelect", filterMultipleSelect),
 
     # ROTAS PARA SERVICOS CONTRATADOS
@@ -401,8 +462,8 @@ urlpatterns = [
     path("acoes", AcaoApiView.as_view()),
     path('acoes/<int:acao_id>', AcaoDetailApiView.as_view()),
    
-    path("membroExecucao", MembroExecucaoApiView.as_view()),
-    path('membroExecucao/<int:membro_execucao_id>', MembroExecucaoDetailApiView.as_view()),
+    path("membroExecucao", MembroExecucaoApiView.as_view(), name="membroExecucao"),
+    path('membroExecucao/<int:membro_execucao_id>', MembroExecucaoDetailApiView.as_view(), name="membroExecucaoDetail"),
     
     path("tickets", TicketApiView.as_view()),
     path('tickets/<int:ticket_id>', TicketDetailApiView.as_view()),
@@ -438,6 +499,9 @@ urlpatterns = [
 
     path("anexos", AnexoApiView.as_view()),
     path('anexos/<int:anexo_id>', AnexoDetailApiView.as_view()),
+    
+    path("comentarios", ComentarioApiView.as_view()),
+    path('comentarios/<int:comentario_id>', ComentarioDetailApiView.as_view()),
     
 
     # ROTAS DE AUTENTICAÇÂO

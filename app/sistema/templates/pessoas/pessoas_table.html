@@ -37,27 +37,12 @@
                     <span class="column-label ml-1">Cargo</span>
                 </div>
             </th>
-            <th class="w-10 text-left clickable-column" id="column-pessoa-tipo" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(
-                    this,
-                    'tipo', 
-                    'filterPessoa_order_by', 
-                    (state) => carregarPessoas(getFiltros(), state)
-                )" 
-                title="Ordenar por Tipo">
+            <th class="w-10 text-left clickable-column" id="column-pessoa-instituicao" data-toggle="tooltip"
+                data-placement="top" onclick="orderTableBy(this, 'instituicao', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))" title="Ordenar por Instituição">
                 <div class="d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-down-a-z arrow-down"></i>
                     <i class="fa-solid fa-arrow-down-z-a arrow-up"></i>
-                    <span class="column-label ml-1">Tipo</span>
-                </div>
-            </th>
-            <th class="w-10 text-left clickable-column" id="column-pessoa-contratacoes" data-toggle="tooltip"
-                data-placement="top" onclick="orderTableBy(this,'qtd_contratacoes', 'filterPessoa_order_by', (state) => carregarPessoas(getFiltros(), state))"
-                title="Ordenar por Quantidade de Contratações">
-                <div class="d-flex justify-content-start align-items-center">
-                    <i class="fa-solid fa-arrow-down-1-9 arrow-down"></i>
-                    <i class="fa-solid fa-arrow-down-9-1 arrow-up"></i>
-                    <span class="column-label ml-1">Contratações</span>
+                    <span class="column-label ml-1">Instituição</span>
                 </div>
             </th>
             <th class="w-2 text-left">Ação</th>
@@ -80,8 +65,7 @@
             <td class="w-10 text-left">{{pessoa.email}}</td>
             <td class="w-10 text-left">{{pessoa.telefone}}</td>
             <td class="w-10 text-left">{{pessoa.cargo}}</td>
-            <td class="w-10 text-left">{{pessoa.tipo}}</td>
-            <td class="w-10 text-left">{{pessoa.qtd_contratacoes}}</td>
+            <td class="w-10 text-left">{{pessoa.instituicao_formatada}}</td>
             <td class="w-2 text-left" style="position: relative;">
                 <button id="buttonMenuPessoas{{pessoa.id}}" class="btn-circle">
                     <i class="fa-solid fa-ellipsis-vertical"></i>

@@ -216,7 +216,6 @@ def getFilteredEventos(filters, formatType="type 1"):
     if formatType == "type 2":
         return eventos
     for evento in eventos:
-        print(evento.id, evento.atividade_set.count())
         if evento.atividade_set.count() == 0:
             continue
         tipo = evento.tipo_formatado
@@ -244,11 +243,23 @@ def getSectionTitle(doc, nomeEvento):
     return doc
 
 
-def getCidade(doc, atividade):
-    cidade = atividade.cidade
+def getCidade(doc, atividade: Atividade):
+    evento = atividade.evento
+    acaoEnsino = None
+    cidade = "Não Informado"
+    if evento:
+        acaoEnsino = evento.acaoEnsino
+        
+    if atividade.cidade:
+        cidade = atividade.cidade.nome
+    elif evento and evento.cidade:
+        cidade = evento.cidade.nome
+    elif acaoEnsino and acaoEnsino.cidade:
+        cidade = acaoEnsino.cidade.nome
+
     cidadeParagraph = doc.add_paragraph()
     cidadeParagraph.add_run(f"Cidade:").bold = True
-    cidadeTexto = cidade.nome if cidade else "Não Informado"
+    cidadeTexto = cidade
     cidadeParagraph.add_run(f" {cidadeTexto}")
     cidadeParagraphFormat = cidadeParagraph.paragraph_format
     cidadeParagraphFormat.space_after = Pt(0)
@@ -307,8 +318,21 @@ def getData(doc, atividade):
     return doc
 
 
-def getLocal(doc, atividade):
-    local = atividade.endereco_completo
+def getLocal(doc, atividade: Atividade):
+    evento = atividade.evento
+    acaoEnsino = None
+    if evento:
+        acaoEnsino = evento.acaoEnsino
+    local = ""
+    if atividade.endereco_completo and len(atividade.endereco_completo) > 0:
+        local = atividade.endereco_completo
+    elif evento.endereco_completo and len(evento.endereco_completo) > 0:
+        local = evento.endereco_completo
+    elif acaoEnsino and len(acaoEnsino.endereco_completo) > 0:
+        local = acaoEnsino.endereco_completo
+    else:
+        local = "Não Informado"
+
     localParagraph = doc.add_paragraph()
     localParagraph.add_run(f"Local:").bold = True
     localParagraph.add_run(f" {local}")

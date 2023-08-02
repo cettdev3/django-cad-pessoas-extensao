@@ -16,6 +16,7 @@ from ..models.imagem import Imagem
 from ..models.galeria import Galeria
 from ..models.avaliacao import Avaliacao
 from ..models.dpEventoEscola import DpEventoEscola
+from ..models.propostaProjeto import PropostaProjeto
 from ..models.itinerarioItem import ItinerarioItem
 from ..models.membroExecucao import MembroExecucao
 from ..serializers.dpEventoSerializer import DpEventoSerializer
@@ -120,7 +121,16 @@ class DpEventoApiView(APIView):
         edicao = None
         if postDpEventoData["edicao"]:
             edicao = postDpEventoData["edicao"]
-
+        
+        proposta_projeto = None
+        if postDpEventoData["proposta_projeto_id"]:
+            proposta_projeto = self.get_object(PropostaProjeto, postDpEventoData["proposta_projeto_id"])
+            if not proposta_projeto:
+                return Response(
+                    {"res": "Não existe proposta de projeto com o id informado"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            
         dp_eventoData = {
             "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
             "descricao": postDpEventoData["descricao"] if postDpEventoData["descricao"] else None,
@@ -135,6 +145,7 @@ class DpEventoApiView(APIView):
             "horarioInicio": horarioInicio,
             "horarioFim": horarioFim,
             "edicao": edicao,
+            "proposta_projeto": proposta_projeto,
         }
 
         with transaction.atomic():

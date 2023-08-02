@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'sistema.middlewares.camundaMiddleware.CamundaMiddleware',
+    'sistema.middlewares.instituicaoMiddleware.InstituicaoMiddleware',
 ]
 
 ROOT_URLCONF = 'extensao.urls'

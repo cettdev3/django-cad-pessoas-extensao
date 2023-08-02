@@ -4,8 +4,15 @@ from ..models.pessoa import Pessoas
 from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.itinerario import Itinerario
+from ..models.propostaProjeto import PropostaProjeto
 
 class MembroExecucao(models.Model):    
+    ROLE_CHOICES = (
+        ('responsavel', 'Responsável'),
+        ('proponente', 'Proponente'),
+        ('executor', 'Executor'),
+    )
+
     id = models.AutoField(primary_key=True)
     data_inicio = models.DateField(null = True, blank= True)
     data_fim = models.DateField(null = True, blank= True)
@@ -21,7 +28,9 @@ class MembroExecucao(models.Model):
     itinerario = models.ForeignKey(Itinerario, on_delete=models.SET_NULL, null=True, blank= True)
     avaliador = models.BooleanField(default=False, null = True, blank= True)
     observacao = models.CharField(null = True, max_length=250, blank= True)
-
+    proposta_projeto = models.ForeignKey(PropostaProjeto, on_delete=models.SET_NULL, null=True, blank= True, related_name='equipe')
+    role = models.CharField(null = True, max_length=100, blank= True)
+    instituicao = models.CharField(null = True, max_length=1000, blank= True)
     class Meta:
         db_table = 'membros_execucao'
     
