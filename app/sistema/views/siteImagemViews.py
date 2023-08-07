@@ -14,6 +14,7 @@ def saveImagem(request):
     url = 'http://localhost:8000/imagens/' + str(galeria_id) if galeria_id else 'http://localhost:8000/imagens'
     body = payload
     response = None
+    error = None
     if galeria_id:
         response = requests.put(url, json=body, headers=headers)
     else:

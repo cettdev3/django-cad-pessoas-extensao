@@ -118,6 +118,8 @@ class ImagemDetailApiView(APIView):
         data = {}
         if request.data.get("descricao"):
             data["descricao"] = request.data.get("descricao")
+        if request.data.get("show_on_report") != None:
+            data["show_on_report"] = request.data.get("show_on_report")
 
         serializer = ImagemSerializer(instance=imagem, data=data, partial=True)
         if serializer.is_valid():

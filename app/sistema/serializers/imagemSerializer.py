@@ -10,4 +10,5 @@ class ImagemSerializer(serializers.ModelSerializer):
             "id_alfresco",
             "descricao",
             "shared_link",
+            "show_on_report"
         ]

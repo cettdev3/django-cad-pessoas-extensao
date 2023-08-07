@@ -405,44 +405,50 @@ def getAtividadeImage(doc: Document, atividade, counter):
     galeria = atividade.galeria 
     if not galeria:
         return doc
-
-    imagem = atividade.galeria.imagem_set.first()
-    if not imagem:
-        return doc
     
-    alfresco_api = AlfrescoAPI()
-    image_path = f"tmp/{imagem.id_alfresco}.jpg"
-    alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
+    imagens = galeria.imagem_set.filter(show_on_report=True)
+    if len(imagens) == 0:
+        imagens = galeria.imagem_set.all()
+        if len(imagens) > 0:
+            imagens = [imagens.first()] if imagens else []
+        else:
+            return doc, counter
+    
+    for imagem in imagens:        
+        alfresco_api = AlfrescoAPI()
+        image_path = f"tmp/{imagem.id_alfresco}.jpg"
+        alfresco_api.getNodeContent(image_path, imagem.id_alfresco)
 
-    try:
-        img = Image.open(image_path)
-        img.save(image_path)
-    except IOError:
-        print("Error: Unable to read or save the image using Pillow")
-
-    p = doc.add_paragraph()
-    p.add_run(f"Figura {counter}: {imagem.descricao}")
-    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-
-    try:
-        img_paragraph = doc.add_paragraph()
-        img_run = img_paragraph.add_run()
-        img_run.add_picture(image_path, width=Inches(4.0))
-        img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    except Exception as e:
-        error_message = (
-            f"Error: Unable to recognize the image format for {imagem.descricao}."
-        )
-        p = doc.add_paragraph()
-        p.add_run(error_message)
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    finally:
         try:
-            os.remove(image_path)
-        except Exception as e:
-            print(f"Error: Unable to delete the image file: {e}")
+            img = Image.open(image_path)
+            img.save(image_path)
+        except IOError:
+            print("Error: Unable to read or save the image using Pillow")
 
-    return doc
+        p = doc.add_paragraph()
+        p.add_run(f"Figura {counter}: {imagem.descricao}")
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+        try:
+            img_paragraph = doc.add_paragraph()
+            img_run = img_paragraph.add_run()
+            img_run.add_picture(image_path, width=Inches(4.0))
+            img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        except Exception as e:
+            error_message = (
+                f"Error: Unable to recognize the image format for {imagem.descricao}."
+            )
+            p = doc.add_paragraph()
+            p.add_run(error_message)
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        finally:
+            try:
+                os.remove(image_path)
+            except Exception as e:
+                print(f"Error: Unable to delete the image file: {e}")
+        counter += 1
+
+    return doc, counter
 
 
 def getAtividade(doc, atividade, counter):
@@ -455,9 +461,9 @@ def getAtividade(doc, atividade, counter):
         doc = getEtapa(doc, atividade)
     doc = getSubAtividades(doc, atividade)
     doc.add_paragraph()
-    doc = getAtividadeImage(doc, atividade, counter)
+    doc, counter = getAtividadeImage(doc, atividade, counter)
     doc.add_paragraph()
-    return doc
+    return doc, counter
 
 
 def reportEventos(eventos):
@@ -469,7 +475,7 @@ def reportEventos(eventos):
 
 
 def getRelatorioType1(doc, relatorioData):
-    counter = 0
+    counter = 1
     for nomeEvento, eventos in relatorioData.items():
         if not reportEventos(eventos):
             continue
@@ -486,13 +492,11 @@ def getRelatorioType1(doc, relatorioData):
                     old_evento = current_evento
                 tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else atividade.nome
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
-                counter = counter + 1
-                doc = getAtividade(doc, atividade, counter)
+                doc, counter = getAtividade(doc, atividade, counter)
     return doc
 
 
 def getRelatorioType2(doc, relatorioData):
-    # Initialize a Counter for status
     status_counter = Counter()
     tipo_counter = Counter()
     for evento in relatorioData:

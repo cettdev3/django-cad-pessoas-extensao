@@ -7,6 +7,7 @@ class Imagem(models.Model):
     descricao = models.CharField(null = True, max_length=100)
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True)
     shared_link = models.CharField(null = True, max_length=500)
+    show_on_report = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'imagens'

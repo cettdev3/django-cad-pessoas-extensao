@@ -10,6 +10,20 @@ data-uuid="{{imagem.id}}"
 {% else %}
 data-uuid=""
 {% endif %}>
+    <div class="d-flex justify-content-start">
+        <!-- checkbox input show_on_report -->
+        <label class="cursor-pointer" for="show_on_report-{{imagem.id}}">
+            <input type="checkbox" id="show_on_report-{{imagem.id}}" name="show_on_report" 
+            {% if imagem %}
+            {% if imagem.show_on_report %}
+            checked
+            {% endif %}
+            {% endif %}
+            >
+            <span class="custom-checkbox"></span>
+            <span class="custom-checkbox-label">Mostrar no relatório:</span>
+        </label>
+    </div>
     <div
     class="custom-image-thumbnail "
     {% if thumbnailStyle %}
@@ -58,9 +72,9 @@ data-uuid=""
     </div>
     
     {% if thumbnailStyle %}
-        <div class="container position-relative" style="padding: 0px; padding-left: 25px">
+    <div class="container position-relative" style="padding: 0px; padding-left: 25px">
     {% else %}
-        <div class="container position-relative">
+    <div class="container position-relative">
     {% endif %}
         <span class="fa-stack custom-prepend-descricao" data-toggle="tooltip" data-placement="top"
             title="Descrição da imagem">
@@ -105,6 +119,12 @@ data-uuid=""
                     console.log("input descricao mudou dentro da thumbnail");
                     saveImage();
                 }, 1000));
+
+                let checkboxShowOnReport = $("#" + thumbnailId).find("#show_on_report-"+params.imagem_id);
+                checkboxShowOnReport.on("change", function() {
+                    console.log("checkbox show on report mudou dentro da thumbnail");
+                    saveImage();
+                });
             }
 
             function saveImage() {
@@ -120,6 +140,7 @@ data-uuid=""
                     data: JSON.stringify({
                         imagem_id: params.imagem_id,
                         descricao: $("#" + thumbnailId).find(".image-descricao-input").val(),
+                        show_on_report: $("#" + thumbnailId).find("#show_on_report-"+params.imagem_id).is(":checked"),
                         dataUrl: imageDataUrl,
                         galeria_id: inputGaleriaId.val()
                     }),
