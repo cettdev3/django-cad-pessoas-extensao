@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container my-3" style="width: 80%; margin: 0 auto;">
 
     <div class="dropdown position-fixed" style="right: 10px;">
         <button class="btn btn-primary" type="button" id="commentsButton" data-bs-toggle="offcanvas"
@@ -64,8 +64,7 @@
             {% endfor %}
         </div>
 
-        <!-- Add your new textarea and button here -->
-        <div class="p-3">
+        <!-- <div class="p-3">
             <div class="input-group">
                 <textarea class="form-control" id="newComment" rows="3" placeholder="Adicione um comentário..."></textarea>
                 <div class="input-group-append">
@@ -74,7 +73,7 @@
                     </button>
                 </div>
             </div>            
-        </div>
+        </div> -->
     </div>
 
     <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
@@ -103,20 +102,20 @@
     </div>
     <h2>{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
     {% for proponente in proposta_projeto.proponentes %}
-    <p>Proponente: {{ proponente.pessoa.nome }}</p>
+    <p><strong>Proponente</strong>: {{ proponente.pessoa.nome }}</p>
     {% endfor %}
-    <p>Data de Início: {{ proposta_projeto.data_inicio|date:"d/m/Y" }}</p>
-    <p>Data de Término: {{ proposta_projeto.data_fim|date:"d/m/Y" }}</p>
-    <p>Resumo Proposta: {{ proposta_projeto.resumo_proposta }}</p>
-    <p>Objetivos Gerais: {{ proposta_projeto.objetivos_gerais }}</p>
-    <p>Objetivos Específicos: {{ proposta_projeto.objetivos_especificos }}</p>
-    <p>Metodologia: {{ proposta_projeto.metodologia }}</p>
-    <p>Formato Conteúdo: {{ proposta_projeto.formato_conteudo }}</p>
-    <p>Justificativas: {{ proposta_projeto.justificativas }}</p>
-    <p>Resultados Esperados: {{ proposta_projeto.resultados_esperados }}</p>
-    <p>Fontes Apoio: {{ proposta_projeto.fontes_apoio }}</p>
-    <p>Informações Adicionais: {{ proposta_projeto.informacoes_adicionais }}</p>
-    <p>Público Alvo: {{ proposta_projeto.publico_alvo }}</p>
+    <p><strong>Data de Início</strong>: {{ proposta_projeto.data_inicio|date:"d/m/Y" }}</p>
+    <p><strong>Data de Término</strong>: {{ proposta_projeto.data_fim|date:"d/m/Y" }}</p>
+    <p><strong>Resumo Proposta</strong>: {{ proposta_projeto.resumo_proposta }}</p>
+    <p><strong>Objetivos Gerais</strong>: {{ proposta_projeto.objetivos_gerais }}</p>
+    <p><strong>Objetivos Específicos</strong>: {{ proposta_projeto.objetivos_especificos }}</p>
+    <p><strong>Metodologia</strong>: {{ proposta_projeto.metodologia }}</p>
+    <p><strong>Formato Conteúdo</strong>: {{ proposta_projeto.formato_conteudo }}</p>
+    <p><strong>Justificativas</strong>: {{ proposta_projeto.justificativas }}</p>
+    <p><strong>Resultados Esperados</strong>: {{ proposta_projeto.resultados_esperados }}</p>
+    <p><strong>Fontes Apoio</strong>: {{ proposta_projeto.fontes_apoio }}</p>
+    <p><strong>Informações Adicionais</strong>: {{ proposta_projeto.informacoes_adicionais }}</p>
+    <p><strong>Público Alvo</strong>: {{ proposta_projeto.publico_alvo }}</p>
 
     <h3>Orçamento</h3>
     <table class="table table-striped">
