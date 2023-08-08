@@ -39,19 +39,21 @@
                                     {% if proposta.evento %}
                                     <a class="dropdown-item cursor-pointer"
                                     href="{% url 'visualizar-dp-evento' proposta.evento.id %}">
-                                    Ver Projeto
+                                        Ver Projeto
                                     </a>
                                     {% endif %}
-                                    {% if user.pessoa.instituicao == "cett" %}
+                                    {% if user.pessoa.instituicao == "cett" or proposta.status == 'aprovada' %}
                                     <a href="{% url 'show-proposta-projeto' proposta.id %}"
                                     class="dropdown-item cursor-pointer">
                                         <span> Ver Proposta</span>
                                     </a>
                                     {% else %}
+                                    {% if proposta.status != 'aprovada' %}
                                     <a href="{% url 'cotec-projeto-form' %}?proposta_id={{ proposta.id }}"
                                     class="dropdown-item cursor-pointer">
                                         <span> Editar Proposta</span>
                                     </a>
+                                    {% endif %}
                                     {% endif %}
                                     <button class="dropdown-item cursor-pointer" 
                                     type="button"

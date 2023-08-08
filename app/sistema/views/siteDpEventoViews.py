@@ -9,6 +9,7 @@ from sistema.services.alfrescoApi import AlfrescoAPI
 from sistema.models.atividade import Atividade
 from sistema.models.galeria import Galeria
 from sistema.models.imagem import Imagem
+from sistema.models.pessoa import Pessoas
 from sistema.models.ticket import Ticket
 from sistema.models.anexo import Anexo
 from itertools import chain
@@ -166,7 +167,13 @@ def visualizarDpEvento(request, codigo):
     dpEvento = dpEvento.get(id=codigo)
 
     departamentos = Departamento.objects.all()
+    user = request.user
+    pessoaAuthenticada = Pessoas.objects.filter(user=user).first()
     path_back = "gerencia_dp_eventos"
+
+    if pessoaAuthenticada is not None and pessoaAuthenticada.instituicao == Pessoas.INSTITUICAO_ESCOLA:
+        path_back = "cotec-projeto-index"
+
     dpEvento = DpEventoSerializer(dpEvento).data
     categoriaAtividades = AtividadeCategoria.objects.all()
     return render(

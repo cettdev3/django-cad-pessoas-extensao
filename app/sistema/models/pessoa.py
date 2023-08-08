@@ -5,7 +5,10 @@ from ..models.escola import Escola
 from django.contrib.auth.models import User
 # Create your models here.
 class Pessoas(models.Model):
-
+    INSTITUICAO_CETT = 'cett'
+    INSTITUICAO_ESCOLA = 'escola'
+    INSTITUICAO_OUTROS = 'outros'
+    
     INSTITUICAO_CHOICES = (
         ('escola', 'Escola'),
         ('cett', 'CETT'),
