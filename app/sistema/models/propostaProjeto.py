@@ -3,12 +3,19 @@ from itertools import chain
 from django.utils import timezone
 
 class PropostaProjeto(models.Model):
+    STATUS_RASCUNHO = "rascunho"
+    STATUS_EM_ANALISE = "em_analise"
+    STATUS_DEVOLVIDA = "devolvida"
+    STATUS_APROVADA = "aprovada"
+    STATUS_REPROVADA = "reprovada"
+    STATUS_CANCELADA = "cancelada"
     STATUS_CHOICES = [
-        ('em_analise', 'Em análise'),
-        ('devolvida', 'Devolvida'),
-        ('aprovada', 'Aprovada'),
-        ('reprovada', 'Reprovada'),
-        ('cancelada', 'Cancelada'),
+        (STATUS_RASCUNHO, 'Rascunho'),
+        (STATUS_EM_ANALISE, 'Em análise'),
+        (STATUS_DEVOLVIDA, 'Devolvida'),
+        (STATUS_APROVADA, 'Aprovada'),
+        (STATUS_REPROVADA, 'Reprovada'),
+        (STATUS_CANCELADA, 'Cancelada'),
     ]
 
     titulo_projeto = models.CharField(max_length=255, null=True, blank=True)
@@ -44,3 +51,17 @@ class PropostaProjeto(models.Model):
     @property
     def status_formatado(self):
         return dict(self.STATUS_CHOICES)[self.status]
+    
+    @property
+    def read_only(self):
+        readOnly =  self.status != self.STATUS_RASCUNHO
+        readOnly = readOnly and self.status != self.STATUS_DEVOLVIDA 
+        return readOnly
+    
+    @property
+    def is_editable(self):
+        return self.status == self.STATUS_RASCUNHO or self.status == self.STATUS_DEVOLVIDA
+    
+    @property
+    def is_deleteable(self):
+        return self.status == self.STATUS_RASCUNHO

@@ -147,6 +147,10 @@ def createPropostaProjeto(request):
         proposta_projeto.publico_alvo = data.get("publico_alvo")
         proposta_projeto.orcamento = orcamento
         proposta_projeto.escola = pessoa.escola
+        if data.get("status"):
+            proposta_projeto.status = data.get("status")
+        else:
+            proposta_projeto.status = PropostaProjeto.STATUS_EM_ANALISE
         proposta_projeto.save() 
 
         for atividade in data.get("cronograma"):
@@ -200,10 +204,13 @@ def createPropostaProjeto(request):
             db_orcamento_item.valor = orcamento_item.get('valor')
             db_orcamento_item.valor_total = orcamento_item.get('valor_total')
             db_orcamento_item.save()
-    # try:
-    success = PropostaSubmetidaEmail(proposta_projeto).send()
-    # except Exception as e:
-    #     print(e)
+
+    if proposta_projeto.status == PropostaProjeto.STATUS_EM_ANALISE:
+        try:
+            success = PropostaSubmetidaEmail(proposta_projeto).send()
+        except Exception as e:
+            print(e)
+        
 
     return redirect('cotec-projeto-index')
 
@@ -247,12 +254,16 @@ def updatePropostaProjeto(request, pk):
 
 @login_required(login_url="/auth-user/login-user")
 def showPropostaProjeto(request, pk): 
+    pessoa = Pessoas.objects.get(user=request.user)
     proposta_projeto = PropostaProjeto.objects.get(pk=pk)
+    page_title = "Proposta de Projeto de Extensão"
     return render(
         request,
         "projetosCotec/projetosCotecPropostaShow.html",
         {
             "proposta_projeto": proposta_projeto,
+            "pessoa": pessoa,
+            "page_title": page_title,
         },
     )
 
@@ -288,12 +299,15 @@ def propostasTable(request):
         )
     if pessoa.instituicao != "cett" and pessoa.escola:
         propostas = propostas.filter(escola=pessoa.escola)
+    if pessoa.instituicao == "cett":
+        propostas = propostas.exclude(status=PropostaProjeto.STATUS_RASCUNHO)
     propostas = propostas.all()
     return render(
         request,
         "projetosCotec/projetosCotecPropostaTable.html",
         {
             "propostas": propostas,
+            "pessoa": pessoa,
         },
     )
 

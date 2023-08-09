@@ -5,7 +5,8 @@ import envconfiguration as config
 
 class PropostaSubmetidaEmail:
     def __init__(self, proposta_projeto: PropostaProjeto):
-        self.recipient = ["gerente.operacional@cett.org.br", "coordenacao.extensao@cett.org.br", "kaikebsilva62@gmail.com"]
+        # "gerente.operacional@cett.org.br", "coordenacao.extensao@cett.org.br",
+        self.recipient = ["kaikebsilva62@gmail.com"]
         self.titulo_projeto = proposta_projeto.titulo_projeto
         self.proposta_url = config.BASE_URL+"/show-proposta-projeto/"+str(proposta_projeto.pk)
         self.nome_proponente = MembroExecucao.objects.filter(

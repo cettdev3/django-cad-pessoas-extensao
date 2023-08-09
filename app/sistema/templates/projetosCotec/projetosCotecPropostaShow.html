@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="container my-3" style="width: 80%; margin: 0 auto;">
-
     <div class="dropdown position-fixed" style="right: 10px;">
         <button class="btn btn-primary" type="button" id="commentsButton" data-bs-toggle="offcanvas"
-            data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
-            <i class="fa fa-comment"></i>
+        data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
+        <i class="fa fa-comment"></i>
         </button>
+        {% if pessoa.instituicao == 'cett' %}
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Opções
@@ -41,7 +41,34 @@
             {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
     </div>
+    {% if pessoa.instituicao == 'cett' %}
+    <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="justificativaForm">
+                        <div class="form-group">
+                            <label for="justificativa">Justificativa</label>
+                            <textarea class="form-control" id="justificativa" name="justificativa" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" id="submitJustificativa" class="btn btn-primary">Devolver ao autor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="offcanvas offcanvas-end" tabindex="-1" id="commentsOffcanvas" aria-labelledby="commentsOffcanvasLabel"
         style="width: 30%;">
@@ -74,31 +101,6 @@
                 </div>
             </div>            
         </div> -->
-    </div>
-
-    <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="justificativaForm">
-                        <div class="form-group">
-                            <label for="justificativa">Justificativa</label>
-                            <textarea class="form-control" id="justificativa" name="justificativa" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" id="submitJustificativa" class="btn btn-primary">Devolver ao autor</button>
-                </div>
-            </div>
-        </div>
     </div>
     <h2>{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
     {% for proponente in proposta_projeto.proponentes %}

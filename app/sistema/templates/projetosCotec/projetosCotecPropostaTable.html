@@ -42,25 +42,26 @@
                                         Ver Projeto
                                     </a>
                                     {% endif %}
-                                    {% if user.pessoa.instituicao == "cett" or proposta.status == 'aprovada' %}
                                     <a href="{% url 'show-proposta-projeto' proposta.id %}"
                                     class="dropdown-item cursor-pointer">
                                         <span> Ver Proposta</span>
                                     </a>
-                                    {% else %}
-                                    {% if proposta.status != 'aprovada' %}
+                                    {% if pessoa.instituicao != 'cett' %}
+                                    {% if proposta.is_editable  %}
                                     <a href="{% url 'cotec-projeto-form' %}?proposta_id={{ proposta.id }}"
                                     class="dropdown-item cursor-pointer">
                                         <span> Editar Proposta</span>
                                     </a>
                                     {% endif %}
                                     {% endif %}
+                                    {% if proposta.is_deleteable  %}
                                     <button class="dropdown-item cursor-pointer" 
                                     type="button"
                                     id="btn-excluir-proposta"
                                     data-proposta-projeto-id="{{ proposta.id }}">
                                         Excluir
                                     </button>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
