@@ -4,13 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.forms.models import model_to_dict
 import json
 from django.http import JsonResponse
-from sistema.models import PropostaProjeto, DpEvento, DpEventoEscola, Escola, Galeria, AtividadeSection, TipoAtividade, AtividadeCategoria
+from sistema.models import PropostaProjeto, DpEvento, DpEventoEscola, Escola, Galeria, AtividadeSection, AtividadeCategoria
 from django.db import transaction
 import requests
 from rest_framework.authtoken.models import Token
-from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
+from sistema.emailtemplates import PropostaSubmetidaEmail
 
 @login_required(login_url="/auth-user/login-user")
 def projetoCotecIndex(request):
@@ -125,14 +124,17 @@ def createPropostaProjeto(request):
     pessoa = Pessoas.objects.get(user=user)
     if not pessoa.escola:
         return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter propostas!"}, status=400)
-
+    
+    proposta_projeto = None
     with transaction.atomic():
         orcamento = Orcamento()
         orcamento.save()
         proposta_projeto = PropostaProjeto()
         proposta_projeto.titulo_projeto = data.get("titulo_projeto")
-        proposta_projeto.data_inicio = data.get("data_inicio")
-        proposta_projeto.data_fim = data.get("data_fim")
+        if data.get("data_inicio"):
+            proposta_projeto.data_inicio = data.get("data_inicio")
+        if data.get("data_fim"):
+            proposta_projeto.data_fim = data.get("data_fim")
         proposta_projeto.resumo_proposta = data.get("resumo_proposta")
         proposta_projeto.objetivos_gerais = data.get("objetivos_gerais")
         proposta_projeto.objetivos_especificos = data.get("objetivos_especificos")
@@ -198,6 +200,11 @@ def createPropostaProjeto(request):
             db_orcamento_item.valor = orcamento_item.get('valor')
             db_orcamento_item.valor_total = orcamento_item.get('valor_total')
             db_orcamento_item.save()
+    try:
+        success = PropostaSubmetidaEmail(proposta_projeto).send()
+    except Exception as e:
+        print(e)
+
     return redirect('cotec-projeto-index')
 
 @login_required(login_url="/auth-user/login-user")

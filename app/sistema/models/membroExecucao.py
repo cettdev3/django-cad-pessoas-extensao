@@ -6,11 +6,15 @@ from ..models.dpEvento import DpEvento
 from ..models.itinerario import Itinerario
 from ..models.propostaProjeto import PropostaProjeto
 
-class MembroExecucao(models.Model):    
+class MembroExecucao(models.Model): 
+    ROLE_PROPONENTE = 'proponente'
+    ROLE_EXECUTOR = 'executor'
+    ROLE_RESPONSAVEL = 'responsavel'
+       
     ROLE_CHOICES = (
-        ('responsavel', 'Responsável'),
-        ('proponente', 'Proponente'),
-        ('executor', 'Executor'),
+        (ROLE_PROPONENTE, 'Responsável'),
+        (ROLE_EXECUTOR, 'Proponente'),
+        (ROLE_RESPONSAVEL, 'Executor'),
     )
 
     id = models.AutoField(primary_key=True)

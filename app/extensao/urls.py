@@ -183,7 +183,7 @@ urlpatterns = [
     path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
-    
+
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
     path("create-comentario", createComentario, name="create-comentario"),
