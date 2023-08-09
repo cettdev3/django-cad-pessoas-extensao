@@ -123,7 +123,7 @@ def createPropostaProjeto(request):
     user = request.user
     pessoa = Pessoas.objects.get(user=user)
     if not pessoa.escola:
-        return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter propostas!"}, status=400)
+        return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter uma proposta"}, status=400)
     
     proposta_projeto = None
     with transaction.atomic():
@@ -200,10 +200,10 @@ def createPropostaProjeto(request):
             db_orcamento_item.valor = orcamento_item.get('valor')
             db_orcamento_item.valor_total = orcamento_item.get('valor_total')
             db_orcamento_item.save()
-    try:
-        success = PropostaSubmetidaEmail(proposta_projeto).send()
-    except Exception as e:
-        print(e)
+    # try:
+    success = PropostaSubmetidaEmail(proposta_projeto).send()
+    # except Exception as e:
+    #     print(e)
 
     return redirect('cotec-projeto-index')
 

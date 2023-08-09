@@ -76,6 +76,7 @@ services:
       - MAIL_ACCOUNT=${MAIL_ACCOUNT}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - MAIL_FROM=${MAIL_FROM}
+      - BASE_URL=${BASE_URL}
     ports:
       - 8081:8000
     volumes:

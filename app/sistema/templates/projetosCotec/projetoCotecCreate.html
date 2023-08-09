@@ -311,7 +311,8 @@
             function (data) {
                 $(location).attr('href', "{% url 'cotec-projeto-success' %}?proposta_id={{proposta_projeto.id}}");
             }, function (error) {
-                console.log(error)
+                // console.log(error.responseJSON.message)
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
             })
         });
 
