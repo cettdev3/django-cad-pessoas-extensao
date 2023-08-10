@@ -209,29 +209,7 @@ def createPropostaProjeto(request):
 
     if proposta_projeto.status == PropostaProjeto.STATUS_EM_ANALISE:
         try:
-            response = requests.post(config.EXT_DEV_BASE_URL+"/token", json={
-                "username": config.EXT_DEV_USERNAME,
-                "password": config.EXT_DEV_PASSWORD
-            })
-            token = json.loads(response.content).get("access")
-
-            headers = {
-                'Authorization': f'Bearer {token}'
-            }
-
-            proposta_url = config.EXT_BASE_URL+"/show-proposta-projeto/"+str(proposta_projeto.pk)
-            nome_proponente = MembroExecucao.objects.filter(
-                proposta_projeto=proposta_projeto,
-                role=MembroExecucao.ROLE_PROPONENTE
-            ).first().pessoa.nome
-
-            responseEmail = requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
-                        headers=headers,
-                        json={
-                            'titulo_projeto': proposta_projeto.titulo_projeto,
-                            'nome_proponente': nome_proponente,
-                            'proposta_url': proposta_url
-                        })
+            success = PropostaSubmetidaEmail(proposta_projeto).send()
         except Exception as e:
             print(e)
         
@@ -524,29 +502,7 @@ def createProjetoFromProposta(request, pk):
 def publicSendEmail(request):
         proposta_projeto = PropostaProjeto.objects.get(pk=6)
         try:
-            response = requests.post(config.EXT_DEV_BASE_URL+"/token", json={
-                "username": config.EXT_DEV_USERNAME,
-                "password": config.EXT_DEV_PASSWORD
-            })
-            token = json.loads(response.content).get("access")
-
-            headers = {
-                'Authorization': f'Bearer {token}'
-            }
-
-            proposta_url = config.EXT_BASE_URL+"/show-proposta-projeto/"+str(proposta_projeto.pk)
-            nome_proponente = MembroExecucao.objects.filter(
-                proposta_projeto=proposta_projeto,
-                role=MembroExecucao.ROLE_PROPONENTE
-            ).first().pessoa.nome
-
-            responseEmail = requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
-                        headers=headers,
-                        json={
-                            'titulo_projeto': proposta_projeto.titulo_projeto,
-                            'nome_proponente': nome_proponente,
-                            'proposta_url': proposta_url
-                        })
+            success = PropostaSubmetidaEmail(proposta_projeto).send()
         except Exception as e:
             print(e)
 
