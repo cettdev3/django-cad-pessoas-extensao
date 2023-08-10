@@ -122,6 +122,7 @@ def createPropostaProjeto(request):
     data = json.loads(request.body.decode())
     user = request.user
     pessoa = Pessoas.objects.get(user=user)
+    print(pessoa.nome)
     if not pessoa.escola:
         return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter uma proposta"}, status=400)
     

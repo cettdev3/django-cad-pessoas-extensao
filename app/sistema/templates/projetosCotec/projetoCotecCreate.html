@@ -74,6 +74,7 @@
             <span class="badge badge-secondary step-badge" id="step-3-badge">3</span>
             <div class="step-line" id="line-3"></div>
             <span class="badge badge-secondary step-badge" id="step-4-badge">4</span>
+            {% if proposta_projeto.id %}
             <div class="ml-5 mr-2">
                 <span class="badge 
                 {% if proposta_projeto.status == 'rascunho' %}
@@ -89,6 +90,7 @@
                     {{proposta_projeto.status_formatado}}
                 </span>
             </div>
+            {% endif %}
         </div>
     </div>
     
@@ -402,7 +404,7 @@
 
             createPropostaProjeto(values, 
             function (data) {
-                $(location).attr('href', "{% url 'cotec-projeto-success' %}?proposta_id={{proposta_projeto.id}}");
+                $(location).attr('href', "{% url 'cotec-projeto-index' %}");
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             })
