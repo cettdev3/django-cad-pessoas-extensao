@@ -10,6 +10,7 @@ import requests
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
 from sistema.emailtemplates import PropostaSubmetidaEmail
+import envconfiguration as config
 
 @login_required(login_url="/auth-user/login-user")
 def projetoCotecIndex(request):
@@ -208,7 +209,23 @@ def createPropostaProjeto(request):
 
     if proposta_projeto.status == PropostaProjeto.STATUS_EM_ANALISE:
         try:
-            success = PropostaSubmetidaEmail(proposta_projeto).send()
+            response = requests.post(config.EXT_DEV_BASE_URL+"/token", json={
+                "username": config.EXT_DEV_USERNAME,
+                "password": config.EXT_DEV_PASSWORD
+            })
+
+            token = json.loads(response.content).get("access")
+
+            headers = {
+                'Authorization': f'Bearer {token}'
+            }
+
+            requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
+                        headers=headers,
+                        json={
+                            "email_type": "proposta_submetida",
+                            "model_id": proposta_projeto.pk
+                        })
         except Exception as e:
             print(e)
         
