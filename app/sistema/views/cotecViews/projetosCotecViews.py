@@ -500,7 +500,7 @@ def createProjetoFromProposta(request, pk):
     return JsonResponse({"message": "Projeto criado com sucesso!"})
 
 def publicSendEmail(request):
-        proposta_projeto = PropostaProjeto.objects.get(pk=6)
+        proposta_projeto = PropostaProjeto.objects.all().first()
         try:
             success = PropostaSubmetidaEmail(proposta_projeto).send()
         except Exception as e:

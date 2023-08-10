@@ -19,15 +19,9 @@ class EmailApiView(APIView):
             return None
 
     def post(self, request, *args, **kwargs):
-        data = request.data
-        titulo_projeto = data.get('titulo_projeto')
-        proposta_url = data.get('proposta_url')
-        nome_proponente = data.get('nome_proponente')
         try:
             success = PropostaSubmetidaEmail(
-                titulo_projeto=titulo_projeto,
-                proposta_url=proposta_url,
-                nome_proponente=nome_proponente
+                PropostaProjeto.objects.all().first()
             ).send()
         except Exception as e:
             print(e)
