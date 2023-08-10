@@ -213,7 +213,6 @@ def createPropostaProjeto(request):
                 "username": config.EXT_DEV_USERNAME,
                 "password": config.EXT_DEV_PASSWORD
             })
-
             token = json.loads(response.content).get("access")
 
             headers = {
@@ -226,11 +225,11 @@ def createPropostaProjeto(request):
                 role=MembroExecucao.ROLE_PROPONENTE
             ).first().pessoa.nome
 
-            requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
+            responseEmail = requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
                         headers=headers,
                         json={
                             'titulo_projeto': proposta_projeto.titulo_projeto,
-                            'nome_proponente': proposta_projeto.nome_proponente,
+                            'nome_proponente': nome_proponente,
                             'proposta_url': proposta_url
                         })
         except Exception as e:
