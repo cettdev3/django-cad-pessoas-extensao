@@ -220,11 +220,18 @@ def createPropostaProjeto(request):
                 'Authorization': f'Bearer {token}'
             }
 
+            proposta_url = config.EXT_BASE_URL+"/show-proposta-projeto/"+str(proposta_projeto.pk)
+            nome_proponente = MembroExecucao.objects.filter(
+                proposta_projeto=proposta_projeto,
+                role=MembroExecucao.ROLE_PROPONENTE
+            ).first().pessoa.nome
+
             requests.post(config.EXT_DEV_BASE_URL+"/send-email", 
                         headers=headers,
                         json={
-                            "email_type": "proposta_submetida",
-                            "model_id": proposta_projeto.pk
+                            'titulo_projeto': proposta_projeto.titulo_projeto,
+                            'nome_proponente': proposta_projeto.nome_proponente,
+                            'proposta_url': proposta_url
                         })
         except Exception as e:
             print(e)

@@ -20,11 +20,15 @@ class EmailApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        email_type = data.get('email_type')
-        model_id = data.get('model_id')
-        proposta_projeto = PropostaProjeto.objects.get(id=model_id)
+        titulo_projeto = data.get('titulo_projeto')
+        proposta_url = data.get('proposta_url')
+        nome_proponente = data.get('nome_proponente')
         try:
-            success = PropostaSubmetidaEmail(proposta_projeto).send()
+            success = PropostaSubmetidaEmail(
+                titulo_projeto=titulo_projeto,
+                proposta_url=proposta_url,
+                nome_proponente=nome_proponente
+            ).send()
         except Exception as e:
             print(e)
             return Response({"res": "Erro ao enviar email"}, status=status.HTTP_400_BAD_REQUEST)
