@@ -80,7 +80,8 @@ from sistema.views.cotecViews.projetosCotecViews import (
     updatePropostaProjeto,
     removePropostaProjeto,
     showPropostaProjeto,
-    createProjetoFromProposta
+    createProjetoFromProposta,
+    publicSendEmail
 )
 
 from sistema.views.siteGaleriaViews import (
@@ -161,8 +162,10 @@ urlpatterns = [
     path("editarPessoa/<codigo>", editarPessoa),
     path("edicaoPessoa",edicaoPessoa),
     path("registrar",registrar),
+
     
     # ROTAS DO COTEC
+    path("public-send-email", publicSendEmail, name="public-send-email"),
     path("cotec-projeto-index", projetoCotecIndex, name="cotec-projeto-index"),
     path("cotec-projeto-success", projetoCotecSuccess, name="cotec-projeto-success"),
     path("cotec-projeto-form", projetoCotecForm, name="cotec-projeto-form"),
