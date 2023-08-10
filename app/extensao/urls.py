@@ -76,6 +76,7 @@ from sistema.views.cotecViews.projetosCotecViews import (
     updateItemOrcamento, 
     createItemOrcamento, 
     removeItemOrcamento,
+    sendEmail,
     projetoCotecSuccess,
     updatePropostaProjeto,
     removePropostaProjeto,
@@ -183,6 +184,7 @@ urlpatterns = [
     path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
+    path("send-email", sendEmail, name="send-email"),
 
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
