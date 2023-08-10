@@ -165,7 +165,7 @@ urlpatterns = [
 
     
     # ROTAS DO COTEC
-    # path("public-send-email", publicSendEmail, name="public-send-email"),
+    path("public-send-email", publicSendEmail, name="public-send-email"),
     path("cotec-projeto-index", projetoCotecIndex, name="cotec-projeto-index"),
     path("cotec-projeto-success", projetoCotecSuccess, name="cotec-projeto-success"),
     path("cotec-projeto-form", projetoCotecForm, name="cotec-projeto-form"),

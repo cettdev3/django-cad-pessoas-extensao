@@ -4,14 +4,18 @@ from email.message import EmailMessage
 import mimetypes
 import envconfiguration as config
 
-
 class SMTPClient:
     def __init__(self):
-        self.SMTP_SERVER = config.SMTP_EXT_SERVER
-        self.SMTP_PORT = config.SMTP_EXT_PORT
-        self.MAIL_ACCOUNT = config.MAIL_EXT_ACCOUNT
-        self.MAIL_PASSWORD = config.MAIL_EXT_PASSWORD
-        self.MAIL_FROM = config.MAIL_EXT_FROM
+        # self.SMTP_SERVER = config.SMTP_EXT_SERVER
+        # self.SMTP_PORT = config.SMTP_EXT_PORT
+        # self.MAIL_ACCOUNT = config.MAIL_EXT_ACCOUNT
+        # self.MAIL_PASSWORD = config.MAIL_EXT_PASSWORD
+        # self.MAIL_FROM = config.MAIL_EXT_FROM
+        self.SMTP_SERVER = config.GOOGLE_SMTP_SERVER
+        self.SMTP_PORT = config.GOOGLE_SMTP_PORT
+        self.MAIL_ACCOUNT = config.GOOGLE_SMTP_USER
+        self.MAIL_PASSWORD = config.GOOGLE_SMTP_PASSWORD
+        self.MAIL_FROM = config.GOOGLE_SMTP_USER
         self.toAddresses = []
         self.bccAddresses = []
         self.ccAddresses = []
