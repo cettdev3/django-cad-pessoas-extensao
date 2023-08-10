@@ -76,7 +76,6 @@ from sistema.views.cotecViews.projetosCotecViews import (
     updateItemOrcamento, 
     createItemOrcamento, 
     removeItemOrcamento,
-    sendEmail,
     projetoCotecSuccess,
     updatePropostaProjeto,
     removePropostaProjeto,
@@ -128,6 +127,7 @@ from sistema.views.servicoApiViews import ServicoApiView, ServicoDetailApiView
 from sistema.views.atividadeSectionApiViews import AtividadeSectionApiView, AtividadeSectionDetailApiView
 from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
 from sistema.views.comentarioApiViews import ComentarioApiView, ComentarioDetailApiView
+from sistema.views.emailApiViews import EmailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -184,7 +184,6 @@ urlpatterns = [
     path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
-    path("send-email", sendEmail, name="send-email"),
 
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
@@ -428,6 +427,8 @@ urlpatterns = [
     # ROTAS DE API
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     
+    path("send-email", EmailApiView.as_view()),
+
     path("pessoas", PessoaApiView.as_view()),
     path("pessoas/<int:pessoa_id>", PessoaDetailApiView.as_view()),
 
