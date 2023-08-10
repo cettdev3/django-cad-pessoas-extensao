@@ -7,11 +7,11 @@ import envconfiguration as config
 
 class SMTPClient:
     def __init__(self):
-        self.SMTP_SERVER = config.SMTP_SERVER
-        self.SMTP_PORT = config.SMTP_PORT
-        self.MAIL_ACCOUNT = config.MAIL_ACCOUNT
-        self.MAIL_PASSWORD = config.MAIL_PASSWORD
-        self.MAIL_FROM = config.MAIL_FROM
+        self.SMTP_SERVER = config.SMTP_EXT_SERVER
+        self.SMTP_PORT = config.SMTP_EXT_PORT
+        self.MAIL_ACCOUNT = config.MAIL_EXT_ACCOUNT
+        self.MAIL_PASSWORD = config.MAIL_EXT_PASSWORD
+        self.MAIL_FROM = config.MAIL_EXT_FROM
         self.toAddresses = []
         self.bccAddresses = []
         self.ccAddresses = []
@@ -20,6 +20,13 @@ class SMTPClient:
         self.htmlMessage = ''
         self.textMessage = ''
         self.attachments = []
+        print( "Dados sendo trazidos do env",
+            "self.SMTP_SERVER" + self.SMTP_SERVER,
+            "self.SMTP_PORT" +self.SMTP_PORT,
+            "self.MAIL_ACCOUNT", self.MAIL_ACCOUNT,
+            "self.MAIL_PASSWORD", self.MAIL_PASSWORD,
+            "self.MAIL_FROM", self.MAIL_FROM,
+        )
 
     def send(self):
         
@@ -61,6 +68,6 @@ class SMTPClient:
             smtp.quit()
             return True
         except Exception as error:
-            print(error)
+            print("dentro de erro", error)
             return False
        
