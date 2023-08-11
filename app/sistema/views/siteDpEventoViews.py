@@ -40,8 +40,10 @@ import xlsxwriter
 from io import BytesIO
 from xlsxwriter.workbook import Worksheet
 from xlsxwriter.format import Format
+from sistema.decorators.pessoaIsEscola import pessoa_is_escola
 
 @login_required(login_url="/auth-user/login-user")
+@pessoa_is_escola
 def gerencia_dp_eventos(request):
     page_title = "Projetos"
     dp_eventos = DpEvento.objects.all()

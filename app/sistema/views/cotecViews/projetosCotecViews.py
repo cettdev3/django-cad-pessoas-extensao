@@ -14,11 +14,16 @@ import envconfiguration as config
 
 @login_required(login_url="/auth-user/login-user")
 def projetoCotecIndex(request):
+    user = request.user
+    pessoa = Pessoas.objects.get(user=user)
     page_title = "Propostas de Projetos"
     return render(                  
         request,
         "projetosCotec/projetosCotecIndex.html",
-        {"page_title": page_title},
+        {
+            "page_title": page_title,
+            "pessoa": pessoa,
+        },
     )
 
 @login_required(login_url="/auth-user/login-user")

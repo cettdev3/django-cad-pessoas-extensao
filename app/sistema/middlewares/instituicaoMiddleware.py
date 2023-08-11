@@ -29,36 +29,30 @@ class InstituicaoMiddleware:
             reverse('cotec-projeto-success'),
         ]
 
-        isPkRoute = False
-        update_atividade_base_url = reverse('update-atividade', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(update_atividade_base_url)
-
-        remove_atividade_base_url = reverse('remove-atividade', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(remove_atividade_base_url)
-
-        update_membro_equipe_base_url = reverse('update-membro-equipe', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(update_membro_equipe_base_url)
-
-        remove_membro_equipe_base_url = reverse('remove-membro-equipe', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(remove_membro_equipe_base_url)
-
-        update_membro_execucao_api_base_url = reverse('membroExecucaoDetail', kwargs={'membro_execucao_id': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(update_membro_execucao_api_base_url)
-
-        update_item_orcamento_base_url = reverse('update-item-orcamento', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(update_item_orcamento_base_url)
-
-        remove_item_orcamento_base_url = reverse('remove-item-orcamento', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(remove_item_orcamento_base_url)
-
-        update_proposta_projeto_base_url = reverse('update-proposta-projeto', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(update_proposta_projeto_base_url)
-
-        remove_proposta_projeto_base_url = reverse('remove-proposta-projeto', kwargs={'pk': 0})[:-1]
-        isPkRoute = isPkRoute or request.path_info.startswith(remove_proposta_projeto_base_url)
+        dynamic_urls = [
+            'update-atividade',
+            'remove-atividade',
+            'update-membro-equipe',
+            'remove-membro-equipe',
+            'membroExecucaoDetail',
+            'update-item-orcamento',
+            'remove-item-orcamento',
+            'update-proposta-projeto',
+            'remove-proposta-projeto',
+        ]
         
-        if not isPkRoute and request.path_info not in included_urls:
-            if request.user.is_authenticated:
-                if hasattr(request.user, 'pessoa'):
-                    if request.user.pessoa.instituicao == 'escola':
+        isPkRoute = False
+        for url_name in dynamic_urls:
+            base_url = reverse(url_name, kwargs={'id': 0} if 'id' in url_name else {'pk': 0})[:-1]
+            stripped_base_url = base_url[:-1]
+            stripped_path_info = request.path_info[:-2]
+            if stripped_path_info == stripped_base_url:
+                isPkRoute = True
+                break
+
+        
+        if request.user.is_authenticated:
+            if hasattr(request.user, 'pessoa'):
+                if request.user.pessoa.instituicao == 'escola':
+                    if not (isPkRoute or request.path_info in included_urls):
                         return redirect('cotec-projeto-index')
