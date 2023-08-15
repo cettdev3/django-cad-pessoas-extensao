@@ -293,6 +293,22 @@
                     select_label: 'Selecione uma cidade'},
                     function (selectComponent) {
                         inputCidade.html(selectComponent);
+                        let cidadeModal = new CustomModalFormComponent({
+                            loadContent: cidadeForm,
+                            modalTitle: "Cadastrar Cidade",
+                            modalBtnActionText: "Cadastrar Cidade",
+                            modalActionFunction: cidadeCreate
+                        })
+                        
+                        let select = new CustomSelectMultiple(
+                            inputCidade.children().first(), {
+                            label: "Selecione a cidade",
+                            loadOptions: getCidades,
+                            multiple: false,
+                            modal: cidadeModal,
+                        })
+
+                        inputCidade.data('select', select);
                     },
                     function () {
                         inputCidade.html('');
@@ -339,7 +355,7 @@
                     let inputCidade = $(this).find("div[id^='input-cidade-']");
                     inputCidade.each(function () {
                         let number = $(this).attr('id').split('-').pop();
-                        let value = $("#custom-select-multiple-cidade-"+ params.id + "-" + number)[0].getValue();
+                        let value = $(this).data('select').getValue();
                         atividade['cidade_id'] = value;
                     });
 

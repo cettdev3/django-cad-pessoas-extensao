@@ -93,8 +93,10 @@
             {% endif %}
         </div>
     </div>
-    
     <div id="form-container" class="container">
+        <div id="multiple-select-component">
+        </div>
+        <button type="button" class="btn btn-primary" id="openPessoaModalButton" style="margin-right: 1em;">Cadastrar Pessoa</button>
         <form id="create-projeto-cotec-form">
             <div id="step-dados-gerais">
                 <h2>Dados Gerais</h2>
@@ -108,6 +110,7 @@
                 </div>
                 <div data-membro-equipe-id="{{proposta_projeto.responsavel.id}}"
                 class="form-group">
+                {{proposta_projeto.responsaveis}}
                     <label for="responsavel">Responsáveis</label>
                     {% include 'projetosCotec/EquipeSectionInput.html' with read_only=proposta_projeto.read_only card_placeholder_label="Clique no botão acima para adicionar um Responsável" hide_funcao='True' add_button_label="Adicionar Responsável" card_label='Responsável' id='responsaveis' equipe=proposta_projeto.responsaveis propostaId=proposta_projeto.id %}
                 </div>
@@ -294,6 +297,7 @@
         </form>
     </div>
 </div>
+    
 <script>
     function getOrcamentoValues() {
         return $('#orcamento')[0].getValue()
@@ -401,7 +405,6 @@
         $('#rascunhoBtn').on('click', function () {
             let values = getSelectedValues()
             values.status = 'rascunho'
-
             createPropostaProjeto(values, 
             function (data) {
                 $(location).attr('href', "{% url 'cotec-projeto-index' %}");
@@ -445,6 +448,21 @@
                     console.log(error)
                 })
             }
+        });
+
+        const pessoaModal = new CustomModalComponent({
+            loadContent: pessoaForm,
+            modalTitle: "Cadastrar Pessoa",
+            modalBtnActionText: "Cadastrar Pessoa",
+            modalActionFunction: pessoaCreate
+        });
+
+        const pessoaSelect = new CustomSelectMultiple(pessoaModal, {
+            label: "Select Pessoa",
+            multiple: true,
+            loadOptions: getPessoas
+        }, function() {
+            $('#multiple-select-component').append(pessoaSelect.element);
         });
     });
 </script>

@@ -17,17 +17,17 @@ async function getPessoaSelect(data, callback=null) {
 }
 
 
-function pessoaForm(data, callback = null) {
-    $.ajax({
+async function pessoaForm(data, onSuccess=null, onError=null) {
+    return await $.ajax({
         url: '/pessoa-modal',
         contentType: 'application/json',
         method: "GET",
         data: data,
         success: function(response) {
-            if (callback) callback(response);
+            if (onSuccess) onSuccess(response);
         },
         error: function(response) {
-            console.log(response);
+            if (onError) onError(response);
         }
     });
 }
@@ -48,3 +48,18 @@ async function pessoaCreate(data, onSuccess, onError) {
         }
     });
 };
+
+async function getPessoas(data, onSuccess, onError) {
+    return await $.ajax({
+        url: '/getPessoas',
+        contentType: 'application/json',
+        method: "GET",
+        data: data,
+        success: function(response) {
+            if (onSuccess) onSuccess(response);
+        },
+        error: function(response) {
+            if (onError) onError(response);
+        }
+    });
+}

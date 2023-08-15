@@ -34,9 +34,9 @@ from sistema.views.servicoContratadoApiViews import ServicoContratadoApiView, Se
 from sistema.views.turnoApiViews import TurnoApiView, TurnoDetailApiView
 from sistema.views.departamentoApiViews import DepartamentoApiView, DepartamentoDetailApiView
 from sistema.views.siteViews import home, cadastrar_pessoas, editarPessoa, edicaoPessoa, registrar
-from sistema.views.sitePessoaViews import pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
+from sistema.views.sitePessoaViews import getPessoas, pessoasModalCadastrar, pessoasTable, pessoasSelect, cursosSelect, gerencia_pessoas, eliminarPessoa, visualizarPessoa, pessoasModalAlocar, savePessoa, editarPessoa
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
-from sistema.views.siteCidadeViews import gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect
+from sistema.views.siteCidadeViews import getCidades, gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect, cidadeForm
 from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino, getEnsino, createEventoFromEnsino
 from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
@@ -198,6 +198,7 @@ urlpatterns = [
     path("pessoasTable",pessoasTable),
     path("pessoasSelect",pessoasSelect),
     path("pessoasModalCadastrar",pessoasModalCadastrar),
+    path("getPessoas",getPessoas),
     path("pessoasModalAlocar",pessoasModalAlocar),
     path("cursosSelect", cursosSelect, name="cursos-select"),
     path("cadastrar-pessoas",cadastrar_pessoas),
@@ -233,11 +234,13 @@ urlpatterns = [
     # ROTAS PARA CIDADES
     path("gerenciar-cidades",gerencia_cidades),
     path("cidadesTable",cidadesTable),
+    path("getCidades",getCidades),
     path("cidadesModalCadastrar",cidadesModalCadastrar),
     path("eliminarCidade/<codigo>",eliminarCidade),
     path("saveCidade",saveCidade),
     path("editarCidade/<codigo>",editarCidade),
     path("cidadesSelect",cidadesSelect),
+    path("cidadeForm",cidadeForm),
     
     # ROTAS PARA ESCOLAS
     path("gerenciar-escolas",gerencia_escolas),
