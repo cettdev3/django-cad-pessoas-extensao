@@ -1,74 +1,53 @@
 /**
- * CustomModalComponent Documentation
+ * CustomModalComponent
  * 
- * Overview:
- * CustomModalComponent is a flexible modal (dialog) implementation that allows dynamic content loading, 
- * custom actions, and event handling. It's built on top of jQuery and is designed for easy integration 
- * into web applications.
+ * A custom modal (dialog) component designed for flexibility and ease of use. 
+ * It supports dynamic content loading, custom actions, and event handling.
+ * This modal is built on top of jQuery and is meant for seamless integration 
+ * in web applications.
  * 
- * Initialization:
- * To create a new modal instance, use the CustomModalComponent constructor:
- * const myModal = new CustomModalComponent(options);
+ * @param {Object} options - Configuration options for the modal.
+ *   @param {Function} [options.loadContent] - A function that returns a promise resolving to the content of the modal.
+ *   @param {String} [options.modalTitle="Default Title"] - The title of the modal.
+ *   @param {String} [options.modalBtnActionText="Default Action"] - Text for the primary action button.
+ *   @param {Function} options.modalActionFunction - A function to execute when the action button is clicked.
  * 
- * Options:
- * The CustomModalComponent accepts an options object with the following properties:
- * - `loadContent`: A function to fetch and load content into the modal.
- * - `modalTitle`: The title of the modal.
- * - `modalBtnActionText`: Text for the primary action button.
- * - `modalActionFunction`: Function to execute when the action button is clicked.
+ * @property {Object} state - The current state of the modal.
+ * @property {Object} element - The jQuery DOM element of the modal.
+ * @property {Object} options - Configuration options for the modal.
  * 
- * Example:
- * {
- *     loadContent: fetchDataFunction,
- *     modalTitle: "My Modal Title",
- *     modalBtnActionText: "Execute Action",
- *     modalActionFunction: executeActionFunction
- * }
+ * @example
  * 
- * Methods:
- * - open(size): Opens the modal. Accepts an optional size parameter ('sm', 'lg', 'xl'). Default size is medium.
- * - close(): Closes the modal.
- * - setContent(content): Sets the modal's content.
- * - setTitle(title): Sets the modal's title.
- * - setSize(size): Sets the modal's size.
+ * // Create a new modal instance with custom content and action functions
+ * const customModal = new CustomModalComponent({
+ *     loadContent: () => fetchContentFunction(),
+ *     modalTitle: "Sample Modal",
+ *     modalBtnActionText: "Execute",
+ *     modalActionFunction: (formData) => handleFormDataFunction(formData)
+ * });
  * 
- * Events:
- * - `itemCreated`: Dispatched when an item is successfully created via the modal.
+ * // Open the modal with a specific size
+ * customModal.open('lg'); // Values: 'sm', 'lg', 'xl'
  * 
- * Usage Examples:
- * 1. Initialization:
- *    Create a new modal with custom content loading and action functions:
- *    const myModal = new CustomModalComponent({
- *        loadContent: function(data, onSuccess, onError) {
- *            // Fetch data or generate content
- *            // Call onSuccess(content) with the fetched/generated content
- *        },
- *        modalTitle: "Sample Modal",
- *        modalBtnActionText: "Save Data",
- *        modalActionFunction: function(formData, onSuccess, onError) {
- *            // Handle form data, e.g., save to server
- *            // Call onSuccess(response) on success or onError(error) on failure
- *        }
- *    });
+ * // Listen to events emitted by the modal
+ * customModal.element.on('action-success', (event) => {
+ *     console.log("Action was successful!", event.detail);
+ * });
  * 
- * 2. Open Modal:
- *    To open the modal:
- *    myModal.open();
- * 
- *    To open the modal with a specific size:
- *    myModal.open('lg'); // Possible values: 'sm', 'lg', 'xl'
- * 
- * 3. Event Handling:
- *    Listen to events emitted by the modal:
- *    myModal.element.on('itemCreated', (event) => {
- *        console.log("Item was created!", event.detail);
- *    });
- * 
- * Note:
- * It's recommended to include more detailed explanations, examples, and potential caveats in a full 
- * documentation set, especially if this component will be used by other developers.
+ * @method init - Initializes the modal.
+ * @method bindEvents - Binds the primary action button event.
+ * @method bindModalEvents - Binds bootstrap modal events.
+ * @method handleActionClick - Handles the click event for the primary action button.
+ * @method setActionButtonText - Sets the text of the primary action button.
+ * @method open - Opens the modal with an optional size parameter.
+ * @method close - Closes the modal.
+ * @method setContent - Sets the content of the modal.
+ * @method setTitle - Sets the title of the modal.
+ * @method setSize - Sets the size of the modal.
+ * @method getFormValues - Retrieves form values from the modal's content.
+ * @method loadContent - Loads content into the modal.
+ * @method emitEvent - Emits a custom event from the modal.
  */
-
 class CustomModalComponent {
     constructor(options) {
         this.state = {

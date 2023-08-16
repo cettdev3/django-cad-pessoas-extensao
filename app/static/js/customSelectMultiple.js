@@ -1,3 +1,58 @@
+/**
+ * CustomSelectMultiple
+ * 
+ * A custom dropdown component that allows users to select multiple options from a list. 
+ * It supports filtering of options, adding new options through a modal, and selecting/deselecting options.
+ * 
+ * @param {Object} modal - An instance of the modal component used to add new items.
+ * @param {Object} options - Configuration options for the component.
+ *   @param {Array} [options.selectedOptions] - An initial array of selected option IDs.
+ *   @param {String} [options.label="Select"] - The label to display on the dropdown button.
+ *   @param {Boolean} [options.multiple=true] - Whether multiple options can be selected.
+ *   @param {Function} options.loadOptions - A function that returns a promise resolving to the list of options.
+ * @param {Function} [onReady] - A callback function to execute once the component is initialized.
+ * 
+ * @property {Object} modal - Reference to the modal component.
+ * @property {Object} state - The current state of the component.
+ * @property {Object} config - Configuration options for the component.
+ * 
+ * @example
+ * 
+ * // HTML placeholder for the component
+ * <div id="multiple-select-component"></div>
+ * 
+ * // Initialize the modal component
+ * const customModal = new CustomModalComponent({
+ *     // ... modal configuration options ...
+ * });
+ * 
+ * // Initialize the select multiple component
+ * const customSelect = new CustomSelectMultiple(customModal, {
+ *     label: "Select Item",
+ *     multiple: true,
+ *     loadOptions: functionToLoadOptions
+ * }, function() {
+ *     $('#multiple-select-component').append(customSelect.element);
+ * });
+ * 
+ * @method init - Initializes the component.
+ * @method bindModalEvents - Binds events related to the modal.
+ * @method bindUIEvents - Binds UI events like click and keyup.
+ * @method openDropdown - Opens the dropdown menu.
+ * @method closeDropdown - Closes the dropdown menu.
+ * @method resetFilter - Resets the filter input value.
+ * @method loadOptions - Loads options using the provided loadOptions function.
+ * @method renderOptions - Renders the options in the dropdown.
+ * @method updateLabel - Updates the dropdown button label.
+ * @method handleNewItem - Handles adding a new item to the options.
+ * @method handleOptionClick - Handles selecting/deselecting an option.
+ * @method handleBadgeRemove - Handles removing a selected option badge.
+ * @method handleFilter - Filters the options based on user input.
+ * @method renderBadges - Renders the badges for selected options.
+ * @method getValue - Gets the currently selected option(s).
+ * @method setValue - Sets the selected option(s).
+ */
+
 class CustomSelectMultiple {
     constructor(modal, options, onReady) {
         this.modal = modal;
@@ -60,19 +115,31 @@ class CustomSelectMultiple {
 
     resetFilter() {
         this.element.find('#filterInput').val('');
-        this.renderOptions(); // Reset the display of options without filtering
+        this.renderOptions();
     }
 
     loadOptions() {
         this.state.isLoading = true;
+        this.showSpinner();
+    
         this.config.loadOptions({}).then(options => {
             this.state.options = options;
             this.renderOptions();
             this.state.isLoading = false;
+            this.hideSpinner();
         }).catch(error => {
             console.log('Failed to load options:', error);
             this.state.isLoading = false;
+            this.hideSpinner();
         });
+    }
+    
+    showSpinner() {
+        this.element.find("#loading-spinner").show();
+    }
+    
+    hideSpinner() {
+        this.element.find("#loading-spinner").hide();
     }
 
     renderOptions(filteredOptions = null) {
@@ -129,7 +196,8 @@ class CustomSelectMultiple {
     }
 
     handleBadgeRemove(event) {
-        const badge = $(event.target).closest('.badge');
+        console.log(event)
+        const badge = $(event.target).closest('.item-badge');
         const optionId = badge.data('id');
         const index = this.state.selectedOptions.indexOf(optionId);
         if (index > -1) this.state.selectedOptions.splice(index, 1);
@@ -158,12 +226,16 @@ class CustomSelectMultiple {
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => o.id === id);
             const badge = $(`
-            <span class="badge badge-primary mr-1" data-id="${option.id}">
-                ${option.nome}
-                <button type="button" class="close">
-                    <span aria-hidden="true">&times;</span>
+            <div class="badge-outline-secondary d-flex align-items-center mx-2 item-badge" data-id="${option.id}">
+                <span>${option.nome}</span>
+                <button type="button" 
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Remover"
+                class="close ml-2">
+                    <i class="fa fa-close"></i>
                 </button>
-            </span>
+            </div>
         `);
 
             badgesContainer.append(badge);
