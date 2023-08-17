@@ -57,7 +57,7 @@ class CustomSelectMultiple {
     constructor(modal, options, onReady) {
         this.modal = modal;
         this.state = {
-            options: [],
+            options: options.options || [],
             selectedOptions: options.selectedOptions || [],
             isLoading: false
         };
@@ -91,12 +91,16 @@ class CustomSelectMultiple {
         this.modal.element.on('action-fail', (event) => showFloatingMessage("Erro ao cadastrar item", "alert-danger"));
     }
 
+    emitChangeEvent() {
+        const event = new CustomEvent('change', { detail: this.state.selectedOptions });
+        this.element[0].dispatchEvent(event);
+    }
+
     bindUIEvents() {
         this.element.on('click', '.dropdown-item', this.handleOptionClick.bind(this));
         this.element.on('click', 'button.close', this.handleBadgeRemove.bind(this));
         this.element.on('keyup', '#filterInput', this.handleFilter.bind(this));
         this.element.find('#btn-open-modal').on('click', () => this.modal.open());
-        this.element.on('hide.bs.dropdown', this.resetFilter.bind(this));
         this.element.find('#filterInput').on('focus', () => this.openDropdown());
         $("body").on('click', (event) => {
             if (!this.element.is(event.target) && this.element.has(event.target).length === 0) {
@@ -111,6 +115,7 @@ class CustomSelectMultiple {
     
     closeDropdown() {
         this.element.find('#dropdownMenu').removeClass('show');
+        this.resetFilter();
     }
 
     resetFilter() {
@@ -119,12 +124,20 @@ class CustomSelectMultiple {
     }
 
     loadOptions() {
+        if (this.state.options.length > 0) {
+            this.renderOptions();
+            this.renderBadges();
+            return;
+        }
+
+
         this.state.isLoading = true;
         this.showSpinner();
     
         this.config.loadOptions({}).then(options => {
             this.state.options = options;
             this.renderOptions();
+            this.renderBadges();
             this.state.isLoading = false;
             this.hideSpinner();
         }).catch(error => {
@@ -170,6 +183,7 @@ class CustomSelectMultiple {
         this.state.selectedOptions.push(item.id);
         this.renderOptions();
         this.renderBadges();
+        this.emitChangeEvent();
     }
 
     handleOptionClick(event) {
@@ -186,17 +200,22 @@ class CustomSelectMultiple {
                 this.state.selectedOptions.push(optionId);
             }
         } else {
-            this.state.selectedOptions = [optionId];
-            this.element.find('.dropdown-item input:checked').not(checkbox).prop('checked', false);
+            if (checkbox.prop('checked')) {
+                const index = this.state.selectedOptions.indexOf(optionId);
+                if (index > -1) this.state.selectedOptions.splice(index, 1);
+            } else {
+                this.state.selectedOptions = [optionId] 
+                this.element.find('.dropdown-item input:checked').not(checkbox).prop('checked', false);
+            }
         }
 
         checkbox.prop('checked', !checkbox.prop('checked')); 
         this.renderBadges();
         this.openDropdown();
+        this.emitChangeEvent();
     }
 
     handleBadgeRemove(event) {
-        console.log(event)
         const badge = $(event.target).closest('.item-badge');
         const optionId = badge.data('id');
         const index = this.state.selectedOptions.indexOf(optionId);
@@ -206,6 +225,7 @@ class CustomSelectMultiple {
 
         this.renderOptions();
         badge.remove();
+        this.emitChangeEvent();
     }
 
     handleFilter(event) {
@@ -222,6 +242,7 @@ class CustomSelectMultiple {
     renderBadges() {
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
+        console.log(this.state.selectedOptions)
 
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => o.id === id);
@@ -250,5 +271,6 @@ class CustomSelectMultiple {
         this.state.selectedOptions = this.config.multiple ? values : [values];
         this.renderOptions();
         this.renderBadges();
+        this.emitChangeEvent();
     }
 }

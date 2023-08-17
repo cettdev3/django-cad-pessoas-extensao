@@ -94,24 +94,31 @@
         </div>
     </div>
     <div id="form-container" class="container">
-        <div id="multiple-select-component">
-        </div>
+        <button id="get-form-values">Get form value</button>
         <form id="create-projeto-cotec-form">
             <div id="step-dados-gerais">
                 <h2>Dados Gerais</h2>
                 <div data-membro-equipe-id="{{proposta_projeto.proponente.id}}"
                 class="form-group">
-                {% if proposta_projeto.id %}
-                {% include 'projetosCotec/EquipeSectionInput.html' with read_only=proposta_projeto.read_only hide_funcao='True' hide_remove='True'  card_label='Proponente' id='proponente' equipe=proposta_projeto.proponentes hide_add_button='True' propostaId=proposta_projeto.id %}
-                {% else %}
-                {% include 'projetosCotec/EquipeSectionInput.html' with read_only=proposta_projeto.read_only createOne='True' hide_funcao='True' hide_remove='True'  card_label='Proponente' id='proponente' equipe=proposta_projeto.proponentes hide_add_button='True' propostaId=proposta_projeto.id %}
-                {% endif %}
+                    <label for="proponente"><b>Proponente</b></label>
+                    <div id="multiple-form-component-proponente">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Carregando itens...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div data-membro-equipe-id="{{proposta_projeto.responsavel.id}}"
                 class="form-group">
-                {{proposta_projeto.responsaveis}}
-                    <label for="responsavel">Responsáveis</label>
-                    {% include 'projetosCotec/EquipeSectionInput.html' with read_only=proposta_projeto.read_only card_placeholder_label="Clique no botão acima para adicionar um Responsável" hide_funcao='True' add_button_label="Adicionar Responsável" card_label='Responsável' id='responsaveis' equipe=proposta_projeto.responsaveis propostaId=proposta_projeto.id %}
+                    <label for="responsavel"><b>Responsáveis</b></label>
+                    <div id="multiple-form-component-respomsaveis">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Carregando itens...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="titulo-do-projeto">Título do projeto</label>
@@ -281,10 +288,8 @@
                     class="btn btn-success" 
                     id="editBtn" 
                     style="display: none;">
-                        {% if proposta_projeto.status == 'devolvida' %}
+                        {% if proposta_projeto.status %}
                         <span>Submeter proposta</span>
-                        {% else %}
-                        <span>Salvar alterações</span>
                         {% endif %}
                     </a>
                     {% else %}
@@ -296,7 +301,7 @@
         </form>
     </div>
 </div>
-    
+
 <script>
     function getOrcamentoValues() {
         return $('#orcamento')[0].getValue()
@@ -332,6 +337,8 @@
     }
 
     $(document).ready(function () {
+        let proponentes = {{ proponentes_json|safe }};
+        let responsaveis = {{ responsaveis_json|safe }};
         let propostaId = '{{proposta_projeto.id}}'
         var currentStep = 0;
         var steps = ['step-dados-gerais', 'step-cronograma', 'step-equipe', 'step-orcamento'];
@@ -449,20 +456,91 @@
             }
         });
 
-        const pessoaModal = new CustomModalComponent({
-            loadContent: pessoaForm,
-            modalTitle: "Cadastrar Pessoa",
-            modalBtnActionText: "Cadastrar Pessoa",
-            modalActionFunction: pessoaCreate
+        // SETUP FORMULARIO DE PROPONENTES
+        let proponentesIds = proponentes.map(item => {
+            return {
+                id: item.pk
+            }
         });
 
-        const pessoaSelect = new CustomSelectMultiple(pessoaModal, {
-            label: "Select Pessoa",
-            multiple: true,
-            loadOptions: getPessoas
-        }, function() {
-            $('#multiple-select-component').append(pessoaSelect.element);
+        let handleCreateMembroEquipe = () => propostaId ? createMembroEquipe({proposta_projeto_id: propostaId}, function (data) {
+                showFloatingMessage("Membro adicionado a equipe com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+
+        const multipleFormOptions = {
+            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchComponentTemplateFunction: getMultipleFormComponent,
+            createFunction: propostaId ? handleCreateMembroEquipe : undefined,
+            showAddButton: false,
+            showDeleteButton: false,
+            updateFunction: async function(modelId, data) {
+                console.log(modelId, data)
+            },
+            deleteFunction: async function(modelId) {
+                console.log(modelId)
+            },
+            onReady: function() {
+                $("#multiple-form-component-proponente").html(multipleForm.element);
+                const formData = proponentesIds.length > 0 ? proponentesIds : 1;
+                multipleForm.setValue(formData);
+            }
+        };
+        
+        selectDataService.fetchData('pessoas', getPessoas).then(data => {
+            multipleForm = new MultipleFormComponent(multipleFormOptions);
+            $("#get-form-values").on('click', () => {
+                console.log(multipleForm.getValues())
+            })
+        }).catch(error => {
+            console.error("Failed to fetch pessoas data:", error);
         });
+
+        // SETUP FORMULARIO DE RESPONSÁVEIS
+        let responsaveisIds = responsaveis.map(item => {
+            return {
+                id: item.pk
+            }
+        });
+        
+        let handleDeleteMembroEquipe = (membroEquipeId) => propostaId ? removeMembroEquipe(membroEquipeId, function (data) {
+                showFloatingMessage("Membro removido da equipe com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+
+        const multipleFormOptionsResponsaveis = {
+            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchComponentTemplateFunction: getMultipleFormComponent,
+            createFunction: propostaId ? handleCreateMembroEquipe : undefined,
+            // showAddButton: false,
+            // showDeleteButton: false,
+            updateFunction: async function(modelId, data) {
+                console.log(modelId, data)
+            },
+            deleteFunction: async function(modelId) {
+                handleDeleteMembroEquipe(modelId)
+            },
+            onReady: function() {
+                $("#multiple-form-component-respomsaveis").html(multipleFormResponsaveis.element);
+                const formData = responsaveisIds.length > 0 ? responsaveisIds : 1;
+                multipleFormResponsaveis.setValue(formData);
+            }
+        };
+
+        selectDataService.fetchData('pessoas', getPessoas).then(data => {
+            multipleFormResponsaveis = new MultipleFormComponent(multipleFormOptionsResponsaveis);
+            $("#get-form-values").on('click', () => {
+                console.log(multipleFormResponsaveis.getValues())
+            })
+        }).catch(error => {
+            console.error("Failed to fetch pessoas data:", error);
+        });
+
+        if (propostaId) {
+            window.history.replaceState({}, document.title, "?proposta_id=" + propostaId);
+        }
     });
 </script>
 {% endblock content %}

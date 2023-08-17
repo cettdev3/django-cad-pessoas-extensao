@@ -13,6 +13,36 @@ async function getSelectMultipleComponent(data, onSuccess=null, onError=null) {
     });
 }
 
+async function getMultipleFormComponent(data, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/multiple-form-component",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}
+
+async function getMembroEquipeForm(data = {}, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/membro-equipe-form",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}
+
 async function createPropostaProjeto(data, onSuccess=null, onError=null) {
     return await $.ajax({
         url: "/create-proposta-projeto",
