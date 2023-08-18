@@ -75,7 +75,7 @@
             <div class="step-line" id="line-3"></div>
             <span class="badge badge-secondary step-badge" id="step-4-badge">4</span>
             {% if proposta_projeto.id %}
-            <div class="ml-5 mr-2">
+            <div class="ml-5 mr-2 d-flex">
                 <span class="badge 
                 {% if proposta_projeto.status == 'rascunho' %}
                 bg-secondary
@@ -89,12 +89,46 @@
                 custom-badge">
                     {{proposta_projeto.status_formatado}}
                 </span>
+                <div>
+                    <button class="btn btn-primary" type="button" id="commentsButton" data-bs-toggle="offcanvas"
+                    data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
+                    <i class="fa fa-comment"></i>
+                    </button>
+                
+                    <div class="offcanvas offcanvas-end" style="z-index: 50000; top: 75px"
+                    tabindex="-1" 
+                    id="commentsOffcanvas" 
+                    aria-labelledby="commentsOffcanvasLabel"
+                        style="width: 30%;">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="commentsOffcanvasLabel">Comentários</h5>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body" style="height: 90%; overflow-y: auto;">
+                            {% for comment in proposta_projeto.comentarios.all %}
+                        <div class="card mb-3">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>{{ comment.autor.nome }} </span>
+                                        <small class="text-muted float-right">{{ comment.created_at|date:"d/m/Y, H:i" }}</small>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text text-left">{{ comment.conteudo }}</p>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p>Nenhum comentário ainda</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
             {% endif %}
         </div>
     </div>
-    <div id="form-container" class="container">
-        <form id="create-projeto-cotec-form">
+    <div id="form-container" class="container" >
+        <form id="create-projeto-cotec-form" class="container">
             <div id="step-dados-gerais">
                 <h2>Dados Gerais</h2>
                 <div class="form-group">

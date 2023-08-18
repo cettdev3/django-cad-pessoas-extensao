@@ -3,6 +3,8 @@
             <thead>
                 <tr>
                     <th scope="col" class="text-left">Nome</th>
+                    <th scope="col" class="text-left">Proponente</th>
+                    <th scope="col" class="text-left">Escola</th>
                     <th scope="col" class="text-left">Data de envio</th>
                     <th scope="col" class="text-left">status</th>
                     <th scope="col" class="text-left"></th>
@@ -11,22 +13,75 @@
             <tbody id="tbody">
                 {% for proposta in propostas %}
                 <tr>
-                    <td class="text-left">{{ proposta.titulo_projeto }}</td>
-                    <td class="text-left">{{ proposta.created_at|date:"d/m/Y" }}</td>
+                    <td class="text-left">{{ proposta.titulo_projeto|default_if_none:"Não informado" }}</td>
+                    {% if proposta.proponentes %}
                     <td class="text-left">
-                        {% if proposta.status == 'devolvida' %}
-                        <button class="btn btn-outline-warning btn-sm" 
-                        style="border-radius: 50%" 
-                        data-toggle="modal" 
-                        data-target="#justificativaModal" 
-                        data-justificativa="{{ proposta.justificativas }}">
-                            <i data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Ver Justificativa"
-                             class="fas fa-info-circle"></i>
-                        </button>
+                        {% for proponente in proposta.proponentes %}
+                        {% if proponente.pessoa %}
+                        <div>{{ proponente.pessoa.nome }}</div>
+                        {% else %}
+                        <div>Não Informado</div>
                         {% endif %}
-                        {{ proposta.status_formatado }}
+                        {% endfor %}
+                    </td>   
+                    {% else %}
+                    <td class="text-left">Não informado</td>
+                    {% endif %}
+                    {% if proposta.escola %}
+                    <td class="text-left">{{ proposta.escola.nome|default_if_none:"Não informado" }}</td>
+                    {% else %}
+                    <td class="text-left">Não informado</td>
+                    {% endif %}
+                    {% if proposta.created_at %}
+                    <td class="text-left">{{ proposta.created_at|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td class="text-left">Não informado</td>
+                    {% endif %}
+                    <td >
+                        <div style="gap: 8px;" 
+                        class="d-flex justify-content-start align-items-center">
+                            {% if proposta.status == 'aprovada' %}
+                            <span class="badge badge-success">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'reprovada' %}
+                            <span class="badge badge-danger">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'em_analise' %}
+                            <span class="badge badge-warning">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'devolvida' %}
+                            <span class="badge badge-danger">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'cancelada' %}
+                            <span class="badge badge-danger">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'rascunho' %}
+                            <span class="badge badge-secondary">
+                                {{ proposta.status_formatado }}
+                            </span>
+                            {% endif %}
+                            {% if proposta.status == 'devolvida' %}
+                                <i 
+                                style="border-radius: 50%" 
+                                data-toggle="modal" 
+                                data-target="#justificativaModal" 
+                                data-justificativa="{{ proposta.justificativas }}"
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Ver Justificativa"
+                                class="fas fa-info-circle cursor-pointer text-warning"></i>
+                            {% endif %}
+                        </div>
                     </td>
                     <td class="text-left">
                         <div class="d-flex justify-content-end">
@@ -55,9 +110,8 @@
                                     {% endif %}
                                     {% endif %}
                                     {% if proposta.is_deleteable  %}
-                                    <button class="dropdown-item cursor-pointer" 
+                                    <button class="dropdown-item cursor-pointer btn-excluir-proposta" 
                                     type="button"
-                                    id="btn-excluir-proposta"
                                     data-proposta-projeto-id="{{ proposta.id }}">
                                         Excluir
                                     </button>
@@ -93,7 +147,7 @@
 <script>
     $(document).ready(function () {
         (function(params) {
-            $('#btn-excluir-proposta').click(function () {
+            $('.btn-excluir-proposta').on('click', function () {
                 var proposta_projeto_id = $(this).data('proposta-projeto-id')
                 console.log(proposta_projeto_id)
                 removePropostaProjeto(
