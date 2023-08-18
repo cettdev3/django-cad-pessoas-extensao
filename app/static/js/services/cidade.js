@@ -16,8 +16,8 @@ async function getCidadeSelect(data, callback=null) {
     });
 }
 
-function cidadeForm(data, onSuccess=null, onError=null) {
-    $.ajax({
+async function cidadeForm(data, onSuccess=null, onError=null) {
+    return await $.ajax({
         url: '/cidadeForm',
         contentType: 'application/json',
         method: "GET",
@@ -49,7 +49,7 @@ async function cidadeCreate(data, onSuccess, onError) {
 };
 
 async function getCidades(data, onSuccess, onError) {
-    $.ajax({
+    return await $.ajax({
         url: '/getCidades',
         contentType: 'application/json',
         method: "GET",

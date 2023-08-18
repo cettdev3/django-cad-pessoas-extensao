@@ -8,6 +8,7 @@ class MultipleFormComponent {
         this.deleteFunction = options.deleteFunction || null;
         this.initialFormCount = options.initialFormCount || 0;
         this.showDeleteButton = options.showDeleteButton !== undefined ? options.showDeleteButton : true;
+        this.showSaveButton = options.showSaveButton !== undefined ? options.showSaveButton : true;
         this.showAddButton = options.showAddButton !== undefined ? options.showAddButton : true;
 
         this.init();
@@ -53,16 +54,16 @@ class MultipleFormComponent {
             if (this.createFunction && !modelId) {
                 let model = await this.createFunction();
                 modelId = model.id;
-                saveButton = '<button class="btn btn-primary save-form-btn" style="margin-top: 10px;">Save</button>';
+                saveButton = this.showSaveButton ? '<button class="btn btn-primary save-form-btn" style="margin-top: 10px;">Save</button>' : '';
             }
     
             const formContent = await this.fetchFormTemplateFunction({ model_id: modelId });
             const wrappedFormContent = `
             <div class="individual-form" data-id="${modelId}" style="border: 1px solid #e0e0e0; padding: 10px;">
                 ${formContent}
-                <div class="form-actions">
+                <div class="form-actions d-flex justify-content-end">
                     ${saveButton}
-                    ${this.showDeleteButton ? '<button class="btn btn-danger remove-form-btn" style="margin-top: 10px;">Remove</button>' : ''}
+                    ${this.showDeleteButton ? '<button class="btn btn-danger remove-form-btn" style="margin-top: 10px;">Remover</button>' : ''}
                 </div>
             </div>`;
             this.element.find('.form-container').append(wrappedFormContent);
@@ -133,7 +134,6 @@ class MultipleFormComponent {
     }    
 
     async setValue(data) {
-        console.log("setting value", data);
         if (typeof data === 'number') {
             for (let i = 0; i < data; i++) {
                 await this.addForm();

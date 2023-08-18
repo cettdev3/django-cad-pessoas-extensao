@@ -1,0 +1,151 @@
+<form id="form-atividade-container-{{atividade.id}}">
+    <div id="form-container-{{atividade.id}}">
+        <dib class="form-group row">
+            <div class="col-3">
+                <label for="nome"><b>Nome</b></label>
+                <input type="text" class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{atividade.id}}"
+                data-current-value="{{atividade.nome|default_if_none:''}}"
+                value="{{atividade.nome|default_if_none:''}}"
+                id="nome"
+                name="nome">
+            </div>
+
+            <div class="col-3">
+                <label for="nome"><b>Data Início</b></label>
+                <input type="date" class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{atividade.id}}"
+                data-current-value="{{atividade.data_realizacao_inicio|default_if_none:''}}"
+                value="{{atividade.data_realizacao_inicio|date:'Y-m-d' }}"
+                id="data_realizacao_inicio"
+                name="data_realizacao_inicio">
+            </div>
+
+            <div class="col-3">
+                <label for="nome"><b>Hora Início</b></label>
+                <input type="time" class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{atividade.id}}"
+                data-current-value="{{atividade.horario_inicio|default_if_none:''}}"
+                value="{{atividade.horario_inicio|date:'H:i'}}"
+                id="horario_inicio"
+                name="horario_inicio">
+            </div>
+
+            <div class="col-3">
+                <label for="nome"><b>Público Esperado</b></label>
+                <input type="number" class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{atividade.id}}"
+                data-current-value="{{atividade.publico_esperado|default_if_none:''}}"
+                value="{{atividade.publico_esperado|default_if_none:''}}"
+                id="publico_esperado"
+                name="publico_esperado">
+            </div>
+        </dib>
+
+        <div class="form-group row">
+            <div class="col-6">
+                <label for="nome"><b>Cidade</b></label>
+                <div id="select-atividade-cidade-{{atividade.id}}" 
+                data-cidade-id="{{atividade.cidade.id}}">
+                </div>
+            </div>
+
+            <div class="col-6">
+                <label for="nome"><b>Local</b></label>
+                <input type="text" class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{atividade.id}}"
+                data-current-value="{{atividade.local|default_if_none:''}}"
+                value="{{atividade.local|default_if_none:''}}"
+                id="local"
+                name="local">
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            let formContainer = $("#form-container-" + params.atividadeId);
+
+            const cidadeModal = new CustomModalComponent({
+                loadContent: cidadeForm,
+                modalTitle: "Adicionar Cidade",
+                modalBtnActionText: "Adicionar",
+                modalActionFunction: cidadeCreate
+            });
+
+            let cidade_id = $(`#select-atividade-cidade-${params.atividadeId}`).data('cidade-id');
+
+            const customSelect = new CustomSelectMultiple(cidadeModal, {
+                label: "Selecione Cidade",
+                multiple: false,
+                selectedOptions: cidade_id ? [cidade_id] : [],
+                loadOptions: function () {
+                    return selectDataService.fetchData('cidades', getCidades);
+                }
+            }, function () {
+                $('#select-atividade-cidade-' + params.atividadeId).append(customSelect.element);
+                formContainer[0].getValue = function () {
+                    var membroEquipe = {}
+
+                    formContainer.find("input").each(function () {
+                        var name = $(this).attr('name');
+                        membroEquipe[name] = $(this).val();
+                    });
+
+                    return membroEquipe;
+                }
+
+                formContainer.find("input").each(function () {
+                    let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio', 'publico_esperado', 'local'];
+                    if (!includedField.includes($(this).attr('name'))) return;
+                    $(this).on('change', function () {
+                        var name = $(this).attr('name');
+                        var value = $(this).val();
+                        let data = {}
+                        let current_value = $(this).data('current-value');
+                        data[name] = value;
+
+                        if (current_value == value || !params.atividadeId) return;
+                        updateAtividade(params.atividadeId, 
+                        data, 
+                        function (response) {
+                            showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
+                        }, function (error) {
+                            showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
+                            $(this).val(current_value);
+                        });
+                    });
+                });
+
+                customSelect.element.on('change', function (event) {
+                    const selectedOptions = event.detail;
+                    if (selectedOptions.length == 0) return
+                    if (!params.atividadeId) return;
+
+                    let data = {
+                        cidade_id: selectedOptions[0]
+                    }
+
+                    updateAtividade(params.atividadeId,
+                        data,
+                        function (response) {
+                            showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
+                        }, function (error) {
+                            showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
+                            $(this).val(current_value);
+                        });
+                });
+
+            });
+
+        })({
+            atividadeId: '{{atividade.id}}'
+        })
+    });
+</script>

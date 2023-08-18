@@ -1,0 +1,136 @@
+<form id="form-item-orcamento-container-{{itemOrcamento.id}}">
+    <div id="form-container-{{itemOrcamento.id}}">
+        <div class="form-group row">
+            <div class="col-12">
+                <label for="itemOrcamento"><b>Descrição</b></label>
+                <textarea 
+                class="form-control" 
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{itemOrcamento.id}}"
+                data-current-value="{{itemOrcamento.descricao|default_if_none:''}}"
+                value="{{itemOrcamento.descricao|default_if_none:''}}"
+                id="descricao"
+                name="descricao">{{itemOrcamento.descricao|default_if_none:''}}</textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label for="itemOrcamento"><b>Unidade</b></label>
+                <input type="text"
+                class="form-control"
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{itemOrcamento.id}}"
+                data-current-value="{{itemOrcamento.unidade|default_if_none:''}}"
+                value="{{itemOrcamento.unidade|default_if_none:''}}"
+                id="unidade"
+                name="unidade">
+            </div>
+
+            <div class="col-3">
+                <label for="itemOrcamento"><b>Quantidade</b></label>
+                <input type="number"
+                step="1"
+                class="form-control"
+                {% if read_only == True %} disabled {% endif %}
+                data-id="{{itemOrcamento.id}}"
+                data-current-value="{{itemOrcamento.quantidade|default_if_none:''}}"
+                value="{{itemOrcamento.quantidade|default_if_none:''}}"
+                id="quantidade"
+                name="quantidade">
+            </div>
+
+            <div class="col-3">
+                <label for="itemOrcamento"><b>Valor</b></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">R$</span>
+                    </div>
+                    <input type="text"
+                    class="form-control"
+                    {% if read_only == True %} disabled {% endif %}
+                    data-id="{{itemOrcamento.id}}"
+                    data-current-value="{{itemOrcamento.valor|default_if_none:''}}"
+                    value="{{itemOrcamento.valor|default_if_none:''}}"
+                    id="valor"
+                    name="valor">
+                </div>
+            </div>
+
+            <div class="col-3">
+                <label for="itemOrcamento"><b>Valor Total</b></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">R$</span>
+                    </div>
+                    <input type="text"
+                    class="form-control"
+                    disabled
+                    data-id="{{itemOrcamento.id}}"
+                    data-current-value="{{itemOrcamento.valor_total|default_if_none:''}}"
+                    value="{{itemOrcamento.valor_total|default_if_none:''}}"
+                    id="valor_total"
+                    name="valor_total">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            let formContainer = $("#form-container-" + params.itemOrcamentoId);
+
+
+            function handleUpdateItemOrcamento(id, data) {
+                updateItemOrcamento(id, 
+                    data, 
+                    function (response) {
+                        showFloatingMessage("Item de orcamento atualizado com sucesso!", "alert-success")
+                    }, function (error) {
+                        showFloatingMessage("Erro ao atualizar item de orcamento!", "alert-danger")
+                        $(this).val(current_value);
+                    });
+            }
+
+            formContainer[0].getValue = function () {
+                var itemOrcamento = {}
+                formContainer.find("input, textarea").each(function () {
+                    var name = $(this).attr('name');
+                    itemOrcamento[name] = $(this).val();
+                });
+
+                return itemOrcamento;
+            }
+
+            formContainer.find("input , textarea").each(function () {
+                let includedField = ['descricao', 'unidade', 'quantidade', 'valor', 'valor_total'];
+                if (!includedField.includes($(this).attr('name'))) return;
+                $(this).on('change', function () {
+                    var name = $(this).attr('name');
+                    var value = $(this).val();
+                    let data = {}
+                    let current_value = $(this).data('current-value');
+                    data[name] = value;
+
+                    if (current_value == value || !params.itemOrcamentoId) return;
+                    handleUpdateItemOrcamento(params.itemOrcamentoId, data);
+                });
+            });
+
+            // calculate valor total when quantidade or valor change
+            formContainer.find("input[name='quantidade'], input[name='valor']").each(function () {
+                $(this).on('change', function () {
+                    var quantidade = formContainer.find("input[name='quantidade']").val();
+                    var valor = formContainer.find("input[name='valor']").val();
+                    if (!quantidade || !valor) return;
+                    var valor_total = quantidade * valor;
+                    formContainer.find("input[name='valor_total']").val(valor_total);
+                    handleUpdateItemOrcamento(params.itemOrcamentoId, {valor_total: valor_total});
+                });
+            });
+
+        })({
+            itemOrcamentoId: '{{itemOrcamento.id}}'
+        })
+    });
+</script>

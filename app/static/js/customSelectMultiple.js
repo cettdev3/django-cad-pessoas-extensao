@@ -130,11 +130,10 @@ class CustomSelectMultiple {
             return;
         }
 
-
         this.state.isLoading = true;
         this.showSpinner();
     
-        this.config.loadOptions({}).then(options => {
+        this.config.loadOptions({}).then(options => {            
             this.state.options = options;
             this.renderOptions();
             this.renderBadges();
@@ -242,7 +241,6 @@ class CustomSelectMultiple {
     renderBadges() {
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
-        console.log(this.state.selectedOptions)
 
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => o.id === id);

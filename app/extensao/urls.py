@@ -52,7 +52,7 @@ from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, 
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
 from sistema.views.siteTipoAtividadeViews import gerenciarTipoAtividade, tiposAtividadesTable, tipoAtividadeModal, saveTipoAtividade, eliminarTipoAtividade, tipoAtividadeEditarModal, editarTipoAtividade, tiposAtividadesSelect
-from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, deleteAtividade, getAtividadeDrawer, editarAtividade, atividadeSelect
+from sistema.views.siteAtividadeViews import atividadesDpEventoTable, atividadesTable, atividadeModal, saveAtividade, deleteAtividade, getAtividadeDrawer, editarAtividade, atividadeSelect, atividadeForm
 from sistema.views.siteDataRemovidaViews import eliminarDataRemovida, createDataRemovida
 from sistema.views.siteAvaliacaoViews import avaliacoesTable, eliminarAvaliacao, updateAvaliacao, avaliacaoModal, saveAvaliacao, avaliacoesDpEventoTable, avaliacaoRelatorio
 from sistema.views.siteServicosContratadosViews import servicoContratadoModal, servicoContratadoTable, saveServicoContratado, deleteServicoContratado
@@ -83,6 +83,7 @@ from sistema.views.cotecViews.projetosCotecViews import (
     removePropostaProjeto,
     showPropostaProjeto,
     createProjetoFromProposta,
+    itemOrcamentoForm
 )
 
 from sistema.views.siteGaleriaViews import (
@@ -189,6 +190,7 @@ urlpatterns = [
     path("update-item-orcamento/<pk>", updateItemOrcamento, name="update-item-orcamento"),
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
+    path("item-orcamento-form", itemOrcamentoForm, name="item-orcamento-form"),
 
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
@@ -326,6 +328,7 @@ urlpatterns = [
     path("editarAtividade/<atividade_id>", editarAtividade),
     path("atividadesDpEventoTable", atividadesDpEventoTable),
     path("atividadeSelect", atividadeSelect),
+    path("atividadeForm", atividadeForm),
     
     # ROTAS PARA MEMBROS DE EXECUCAO
     path("membrosExecucaoTable",membrosExecucaoTable),

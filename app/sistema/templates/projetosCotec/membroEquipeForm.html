@@ -11,7 +11,9 @@
             <div class="col-6">
                 <label for="nome">Função</label>
                 <input type="text" class="form-control" 
-                {% if read_only == True %} disabled {% endif %}
+                {% if read_only == True or membroEquipe.role == 'responsavel' or membroEquipe.role == 'proponente' %} 
+                    disabled 
+                {% endif %}
                 data-id="{{membroEquipe.id}}" 
                 data-current-value="{{membroEquipe.role|default_if_none:''}}"
                 value="{{membroEquipe.role|default_if_none:''}}" 

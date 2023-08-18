@@ -94,32 +94,9 @@
         </div>
     </div>
     <div id="form-container" class="container">
-        <button id="get-form-values">Get form value</button>
         <form id="create-projeto-cotec-form">
             <div id="step-dados-gerais">
                 <h2>Dados Gerais</h2>
-                <div data-membro-equipe-id="{{proposta_projeto.proponente.id}}"
-                class="form-group">
-                    <label for="proponente"><b>Proponente</b></label>
-                    <div id="multiple-form-component-proponente">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Carregando itens...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div data-membro-equipe-id="{{proposta_projeto.responsavel.id}}"
-                class="form-group">
-                    <label for="responsavel"><b>Responsáveis</b></label>
-                    <div id="multiple-form-component-respomsaveis">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Carregando itens...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="form-group">
                     <label for="titulo-do-projeto">Título do projeto</label>
                     <input type="text" 
@@ -232,6 +209,15 @@
                     name="fontes_apoio" rows="5">{{proposta_projeto.fontes_apoio|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
+                    <label for="publico_alvo">Público alvo</label>
+                    <textarea class="form-control proposta-field" id="publico_alvo" 
+                    {% if proposta_projeto.read_only %}
+                    disabled
+                    {% endif %}
+                    name="publico_alvo"
+                    rows="5">{{proposta_projeto.publico_alvo|default_if_none:''}}</textarea>
+                </div>
+                <div class="form-group">
                     <label for="informacoes-adicionais">Informações adicionais</label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
@@ -241,30 +227,62 @@
                     name="informacoes_adicionais"
                     rows="5">{{proposta_projeto.informacoes_adicionais|default_if_none:''}}</textarea>
                 </div>
-                <div class="form-group">
-                    <label for="publico_alvo">Público alvo</label>
-                    <textarea class="form-control proposta-field" id="publico_alvo" 
-                    {% if proposta_projeto.read_only %}
-                    disabled
-                    {% endif %}
-                    name="publico_alvo"
-                    rows="5">{{proposta_projeto.publico_alvo|default_if_none:''}}</textarea>
-                </div>
             </div>
     
-            <div id="step-cronograma">
+            <div id="step-cronograma" style="height: fit-content;">
                 <h2>Cronograma geral das atividades</h2>
-                {% include 'projetosCotec/atividadeSectionInput.html' with read_only=proposta_projeto.read_only cidades=cidades id='cronograma-geral' cronograma=proposta_projeto.atividades.all propostaId=proposta_projeto.id %}
+                <div id="multiple-form-component-cronograma">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Carregando itens...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
     
             <div id="step-equipe">
                 <h2>Equipe</h2>
-                {% include 'projetosCotec/EquipeSectionInput.html' with read_only=proposta_projeto.read_only pessoas=pessoas id='equipe-executora' equipe=proposta_projeto.equipe.all propostaId=proposta_projeto.id %}
+                <div class="form-group">
+                    <label for="proponente"><b>Proponente</b></label>
+                    <div id="multiple-form-component-proponente">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Carregando itens...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="responsavel"><b>Responsáveis</b></label>
+                    <div id="multiple-form-component-respomsaveis">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Carregando itens...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="equipe-executora"><b>Equipe executora</b></label>
+                    <div id="multiple-form-component-equipe">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Carregando itens...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
     
             <div id="step-orcamento">
                 <h2>Orçamento</h2>
-                {% include 'projetosCotec/orcamentoSectionInput.html' with read_only=proposta_projeto.read_only id='orcamento' orcamento_items=proposta_projeto.orcamento.items.all orcamentoId=proposta_projeto.orcamento.id %}
+                <div id="multiple-form-component-orcamento">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Carregando itens...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
     
             <div class="d-flex justify-content-between pb-2">
@@ -339,7 +357,11 @@
     $(document).ready(function () {
         let proponentes = {{ proponentes_json|safe }};
         let responsaveis = {{ responsaveis_json|safe }};
+        let equipe = {{ equipe_json|safe }};
+        let atividades = {{ atividades_json|safe }};
         let propostaId = '{{proposta_projeto.id}}'
+        let orcamentoId = '{{proposta_projeto.orcamento.id}}'
+        let itensOrcamento = {{ orcamento_itens_json|safe }}
         var currentStep = 0;
         var steps = ['step-dados-gerais', 'step-cronograma', 'step-equipe', 'step-orcamento'];
 
@@ -463,7 +485,7 @@
             }
         });
 
-        let handleCreateMembroEquipe = () => propostaId ? createMembroEquipe({proposta_projeto_id: propostaId}, function (data) {
+        let handleCreateMembroEquipe = (data) => propostaId ? createMembroEquipe(data, function (data) {
                 showFloatingMessage("Membro adicionado a equipe com sucesso", "alert-success");
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
@@ -472,7 +494,7 @@
         const multipleFormOptions = {
             fetchFormTemplateFunction: getMembroEquipeForm,
             fetchComponentTemplateFunction: getMultipleFormComponent,
-            createFunction: propostaId ? handleCreateMembroEquipe : undefined,
+            createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "proponente"}) : undefined,
             showAddButton: false,
             showDeleteButton: false,
             updateFunction: async function(modelId, data) {
@@ -487,15 +509,6 @@
                 multipleForm.setValue(formData);
             }
         };
-        
-        selectDataService.fetchData('pessoas', getPessoas).then(data => {
-            multipleForm = new MultipleFormComponent(multipleFormOptions);
-            $("#get-form-values").on('click', () => {
-                console.log(multipleForm.getValues())
-            })
-        }).catch(error => {
-            console.error("Failed to fetch pessoas data:", error);
-        });
 
         // SETUP FORMULARIO DE RESPONSÁVEIS
         let responsaveisIds = responsaveis.map(item => {
@@ -513,9 +526,10 @@
         const multipleFormOptionsResponsaveis = {
             fetchFormTemplateFunction: getMembroEquipeForm,
             fetchComponentTemplateFunction: getMultipleFormComponent,
-            createFunction: propostaId ? handleCreateMembroEquipe : undefined,
+            createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "responsavel"}) : undefined,
             // showAddButton: false,
             // showDeleteButton: false,
+            showSaveButton: false,
             updateFunction: async function(modelId, data) {
                 console.log(modelId, data)
             },
@@ -529,14 +543,144 @@
             }
         };
 
+        // SETUP FORMULARIO DE EQUIPE
+
+        equipeIds = equipe.map(item => {
+            return {
+                id: item.pk
+            }
+        });
+        const multipleFormEquipeOptions = {
+            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchComponentTemplateFunction: getMultipleFormComponent,
+            createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId}) : undefined,
+            // showAddButton: false,
+            // showDeleteButton: false,
+            showSaveButton: false,
+            updateFunction: async function(modelId, data) {
+                console.log(modelId, data)
+            },
+            deleteFunction: async function(modelId) {
+                handleDeleteMembroEquipe(modelId)
+            },
+            onReady: function() {
+                $("#multiple-form-component-equipe").html(multipleFormEquipe.element);
+                const formData = equipeIds.length > 0 ? equipeIds : 0;
+                multipleFormEquipe.setValue(formData);
+            }
+        };
+
         selectDataService.fetchData('pessoas', getPessoas).then(data => {
+            multipleForm = new MultipleFormComponent(multipleFormOptions);
+            $("#get-form-values").on('click', () => {
+                console.log("proponente: ", multipleForm.getValues())
+            })
+
             multipleFormResponsaveis = new MultipleFormComponent(multipleFormOptionsResponsaveis);
             $("#get-form-values").on('click', () => {
-                console.log(multipleFormResponsaveis.getValues())
+                console.log("responsavel: ", multipleFormResponsaveis.getValues())
+            })
+
+            multipleFormEquipe = new MultipleFormComponent(multipleFormEquipeOptions);
+            $("#get-form-values").on('click', () => {
+                console.log("equipe: ", multipleFormEquipe.getValues())
             })
         }).catch(error => {
             console.error("Failed to fetch pessoas data:", error);
         });
+
+        // SETUP FORMULARIO DE CRONOGRAMA
+        let atividadeIds = atividades.map(item => {
+            return {
+                id: item.pk
+            }
+        });
+
+        let handleCreateCronograma = () => propostaId ? createAtividade({proposta_projeto_id: propostaId}, function (data) {
+                showFloatingMessage("Item adicionado ao cronograma com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+
+        
+        let handleDeleteCronograma = (membroEquipeId) => propostaId ? removeAtividade(membroEquipeId, function (data) {
+                showFloatingMessage("Membro removido da equipe com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+
+        const multipleFormOptionsCronograma = {
+            fetchFormTemplateFunction: getAtividadeForm,
+            fetchComponentTemplateFunction: getMultipleFormComponent,
+            createFunction: propostaId ? handleCreateCronograma : undefined,
+            // showAddButton: false,
+            // showDeleteButton: false,
+            showSaveButton: false,
+            updateFunction: async function(modelId, data) {
+                console.log(modelId, data)
+            },
+            deleteFunction: async function(modelId) {
+                handleDeleteCronograma(modelId)
+            },
+            onReady: function() {
+                $("#multiple-form-component-cronograma").html(multipleFormCronograma.element);
+                const formData = atividadeIds.length > 0 ? atividadeIds : 1;
+                multipleFormCronograma.setValue(formData);
+            }
+        };
+
+        selectDataService.fetchData('cidades', getCidades).then(data => {
+            multipleFormCronograma = new MultipleFormComponent(multipleFormOptionsCronograma);
+            $("#get-form-values").on('click', () => {
+                console.log("cronograma: ", multipleFormCronograma.getValues())
+            })
+        }).catch(error => {
+            console.error("Failed to fetch cidades data:", error);
+        });
+
+        // SETUP FORMULARIO DE ORÇAMENTO
+        let itemOrcamentoIds = itensOrcamento.map(item => {
+            return {
+                id: item.pk
+            }
+        });
+
+        let handleCreateOrcamento = () => orcamentoId ? createItemOrcamento({orcamento_id: orcamentoId}, function (data) {
+                showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+        
+        let handleDeleteOrcamento = (itemOrcamentoId) => orcamentoId ? removeItemOrcamento(itemOrcamentoId, function (data) {
+                showFloatingMessage("Item removido do orçamento com sucesso", "alert-success");
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            }) : undefined;
+
+        const multipleFormOptionsOrcamento = {
+            fetchFormTemplateFunction: getItemOrcamentoForm,
+            fetchComponentTemplateFunction: getMultipleFormComponent,
+            createFunction: orcamentoId ? handleCreateOrcamento : undefined,
+            // showAddButton: false,
+            // showDeleteButton: false,
+            showSaveButton: false,
+            updateFunction: async function(modelId, data) {
+                console.log(modelId, data)
+            },
+            deleteFunction: async function(modelId) {
+                handleDeleteOrcamento(modelId)
+            },
+            onReady: function() {
+                $("#multiple-form-component-orcamento").html(multipleFormOrcamento.element);
+                const formData = itemOrcamentoIds.length > 0 ? itemOrcamentoIds : 1;
+                multipleFormOrcamento.setValue(formData);
+            }
+        };
+
+        multipleFormOrcamento = new MultipleFormComponent(multipleFormOptionsOrcamento);
+        $("#get-form-values").on('click', () => {
+            console.log("orcamento: ", multipleFormOrcamento.getValues())
+        })
 
         if (propostaId) {
             window.history.replaceState({}, document.title, "?proposta_id=" + propostaId);

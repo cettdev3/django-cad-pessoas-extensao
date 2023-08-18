@@ -11,7 +11,7 @@ from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
 from sistema.emailtemplates import PropostaSubmetidaEmail
 from django.core import serializers
-import envconfiguration as config
+from django.db.models import Q
 
 @login_required(login_url="/auth-user/login-user")
 def projetoCotecIndex(request):
@@ -62,6 +62,9 @@ def projetoCotecForm(request):
     cursos_json = json.dumps(cursos_list)
     proponentes_json = serializers.serialize('json', proposta_projeto.proponentes)
     responsaveis_json = serializers.serialize('json', proposta_projeto.responsaveis)
+    atividades_json = serializers.serialize('json', proposta_projeto.atividades.all())
+    equipe_json = serializers.serialize('json', proposta_projeto.equipe.filter(~Q(role__in=["proponente", "responsavel"])))
+    orcamento_itens_json = serializers.serialize('json', proposta_projeto.orcamento.items.all())
     return render(
         request,
         "projetosCotec/projetoCotecCreate.html",
@@ -73,6 +76,9 @@ def projetoCotecForm(request):
             "proposta_projeto": proposta_projeto,
             "proponentes_json": proponentes_json,
             "responsaveis_json": responsaveis_json,
+            "atividades_json": atividades_json,
+            "equipe_json": equipe_json,
+            "orcamento_itens_json": orcamento_itens_json,
         },
     )
 
@@ -111,20 +117,6 @@ def selectMultipleComponent(request):
     context["modal_label"] = request.GET.get("modal_label")
     context["select_label"] = request.GET.get("select_label")
     context["multiple"] = request.GET.get("multiple")
-
-    pessoas = None
-    if context["model"] == "pessoas":
-        pessoas = Pessoas.objects.all()
-        pessoas_list = list(pessoas.values('id', 'nome')) 
-        pessoas_json = json.dumps(pessoas_list, ensure_ascii=False)
-        context["options"] = pessoas_json
-    
-    cidades = None
-    if context["model"] == "cidade":
-        cidades = Cidade.objects.all()
-        cidades_list = list(cidades.values('id', 'nome')) 
-        cidades_json = json.dumps(cidades_list, ensure_ascii=False)
-        context["options"] = cidades_json
 
     return render(
         request,
@@ -367,10 +359,10 @@ def propostasTable(request):
 def updateAtividade(request, pk):
     data = json.loads(request.body.decode())
     atividade = Atividade.objects.get(pk=pk)
-    if data.get("data"):
-        atividade.data_realizacao_inicio = data.get("data")
-    if data.get("hora"):
-        atividade.horario_inicio = data.get("hora")
+    if data.get("data_realizacao_inicio"):
+        atividade.data_realizacao_inicio = data.get("data_realizacao_inicio")
+    if data.get("horario_inicio"):
+        atividade.horario_inicio = data.get("horario_inicio")
     if data.get("local"):
         atividade.local = data.get("local")
     if data.get("nome"):
@@ -477,6 +469,18 @@ def removeItemOrcamento(request, pk):
     itemOrcamento = OrcamentoItem.objects.get(pk=pk)
     itemOrcamento.delete()
     return JsonResponse({"message": "Atividade removida com sucesso!"})
+
+@login_required(login_url="/auth-user/login-user")
+def itemOrcamentoForm(request):
+    model_id = request.GET.get("model_id")
+    context = {}
+    if model_id:
+        try:
+            atividade = OrcamentoItem.objects.get(pk=model_id)
+            context["itemOrcamento"] = atividade
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Item de orcamento não encontrado"}, status=400)
+    return render(request, 'projetosCotec/itemOrcamentoForm.html', context)
 
 # def deleteAll():
 #     with transaction.atomic():
