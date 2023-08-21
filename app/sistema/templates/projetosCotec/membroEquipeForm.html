@@ -29,7 +29,11 @@
                 {% endif %}
                 data-id="{{membroEquipe.id}}" 
                 data-current-value="{{membroEquipe.instituicao|default_if_none:''}}"
+                {% if membroEquipe.instituicao %}
                 value="{{membroEquipe.instituicao|default_if_none:''}}" 
+                {% elif escola_nome %}
+                value="{{escola_nome}}" 
+                {% endif %}
                 id="instituicao" 
                 name="instituicao">
             </div>

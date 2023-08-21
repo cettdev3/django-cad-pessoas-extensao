@@ -393,6 +393,7 @@
         let responsaveis = {{ responsaveis_json|safe }};
         let equipe = {{ equipe_json|safe }};
         let atividades = {{ atividades_json|safe }};
+        let escola_nome = {% if user.is_authenticated %}'{{ user.pessoa.escola.nome }}'{% else %}''{% endif %}
         let propostaId = '{{proposta_projeto.id}}'
         let orcamentoId = '{{proposta_projeto.orcamento.id}}'
         let itensOrcamento = {{ orcamento_itens_json|safe }}
@@ -526,7 +527,7 @@
             }) : undefined;
 
         const multipleFormOptions = {
-            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
             fetchComponentTemplateFunction: getMultipleFormComponent,
             createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "proponente"}) : undefined,
             showAddButton: false,
@@ -558,7 +559,7 @@
             }) : undefined;
 
         const multipleFormOptionsResponsaveis = {
-            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
             fetchComponentTemplateFunction: getMultipleFormComponent,
             createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "responsavel"}) : undefined,
             // showAddButton: false,
@@ -585,7 +586,7 @@
             }
         });
         const multipleFormEquipeOptions = {
-            fetchFormTemplateFunction: getMembroEquipeForm,
+            fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
             fetchComponentTemplateFunction: getMultipleFormComponent,
             createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId}) : undefined,
             // showAddButton: false,

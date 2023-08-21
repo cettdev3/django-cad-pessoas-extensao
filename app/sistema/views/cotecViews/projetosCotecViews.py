@@ -136,7 +136,9 @@ def getMultipleFormComponent(request):
 @login_required(login_url="/auth-user/login-user")
 def membroEquipeForm(request):
     model_id = request.GET.get("model_id")
+    escola_nome = request.GET.get("escola_nome")
     context = {}
+    context["escola_nome"] = escola_nome
     if model_id:
         try:
             membroEquipe = MembroExecucao.objects.get(pk=model_id)
