@@ -1,7 +1,7 @@
 <form id="form-atividade-container-{{atividade.id}}">
     <div id="form-container-{{atividade.id}}">
-        <dib class="form-group row">
-            <div class="col-3">
+        <div class="form-group row">
+            <div class="col-12">
                 <label for="nome"><b>Nome</b></label>
                 <input type="text" class="form-control" 
                 {% if read_only == True %} disabled {% endif %}
@@ -11,40 +11,56 @@
                 id="nome"
                 name="nome">
             </div>
-
+        </div>
+        <div class="row align-items-end">
             <div class="col-3">
                 <label for="nome"><b>Data Início</b></label>
                 <input type="date" class="form-control" 
-                {% if read_only == True %} disabled {% endif %}
-                data-id="{{atividade.id}}"
-                data-current-value="{{atividade.data_realizacao_inicio|default_if_none:''}}"
-                value="{{atividade.data_realizacao_inicio|date:'Y-m-d' }}"
-                id="data_realizacao_inicio"
-                name="data_realizacao_inicio">
+                       {% if read_only == True %} disabled {% endif %}
+                       data-id="{{atividade.id}}"
+                       data-current-value="{{atividade.data_realizacao_inicio|default_if_none:''}}"
+                       value="{{atividade.data_realizacao_inicio|date:'Y-m-d' }}"
+                       id="data_realizacao_inicio"
+                       name="data_realizacao_inicio">
             </div>
-
+        
             <div class="col-3">
                 <label for="nome"><b>Hora Início</b></label>
                 <input type="time" class="form-control" 
-                {% if read_only == True %} disabled {% endif %}
-                data-id="{{atividade.id}}"
-                data-current-value="{{atividade.horario_inicio|default_if_none:''}}"
-                value="{{atividade.horario_inicio|date:'H:i'}}"
-                id="horario_inicio"
-                name="horario_inicio">
+                       {% if read_only == True %} disabled {% endif %}
+                       data-id="{{atividade.id}}"
+                       data-current-value="{{atividade.horario_inicio|default_if_none:''}}"
+                       value="{{atividade.horario_inicio|date:'H:i'}}"
+                       id="horario_inicio"
+                       name="horario_inicio">
             </div>
-
+            
+            <div class="col-3">
+                <label for="nome"><b>Hora de Término</b></label>
+                <input type="time" class="form-control" 
+                       {% if read_only == True %} disabled {% endif %}
+                       data-id="{{atividade.id}}"
+                       data-current-value="{{atividade.horario_fim|default_if_none:''}}"
+                       value="{{atividade.horario_fim|date:'H:i'}}"
+                       id="horario_fim"
+                       name="horario_fim">
+            </div>
+        
             <div class="col-3">
                 <label for="nome"><b>Público Esperado</b></label>
                 <input type="number" class="form-control" 
-                {% if read_only == True %} disabled {% endif %}
-                data-id="{{atividade.id}}"
-                data-current-value="{{atividade.publico_esperado|default_if_none:''}}"
-                value="{{atividade.publico_esperado|default_if_none:''}}"
-                id="publico_esperado"
-                name="publico_esperado">
+                       {% if read_only == True %} disabled {% endif %}
+                       data-id="{{atividade.id}}"
+                       data-current-value="{{atividade.publico_esperado|default_if_none:''}}"
+                       value="{{atividade.publico_esperado|default_if_none:''}}"
+                       id="publico_esperado"
+                       name="publico_esperado">
             </div>
-        </dib>
+        
+            <div class="col-6 offset-3 mt-0">
+                <small id="timeDifferenceError" class="form-text text-danger"></small>
+            </div>
+        </div>
 
         <div class="form-group row">
             <div class="col-6">
@@ -102,7 +118,7 @@
                 }
 
                 formContainer.find("input").each(function () {
-                    let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio', 'publico_esperado', 'local'];
+                    let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio','horario_fim', 'publico_esperado', 'local'];
                     if (!includedField.includes($(this).attr('name'))) return;
                     $(this).on('change', function () {
                         var name = $(this).attr('name');
@@ -143,6 +159,38 @@
                 });
 
             });
+
+            let startTimeInput = $('#horario_inicio');
+            let endTimeInput = $('#horario_fim');
+        
+            function validateTimeDifference() {
+                let startTimeArray = $('#horario_inicio').val().split(':');
+                let endTimeArray = $('#horario_fim').val().split(':');
+            
+                let startDate = new Date();
+                startDate.setHours(startTimeArray[0], startTimeArray[1], 0, 0);
+            
+                let endDate = new Date();
+                endDate.setHours(endTimeArray[0], endTimeArray[1], 0, 0);
+            
+                let differenceInHours = (endDate - startDate) / (1000 * 60 * 60);
+            
+                if (differenceInHours < 4) {
+                    $('#timeDifferenceError').text("A diferença entre o horário de início e término deve ser de pelo menos 4 horas!");
+                    $('#horario_inicio').addClass('is-invalid');
+                    $('#horario_fim').addClass('is-invalid');
+            
+                    return false;
+                } else {
+                    $('#timeDifferenceError').text("");
+                    $('#horario_inicio').removeClass('is-invalid');
+                    $('#horario_fim').removeClass('is-invalid');
+                    return true;
+                }
+            }
+                                
+            startTimeInput.on('change', validateTimeDifference);
+            endTimeInput.on('change', validateTimeDifference);
 
         })({
             atividadeId: '{{atividade.id}}'

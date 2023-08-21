@@ -363,6 +363,8 @@ def updateAtividade(request, pk):
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio")
     if data.get("horario_inicio"):
         atividade.horario_inicio = data.get("horario_inicio")
+    if data.get("horario_fim"):
+        atividade.horario_fim = data.get("horario_fim")
     if data.get("local"):
         atividade.local = data.get("local")
     if data.get("nome"):
