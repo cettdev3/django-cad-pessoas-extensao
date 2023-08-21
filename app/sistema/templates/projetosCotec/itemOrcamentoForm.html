@@ -40,21 +40,31 @@
             </div>
 
             <div class="col-3">
-                <label for="itemOrcamento"><b>Valor Estimado</b></label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">R$</span>
+                <div class="d-flex justify-content-between mb-0">
+                    <label for="itemOrcamento"><b>Valor Estimado</b></label>
+                    <div class="mb-2">
+                        <input type="checkbox" id="em_estoque_{{itemOrcamento.id}}" name="em_estoque" {% if itemOrcamento.em_estoque %} checked {% endif %}>
+                        <label for="em_estoque_{{itemOrcamento.id}}" class="mb-0">Em estoque</label>
                     </div>
-                    <input type="text"
-                    class="form-control"
-                    {% if read_only == True %} disabled {% endif %}
-                    data-id="{{itemOrcamento.id}}"
-                    data-current-value="{{itemOrcamento.valor|default_if_none:''}}"
-                    value="{{itemOrcamento.valor|default_if_none:''}}"
-                    id="valor"
-                    name="valor">
+                </div>
+                <div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        <input type="text"
+                               class="form-control"
+                               {% if read_only == True %} disabled {% endif %}
+                               data-id="{{itemOrcamento.id}}"
+                               data-current-value="{{itemOrcamento.valor|default_if_none:''}}"
+                               value="{{itemOrcamento.valor|default_if_none:''}}"
+                               id="valor"
+                               name="valor">
+                    </div>
                 </div>
             </div>
+            
+            
 
             <div class="col-3">
                 <label for="itemOrcamento"><b>Valor Total Estimado</b></label>
@@ -80,6 +90,27 @@
         (function (params) {
             let formContainer = $("#form-container-" + params.itemOrcamentoId);
 
+            function handleSemCustoCheckbox() {
+            var isChecked = $("#em_estoque_" + params.itemOrcamentoId).is(':checked');
+            if (isChecked) {
+                formContainer.find("input[name='valor'], input[name='valor_total']").prop('disabled', true).val('0');
+            } else {
+                formContainer.find("input[name='valor']").prop('disabled', false);
+            }
+        }
+        
+        // Initially handle the checkbox behavior
+        handleSemCustoCheckbox();
+        
+        // Listen for changes on the checkbox
+        $("#em_estoque_" + params.itemOrcamentoId).on('change', function() {
+            handleSemCustoCheckbox();
+            handleUpdateItemOrcamento(params.itemOrcamentoId, {
+                valor: formContainer.find("input[name='valor']").val(),
+                valor_total: formContainer.find("input[name='valor_total']").val(),
+                em_estoque: $(this).is(':checked') 
+            });
+        });
 
             function handleUpdateItemOrcamento(id, data) {
                 updateItemOrcamento(id, 

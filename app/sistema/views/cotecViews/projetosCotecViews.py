@@ -450,6 +450,8 @@ def updateItemOrcamento(request, pk):
         itemOrcamento.unidade = data.get('unidade')
     if data.get('valor'):
         itemOrcamento.valor = data.get('valor')
+    if 'em_estoque' in data:
+        itemOrcamento.em_estoque = data.get('em_estoque')
     if data.get('valor_total'):
         itemOrcamento.valor_total = data.get('valor_total')
     itemOrcamento.save()
