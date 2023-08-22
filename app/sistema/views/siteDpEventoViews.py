@@ -434,15 +434,17 @@ def getAtividadeImage(doc: Document, atividade, imageCounter):
         except IOError:
             print("Error: Unable to read or save the image using Pillow")
 
+        # Title of the image
         p = doc.add_paragraph()
         p.add_run(f"Figura {imageCounter}: {imagem.descricao}")
-        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER  # Center-align the title
 
         try:
+            # Image
             img_paragraph = doc.add_paragraph()
             img_run = img_paragraph.add_run()
             img_run.add_picture(image_path, width=Inches(4.0))
-            img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER  # Center-align the image
         except Exception as e:
             error_message = (
                 f"Error: Unable to recognize the image format for {imagem.descricao}."
@@ -458,6 +460,7 @@ def getAtividadeImage(doc: Document, atividade, imageCounter):
         imageCounter += 1
 
     return doc, imageCounter
+
 
 
 def getAtividade(doc, atividade, counter, imageCounter):
@@ -487,6 +490,17 @@ def reportEventos(eventos):
 def getRelatorioType1(doc, relatorioData):
     counter = 1
     imageCounter = 1
+
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Arial'
+    font.size = Pt(12)
+    
+    run_style = doc.styles['DefaultParagraphFont']
+    run_font = run_style.font
+    run_font.name = 'Arial'
+    run_font.size = Pt(12)
+
     for nomeEvento, eventos in relatorioData.items():
         if not reportEventos(eventos):
             continue
@@ -499,7 +513,6 @@ def getRelatorioType1(doc, relatorioData):
                 if current_evento != old_evento:
                     tipoTexto = evento.tipo_formatado if evento.tipo else "Não Informado"
                     cidadeNomeTexto = evento.cidade.nome if evento.cidade else "Não Informado"
-                    # doc = getSectionTitle(doc, f"{tipoTexto} - {cidadeNomeTexto}")
                     old_evento = current_evento
                 tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else atividade.nome
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
