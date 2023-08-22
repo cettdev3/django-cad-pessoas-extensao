@@ -4,6 +4,7 @@ from ..models.dpEvento import DpEvento
 from ..models.cidade import Cidade
 from .escolaSerializer import EscolaSerializer
 from .membroExecucaoSerializer import MembroExecucaoSerializer
+from .propostaProjetoSerializer import PropostaProjetoSerializer
 
 class DpEventoSerializer(serializers.ModelSerializer):
     membroexecucao_set = MembroExecucaoSerializer(many=True, read_only=True)
@@ -12,6 +13,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
     data_fim_formatada = serializers.CharField(read_only=True)
     tipo_formatado = serializers.CharField(read_only=True)
     escolas = EscolaSerializer(many=True, read_only=True)
+    proposta_projeto = PropostaProjetoSerializer(read_only=True)
     class Meta:
         model = DpEvento
         fields = [
@@ -40,6 +42,7 @@ class DpEventoSerializer(serializers.ModelSerializer):
             "horarioInicio",
             "horarioFim",
             "valor_total",
-            "edicao"
+            "edicao",
+            "proposta_projeto"
         ]
         depth = 5

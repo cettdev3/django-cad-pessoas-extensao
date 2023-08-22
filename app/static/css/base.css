@@ -97,3 +97,83 @@ input[type="time"].error::after {
     background-color: rgba(255, 0, 0, 0.5); /* Semi-transparent red */
     pointer-events: none;  /* Ensure the input is still usable */
 }
+
+.w-5-p {
+    width: 5%;
+}
+
+.w-10-p {
+    width: 10%;
+}
+
+.w-15-p {
+    width: 15%;
+}
+
+.w-20-p {
+    width: 20%;
+}
+
+.w-25-p {
+    width: 25%;
+}
+
+.w-30-p {
+    width: 30%;
+}
+
+.w-35-p {
+    width: 35%;
+}
+
+.w-40-p {
+    width: 40%;
+}
+
+.w-45-p {
+    width: 45%;
+}
+
+.w-50-p {
+    width: 50%;
+}
+
+.w-55-p {
+    width: 55%;
+}
+
+.w-60-p {
+    width: 60%;
+}
+
+.w-65-p {
+    width: 65%;
+}
+
+.w-70-p {
+    width: 70%;
+}
+
+.w-75-p {
+    width: 75%;
+}
+
+.w-80-p {
+    width: 80%;
+}
+
+.w-85-p {
+    width: 85%;
+}
+
+.w-90-p {
+    width: 90%;
+}
+
+.w-95-p {
+    width: 95%;
+}
+
+.w-100-p {
+    width: 100%;
+}

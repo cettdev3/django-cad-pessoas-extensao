@@ -41,11 +41,14 @@ style="height: calc(100vh - 75px);">
                 <li class=" cs-tab-link active">
                     <a id="membro-execucao-tab" data-toggle="tab" href="#membrosExecucao">Equipe de Execução</a>
                 </li>
-                {% comment %} <li class=" cs-tab-link active">
+                <!-- <li class=" cs-tab-link active">
                     <a id="itinerarios-tab" data-toggle="tab" href="#itinerarios">Itinerários</a>
-                </li> {% endcomment %}
+                </li> -->
                 <li class=" cs-tab-link active">
                     <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
+                </li>
+                <li class=" cs-tab-link active">
+                    <a id="orcamento-tab" data-toggle="tab" href="#orcamento">Orcamento</a>
                 </li>
                 <li class=" cs-tab-link active">
                     <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
@@ -73,13 +76,13 @@ style="height: calc(100vh - 75px);">
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
-                <!-- <div id="add-galeria-btn">
-                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Galeria" 
+                <div id="add-item-orcamento-btn">
+                    <div data-toggle="tooltip" data-placement="top" title="Adicionar Atividade" 
                     class="d-flex align-items-center ">            
-                        <button onclick="openGaleriaModal()" 
+                        <button onclick="addItemOrcamento()" 
                         class="btn btn-success">Adicionar</button>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
         <div class="tab-content w-100 h-100 scroll-custom position-relative" 
@@ -177,15 +180,6 @@ style="height: calc(100vh - 75px);">
             class="tab-pane active in" >
                 <div id="receberTabelaMembrosExecucao" ></div>
             </div>
-            {% comment %} <div id="itinerarios" class="tab-pane" style="height: 100%;">
-                {% include "itinerarios/itinerario_input.html" with 
-                itinerario=dpEvento 
-                acao=dpEvento 
-                membrosExecucao=membrosExecucao
-                select_id=select_id
-                title=title 
-            %}
-            </div> {% endcomment %}
             <div id="atividades" class="tab-pane " >
                 <div id="atividadesTableContainer"></div>
                 <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
@@ -199,16 +193,22 @@ style="height: calc(100vh - 75px);">
                     </div>
                 </div>
             </div>
-            <!-- <div id="avaliacao" class="tab-pane" >
-                <div id="avaliacaoLocalTableContainer"></div>
-            </div> -->
+            <div id="orcamento" class="tab-pane">
+                {% include "orcamentos/orcamentoTable.html" with orcamento=dpEvento.proposta_projeto.orcamento %}
+                <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
+                    <div class="loading-container"
+                    style="display: none; position: relative">
+                        <div class="d-flex flex-column justify-content-center align-items-center">
+                            <div class="spinner-border text-primary " role="status">
+                            </div>
+                            <h3>Carregando...</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="galerias" class="tab-pane" >
                 <div id="galeriasTableContainer"></div>
             </div>
-            {% comment %} <div id="servicoContratado"  class="tab-pane active in h-100"
-            style="overflow-y: scroll;">
-                <div id="servicoContratadoTableContainer"></div>
-            </div> {% endcomment %}
         </div>
     </div>
 </div>
@@ -254,6 +254,10 @@ style="height: calc(100vh - 75px);">
                 $('#cadastrarMembroExecucaoModal').modal('show');
             }
         });
+    }
+
+    function addItemOrcamento() {
+        console.log("addItemOrcamento")
     }
 
     function clearModalFormTicket(tableToReload = null) {
@@ -414,14 +418,14 @@ style="height: calc(100vh - 75px);">
     }
     
     function dpEventoVisualizarTabsControl(id) {
-        console.log(id)
-        {% comment %} add-servico-contratado-btn {% endcomment %}
+        console.log("id da tab clicada: ", id)
         if (id == "membro-execucao-tab") {
             $("#add-membro-execucao-btn").show()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
+            $("#add-item-orcamento-btn").hide()
             $("#atividades-table-header").hide()
         } else if (id == "itinerarios-tab") {
             $("#add-membro-execucao-btn").hide()
@@ -429,33 +433,44 @@ style="height: calc(100vh - 75px);">
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
+            $("#add-item-orcamento-btn").hide()
             $("#atividades-table-header").hide()
-            reloadMap()
         } else if (id == "atividades-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").show()
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
+            $("#add-item-orcamento-btn").hide()
             $("#atividades-table-header").show()
         } else if (id == "avaliacao-local-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").show()
             $("#add-galeria-btn").hide()
+            $("#add-item-orcamento-btn").hide()
             $("#add-servico-contratado-btn").hide()
             $("#atividades-table-header").hide()
         } else if (id == "galerias-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
+            $("#add-item-orcamento-btn").hide()
             $("#add-galeria-btn").show()
             $("#add-servico-contratado-btn").hide()
+            $("#atividades-table-header").hide()
+        } else if (id == "orcamento-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
+            $("#add-item-orcamento-btn").show()
             $("#atividades-table-header").hide()
         } else {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
+            $("#add-item-orcamento-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
             $("#atividades-table-header").hide()

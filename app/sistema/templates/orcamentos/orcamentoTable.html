@@ -1,0 +1,87 @@
+<table class="table table-borderless" width="100%" cellspacing="0" id="table-orcamento-{{orcamento.id}}">
+    <thead class="border">
+        <tr class="">
+            <th class="w-45-p text-left">Descrição</th>
+            <th class="w-10-p text-left">Quantidade</th>
+            <th class="w-10-p text-left">Unidade</th>
+            <th class="w-15-p text-left">Valor Estimado</th>
+            <th class="w-15-p text-left">Valor Total Estimado</th>
+            <th class="w-5 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for orcamentoItem in orcamento.items %}
+        <tr>
+            <td class="w-45-p text-left">
+                #{{orcamentoItem.id}}:{{orcamentoItem.descricao}}
+            </td>
+            <td class="w-10-p text-left">
+                {{orcamentoItem.quantidade}}
+            </td>
+            <td class="w-10-p text-left">
+                {{orcamentoItem.unidade}}
+            </td>
+            <td class="w-15-p text-left">
+                {{orcamentoItem.valor}}
+            </td>
+            <td class="w-15-p text-left">
+                {{orcamentoItem.valor_total}}
+            </td>
+            <td class="w-5-p text-left" style="position: relative;">
+                <div class="d-flex justify-content-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn-remove-default btn-circle btn-outline-secondary"
+                        data-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <button data-orcamento-item-id="{{orcamentoItem.id}}" 
+                            class="dropdown-item cursor-pointer"
+                            id="item-orcamento-edit-btn-{{orcamentoItem.id}}">Editar</button>
+                            <button class="dropdown-item cursor-pointer"
+                            onclick="criarTicket('{{orcamentoItem.id}}')">Adicionar Demanda</button>
+                            <button class="dropdown-item cursor-pointer"
+                            onclick="openDeleteModal(() => deleteOrcamentoItem('{{orcamentoItem.id}}'))">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function deleteOrcamentoItem(orcamentoItemId) {
+        removeItemOrcamento(itemOrcamentoId, function (data) {
+            showFloatingMessage("Item removido do orçamento com sucesso", "alert-success");
+        }, function (error) {
+            showFloatingMessage(error.responseJSON.message, "alert-danger");
+        })
+    }
+
+    $(document).ready(function() {
+        (function(params) {
+            let table = $("#table-orcamento-" + params.orcamentoId);
+            const orcamentoModal = new CustomModalComponent({
+                modalTitle: "Adicionar Item de Orçamento",
+                modalBtnActionText: "Adicionar",
+                modalActionFunction: () => updateItemOrcamento(
+                    {orcamento_id: params.orcamentoId, ...orcamentoModal.getFormValues()}, 
+                    function (data) {
+                        showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+                    }, 
+                    function (error) {
+                        showFloatingMessage(error.responseJSON.message, "alert-danger");
+                    })
+            });
+
+            table.on('click', '[id^="item-orcamento-edit-btn-"]', ($event) => {
+                console.log("edit item orcamento", $event.currentTarget)
+                let itemOrcamentoId = $($event.currentTarget).data('orcamento-item-id');
+                orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
+                orcamentoModal.open('xl');
+            });
+
+        })({orcamentoId: '{{orcamento.id}}'})
+    })
+</script>

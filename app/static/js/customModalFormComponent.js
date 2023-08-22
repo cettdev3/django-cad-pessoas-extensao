@@ -89,7 +89,6 @@ class CustomModalComponent {
                 this.close();
             })
             .catch(error => {
-                console.log("erro dentro da modal", error);
                 this.emitEvent('action-fail', error);
             });
     }
@@ -98,7 +97,7 @@ class CustomModalComponent {
         this.element.find(".modal-action").html(text);
     }
 
-    open(size) {
+    open(size = 'lg') {
         this.setSize(size); 
         this.loadContent();
     }

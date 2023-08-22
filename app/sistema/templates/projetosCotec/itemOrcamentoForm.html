@@ -54,7 +54,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">R$</span>
                     </div>
-                    <input type="text" class="form-control" disabled data-id="{{itemOrcamento.id}}"
+                    <input type="text" class="form-control" readonly data-id="{{itemOrcamento.id}}"
                         data-current-value="{{itemOrcamento.valor_total|default_if_none:''}}"
                         value="{{itemOrcamento.valor_total|default_if_none:''}}" id="valor_total" name="valor_total">
                 </div>
@@ -65,37 +65,33 @@
 <script>
     $(document).ready(function () {
         (function (params) {
+            console.log("params dentro do formulario de item de orcamento: ", params)
             let formContainer = $("#form-container-" + params.itemOrcamentoId);
 
             function handleSemCustoCheckbox() {
                 var isChecked = $("#em_estoque_" + params.itemOrcamentoId).is(':checked');
                 if (isChecked) {
-                    formContainer.find("input[name='valor'], input[name='valor_total']").prop('disabled', true).val('0');
+                    formContainer.find("input[name='valor'], input[name='valor_total']").prop('readonly', true).val('0');
                 } else {
-                    formContainer.find("input[name='valor']").prop('disabled', false);
+                    formContainer.find("input[name='valor']").prop('readonly', false);
                 }
             }
 
-            // resize textarea
             formContainer.find("#descricao").each(function () {
                 let resizeTextarea = function (el) {
                     $(el).css('height', 'auto');
                     $(el).height(el.scrollHeight);
                 };
 
-                // Handle input event instead of change for real-time resizing
                 $(this).on('input', function () {
                     resizeTextarea(this);
                 });
 
-                // Call once for initial resize
                 resizeTextarea(this);
             });
 
-            // Initially handle the checkbox behavior
             handleSemCustoCheckbox();
 
-            // Listen for changes on the checkbox
             $("#em_estoque_" + params.itemOrcamentoId).on('change', function () {
                 handleSemCustoCheckbox();
                 handleUpdateItemOrcamento(params.itemOrcamentoId, {
@@ -141,7 +137,6 @@
                 });
             });
 
-            // calculate valor total when quantidade or valor change
             formContainer.find("input[name='quantidade'], input[name='valor']").each(function () {
                 $(this).on('change', function () {
                     var quantidade = formContainer.find("input[name='quantidade']").val();
