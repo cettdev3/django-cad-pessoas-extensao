@@ -80,3 +80,20 @@
     color: #fff;
     transform: scale(1.01);
 }
+
+/* Base style for the time input */
+input[type="time"] {
+    position: relative;
+}
+
+/* Style for the time input with validation error */
+input[type="time"].error::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2em;  /* Adjust to cover the clock icon */
+    background-color: rgba(255, 0, 0, 0.5); /* Semi-transparent red */
+    pointer-events: none;  /* Ensure the input is still usable */
+}

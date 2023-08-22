@@ -79,7 +79,7 @@ class MembroExecucaoApiView(APIView):
                 )
         if not acao and not evento and not proposta_projeto:
             return Response(
-                {"res": "É necessário informar a ação, o evento ou a proposta de projeto para adicionar o membro a equipe"},
+                {"message": "É necessário informar a ação, o evento ou a proposta de projeto para adicionar o membro a equipe"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         

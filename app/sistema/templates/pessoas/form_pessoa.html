@@ -135,10 +135,10 @@
                 if (instituicaoValue == 'escola') pessoaFormSelectEscola.show()
                 else pessoaFormSelectEscola.hide()
             });
-    
-            $("#cadastrarPessoaForm")[0].getFormData = getFormData
+            console.log("params.id: ", params.id)
+            $("#pessoas-form-container-"+params.id)[0].getFormData = getFormData
             buscarCursos(cursos)
             maskValues()
-        })({id: '{{id}}}'})
+        })({id: '{{id}}'})
     });
 </script>

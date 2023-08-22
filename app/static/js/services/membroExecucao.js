@@ -18,7 +18,6 @@ async function getMembroExecucaoSelect(data, callback=null) {
 }
 
 async function updateMembroEquipe(membro_equipe_id, data, onSuccess=null, onError=null) {
-    console.log("dentro de update atividade",data)
     return await $.ajax({
         url: "/update-membro-equipe/"+membro_equipe_id,
         headers: { "X-CSRFToken":  XCSRFToken },
@@ -35,13 +34,13 @@ async function updateMembroEquipe(membro_equipe_id, data, onSuccess=null, onErro
 }
 
 async function createMembroEquipe(data, onSuccess=null, onError=null) {
-    console.log("dentro de create atividade",data)
     return await $.ajax({
         url: "/create-membro-equipe",
         headers: { "X-CSRFToken":  XCSRFToken },
         contentType: 'application/json',
         method: "POST",
         data: JSON.stringify(data),
+        dataType: "json",
         success: function (data) {
             if (onSuccess) onSuccess(data);
         },

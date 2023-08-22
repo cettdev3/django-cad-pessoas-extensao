@@ -14,11 +14,9 @@ from ..serializers.atividadeSectionSerializer import AtividadeSectionSerializer
 import requests
 import json
 from django.http import JsonResponse
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.db.models import Prefetch
-
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required(login_url="/auth-user/login-user")
 def atividadesTable(request):
@@ -196,4 +194,20 @@ def getAtividadeDrawer(request, atividade_id):
             "categorias": categorias,
             "thumbnailStyle": thumbnailStyle,
         },
+    )
+
+@login_required(login_url="/auth-user/login-user")
+def atividadeForm(request):
+    model_id = request.GET.get("model_id")
+    context = {}
+    if model_id:
+        try:
+            atividade = Atividade.objects.get(pk=model_id)
+            context["atividade"] = atividade
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Atividade não encontrada"}, status=400)
+    return render(
+        request,
+        "projetosCotec/atividadeForm.html",
+        context,
     )

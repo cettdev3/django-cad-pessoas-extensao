@@ -80,7 +80,7 @@
             {% for comment in proposta_projeto.comentarios.all %}
         <div class="card mb-3">
                 <div class="card-header">
-                    {{ comment.autor.nome }} <small class="text-muted float-right">{{ comment.created_at|date:"d M Y, H:i" }}</small>
+                    {{ comment.autor.nome }} <small class="text-muted float-right">{{ comment.created_at|date:"d/m/Y, H:i"}}</small>
                 </div>
                 <div class="card-body">
                     <p class="card-text">{{ comment.conteudo }}</p>
@@ -102,29 +102,113 @@
             </div>            
         </div> -->
     </div>
-    <h2>{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
+    <h2 class="mb-5">#{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
     {% for proponente in proposta_projeto.proponentes %}
-    <p><strong>Proponente</strong>: {{ proponente.pessoa.nome }}</p>
+    <div>
+        <h4>Proponente:</h4>
+        <p class="ml-5">
+           {{ proponente.pessoa.nome|default_if_none:'Não Informado' }}
+        </p>
+    </div>
     {% endfor %}
-    <p><strong>Data de Início</strong>: {{ proposta_projeto.data_inicio|date:"d/m/Y" }}</p>
-    <p><strong>Data de Término</strong>: {{ proposta_projeto.data_fim|date:"d/m/Y" }}</p>
-    <p><strong>Resumo Proposta</strong>: {{ proposta_projeto.resumo_proposta }}</p>
-    <p><strong>Objetivos Gerais</strong>: {{ proposta_projeto.objetivos_gerais }}</p>
-    <p><strong>Objetivos Específicos</strong>: {{ proposta_projeto.objetivos_especificos }}</p>
-    <p><strong>Metodologia</strong>: {{ proposta_projeto.metodologia }}</p>
-    <p><strong>Formato Conteúdo</strong>: {{ proposta_projeto.formato_conteudo }}</p>
-    <p><strong>Justificativas</strong>: {{ proposta_projeto.justificativas }}</p>
-    <p><strong>Resultados Esperados</strong>: {{ proposta_projeto.resultados_esperados }}</p>
-    <p><strong>Fontes Apoio</strong>: {{ proposta_projeto.fontes_apoio }}</p>
-    <p><strong>Informações Adicionais</strong>: {{ proposta_projeto.informacoes_adicionais }}</p>
-    <p><strong>Público Alvo</strong>: {{ proposta_projeto.publico_alvo }}</p>
+    
+    {% if proposta_projeto.data_inicio %}
+    <div>
+        <h4>Data de Início:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.data_inicio|date:"d/m/Y" }}
+        </p>
+    </div>
+    {% else %}
+    <div>
+        <h4>Data de Início:</h4>
+        <p class="ml-5">
+           Não informada</
+        </p>
+    </div>
+    {% endif %}
+    {% if proposta_projeto.data_fim %}
+    <div>
+        <h4>Data de Término:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.data_fim|date:"d/m/Y" }}
+        </p>
+    </div>
+    {% else %}
+    <div>
+        <h4>Data de Término:</h4>
+        <p class="ml-5">
+           Não informada</
+        </p>
+    </div>
+    {% endif %}
+    <div>
+        <h4>Resumo Proposta:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.resumo_proposta|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Objetivos Gerais:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.objetivos_gerais|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Objetivos Específicos:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.objetivos_especificos|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Metodologia:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.metodologia|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Formato Conteúdo:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.formato_conteudo|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Justificativas:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.justificativas|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Resultados Esperados:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.resultados_esperados|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Fontes Apoio:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.fontes_apoio|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Informações Adicionais:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.informacoes_adicionais|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Público Alvo:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.publico_alvo|default_if_none:'Não Informado' }}
+        </p>
+    </div>
 
     <h3>Orçamento</h3>
-    <table class="table table-striped">
+    <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th class="text-center">Descricao</th>
-                <th class="text-center">Tipo</th>
+                <!-- <th class="text-center">Tipo</th> -->
                 <th class="text-center">Quantidade</th>
                 <th class="text-center">Unidade</th>
                 <th class="text-center">Valor</th>
@@ -134,19 +218,19 @@
         <tbody>
             {% for item in proposta_projeto.orcamento.items.all %}
             <tr>
-                <td>{{ item.descricao }}</td>
-                <td>{{ item.tipo }}</td>
-                <td>{{ item.quantidade }}</td>
-                <td>{{ item.unidade }}</td>
-                <td>{{ item.valor }}</td>
-                <td>{{ item.valor_total }}</td>
+                <td>{{ item.descricao|default_if_none:'Não Informado' }}</td>
+                <!-- <td>{{ item.tipo }}</td> -->
+                <td>{{ item.quantidade|default_if_none:'Não Informado' }}</td>
+                <td>{{ item.unidade|default_if_none:'Não Informado' }}</td>
+                <td> {% if item.valor %} R$ {% endif %} {{ item.valor|default_if_none:'Não Informado' }}</td>
+                <td>{% if item.valor_total %} R$ {% endif %} {{ item.valor_total|default_if_none:'Não Informado' }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <h3>Equipe</h3>
-    <table class="table table-striped">
+    <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th class="text-center">Função</th>
@@ -157,16 +241,20 @@
         <tbody>
             {% for membro in proposta_projeto.equipe.all %}
             <tr>
-                <td>{{ membro.role }}</td>
-                <td>{{ membro.instituicao }}</td>
-                <td>{{ membro.pessoa.nome }}</td>
+                <td>{{ membro.role|default_if_none:'Não Informado' }}</td>
+                <td>{{ membro.instituicao|default_if_none:'Não Informado' }}</td>
+                {% if membro.pessoa %}
+                <td>{{ membro.pessoa.nome|default_if_none:'Não Informado' }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <h3>Atividades</h3>
-    <table class="table table-striped">
+    <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th class="text-center">Nome</th>
@@ -179,11 +267,19 @@
         <tbody>
             {% for atividade in proposta_projeto.atividades.all %}
             <tr>
-                <td>{{ atividade.nome }}</td>
-                <td>{{ atividade.data_realizacao_inicio }}</td>
-                <td>{{ atividade.horario_inicio }}</td>
-                <td>{{ atividade.local }}</td>
-                <td>{{ atividade.publico_esperado }}</td>
+                <td>{{ atividade.nome|default_if_none:'Não Informado' }}</td>
+                {% if atividade.data_realizacao_inicio %}
+                <td>{{ atividade.data_realizacao_inicio|date:"d/m/Y" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.horario_inicio %}
+                <td>{{ atividade.horario_inicio|time:"H:i" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                <td>{{ atividade.local|default_if_none:'Não Informado' }}</td>
+                <td>{{ atividade.publico_esperado|default_if_none:'Não Informado' }}</td>
             </tr>
             {% endfor %}
         </tbody>

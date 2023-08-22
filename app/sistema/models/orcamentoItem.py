@@ -9,6 +9,7 @@ class OrcamentoItem(models.Model):
     unidade = models.CharField(max_length=255, null=True, blank=True)
     valor = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     valor_total = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    em_estoque = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'orcamento_itens'

@@ -1,0 +1,20 @@
+
+<div class="w-100" id="cidade-form-container-{{id}}">
+    <form id="cadastrarCidadeForm">
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <label><b>Nome da Cidade:</b></label>
+                <input 
+                type="text" 
+                {% if cidade %}
+                value="{{cidade.nome}}" 
+                {% endif %}
+                class="form-control" 
+                id="nome" 
+                name="nome" 
+                placeholder=""
+                required>
+            </div>
+        </div>
+    </form>
+</div>

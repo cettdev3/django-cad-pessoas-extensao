@@ -95,3 +95,18 @@ async function getAtividadeSelect(data, callback=null) {
         }
     });
 }
+
+async function getAtividadeForm(data, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/atividadeForm",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}

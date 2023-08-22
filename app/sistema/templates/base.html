@@ -231,13 +231,14 @@
         </div>
 
     </div>
+    {% include 'projetosCotec/customModalFormComponent.html' %}
     <div id="modalTicketContainer"></div>
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded " style="margin-right: 40px;" href="#page-top">
+    <!-- <a class="scroll-to-top rounded " style="margin-right: 40px;" href="#page-top">
         <i class="fas fa-angle-up"></i>
-    </a>
+    </a> -->
 
     <div id="confirmDeleteModalContainer"></div>
     <!-- Bootstrap core JavaScript-->
@@ -262,6 +263,7 @@
     <script src="{% static 'js/custom_photo_gallery.js' %}"></script>
 
     <!-- services -->
+    <script src="{% static 'js/services/selectDataService.js' %}"></script>
     <script src="{% static 'js/services/atividadeSection.js' %}"></script>
     <script src="{% static 'js/services/atividade.js' %}"></script>
     <script src="{% static 'js/services/membroExecucao.js' %}"></script>
@@ -278,6 +280,9 @@
     <script src="{% static 'js/services/projetosCotec.js' %}"></script>
     <script src="{% static 'js/services/itemOrcamento.js' %}"></script>
     <script src="{% static 'js/services/comentario.js' %}"></script>
+    <script src="{% static 'js/customModalFormComponent.js' %}"></script>
+    <script src="{% static 'js/customSelectMultiple.js' %}"></script>
+    <script src="{% static 'js/multipleFormComponent.js' %}"></script>
 
     <!-- Page level custom scripts -->
     <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
@@ -433,6 +438,7 @@
         $(document).ready(function () {
             carregarDeleteModal();
         });
+        
     </script>
 </body>
 
