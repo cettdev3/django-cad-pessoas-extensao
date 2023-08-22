@@ -58,7 +58,6 @@
     function getDemandaFilters() {
         let filtros = {}
         $("*[id^='filterDemanda']").each(function () {
-            console.log($(this).attr("name"))
 
             if ($(this).val()) {
                 filtros[$(this).attr("name")] = $(this).val()

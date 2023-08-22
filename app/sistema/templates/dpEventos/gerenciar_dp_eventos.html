@@ -186,7 +186,6 @@ z-index: 4
     function getDpEventoFilters() {
         let filtros = {}
         $("*[id^='" + filterPrefix + "']").each(function () {
-            console.log($(this).attr("name"))
 
             if ($(this).val()) {
                 filtros[$(this).attr("name")] = $(this).val()
