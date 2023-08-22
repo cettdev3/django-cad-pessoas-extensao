@@ -434,17 +434,15 @@ def getAtividadeImage(doc: Document, atividade, imageCounter):
         except IOError:
             print("Error: Unable to read or save the image using Pillow")
 
-        # Title of the image
         p = doc.add_paragraph()
         p.add_run(f"Figura {imageCounter}: {imagem.descricao}")
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER  # Center-align the title
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         try:
-            # Image
             img_paragraph = doc.add_paragraph()
             img_run = img_paragraph.add_run()
             img_run.add_picture(image_path, width=Inches(4.0))
-            img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER  # Center-align the image
+            img_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         except Exception as e:
             error_message = (
                 f"Error: Unable to recognize the image format for {imagem.descricao}."
