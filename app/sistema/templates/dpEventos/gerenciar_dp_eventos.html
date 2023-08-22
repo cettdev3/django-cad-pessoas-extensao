@@ -241,7 +241,6 @@ z-index: 4
     function startFilterControl() {
         $("*[id^='"+filterPrefix+"']").each(function () {
             let input = $(this)
-            console.log(input.attr('id'))
             if ($(this).attr('type') == 'text') {
                 $(this)
                 .keyup(debounce(function() {

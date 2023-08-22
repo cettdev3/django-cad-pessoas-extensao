@@ -412,11 +412,11 @@
             addEquipeMembersToItinerario()
             $('body').trigger('reloadMap')
         } else {
-            try {
-                removeItinerarioEquipeMembers()
-            } catch (e) {
-                console.log("Erro ao remover membros do itinerario: ", e)
-            }
+            // try {
+            //     removeItinerarioEquipeMembers()
+            // } catch (e) {
+            //     console.log("Erro ao remover membros do itinerario: ", e)
+            // }
             customModalBodyContainer.removeClass("w-100-vw")
             customModalBodyContainer.addClass("w-75-vw")
         }
