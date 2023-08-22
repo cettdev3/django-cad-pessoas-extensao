@@ -38,7 +38,6 @@ function isvisibleOnViewport(element) {
 }
 
 $(document).ready(function () {
-    console.log("ready")
     $(document).mouseup(function (e) {
         $("div[id^='"+hiddenMenuContainerId+"']").each(function (i, el) {
             if (!$(this).is(e.target) && $(this).has(e.target).length === 0) {

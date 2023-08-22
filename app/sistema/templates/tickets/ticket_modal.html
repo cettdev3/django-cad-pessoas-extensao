@@ -28,7 +28,7 @@
                     <button type="button" 
                     id="dismissCadastrarTicket" 
                     class="close" 
-                    data-dismiss="modal" 
+                    data-bs-dismiss="modal" 
                     aria-label="Close">
                         <span>&times;</span>
                     </button>
@@ -159,9 +159,7 @@
         document.getElementById(formId).reset();
         if (changedResource) ticketModificadaEventProxy.modificado = changedResource
         let dismissBtn = $("#"+dismissCadastrarTicketId)
-        console.log(dismissBtn)
         dismissBtn.click()
-        console.log("modal fechada")
         $('.modal-backdrop').remove()
         $(document.body).removeClass("modal-open");
     }

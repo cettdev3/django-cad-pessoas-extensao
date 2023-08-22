@@ -10,7 +10,7 @@
                     <button type="button" 
                     id="dismissCadastrarMembrosExecucao" 
                     class="close" 
-                    data-dismiss="modal" 
+                    data-bs-dismiss="modal" 
                     aria-label="Close">
                         <span>&times;</span>
                     </button>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="modal-footer">
                     <button
-                    data-dismiss="modal"
+                    data-bs-dismiss="modal"
                     type="button"
                     class="btn btn-primary">
                     <div id="loading" style="display: none">
@@ -113,9 +113,7 @@
         </form>
     </div>
 </div>
-{% comment %} json script {% endcomment %}
 {{ membro_execucao|json_script:"membro_execucao" }}
-
 <script id="membro_execucao_data_{{membro_execucao.id}}">
     function updateIdProtocolo(ticketId){
         let id_protocolo = $("#id_protocolo_" + ticketId).val()
@@ -126,6 +124,8 @@
     }
 
     $(document).ready(function () {
-        
+        $('#dismissCadastrarMembrosExecucao').click(function(){
+            $('#membroExecucaoDemandasModal').modal('hide');
+        });        
     });
 </script>
