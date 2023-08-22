@@ -410,7 +410,7 @@ def getAtividadeLabel(doc, atividade, counter):
     atividadeLabelFormat.space_after = Pt(0)
     return doc
 
-def getAtividadeImage(doc: Document, atividade, counter):
+def getAtividadeImage(doc: Document, atividade, imageCounter):
     galeria = atividade.galeria 
     if not galeria:
         return doc
@@ -421,7 +421,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
         if len(imagens) > 0:
             imagens = [imagens.first()] if imagens else []
         else:
-            return doc, counter
+            return doc, imageCounter
     
     for imagem in imagens:        
         alfresco_api = AlfrescoAPI()
@@ -435,7 +435,7 @@ def getAtividadeImage(doc: Document, atividade, counter):
             print("Error: Unable to read or save the image using Pillow")
 
         p = doc.add_paragraph()
-        p.add_run(f"Figura {counter}: {imagem.descricao}")
+        p.add_run(f"Figura {imageCounter}: {imagem.descricao}")
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
 
         try:
@@ -455,12 +455,12 @@ def getAtividadeImage(doc: Document, atividade, counter):
                 os.remove(image_path)
             except Exception as e:
                 print(f"Error: Unable to delete the image file: {e}")
-        counter += 1
+        imageCounter += 1
 
-    return doc, counter
+    return doc, imageCounter
 
 
-def getAtividade(doc, atividade, counter):
+def getAtividade(doc, atividade, counter, imageCounter):
     doc = getAtividadeLabel(doc, atividade, counter)
     doc = getCidade(doc, atividade)
     doc = getQuantitativo(doc, atividade)
@@ -470,9 +470,10 @@ def getAtividade(doc, atividade, counter):
         doc = getEtapa(doc, atividade)
     doc = getSubAtividades(doc, atividade)
     doc.add_paragraph()
-    doc, counter = getAtividadeImage(doc, atividade, counter)
+    doc, imageCounter = getAtividadeImage(doc, atividade, imageCounter)
     doc.add_paragraph()
-    return doc, counter
+    counter = counter + 1
+    return doc, counter, imageCounter
 
 
 def reportEventos(eventos):
@@ -485,6 +486,7 @@ def reportEventos(eventos):
 
 def getRelatorioType1(doc, relatorioData):
     counter = 1
+    imageCounter = 1
     for nomeEvento, eventos in relatorioData.items():
         if not reportEventos(eventos):
             continue
@@ -501,7 +503,7 @@ def getRelatorioType1(doc, relatorioData):
                     old_evento = current_evento
                 tipoAtividadeTexto = atividade.tipoAtividade.nome if atividade.tipoAtividade else atividade.nome
                 doc = getSectionTitle(doc, f"{tipoAtividadeTexto}")
-                doc, counter = getAtividade(doc, atividade, counter)
+                doc, counter, imageCounter = getAtividade(doc, atividade, counter, imageCounter)
     return doc
 
 
