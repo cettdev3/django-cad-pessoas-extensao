@@ -63,11 +63,9 @@ async function getItemOrcamentoForm(data, onSuccess=null, onError=null) {
 
 function initializeItemOrcamentoForm(itemOrcamentoId, container = null) {
     params = { itemOrcamentoId: itemOrcamentoId };
-    console.log("params dentro do formulario de item de orcamento: ", params)
     let formContainer = container ? container : $("#form-container-" + params.itemOrcamentoId);
-    console.log("formcontainer dentro de initialize form: ", formContainer)
     function handleSemCustoCheckbox() {
-        var isChecked = $("#em_estoque_" + params.itemOrcamentoId).is(':checked');
+        var isChecked = $(formContainer).find("input[id='em_estoque_" + params.itemOrcamentoId + "']").is(':checked');
         if (isChecked) {
             $(formContainer).find("input[name='valor'], input[name='valor_total']").prop('readonly', true).val('0');
         } else {
@@ -89,8 +87,7 @@ function initializeItemOrcamentoForm(itemOrcamentoId, container = null) {
     });
 
     handleSemCustoCheckbox();
-
-    $("#em_estoque_" + params.itemOrcamentoId).on('change', function () {
+    $(formContainer).find("input[id='em_estoque_" + params.itemOrcamentoId + "']").on('change', function () {
         handleSemCustoCheckbox();
         handleUpdateItemOrcamento(params.itemOrcamentoId, {
             valor: $(formContainer).find("input[name='valor']").val(),
@@ -112,9 +109,11 @@ function initializeItemOrcamentoForm(itemOrcamentoId, container = null) {
 
     $(formContainer)[0].getValue = function () {
         var itemOrcamento = {}
-        $(formContainer).find("input, textarea").each(function () {
+        $(formContainer).find("input, textarea, checkbox").each(function () {
             var name = $(this).attr('name');
-            itemOrcamento[name] = $(this).val();
+            console.log($(this).attr('type'), name, $(this).val(), $(this).is(':checked'))
+            if ($(this).attr('type') == 'checkbox') itemOrcamento[name] = $(this).is(':checked')
+            else itemOrcamento[name] = $(this).val();
         });
 
         return itemOrcamento;

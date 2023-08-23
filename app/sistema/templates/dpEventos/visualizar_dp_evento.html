@@ -257,7 +257,25 @@ style="height: calc(100vh - 75px);">
     }
 
     function addItemOrcamento() {
-        console.log("addItemOrcamento")
+        const orcamentoModal = new CustomModalComponent({
+            modalTitle: "Adicionar Item de Orçamento",
+            modalBtnActionText: "Salvar",
+            modalActionFunction: () => updateItemOrcamento(
+                {orcamento_id: params.orcamentoId, ...orcamentoModal.getFormValues()}, 
+                function (data) {
+                    showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+                }, 
+                function (error) {
+                    showFloatingMessage(error.responseJSON.message, "alert-danger");
+                })
+        });
+
+        table.on('click', '[id^="item-orcamento-edit-btn-"]', ($event) => {
+            let itemOrcamentoId = $($event.currentTarget).data('orcamento-item-id');
+            orcamentoModal.options.initializeForm = (container) => initializeItemOrcamentoForm(itemOrcamentoId, container)
+            orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
+            orcamentoModal.open('xl');
+        });
     }
 
     function clearModalFormTicket(tableToReload = null) {
@@ -418,7 +436,6 @@ style="height: calc(100vh - 75px);">
     }
     
     function dpEventoVisualizarTabsControl(id) {
-        console.log("id da tab clicada: ", id)
         if (id == "membro-execucao-tab") {
             $("#add-membro-execucao-btn").show()
             $("#add-atividade-btn").hide()

@@ -123,11 +123,11 @@ class CustomModalComponent {
     }
 
     getFormValues() {
-        const formDataArray = this.element.find('form').serializeArray();
         const formDataObject = {};
-
-        formDataArray.forEach(field => {
-            formDataObject[field.name] = field.value;
+        this.element.find('input, textarea, select, checkbox').each(function() {
+            let name = $(this).attr('name'); 
+            if ($(this).attr('type') == 'checkbox') formDataObject[name] = $(this).is(':checked')
+            else formDataObject[name] = $(this).val();
         });
 
         return formDataObject;
@@ -137,7 +137,6 @@ class CustomModalComponent {
         this.state.isLoading = true;
         this.options.loadContent({})
             .then(content => {
-                console.log("abrindo modal");
                 this.element.modal('show');
                 this.setContent(content);
                 this.options.initializeForm(this.element.find('form'))

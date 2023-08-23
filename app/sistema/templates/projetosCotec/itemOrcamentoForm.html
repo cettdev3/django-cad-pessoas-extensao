@@ -38,15 +38,14 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">R$</span>
                         </div>
-                        <input type="text" class="form-control" {% if read_only == True %} disabled {% endif %}
-                            data-id="{{itemOrcamento.id}}"
-                            data-current-value="{{itemOrcamento.valor|default_if_none:''}}"
-                            value="{{itemOrcamento.valor|default_if_none:''}}" id="valor" name="valor">
+                        <input type="text" class="form-control" 
+                        {% if read_only == True or itemOrcamento.em_estoque %} readonly {% endif %}
+                        data-id="{{itemOrcamento.id}}"
+                        data-current-value="{{itemOrcamento.valor|default_if_none:''}}"
+                        value="{{itemOrcamento.valor|default_if_none:''}}" id="valor" name="valor">
                     </div>
                 </div>
             </div>
-
-
 
             <div class="col-3">
                 <label for="itemOrcamento"><b>Valor Total Estimado</b></label>

@@ -65,20 +65,20 @@
             const orcamentoModal = new CustomModalComponent({
                 modalTitle: "Adicionar Item de Orçamento",
                 modalBtnActionText: "Salvar",
-                modalActionFunction: () => updateItemOrcamento(
-                    {orcamento_id: params.orcamentoId, ...orcamentoModal.getFormValues()}, 
-                    function (data) {
-                        showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
-                    }, 
-                    function (error) {
-                        showFloatingMessage(error.responseJSON.message, "alert-danger");
-                    })
             });
 
             table.on('click', '[id^="item-orcamento-edit-btn-"]', ($event) => {
                 let itemOrcamentoId = $($event.currentTarget).data('orcamento-item-id');
                 orcamentoModal.options.initializeForm = (container) => initializeItemOrcamentoForm(itemOrcamentoId, container)
                 orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
+                orcamentoModal.options.modalActionFunction = (data) => updateItemOrcamento(itemOrcamentoId,
+                    {orcamento_id: params.orcamentoId, ...data}, 
+                    function (data) {
+                        showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+                    }, 
+                    function (error) {
+                        showFloatingMessage(error.responseJSON.message, "alert-danger");
+                    })
                 orcamentoModal.open('xl');
             });
 
