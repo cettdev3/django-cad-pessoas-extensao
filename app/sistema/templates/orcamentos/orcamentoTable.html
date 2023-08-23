@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for orcamentoItem in orcamento.items %}
+        {% for orcamentoItem in orcamento.items.all %}
         <tr>
             <td class="w-45-p text-left">
                 {{orcamentoItem.descricao}}
@@ -41,7 +41,7 @@
                             <button class="dropdown-item cursor-pointer"
                             onclick="criarTicket('{{orcamentoItem.id}}')">Adicionar Demanda</button>
                             <button class="dropdown-item cursor-pointer"
-                            onclick="openDeleteModal(() => deleteOrcamentoItem('{{orcamentoItem.id}}'))">Excluir</button>
+                            onclick="openDeleteModal(() => deleteOrcamentoItem('{{orcamentoItem.id}}', '{{orcamento.id}}'))">Excluir</button>
                         </div>
                     </div>
                 </div>
@@ -51,9 +51,14 @@
     </tbody>
 </table>
 <script>
-    function deleteOrcamentoItem(orcamentoItemId) {
-        removeItemOrcamento(itemOrcamentoId, function (data) {
+    function deleteOrcamentoItem(orcamentoItemId, orcamentoId) {
+        removeItemOrcamento(orcamentoItemId, function (data) {
             showFloatingMessage("Item removido do orçamento com sucesso", "alert-success");
+            try {
+                carregarOrcamento({model_id: orcamentoId})
+            } catch (error) {
+                console.log("nao foi possivel carregar a tabela de orcamentos, função nao existe")
+            }
         }, function (error) {
             showFloatingMessage(error.responseJSON.message, "alert-danger");
         })

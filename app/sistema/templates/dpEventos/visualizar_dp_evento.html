@@ -79,7 +79,7 @@ style="height: calc(100vh - 75px);">
                 <div id="add-item-orcamento-btn">
                     <div data-toggle="tooltip" data-placement="top" title="Adicionar Atividade" 
                     class="d-flex align-items-center ">            
-                        <button onclick="addItemOrcamento()" 
+                        <button onclick="addItemOrcamento('{{dpEvento.proposta_projeto.orcamento.id}}')" 
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
@@ -194,7 +194,7 @@ style="height: calc(100vh - 75px);">
                 </div>
             </div>
             <div id="orcamento" class="tab-pane">
-                {% include "orcamentos/orcamentoTable.html" with orcamento=dpEvento.proposta_projeto.orcamento %}
+                <div id="orcamentoTableContainer"></div>
                 <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
                     <div class="loading-container"
                     style="display: none; position: relative">
@@ -256,26 +256,21 @@ style="height: calc(100vh - 75px);">
         });
     }
 
-    function addItemOrcamento() {
+    function addItemOrcamento(orcamentoId) {
         const orcamentoModal = new CustomModalComponent({
             modalTitle: "Adicionar Item de Orçamento",
             modalBtnActionText: "Salvar",
-            modalActionFunction: () => updateItemOrcamento(
-                {orcamento_id: params.orcamentoId, ...orcamentoModal.getFormValues()}, 
-                function (data) {
-                    showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
-                }, 
-                function (error) {
-                    showFloatingMessage(error.responseJSON.message, "alert-danger");
-                })
+            initializeForm: (container) => initializeItemOrcamentoForm(null, container),
+            loadContent: (parms) => getItemOrcamentoForm({}),
+            modalActionFunction: (data) =>  createItemOrcamento({orcamento_id: orcamentoId, ...data}, function (data) {
+                showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+                carregarOrcamento({model_id: orcamentoId})
+            }, function (error) {
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            })
         });
 
-        table.on('click', '[id^="item-orcamento-edit-btn-"]', ($event) => {
-            let itemOrcamentoId = $($event.currentTarget).data('orcamento-item-id');
-            orcamentoModal.options.initializeForm = (container) => initializeItemOrcamentoForm(itemOrcamentoId, container)
-            orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
-            orcamentoModal.open('xl');
-        });
+        orcamentoModal.open('xl');
     }
 
     function clearModalFormTicket(tableToReload = null) {
@@ -363,6 +358,18 @@ style="height: calc(100vh - 75px);">
             }
         });
 
+    }
+    
+    function carregarOrcamento(data = null) {
+        toggleLoading("show");
+        $("#orcamentoTableContainer").html("");
+        getOrcamentoTable(data, function (data) {
+            toggleLoading("hide");
+            $("#orcamentoTableContainer").html(data);
+        }, function (error) {
+            showFloatingMessage("Erro ao carregar orçamento", "alert-danger");
+            toggleLoading("hide");
+        });
     }
     
     function carregarServicosContratados() {
@@ -517,6 +524,7 @@ style="height: calc(100vh - 75px);">
     }
     
     $(document).ready(function() {
+        let orcamentoId = '{{dpEvento.proposta_projeto.orcamento.id}}'
         membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;
@@ -538,6 +546,7 @@ style="height: calc(100vh - 75px);">
         carregarAvaliacaoLocal()
         carregarServicosContratados()
         carregarGalerias()
+        carregarOrcamento({model_id: orcamentoId})
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

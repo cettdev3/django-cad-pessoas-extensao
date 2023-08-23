@@ -467,6 +467,20 @@ def createItemOrcamento(request):
     orcamento = Orcamento.objects.get(pk=data.get("orcamento_id"))
     itemOrcamento = OrcamentoItem()
     itemOrcamento.orcamento = orcamento
+    if data.get('descricao'):
+        itemOrcamento.descricao = data.get('descricao')
+    if data.get('tipo'):
+        itemOrcamento.tipo = data.get('tipo')
+    if data.get('quantidade'):
+        itemOrcamento.quantidade = data.get('quantidade')
+    if data.get('unidade'):
+        itemOrcamento.unidade = data.get('unidade')
+    if data.get('valor'):
+        itemOrcamento.valor = data.get('valor')
+    if 'em_estoque' in data:
+        itemOrcamento.em_estoque = data.get('em_estoque')
+    if data.get('valor_total'):
+        itemOrcamento.valor_total = data.get('valor_total')
     itemOrcamento.save()
     itemOrcamento = model_to_dict(itemOrcamento)
     return JsonResponse(itemOrcamento)
@@ -488,6 +502,18 @@ def itemOrcamentoForm(request):
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Item de orcamento não encontrado"}, status=400)
     return render(request, 'projetosCotec/itemOrcamentoForm.html', context)
+
+@login_required(login_url="/auth-user/login-user")
+def orcamentoTable(request):
+    model_id = request.GET.get("model_id")
+    context = {}
+    if model_id:
+        try:
+            atividade = Orcamento.objects.get(pk=model_id)
+            context["orcamento"] = atividade
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Oramento não encontrado"}, status=400)
+    return render(request, 'orcamentos/orcamentoTable.html', context)
 
 # def deleteAll():
 #     with transaction.atomic():

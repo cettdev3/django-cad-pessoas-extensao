@@ -62,6 +62,7 @@ from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServic
 from sistema.views.cotecViews.projetosCotecViews import (
     projetoCotecForm, 
     projetoCotecIndex, 
+    orcamentoTable,
     pessoaModal, 
     pessoaCreate, 
     selectMultipleComponent, 
@@ -191,6 +192,7 @@ urlpatterns = [
     path("create-item-orcamento", createItemOrcamento, name="create-item-orcamento"),
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
     path("item-orcamento-form", itemOrcamentoForm, name="item-orcamento-form"),
+    path("orcamento-table", orcamentoTable, name="orcamento-table"),
 
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),

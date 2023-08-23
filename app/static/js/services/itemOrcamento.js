@@ -97,6 +97,7 @@ function initializeItemOrcamentoForm(itemOrcamentoId, container = null) {
     });
 
     function handleUpdateItemOrcamento(id, data) {
+        if (!id) return;
         updateItemOrcamento(id,
             data,
             function (response) {
