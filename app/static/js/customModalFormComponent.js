@@ -137,8 +137,10 @@ class CustomModalComponent {
         this.state.isLoading = true;
         this.options.loadContent({})
             .then(content => {
-                this.setContent(content);
+                console.log("abrindo modal");
                 this.element.modal('show');
+                this.setContent(content);
+                this.options.initializeForm(this.element.find('form'))
             })
             .catch(error => {
                 this.emitEvent('load-fail', error);

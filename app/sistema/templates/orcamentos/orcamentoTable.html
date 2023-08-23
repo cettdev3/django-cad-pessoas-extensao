@@ -13,7 +13,7 @@
         {% for orcamentoItem in orcamento.items %}
         <tr>
             <td class="w-45-p text-left">
-                #{{orcamentoItem.id}}:{{orcamentoItem.descricao}}
+                {{orcamentoItem.descricao}}
             </td>
             <td class="w-10-p text-left">
                 {{orcamentoItem.quantidade}}
@@ -64,7 +64,7 @@
             let table = $("#table-orcamento-" + params.orcamentoId);
             const orcamentoModal = new CustomModalComponent({
                 modalTitle: "Adicionar Item de Orçamento",
-                modalBtnActionText: "Adicionar",
+                modalBtnActionText: "Salvar",
                 modalActionFunction: () => updateItemOrcamento(
                     {orcamento_id: params.orcamentoId, ...orcamentoModal.getFormValues()}, 
                     function (data) {
@@ -76,8 +76,8 @@
             });
 
             table.on('click', '[id^="item-orcamento-edit-btn-"]', ($event) => {
-                console.log("edit item orcamento", $event.currentTarget)
                 let itemOrcamentoId = $($event.currentTarget).data('orcamento-item-id');
+                orcamentoModal.options.initializeForm = (container) => initializeItemOrcamentoForm(itemOrcamentoId, container)
                 orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
                 orcamentoModal.open('xl');
             });

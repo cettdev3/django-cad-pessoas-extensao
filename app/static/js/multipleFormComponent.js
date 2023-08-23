@@ -1,7 +1,8 @@
 class MultipleFormComponent {
     constructor(options) {
         this.fetchFormTemplateFunction = options.fetchFormTemplateFunction;
-        this.fetchComponentTemplateFunction = options.fetchComponentTemplateFunction;
+        this.fetchComponentTemplateFunction = options.fetchComponentTemplateFunction || null;
+        this.initializeForm = options.initializeForm || null;
         this.onReady = options.onReady || null;
         this.createFunction = options.createFunction || null;
         this.updateFunction = options.updateFunction || null;
@@ -67,7 +68,10 @@ class MultipleFormComponent {
                 </div>
             </div>`;
             this.element.find('.form-container').append(wrappedFormContent);
-    
+            // get the last form and initialize it
+            const newForm = this.element.find('.individual-form').last();
+            if (this.initializeForm) this.initializeForm(modelId, newForm);
+
             if (formData) {
                 const newForm = this.element.find('.individual-form').last();
                 for (const key in formData) {

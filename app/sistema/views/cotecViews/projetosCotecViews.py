@@ -441,6 +441,7 @@ def removeMembroEquipe(request, pk):
 @login_required(login_url="/auth-user/login-user")
 def updateItemOrcamento(request, pk):
     data = json.loads(request.body.decode())
+    print("data dentro de update item orcamento: ", data)
     itemOrcamento = OrcamentoItem.objects.get(pk=pk)
     if data.get('descricao'):
         itemOrcamento.descricao = data.get('descricao')
