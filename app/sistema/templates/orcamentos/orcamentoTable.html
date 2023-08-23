@@ -78,8 +78,13 @@
                 orcamentoModal.options.loadContent = (parms) => getItemOrcamentoForm({model_id: itemOrcamentoId})
                 orcamentoModal.options.modalActionFunction = (data) => updateItemOrcamento(itemOrcamentoId,
                     {orcamento_id: params.orcamentoId, ...data}, 
-                    function (data) {
+                    (data) => {
                         showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+                        try {
+                            carregarOrcamento({model_id: params.orcamentoId})
+                        } catch (error) {
+                            console.log("nao foi possivel carregar a tabela de orcamentos, função nao existe")
+                        }
                     }, 
                     function (error) {
                         showFloatingMessage(error.responseJSON.message, "alert-danger");
