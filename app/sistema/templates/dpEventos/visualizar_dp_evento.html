@@ -47,9 +47,11 @@ style="height: calc(100vh - 75px);">
                 <li class=" cs-tab-link active">
                     <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
                 </li>
+                {% if dpEvento.proposta_projeto.orcamento %}
                 <li class=" cs-tab-link active">
                     <a id="orcamento-tab" data-toggle="tab" href="#orcamento">Orcamento</a>
                 </li>
+                {% endif %}
                 <li class=" cs-tab-link active">
                     <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
                 </li>
@@ -76,6 +78,7 @@ style="height: calc(100vh - 75px);">
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
+                {% if dpEvento.proposta_projeto.orcamento %}
                 <div id="add-item-orcamento-btn">
                     <div data-toggle="tooltip" data-placement="top" title="Adicionar Atividade" 
                     class="d-flex align-items-center ">            
@@ -83,6 +86,7 @@ style="height: calc(100vh - 75px);">
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
         <div class="tab-content w-100 h-100 scroll-custom position-relative" 
@@ -193,6 +197,7 @@ style="height: calc(100vh - 75px);">
                     </div>
                 </div>
             </div>
+            {% if dpEvento.proposta_projeto.orcamento %}
             <div id="orcamento" class="tab-pane">
                 <div id="orcamentoTableContainer"></div>
                 <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
@@ -206,6 +211,7 @@ style="height: calc(100vh - 75px);">
                     </div>
                 </div>
             </div>
+            {% endif %}
             <div id="galerias" class="tab-pane" >
                 <div id="galeriasTableContainer"></div>
             </div>
@@ -546,7 +552,7 @@ style="height: calc(100vh - 75px);">
         carregarAvaliacaoLocal()
         carregarServicosContratados()
         carregarGalerias()
-        carregarOrcamento({model_id: orcamentoId})
+        if (orcamentoId) carregarOrcamento({model_id: orcamentoId})
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)
