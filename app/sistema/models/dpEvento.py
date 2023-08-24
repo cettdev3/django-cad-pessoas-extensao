@@ -31,7 +31,7 @@ class DpEvento(models.Model):
     process_instance = models.CharField(null = True, blank= True, max_length=300)
     variaveis = models.JSONField(null = True, blank= True)
     status = models.CharField(null = True, max_length=50, blank= True)
-    descricao = models.CharField(null = True, max_length=1000, blank= True)
+    descricao = models.CharField(null = True, max_length=8000, blank= True)
     data_inicio = models.DateField(null = True, blank= True)
     data_fim = models.DateField(null = True, blank= True)
     bairro = models.CharField(null = True, max_length=100, blank= True)
