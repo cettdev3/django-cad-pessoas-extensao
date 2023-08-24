@@ -122,7 +122,7 @@ async function getPropostaTable(data, onSuccess=null, onError=null) {
     });
 }
 
-async function updateAtividade(atividade_id, data, onSuccess=null, onError=null) {
+async function cotecUpdateAtividade(atividade_id, data, onSuccess=null, onError=null) {
     console.log("dentro de update atividade",data)
     return await $.ajax({
         url: "/update-atividade/"+atividade_id,
