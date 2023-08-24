@@ -52,6 +52,7 @@ def pessoasTable(request):
 
 @login_required(login_url='/auth-user/login-user')
 def getPessoas(request):
+    print(request.GET)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     response = requests.get('http://localhost:8000/pessoas', params={
