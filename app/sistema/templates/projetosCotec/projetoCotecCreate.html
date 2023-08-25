@@ -631,7 +631,7 @@
             }
         });
 
-        let handleCreateCronograma = () => propostaId ? createAtividade({proposta_projeto_id: propostaId}, function (data) {
+        let handleCreateCronograma = () => propostaId ? createAtividadeCotec({proposta_projeto_id: propostaId}, function (data) {
                 showFloatingMessage("Item adicionado ao cronograma com sucesso", "alert-success");
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");

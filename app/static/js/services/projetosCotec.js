@@ -139,7 +139,7 @@ async function cotecUpdateAtividade(atividade_id, data, onSuccess=null, onError=
     });
 }
 
-async function createAtividade(data, onSuccess=null, onError=null) {
+async function createAtividadeCotec(data, onSuccess=null, onError=null) {
     console.log("dentro de create atividade",data)
     return await $.ajax({
         url: "/create-atividade",
