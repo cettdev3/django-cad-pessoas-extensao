@@ -191,6 +191,12 @@
         location.href = "visualizarDpEvento/" + id
     }
 
+    function removeAnexoCard(anexoId) {
+        deleteAnexo(anexoId, function () {
+            $('#anexo-card-'+anexoId).remove();
+        })
+    }
+
     $(document).ready(function () {
         function isvisibleOnViewport(element) {
             var rect = element.getBoundingClientRect();
