@@ -27,7 +27,7 @@ class DpEvento(models.Model):
     STATUS_WAITING_RETURN = 'waiting_return'
 
     id = models.AutoField(primary_key=True)
-    tipo = models.CharField(null = True, blank= True, max_length=50)   
+    tipo = models.CharField(null = True, blank= True, max_length=500)   
     process_instance = models.CharField(null = True, blank= True, max_length=300)
     variaveis = models.JSONField(null = True, blank= True)
     status = models.CharField(null = True, max_length=50, blank= True)
