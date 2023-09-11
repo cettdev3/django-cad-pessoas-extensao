@@ -3,9 +3,18 @@
 {% block content %}
 <div style="width: 100%;" class="">
     <div class="w-100 shadow
-    d-flex justify-content-end align-items-center 
+    d-flex justify-content-between align-items-center 
     px-3 py-3 my-3
     bg-white">
+        <div class="d-flex justify-content-start align-items-center">
+            <div class="d-flex flex-column justify-content-start align-items-start mx-2">
+                <label for="filterPropostaNome" class="filter-label">Busca</label>
+                <input id="filterPropostaNome" 
+                placeholder="Procurar por nome" 
+                class="form-control-sm border-secondary"
+                name="nome" type="text">
+            </div>
+        </div>
         {% if pessoa.instituicao == 'escola' %}
         <div class="d-flex">
             <a href="{% url 'cotec-projeto-form' %}" style="text-decoration: none; color: white;"
@@ -21,9 +30,18 @@
     </div>
 </div>
 <script>
+    function getFiltersProposta() {
+        let filter = {}
+        let filterInputs = document.querySelectorAll(`input[id^="filterProposta"]`)
+        filterInputs.forEach((input) => {
+            filter[input.name] = input.value
+        })
+        return filter
+    }
+
     function loadPropostasTable() {
         getPropostaTable(
-            {},
+            getFiltersProposta(),
             function(propostaTable) {
                 $('#itemsTable').html(propostaTable)
             },
@@ -32,8 +50,28 @@
             }
         );
     }
+
+    function filtrarPropostas() {
+        loadPropostasTable()
+    }
+
     $(document).ready(function () {
         loadPropostasTable()
+
+        $("input[id^='filterProposta']").each(function () {
+            let input = $(this)
+            if ($(this).attr('type') == 'text') {
+                $(this)
+                .keyup(debounce(function() {
+                    filtrarPropostas()
+                }, 500))
+            } else {
+                $(this)
+                .change(debounce(function() {
+                    filtrarPropostas()
+                }, 500))
+            }
+        })
     })
 </script>
 {% endblock content %}

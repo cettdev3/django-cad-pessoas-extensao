@@ -338,7 +338,7 @@ def removePropostaProjeto(request, pk):
 def propostasTable(request):
     user = request.user
     pessoa = Pessoas.objects.get(user=user)
-    
+    nome = request.GET.get("nome")
     propostas = PropostaProjeto.objects.prefetch_related(
         'orcamento', 
         'equipe', 
@@ -347,7 +347,9 @@ def propostasTable(request):
     if pessoa.instituicao != "cett" and pessoa.escola:
         propostas = propostas.filter(escola=pessoa.escola)
     if pessoa.instituicao == "cett":
-        propostas = propostas.exclude(status=PropostaProjeto.STATUS_RASCUNHO)
+        propostas = propostas.exclude(status=PropostaProjeto.STATUS_RASCUNHO).exclude(status=PropostaProjeto.STATUS_APROVADA)
+    if nome:
+        propostas = propostas.filter(titulo_projeto__icontains=nome)
     propostas = propostas.all()
     return render(
         request,
