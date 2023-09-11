@@ -377,21 +377,21 @@
                 '{{ proposta_projeto.id }}',
                 {},
                 function (response) {
-                    $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                    console.log("click no botao: " + status);
+                    if (status == 'reprovada' || status == 'cancelada' || status == 'em_analise_cett' || status == 'aprovada' ) {
+                        updatePropostaProjeto('{{ proposta_projeto.id }}', {
+                            status: status
+                        }, function (response) {
+                            console.log("aprovada: ", response);
+                            $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                        }, function (error) {
+                            console.error(error);
+                        });
+                    }
                 }, function (error) {
                     console.error(error);
                 }
             );
-        }
-
-        if (status == 'reprovada' || status == 'cancelada' || status == 'em_analise_cett') {
-            updatePropostaProjeto('{{ proposta_projeto.id }}', {
-                status: status
-            }, function (response) {
-                $(location).attr('href', "{% url 'cotec-projeto-index' %}");
-            }, function (error) {
-                console.error(error);
-            });
         }
     });
 </script>
