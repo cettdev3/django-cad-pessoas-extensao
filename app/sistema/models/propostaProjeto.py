@@ -5,13 +5,18 @@ from django.utils import timezone
 class PropostaProjeto(models.Model):
     STATUS_RASCUNHO = "rascunho"
     STATUS_EM_ANALISE = "em_analise"
+    STATUS_EM_ANALISE_DIRECAO = "em_analise_direcao"
+    STATUS_EM_ANALISE_CETT = "em_analise_cett"
     STATUS_DEVOLVIDA = "devolvida"
     STATUS_APROVADA = "aprovada"
     STATUS_REPROVADA = "reprovada"
     STATUS_CANCELADA = "cancelada"
+
     STATUS_CHOICES = [
         (STATUS_RASCUNHO, 'Rascunho'),
         (STATUS_EM_ANALISE, 'Em análise'),
+        (STATUS_EM_ANALISE_DIRECAO, 'Em análise pela direção'),
+        (STATUS_EM_ANALISE_CETT, 'Em análise pelo CETT'),
         (STATUS_DEVOLVIDA, 'Devolvida'),
         (STATUS_APROVADA, 'Aprovada'),
         (STATUS_REPROVADA, 'Reprovada'),

@@ -122,6 +122,13 @@
                                         value="gerente">Gerente</option>
                                         <option 
                                         {% if pessoa %}
+                                            {% if pessoa.cargo == 'diretoria_escola' %}
+                                                selected
+                                            {% endif %}
+                                        {% endif %}
+                                        value="diretoria_escola">Diretoria Escola </option>
+                                        <option 
+                                        {% if pessoa %}
                                             {% if pessoa.cargo == 'outro' %}
                                                 selected
                                             {% endif %}

@@ -501,8 +501,9 @@
         let propostaStatus = '{{proposta_projeto.status}}'
         $('#editBtn').on('click', function () {
             if (propostaStatus == 'devolvida' || propostaStatus == 'rascunho') {
+                let status = "em_analise_direcao"
                 let values = {
-                    status : 'em_analise'
+                    status : status
                 }
                 updatePropostaProjeto(propostaId, values, 
                 function (data) {

@@ -19,3 +19,4 @@ pandas
 openpyxl
 pyheif
 fuzzywuzzy
+msoffice2pdf

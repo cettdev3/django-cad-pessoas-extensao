@@ -50,7 +50,7 @@
                                 {{ proposta.status_formatado }}
                             </span>
                             {% endif %}
-                            {% if proposta.status == 'em_analise' %}
+                            {% if proposta.status == 'em_analise' or proposta.status == 'em_analise_direcao' or proposta.status == 'em_analise_cett'%}
                             <span class="badge badge-warning">
                                 {{ proposta.status_formatado }}
                             </span>

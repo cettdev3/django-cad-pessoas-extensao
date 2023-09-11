@@ -15,6 +15,27 @@ class Pessoas(models.Model):
         ('outros', 'Outros'),
     )
 
+    CARGO_ESTOQUISTA = 'estoquista'
+    CARGO_PROFESSOR = 'professor'
+    CARGO_AUXILIAR = 'auxiliar'
+    CARDO_ASSISTENTE = 'assistente'
+    CARGO_COORDENADOR = 'coordenador'
+    CARGO_GERENTE = 'gerente'
+    CARGO_DIRETORIA_ESCOLA = 'diretoria_escola'
+    CARGO_OUTRO = 'outro'
+
+
+    CARGO_CHOICES = (
+        (CARGO_ESTOQUISTA,"Estoquista"),
+        (CARGO_PROFESSOR,"Professor"),
+        (CARGO_AUXILIAR,"auxiliar"),
+        (CARDO_ASSISTENTE,"Assistente"),
+        (CARGO_COORDENADOR,"Coordenador"),
+        (CARGO_GERENTE,"Gerente"),
+        (CARGO_DIRETORIA_ESCOLA,"Diretoria Escola"),
+        (CARGO_OUTRO,"Outro"),
+    )
+
     id = models.AutoField(primary_key=True)
     email = models.CharField(null = True, max_length=50)
     nome = models.CharField(null = True, max_length=50)

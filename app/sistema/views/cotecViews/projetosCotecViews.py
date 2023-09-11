@@ -176,7 +176,7 @@ def handlePropostaProjetoCreate(data, pessoa):
         if data.get("status"):
             proposta_projeto.status = data.get("status")
         else:
-            proposta_projeto.status = PropostaProjeto.STATUS_EM_ANALISE
+            proposta_projeto.status = PropostaProjeto.STATUS_EM_ANALISE_DIRECAO
         proposta_projeto.save() 
         if data.get("cronograma"):
             for atividade in data.get("cronograma"):
@@ -251,7 +251,7 @@ def createPropostaProjeto(request):
         return JsonResponse({"message": "Você precisa estar vinculado a uma escola para submeter uma proposta"}, status=400)
     
     proposta_projeto = handlePropostaProjetoCreate(data, pessoa)
-    if proposta_projeto.status == PropostaProjeto.STATUS_EM_ANALISE:
+    if proposta_projeto.status == PropostaProjeto.STATUS_EM_ANALISE_DIRECAO:
         try:
             success = PropostaSubmetidaEmail(proposta_projeto).send()
         except Exception as e:
@@ -291,6 +291,7 @@ def updatePropostaProjeto(request, pk):
     if data.get("publico_alvo"):
         proposta_projeto.publico_alvo = data.get("publico_alvo")
     if data.get("status"):
+        print("dentro de set status: ", data.get("status"))
         proposta_projeto.status = data.get("status")
     if data.get("justificativa"):
         proposta_projeto.justificativas = data.get("justificativa")

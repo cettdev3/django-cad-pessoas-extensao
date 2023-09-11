@@ -2,12 +2,27 @@
 
 {% block content %}
 <div class="container my-3" style="width: 80%; margin: 0 auto;">
-    <div class="dropdown position-fixed" style="right: 10px;">
-        <button class="btn btn-primary" type="button" id="commentsButton" data-bs-toggle="offcanvas"
+    <div class="dropdown position-fixed d-flex justify-content-center align-items-center" style="right: 10px;">
+        <div class="ml-5 mr-2 d-flex h-100">
+            <span class="badge 
+            {% if proposta_projeto.status == 'rascunho' %}
+            bg-secondary
+            {% elif proposta_projeto.status == 'devolvida' %}
+            bg-danger
+            {% elif proposta_projeto.status == 'em_analise' or proposta_projeto.status == 'em_analise_direcao' or  proposta_projeto.status == 'em_analise_cett' %}
+            bg-warning
+            {% elif proposta_projeto.status == 'aprovada' %}
+            bg-success
+            {% endif %}
+            custom-badge">
+                {{proposta_projeto.status_formatado}}
+            </span>
+        </div>
+        <button class="btn btn-primary mx-2" type="button" id="commentsButton" data-bs-toggle="offcanvas"
         data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
         <i class="fa fa-comment"></i>
         </button>
-        {% if pessoa.instituicao == 'cett' %}
+        {% if pessoa.instituicao == 'cett' or pessoa.cargo == 'diretoria_escola' %}
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Opções
@@ -15,41 +30,83 @@
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {% for status, display_status in proposta_projeto.STATUS_CHOICES %}
             {% if proposta_projeto.status != status %}
-            <button type="button" 
-            class="dropdown-item" 
-            data-status="{{ status }}"
-            {% if status == 'devolvida' %}
-            data-toggle="modal"
-            data-target="#devolverModal" 
-            {% endif %}>
-                {% if status == 'em_analise'%}
-                <span>Colocar Em Análise</span>
+                {% if pessoa.instituicao == 'cett' %}
+                    {% if status == 'devolvida' or status == 'aprovada' or status == 'reprovada' or status == 'cancelada' %}
+                    <button type="button" 
+                    class="dropdown-item" 
+                    data-status="{{ status }}"
+                    {% if status == 'devolvida' %}
+                    data-toggle="modal"
+                    data-target="#devolverModal" 
+                    {% endif %}>
+                        {% if status == 'devolvida'%}
+                        <span>Devolver ao Autor</span>
+                        {% endif %}
+                        {% if status == 'aprovada' %}
+                        <span>Aprovar</span>
+                        {% endif %}
+                        {% if status == 'reprovada'%}
+                        <span>Reprovar</span>
+                        {% endif %}
+                        {% if status == 'cancelada'%}
+                        <span>Cancelar</span>
+                        {% endif %}
+                    </button>
+                    {% endif %}
                 {% endif %}
-                {% if status == 'devolvida'%}
-                <span>Devolver ao Autor</span>
+
+                {% if pessoa.instituicao == 'escola' and pessoa.cargo == 'diretoria_escola' %}
+                    {% if status == 'em_analise_cett' or status == 'devolvida' or status == 'reprovada' or status == 'cancelada' %}
+                    <button type="button" 
+                    class="dropdown-item" 
+                    data-status="{{ status }}"
+                    {% if status == 'devolvida' %}
+                    data-toggle="modal"
+                    data-target="#devolverModal" 
+                    {% endif %}>
+                        {% if status == 'em_analise_cett'%}
+                        <span>Submeter para o CETT</span>
+                        {% endif %}
+                        {% if status == 'devolvida'%}
+                        <span>Devolver ao Autor</span>
+                        {% endif %}
+                        {% if status == 'reprovada'%}
+                        <span>Reprovar</span>
+                        {% endif %}
+                        {% if status == 'cancelada'%}
+                        <span>Cancelar</span>
+                        {% endif %}
+                    </button>
+                    {% endif %}
                 {% endif %}
-                {% if status == 'aprovada'%}
-                <span>Aprovar</span>
+
+                {% if pessoa.instituicao == 'escola' and pessoa.cargo != 'diretoria_escola' %}
+                    {% if status == 'em_analise_direcao' %}
+                    <button type="button" 
+                    class="dropdown-item" 
+                    data-status="{{ status }}"
+                    {% if status == 'devolvida' %}
+                    data-toggle="modal"
+                    data-target="#devolverModal" 
+                    {% endif %}>
+                        {% if status == 'em_analise_direcao'%}
+                        <span>Submeter para diretoria</span>
+                        {% endif %}
+                    </button>
+                    {% endif %}
                 {% endif %}
-                {% if status == 'reprovada'%}
-                <span>Reprovar</span>
-                {% endif %}
-                {% if status == 'cancelada'%}
-                <span>Cancelar</span>
-                {% endif %}
-            </button>
             {% endif %}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    {% if pessoa.instituicao == 'cett' %}
+    {% if pessoa.instituicao == 'cett' or pessoa.cargo == 'diretoria_escola' %}
     <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -62,7 +119,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                     <button type="button" id="submitJustificativa" class="btn btn-primary">Devolver ao autor</button>
                 </div>
             </div>
@@ -327,7 +384,7 @@
             );
         }
 
-        if (status == 'reprovada' || status == 'cancelada') {
+        if (status == 'reprovada' || status == 'cancelada' || status == 'em_analise_cett') {
             updatePropostaProjeto('{{ proposta_projeto.id }}', {
                 status: status
             }, function (response) {
