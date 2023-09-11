@@ -180,6 +180,11 @@ cellspacing="0">
                 id="hiddenMenuDpEventos{{dpEvento.id}}" 
                 class="btn-group-custom">
                     <a id="linkVisualizarDpEvento{{dpEvento.id}}" href="/visualizarDpEvento/({{dpEvento.id}})"></a>
+                    {% if dpEvento.proposta_projeto.id %}
+                    <a href="{% url 'show-proposta-projeto' dpEvento.proposta_projeto.id %}">
+                    </a>
+                    <button onclick="visualizarProposta('{{dpEvento.proposta_projeto.id}}')">Proposta</button> 
+                    {% endif %}
                     <button onclick="visualizarDpEvento('{{dpEvento.id}}')">Visualizar</button> 
                     <!-- <button onclick="gerarRelatorio('{{dpEvento.id}}')">Relatório</button> -->
                     <button onclick="carregarDpEventoModalEditar('{{dpEvento.id}}')">Editar</button> 
@@ -248,6 +253,10 @@ cellspacing="0">
 
     function visualizarDpEvento(id) {
         location.href = "visualizarDpEvento/" + id
+    }
+    
+    function visualizarProposta(id) {
+        location.href = "show-proposta-projeto/" + id
     }
 
     function openMembroExecucaoDemandasModal(membroId) {
