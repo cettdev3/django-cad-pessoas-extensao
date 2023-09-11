@@ -8,7 +8,6 @@ class PropostaSubmetidaEmail:
         self.recipient = [
             "desenvolvedor2@cett.org.br",
             config.EMAIL_COORDENADORA_EXT,
-            config.EMAIL_GERENTE_EXT
         ]
         self.titulo_projeto = proposta_projeto.titulo_projeto
         self.proposta_url = config.EXT_BASE_URL+"/show-proposta-projeto/"+str(proposta_projeto.pk)
