@@ -27,6 +27,7 @@ class InstituicaoMiddleware:
             reverse('membroExecucao'),
             reverse('create-item-orcamento'),
             reverse('cotec-projeto-success'),
+            reverse('membro-execucao-roles'),
         ]
 
         dynamic_urls = [

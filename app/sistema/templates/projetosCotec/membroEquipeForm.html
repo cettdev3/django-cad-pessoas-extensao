@@ -3,22 +3,24 @@
         <div class="form-group row">
             <div class="col-12">
                 <label for="nome">Nome</label>
-                <div id="select-pessoa-membro-{{membroEquipe.id}}" data-pessoa-id="{{membroEquipe.pessoa.id}}">
+                <div id="select-pessoa-membro-{{membroEquipe.id}}" data-pessoa-id="{{membroEquipe.pessoa|default_if_none:''}}">
                 </div>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-6">
                 <label for="nome">Função</label>
-                <input type="text" class="form-control" 
+                <div id="select-role-membro-{{membroEquipe.id}}" data-role-id="{{membroEquipe.role.id}}">
+                </div>
+                <!-- <input type="text" class="form-control" 
                 {% if read_only == True or membroEquipe.role == 'responsavel' or membroEquipe.role == 'proponente' %} 
                     disabled 
                 {% endif %}
                 data-id="{{membroEquipe.id}}" 
-                data-current-value="{{membroEquipe.role|default_if_none:''}}"
-                value="{{membroEquipe.role|default_if_none:''}}" 
+                data-current-value="{{membroEquipe.role.nome|default_if_none:''}}"
+                value="{{membroEquipe.role.nome|default_if_none:''}}" 
                 id="role" 
-                name="role">
+                name="role"> -->
             </div>
             <div class="col-6">
                 <label for="nome">Instituição</label>
@@ -43,7 +45,10 @@
 <script>
     $(document).ready(function () {
         (function (params) {
+            console.log(params);
             let formContainer = $("#form-container-" + params.membroEquipeId);
+            let role_id_ready = false;
+            let pessoa_id_ready = false;
 
             const pessoaModal = new CustomModalComponent({
                 loadContent: pessoaForm,
@@ -52,75 +57,125 @@
                 modalActionFunction: pessoaCreate
             });
 
-            let pessoa_id = $(`#select-pessoa-membro-${params.membroEquipeId}`).data('pessoa-id');
-
-            const customSelect = new CustomSelectMultiple(pessoaModal, {
-                label: "Selecione Pessoa",
-                multiple: false,
-                selectedOptions: pessoa_id ? [pessoa_id] : [],
-                loadOptions: function () {
-                    return selectDataService.fetchData('pessoas', getPessoas);
-                }
-            }, function () {
-                $('#select-pessoa-membro-' + params.membroEquipeId).append(customSelect.element);
-                formContainer[0].getValue = function () {
-                    var membroEquipe = {}
-
-                    formContainer.find("input").each(function () {
-                        var name = $(this).attr('name');
-                        membroEquipe[name] = $(this).val();
-                    });
-
-                    membroEquipe['pessoa_id'] = customSelect.getValue();
-
-                    return membroEquipe;
-                }
-
-                formContainer.find("input").each(function () {
-                    let includedField = ['role', 'instituicao', 'pessoa_id'];
-                    if (!includedField.includes($(this).attr('name'))) return;
-                    $(this).on('change', function () {
-                        var name = $(this).attr('name');
-                        var value = $(this).val();
-                        let data = {}
-                        let current_value = $(this).data('current-value');
-                        data[name] = value;
-
-                        if (current_value == value || !params.membroEquipeId) return;
-                        updateMembroEquipe(params.membroEquipeId, 
-                        data, 
-                        function (response) {
-                            showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
-                        }, function (error) {
-                            showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
-                            $(this).val(current_value);
-                        });
-                    });
-                });
-
-                customSelect.element.on('change', function (event) {
-                    const selectedOptions = event.detail;
-                    if (selectedOptions.length == 0) return
-                    if (!params.membroEquipeId) return;
-
-                    let data = {
-                        pessoa_id: selectedOptions[0]
-                    }
-
-                    updateMembroEquipe(params.membroEquipeId,
-                        data,
-                        function (response) {
-                            showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
-                        }, function (error) {
-                            showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
-                            $(this).val(current_value);
-                        });
-                });
-
+            const roleModal = new CustomModalComponent({
+                loadContent: membroExecucaoRoleForm,
+                modalTitle: "Adicionar Função",
+                modalBtnActionText: "Adicionar",
+                modalActionFunction: membroExecucaoRoleCreate
             });
 
+            let pessoa_id = $(`#select-pessoa-membro-${params.membroEquipeId}`).data('pessoa-id');
+            let role_ids = params.roles;
+
+            function setupFormReady(field) {
+                if (field == 'role') {
+                    $('#select-role-membro-' + params.membroEquipeId).append(customSelectRole.element);
+                    role_id_ready = true;
+                } else if (field == 'pessoa') {
+                    $('#select-pessoa-membro-' + params.membroEquipeId).append(customSelectPessoa.element);
+                    pessoa_id_ready = true;
+                }
+
+                if (role_id_ready && pessoa_id_ready) {
+                    formContainer[0].getValue = function () {
+                        var membroEquipe = {}
+
+                        formContainer.find("input").each(function () {
+                            var name = $(this).attr('name');
+                            membroEquipe[name] = $(this).val();
+                        });
+
+                        membroEquipe['pessoa_id'] = customSelectPessoa.getValue();
+                        membroEquipe['role_ids'] = customSelectRole.getValue();
+
+                        return membroEquipe;
+                    }
+
+                    formContainer.find("input").each(function () {
+                        let includedField = ['role_id', 'instituicao', 'pessoa_id'];
+                        if (!includedField.includes($(this).attr('name'))) return;
+                        $(this).on('change', function () {
+                            var name = $(this).attr('name');
+                            var value = $(this).val();
+                            let data = {}
+                            let current_value = $(this).data('current-value');
+                            data[name] = value;
+                            data = formContainer[0].getValue()
+                            if (current_value == value || !params.membroEquipeId) return;
+                            updateMembroEquipe(params.membroEquipeId, 
+                            data, 
+                            function (response) {
+                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
+                            }, function (error) {
+                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
+                                $(this).val(current_value);
+                            });
+                        });
+                    });
+                }
+            }
+
+            const customSelectPessoa = new CustomSelectMultiple(
+                pessoaModal, 
+                {
+                    label: "Selecione Pessoa",
+                    multiple: false,
+                    selectedOptions: pessoa_id ? [pessoa_id] : [],
+                    loadOptions: function () {
+                        return selectDataService.fetchData('pessoas', getPessoas);
+                    }
+                }, 
+                function () {
+                    setupFormReady('pessoa');
+                    customSelectPessoa.element.on('change', function (event) {
+                        const selectedOptions = event.detail;
+                        if (selectedOptions.length == 0) return
+                        if (!params.membroEquipeId) return;
+                        data = formContainer[0].getValue()
+                        updateMembroEquipe(params.membroEquipeId,
+                            data,
+                            function (response) {
+                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
+                            }, function (error) {
+                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
+                                $(this).val(current_value);
+                            });
+                    });
+                }
+            );
+
+            const customSelectRole = new CustomSelectMultiple(
+                roleModal, 
+                {
+                    label: "Selecione a Função",
+                    multiple: true,
+                    selectedOptions: role_ids ? role_ids : [],
+                    loadOptions: function () {
+                        return selectDataService.fetchData('membro_execucao_roles', getMembroExecucaoRoles);
+                    }
+                }, 
+                function () {
+                    setupFormReady('role');
+                    customSelectRole.element.on('change', function (event) {
+                        const selectedOptions = event.detail;
+                        if (selectedOptions.length == 0) return
+                        if (!params.membroEquipeId) return;
+                        data = formContainer[0].getValue()
+                        updateMembroEquipe(params.membroEquipeId,
+                            data,
+                            function (response) {
+                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
+                            }, function (error) {
+                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
+                                $(this).val(current_value);
+                            });
+                    });
+                }
+            );
+
         })({
-            membroEquipeId: '{{membroEquipe.id}}'
+            membroEquipeId: '{{membroEquipe.id}}',
+            roles: {{membroEquipe.roles}},
         })
     });
 </script>

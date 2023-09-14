@@ -241,9 +241,12 @@ class CustomSelectMultiple {
     renderBadges() {
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
-
+        console.log("dentro de render badges: ", this.state.selectedOptions)
         this.state.selectedOptions.forEach(id => {
-            const option = this.state.options.find(o => o.id === id);
+            const option = this.state.options.find(o => {
+                return o.id === id
+            });
+            if (!option) return;
             const badge = $(`
             <div class="badge-outline-secondary d-flex align-items-center mx-2 item-badge" data-id="${option.id}">
                 <span>${option.nome}</span>

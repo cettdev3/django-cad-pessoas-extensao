@@ -1,3 +1,4 @@
+from .membroExecucaoRoles import MembroExecucaoRoles
 from .pessoa import Pessoas
 from .propostaProjeto import PropostaProjeto
 from .orcamento import Orcamento

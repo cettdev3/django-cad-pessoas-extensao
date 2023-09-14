@@ -12,6 +12,7 @@ from ..models.ticket import Ticket
 from ..models.itinerario import Itinerario
 from ..models.membroExecucao import MembroExecucao
 from ..models.propostaProjeto import PropostaProjeto
+from ..models.membroExecucaoRoles import MembroExecucaoRoles
 from ..serializers.acaoSerializer import AcaoSerializer
 from ..serializers.membroExecucaoSerializer import MembroExecucaoSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -92,7 +93,6 @@ class MembroExecucaoApiView(APIView):
             "complemento": request.data.get("complemento") if request.data.get("complemento") else None,
             "tipo": request.data.get("tipo") if request.data.get("tipo") else None,
             "avaliador": request.data.get("avaliador") if request.data.get("avaliador") else None,
-            "role": request.data.get("role"),
             "instituicao": request.data.get("instituicao"),
             "cidade": cidade,
             "pessoa": pessoa,
@@ -102,6 +102,8 @@ class MembroExecucaoApiView(APIView):
         }
         with transaction.atomic():
             membroExecucao = MembroExecucao.objects.create(**data)
+            if request.data.get("role_ids"):
+                membroExecucao.roles.add(MembroExecucaoRoles.objects.get(id=request.data.get("role_ids")))
             tickets = request.data.get("tickets")
             if tickets:
                 for ticket in tickets:
@@ -137,6 +139,7 @@ class MembroExecucaoApiView(APIView):
                         "cidade": cidade,
                     }
                     ticketData = Ticket.objects.create(**ticketData)
+                
             serializer = MembroExecucaoSerializer(membroExecucao)
         
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -184,8 +187,10 @@ class MembroExecucaoDetailApiView(APIView):
             membroExecucao.cep = request.data.get("cep")
         if request.data.get("complemento"):
             membroExecucao.complemento = request.data.get("complemento")
-        if request.data.get("role"):
-            membroExecucao.role = request.data.get("role")
+        if request.data.get("role_ids") is not None:
+            membroExecucao.roles.clear()
+            for role_id in request.data.get("role_ids"):
+                membroExecucao.roles.add(MembroExecucaoRoles.objects.get(id=role_id))
         if request.data.get("instituicao"):
             membroExecucao.instituicao = request.data.get("instituicao")
         if request.data.get("avaliador"):
@@ -211,6 +216,7 @@ class MembroExecucaoDetailApiView(APIView):
                 )
             membroExecucao.cidade = cidade
 
+        print("pessoa dentro de update de memebro equipe: ", request.data.get("pessoa_id"), " - ", request.data.get("pessoa_id") is not None)
         if request.data.get("pessoa_id"):
             pessoa = self.get_object(Pessoas, request.data.get("pessoa_id"))
             if not pessoa:

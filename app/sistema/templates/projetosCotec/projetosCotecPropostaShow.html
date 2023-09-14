@@ -298,7 +298,11 @@
         <tbody>
             {% for membro in proposta_projeto.equipe.all %}
             <tr>
-                <td>{{ membro.role|default_if_none:'Não Informado' }}</td>
+                <td>
+                    {% for role in membro.roles.all %}
+                    {{ role.nome|default_if_none:'Não Informado' }}
+                    {% endfor %}
+                </td>
                 <td>{{ membro.instituicao|default_if_none:'Não Informado' }}</td>
                 {% if membro.pessoa %}
                 <td>{{ membro.pessoa.nome|default_if_none:'Não Informado' }}</td>
@@ -392,6 +396,15 @@
                     console.error(error);
                 }
             );
+        } else {
+            updatePropostaProjeto('{{ proposta_projeto.id }}', {
+                status: status
+            }, function (response) {
+                console.log("click no botao: " + status);
+                $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+            }, function (error) {
+                console.error(error);
+            });
         }
     });
 </script>

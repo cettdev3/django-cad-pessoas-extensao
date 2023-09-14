@@ -277,27 +277,7 @@
             <div id="step-equipe">
                 <h2>Equipe</h2>
                 <div class="form-group">
-                    <label for="proponente"><b>Proponente</b></label>
-                    <div id="multiple-form-component-proponente">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Carregando itens...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="responsavel"><b>Responsáveis</b></label>
-                    <div id="multiple-form-component-respomsaveis">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Carregando itens...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="equipe-executora"><b>Equipe executora</b></label>
+                    <label for="equipe-executora"><b></b></label>
                     <div id="multiple-form-component-equipe">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="spinner-border text-primary" role="status">
@@ -389,8 +369,6 @@
     }
 
     $(document).ready(function () {
-        let proponentes = {{ proponentes_json|safe }};
-        let responsaveis = {{ responsaveis_json|safe }};
         let equipe = {{ equipe_json|safe }};
         let atividades = {{ atividades_json|safe }};
         let escola_nome = {% if user.is_authenticated %}'{{ user.pessoa.escola.nome }}'{% else %}''{% endif %}
@@ -514,44 +492,11 @@
             }
         });
 
-        // SETUP FORMULARIO DE PROPONENTES
-        let proponentesIds = proponentes.map(item => {
-            return {
-                id: item.pk
-            }
-        });
-
         let handleCreateMembroEquipe = (data) => propostaId ? createMembroEquipe(data, function (data) {
                 showFloatingMessage("Membro adicionado a equipe com sucesso", "alert-success");
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             }) : undefined;
-
-        const multipleFormOptions = {
-            fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
-            fetchComponentTemplateFunction: getMultipleFormComponent,
-            createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "proponente"}) : undefined,
-            showAddButton: false,
-            showDeleteButton: false,
-            updateFunction: async function(modelId, data) {
-                console.log(modelId, data)
-            },
-            deleteFunction: async function(modelId) {
-                console.log(modelId)
-            },
-            onReady: function() {
-                $("#multiple-form-component-proponente").html(multipleForm.element);
-                const formData = proponentesIds.length > 0 ? proponentesIds : 1;
-                multipleForm.setValue(formData);
-            }
-        };
-
-        // SETUP FORMULARIO DE RESPONSÁVEIS
-        let responsaveisIds = responsaveis.map(item => {
-            return {
-                id: item.pk
-            }
-        });
         
         let handleDeleteMembroEquipe = (membroEquipeId) => propostaId ? removeMembroEquipe(membroEquipeId, function (data) {
                 showFloatingMessage("Membro removido da equipe com sucesso", "alert-success");
@@ -559,26 +504,7 @@
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             }) : undefined;
 
-        const multipleFormOptionsResponsaveis = {
-            fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
-            fetchComponentTemplateFunction: getMultipleFormComponent,
-            createFunction: propostaId ? () => handleCreateMembroEquipe({proposta_projeto_id: propostaId, role: "responsavel"}) : undefined,
-            // showAddButton: false,
-            // showDeleteButton: false,
-            showSaveButton: false,
-            updateFunction: async function(modelId, data) {
-                console.log(modelId, data)
-            },
-            deleteFunction: async function(modelId) {
-                handleDeleteMembroEquipe(modelId)
-            },
-            onReady: function() {
-                $("#multiple-form-component-respomsaveis").html(multipleFormResponsaveis.element);
-                const formData = responsaveisIds.length > 0 ? responsaveisIds : 1;
-                multipleFormResponsaveis.setValue(formData);
-            }
-        };
-
+       
         // SETUP FORMULARIO DE EQUIPE
 
         equipeIds = equipe.map(item => {
@@ -586,6 +512,7 @@
                 id: item.pk
             }
         });
+
         const multipleFormEquipeOptions = {
             fetchFormTemplateFunction: (data) => getMembroEquipeForm({...{escola_nome: escola_nome}, ...data}),
             fetchComponentTemplateFunction: getMultipleFormComponent,
@@ -607,16 +534,6 @@
         };
 
         selectDataService.fetchData('pessoas', getPessoas).then(data => {
-            multipleForm = new MultipleFormComponent(multipleFormOptions);
-            $("#get-form-values").on('click', () => {
-                console.log("proponente: ", multipleForm.getValues())
-            })
-
-            multipleFormResponsaveis = new MultipleFormComponent(multipleFormOptionsResponsaveis);
-            $("#get-form-values").on('click', () => {
-                console.log("responsavel: ", multipleFormResponsaveis.getValues())
-            })
-
             multipleFormEquipe = new MultipleFormComponent(multipleFormEquipeOptions);
             $("#get-form-values").on('click', () => {
                 console.log("equipe: ", multipleFormEquipe.getValues())

@@ -5,6 +5,7 @@ from ..models.acao import Acao
 from ..models.dpEvento import DpEvento
 from ..models.itinerario import Itinerario
 from ..models.propostaProjeto import PropostaProjeto
+from ..models.membroExecucaoRoles import MembroExecucaoRoles
 
 class MembroExecucao(models.Model): 
     ROLE_PROPONENTE = 'proponente'
@@ -33,7 +34,8 @@ class MembroExecucao(models.Model):
     avaliador = models.BooleanField(default=False, null = True, blank= True)
     observacao = models.CharField(null = True, max_length=250, blank= True)
     proposta_projeto = models.ForeignKey(PropostaProjeto, on_delete=models.SET_NULL, null=True, blank= True, related_name='equipe')
-    role = models.CharField(null = True, max_length=100, blank= True)
+    role = models.ForeignKey(MembroExecucaoRoles, on_delete=models.SET_NULL, null=True, blank= True)
+    roles = models.ManyToManyField(MembroExecucaoRoles, related_name='membros_execucao')
     instituicao = models.CharField(null = True, max_length=1000, blank= True)
     class Meta:
         db_table = 'membros_execucao'
@@ -63,3 +65,5 @@ class MembroExecucao(models.Model):
         else: 
             return "sem_tickets"
         return "criado"
+
+

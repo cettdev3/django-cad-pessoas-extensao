@@ -26,8 +26,15 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "ticket_set",
             "itinerario",
             "ticket_status",
-            "role",
+            "roles",
             "instituicao",
             "proposta_projeto"
         ]
-        depth = 4
+    
+    def __init__(self, *args, **kwargs):
+        depth = kwargs.pop('depth', None)
+        super(MembroExecucaoSerializer, self).__init__(*args, **kwargs)
+        if depth is not None:
+            self.Meta.depth = depth
+        else:
+            self.Meta.depth = 4

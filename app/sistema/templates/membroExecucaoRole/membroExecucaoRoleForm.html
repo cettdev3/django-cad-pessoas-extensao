@@ -1,0 +1,67 @@
+<form id="form-role-container-{{membroExecucaoRole.id}}">
+    <div id="form-container-{{membroExecucaoRole.id}}">
+        <div class="form-group row">
+            <div class="col-6">
+                <label for="nome">Nome da função</label>
+                <input type="text" 
+                class="form-control" 
+                {% if read_only == True %} 
+                disabled 
+                {% endif %}
+                data-id="{{membroExecucaoRole.id}}" 
+                data-current-value="{{membroExecucaoRole.nome|default_if_none:''}}"
+                value="{{membroExecucaoRole.nome|default_if_none:''}}" 
+                id="nome" 
+                name="nome">
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            console.log(params);
+            let formContainer = $("#form-container-" + params.membroExecucaoRoleId);
+
+            function setupFormReady(field) {
+                formContainer[0].getValue = function () {
+                    var membroEquipeRole = {}
+
+                    formContainer.find("input").each(function () {
+                        var name = $(this).attr('name');
+                        membroEquipeRole[name] = $(this).val();
+                    });
+
+                    return membroEquipeRole;
+                }
+
+                formContainer.find("input").each(function () {
+                    let includedField = ['nome'];
+                    if (!includedField.includes($(this).attr('name'))) return;
+                    $(this).on('change', function () {
+                        var name = $(this).attr('name');
+                        var value = $(this).val();
+                        let data = {}
+                        let current_value = $(this).data('current-value');
+                        data[name] = value;
+
+                        if (current_value == value || !params.membroExecucaoRoleId) return;
+                        updateMembroExecucaoRole(params.membroExecucaoRoleId, 
+                        data, 
+                        function (response) {
+                            showFloatingMessage("Função de Membro da equipe atualizado com sucesso!", "alert-success")
+                        }, function (error) {
+                            showFloatingMessage("Erro ao atualizar função de membro da equipe!", "alert-danger")
+                            $(this).val(current_value);
+                        });
+                    });
+                });
+            }
+
+            setupFormReady();
+
+        })({
+            membroExecucaoRoleId: '{{membroExecucaoRole.id}}',
+        })
+    });
+</script>

@@ -59,6 +59,7 @@ from sistema.views.siteServicosContratadosViews import servicoContratadoModal, s
 from sistema.views.siteUserViews import usersSelect
 from sistema.views.siteDemandaViews import gerencia_demandas, demandas_tabela, relatorio_sintetico, importDemandaModal, saveBatchDemanda, demandasSelect
 from sistema.views.siteServicoViews import ServicoModalCadastrar, eliminarServico, saveServico, editarServico
+from sistema.views.siteMembroExecucaoRoles import getMembroExecucaoRoles, getMembroExecucaoRoleForm, membroExecucaoRoleCreate
 from sistema.views.cotecViews.projetosCotecViews import (
     projetoCotecForm, 
     projetoCotecIndex, 
@@ -132,6 +133,7 @@ from sistema.views.atividadeSectionApiViews import AtividadeSectionApiView, Ativ
 from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
 from sistema.views.comentarioApiViews import ComentarioApiView, ComentarioDetailApiView
 from sistema.views.emailApiViews import EmailApiView
+from sistema.views.membroExecucaoRoleApiViews import MembroExecucaoRoleApiView, MembroExecucaoRoleDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -420,6 +422,11 @@ urlpatterns = [
     path("galeriaTable", galeriaTable),
     path("saveGaleria", saveGaleria),
     path("deleteGaleria/<galeria_id>", deleteGaleria),
+    
+    # ROTAS PARA MEMBRO EXECUCAO ROLES
+    path("getMembroExecucaoRoles", getMembroExecucaoRoles, name="membro-execucao-roles-all"),
+    path("membro-execucao-role-form", getMembroExecucaoRoleForm, name="membro-execucao-role-form"),
+    path("membro-execucao-role-create", membroExecucaoRoleCreate, name="membro-execucao-role-create"),
 
     #ROTAS PARA SEÇÂO DE ATIVIDADES
     path("atividadeSectionModal", atividadeSectionModal),
@@ -519,6 +526,8 @@ urlpatterns = [
     path("comentarios", ComentarioApiView.as_view()),
     path('comentarios/<int:comentario_id>', ComentarioDetailApiView.as_view()),
     
+    path('membro-execucao-roles', MembroExecucaoRoleApiView.as_view(), name="membro-execucao-roles"),
+    path('membro-execucao-roles/<int:membro_execucao_role_id>', MembroExecucaoRoleDetailApiView.as_view(), name="membro-execucao-role-detail"),
 
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),

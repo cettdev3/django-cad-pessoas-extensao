@@ -4,7 +4,19 @@ from django.contrib.auth.decorators import login_required
 from django.forms.models import model_to_dict
 import json
 from django.http import JsonResponse
-from sistema.models import PropostaProjeto, DpEvento, DpEventoEscola, Escola, Galeria, AtividadeSection, AtividadeCategoria
+from sistema.models import (
+    PropostaProjeto,
+    DpEvento,
+    DpEventoEscola,
+    Escola,
+    Galeria,
+    AtividadeSection,
+    AtividadeCategoria,
+    MembroExecucaoRoles
+)
+from sistema.serializers import (
+    MembroExecucaoSerializer,
+)
 from django.db import transaction
 import requests
 from rest_framework.authtoken.models import Token
@@ -60,10 +72,15 @@ def projetoCotecForm(request):
     cursos = Curso.objects.all()
     cursos_list = list(cursos.values('id', 'nome'))
     cursos_json = json.dumps(cursos_list)
-    proponentes_json = serializers.serialize('json', proposta_projeto.proponentes)
+    proponentes = proposta_projeto.equipe.filter(roles__slug=MembroExecucaoRoles.SLUG_PROPONENTE).prefetch_related('roles')
+    for proponente in proponentes:
+        print(proponente.roles.all())
+    proponentes_json = serializers.serialize('json', proponentes)
     responsaveis_json = serializers.serialize('json', proposta_projeto.responsaveis)
     atividades_json = serializers.serialize('json', proposta_projeto.atividades.all())
-    equipe_json = serializers.serialize('json', proposta_projeto.equipe.filter(~Q(role__in=["proponente", "responsavel"])))
+    
+    equipe_json = serializers.serialize('json', proposta_projeto.equipe.all().prefetch_related('roles'))
+
     orcamento_itens_json = serializers.serialize('json', proposta_projeto.orcamento.items.all())
     return render(
         request,
@@ -141,8 +158,9 @@ def membroEquipeForm(request):
     context["escola_nome"] = escola_nome
     if model_id:
         try:
-            membroEquipe = MembroExecucao.objects.get(pk=model_id)
-            context["membroEquipe"] = membroEquipe
+            membroEquipe = MembroExecucao.objects.prefetch_related('roles').get(pk=model_id)
+            context["membroEquipe"] = MembroExecucaoSerializer(instance=membroEquipe, depth=0).data
+            print("dado do serializer: ", context)
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Membro da equipe não encontrado"}, status=400)
     return render(
@@ -197,7 +215,7 @@ def handlePropostaProjetoCreate(data, pessoa):
                 if membro_equipe.get("data_inicio"):
                     db_membro_equipe.data_inicio = membro_equipe.get("data_inicio")
                 db_membro_equipe.proposta_projeto = proposta_projeto
-                db_membro_equipe.role = membro_equipe.get("role")
+                db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=membro_equipe.get("role"))
                 db_membro_equipe.instituicao = membro_equipe.get("instituicao")
                 if membro_equipe.get("pessoa_id"):
                     db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
@@ -209,13 +227,13 @@ def handlePropostaProjetoCreate(data, pessoa):
                 if membro_equipe.get("pessoa_id"):
                     db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
                 db_membro_equipe.proposta_projeto = proposta_projeto
-                db_membro_equipe.role = "proponente"
+                db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_PROPONENTE)
                 db_membro_equipe.instituicao = membro_equipe.get("instituicao")
                 db_membro_equipe.save()
         else:
             db_membro_equipe = MembroExecucao()
             db_membro_equipe.proposta_projeto = proposta_projeto
-            db_membro_equipe.role = "proponente"
+            db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_PROPONENTE)
             db_membro_equipe.save()
 
         if data.get("responsavel"):
@@ -224,7 +242,7 @@ def handlePropostaProjetoCreate(data, pessoa):
                 if membro_equipe.get("pessoa_id"):
                     db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
                 db_membro_equipe.proposta_projeto = proposta_projeto
-                db_membro_equipe.role = "responsavel"
+                db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_RESPONSAVEL)
                 db_membro_equipe.instituicao = membro_equipe.get("instituicao")
                 db_membro_equipe.save()
 
@@ -362,6 +380,7 @@ def propostasTable(request):
 
 @login_required(login_url="/auth-user/login-user")
 def updateAtividade(request, pk):
+    print("data dentro de update atividade: ", request.body.decode())
     data = json.loads(request.body.decode())
     atividade = Atividade.objects.get(pk=pk)
     if data.get("data_realizacao_inicio"):
@@ -412,6 +431,7 @@ def removeAtividade(request, pk):
 @login_required(login_url="/auth-user/login-user")
 def updateMembroEquipe(request, pk):
     payload = json.loads(request.body)
+    print("payload do update de memebro de equipe: ", payload)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/membroExecucao/'+str(pk)

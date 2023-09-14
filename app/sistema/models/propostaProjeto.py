@@ -47,11 +47,11 @@ class PropostaProjeto(models.Model):
 
     @property
     def responsaveis(self):
-        return self.equipe.filter(role='responsavel')
+        return self.equipe.filter(role__slug='responsavel')
     
     @property
     def proponentes(self):
-        return self.equipe.filter(role='proponente')
+        return self.equipe.filter(role__slug='proponente')
 
     @property
     def status_formatado(self):
