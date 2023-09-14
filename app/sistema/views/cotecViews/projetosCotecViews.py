@@ -364,8 +364,8 @@ def propostasTable(request):
         )
     if pessoa.instituicao != "cett" and pessoa.escola:
         propostas = propostas.filter(escola=pessoa.escola)
-    # if pessoa.instituicao == "cett":
-    #     propostas = propostas.exclude(status=PropostaProjeto.STATUS_RASCUNHO).exclude(status=PropostaProjeto.STATUS_APROVADA)
+    if pessoa.instituicao == "cett":
+        propostas = propostas.exclude(status=PropostaProjeto.STATUS_RASCUNHO)
     if nome:
         propostas = propostas.filter(titulo_projeto__icontains=nome)
     propostas = propostas.all()
