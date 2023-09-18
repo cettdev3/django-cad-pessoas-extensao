@@ -39,6 +39,8 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "dataremovida_set",
             "quantidade_matriculas",
             "codigo_siga",
-            "tipo"
+            "tipo",
+            "atividade_id",
+            "membroExecucao_id",
         ]
         depth = 2

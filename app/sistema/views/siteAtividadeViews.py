@@ -17,6 +17,7 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from django.db.models import Prefetch
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
 
 @login_required(login_url="/auth-user/login-user")
 def atividadesTable(request):
@@ -204,6 +205,7 @@ def atividadeForm(request):
         try:
             atividade = Atividade.objects.get(pk=model_id)
             context["atividade"] = atividade
+            context['alocacoes_json'] = serializers.serialize('json', atividade.alocacoes.all())
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Atividade não encontrada"}, status=400)
     return render(

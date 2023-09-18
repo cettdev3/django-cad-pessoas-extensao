@@ -288,9 +288,9 @@
                 </div>
             </div>
     
-            <div id="step-orcamento">
-                <h2>Orçamento</h2>
-                <div id="multiple-form-component-orcamento">
+            <div id="step-recurso">
+                <h2>Insumos</h2>
+                <div id="multiple-form-component-recurso">
                     <div class="d-flex justify-content-center align-items-center">
                         <div class="spinner-border text-primary" role="status">
                             <span class="sr-only">Carregando itens...</span>
@@ -335,8 +335,8 @@
 </div>
 
 <script>
-    function getOrcamentoValues() {
-        return $('#orcamento')[0].getValue()
+    function getRecursoValues() {
+        return $('#recurso')[0].getValue()
     }
 
     function getCronogramaValues() {
@@ -358,7 +358,7 @@
         data.push({ name: 'responsavel', value: responssavel });
         data.push({ name: 'equipe', value: getEquipeExecucao() });
         data.push({ name: 'cronograma', value: getCronogramaValues() });
-        data.push({ name: 'orcamento', value: getOrcamentoValues() });
+        data.push({ name: 'recursos', value: getRecursoValues() });
         
         let result = data.reduce(function (obj, item) {
             obj[item.name] = item.value;
@@ -373,10 +373,9 @@
         let atividades = {{ atividades_json|safe }};
         let escola_nome = {% if user.is_authenticated %}'{{ user.pessoa.escola.nome }}'{% else %}''{% endif %}
         let propostaId = '{{proposta_projeto.id}}'
-        let orcamentoId = '{{proposta_projeto.orcamento.id}}'
-        let itensOrcamento = {{ orcamento_itens_json|safe }}
+        let recursos = {{ recursos_json|safe }}
         var currentStep = 0;
-        var steps = ['step-dados-gerais', 'step-cronograma', 'step-equipe', 'step-orcamento'];
+        var steps = ['step-dados-gerais', 'step-equipe', 'step-recurso', 'step-cronograma'];
 
         function showStep(step) {
             $('#' + steps[step]).show();
@@ -528,7 +527,7 @@
             },
             onReady: function() {
                 $("#multiple-form-component-equipe").html(multipleFormEquipe.element);
-                const formData = equipeIds.length > 0 ? equipeIds : 0;
+                const formData = equipeIds.length > 0 ? equipeIds : 1;
                 multipleFormEquipe.setValue(formData);
             }
         };
@@ -592,29 +591,30 @@
         });
 
         // SETUP FORMULARIO DE ORÇAMENTO
-        let itemOrcamentoIds = itensOrcamento.map(item => {
+        let recursoIds = recursos.map(item => {
             return {
                 id: item.pk
             }
         });
 
-        let handleCreateOrcamento = () => orcamentoId ? createItemOrcamento({orcamento_id: orcamentoId}, function (data) {
-                showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
+        let handleCreateRecurso = () => propostaId ? createRecurso({proposta_projeto_id: propostaId}, function (data) {
+                showFloatingMessage("Recurso adicionado com sucesso", "alert-success");
             }, function (error) {
+                console.log(error)
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             }) : undefined;
         
-        let handleDeleteOrcamento = (itemOrcamentoId) => orcamentoId ? removeItemOrcamento(itemOrcamentoId, function (data) {
-                showFloatingMessage("Item removido do orçamento com sucesso", "alert-success");
+        let handleDeleteRecurso = (recursoId) => recursoId ? removeRecurso(recursoId, function (data) {
+                showFloatingMessage("Recurso com sucesso", "alert-success");
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             }) : undefined;
 
-        const multipleFormOptionsOrcamento = {
-            fetchFormTemplateFunction: getItemOrcamentoForm,
-            initializeForm:  initializeItemOrcamentoForm,
+        const multipleFormOptionsRecurso = {
+            fetchFormTemplateFunction: getRecursoForm,
+            initializeForm:  initializeRecursoForm,
             fetchComponentTemplateFunction: getMultipleFormComponent,
-            createFunction: orcamentoId ? handleCreateOrcamento : undefined,
+            createFunction: propostaId ? handleCreateRecurso : undefined,
             // showAddButton: false,
             // showDeleteButton: false,
             showSaveButton: false,
@@ -622,18 +622,19 @@
                 console.log(modelId, data)
             },
             deleteFunction: async function(modelId) {
-                handleDeleteOrcamento(modelId)
+                handleDeleteRecurso(modelId)
             },
             onReady: function() {
-                $("#multiple-form-component-orcamento").html(multipleFormOrcamento.element);
-                const formData = itemOrcamentoIds.length > 0 ? itemOrcamentoIds : 1;
-                multipleFormOrcamento.setValue(formData);
+                $("#multiple-form-component-recurso").html(multipleFormRecurso.element);
+                
+                const formData = recursoIds.length > 0 ? recursoIds : 1;
+                multipleFormRecurso.setValue(formData);
             }
         };
 
-        multipleFormOrcamento = new MultipleFormComponent(multipleFormOptionsOrcamento);
+        multipleFormRecurso = new MultipleFormComponent(multipleFormOptionsRecurso);
         $("#get-form-values").on('click', () => {
-            console.log("orcamento: ", multipleFormOrcamento.getValues())
+            console.log("recursos: ", multipleFormRecurso.getValues())
         })
 
         if (propostaId) {

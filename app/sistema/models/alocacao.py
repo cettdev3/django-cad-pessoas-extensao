@@ -37,7 +37,11 @@ class Alocacao(models.Model):
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True)
     turnos = models.ManyToManyField(Turno, blank=True)
     aulas_sabado = models.BooleanField(default=False)
-    
+    atividade = models.ForeignKey('Atividade', on_delete=models.SET_NULL, null=True, blank=True, related_name='alocacoes')
+    funcao = models.CharField(null = True, max_length=100)
+    cargaHoraria = models.FloatField(null = True)
+    tipoContratacao = models.CharField(null = True, max_length=100)
+    membroExecucao = models.ForeignKey('MembroExecucao', on_delete=models.SET_NULL, null=True, blank=True, related_name='alocacoes')
     class Meta:
         db_table = 'alocacoes'
 

@@ -38,7 +38,7 @@ from sistema.views.sitePessoaViews import getPessoas, pessoasModalCadastrar, pes
 from sistema.views.siteCursoViews import gerencia_cursos, cursosTable, cursosModalCadastrar, eliminarCurso, editarCurso, saveCurso
 from sistema.views.siteCidadeViews import getCidades, gerencia_cidades, cidadesTable, cidadesModalCadastrar, eliminarCidade, saveCidade, editarCidade, cidadesSelect, cidadeForm
 from sistema.views.siteEnsinoViews import gerencia_ensinos, ensinosTable, ensinosModalCadastrar, eliminarEnsino, visualizarEnsino, saveEnsino, editarEnsino, getEnsino, createEventoFromEnsino
-from sistema.views.siteAlocacoesViews import alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
+from sistema.views.siteAlocacoesViews import formAlocacaoMembroEquipe, alocacoesTable, alocacaoModalCadastrar, saveAlocacao, editarAlocacao, eliminarAlocacao, modalAlocar, horasTrabalhadas
 from sistema.views.siteEnderecoViews import saveEndereco, editarEndereco, enderecosSelect
 from sistema.views.siteEscolaViews import gerencia_escolas, escolasTable, escolasModalCadastrar, eliminarEscola, saveEscola, editarEscola, escolasSelect
 from sistema.views.siteTestView import testeForm, testeModal, testeGerenciar, testeTabela, testeSave, testeEdit
@@ -47,7 +47,7 @@ from sistema.views.siteAcaoViews import gerencia_acoes, acaoTable, acaoModal, ac
 from sistema.views.siteDpEventoViews import gerencia_dp_eventos, dpEventoTable, dpEventoModal, dp_eventosSelect, saveDpEvento, eliminarDpEvento, editarDpEvento, relatorioDpEvento, visualizarDpEvento, relatorioSintetico, relatorioPorEvento
 from sistema.views.siteItinerarioItemViews import saveItinerarioItem, editarItinerarioItem, eliminarItinerarioItem
 from sistema.views.siteComponentsView import calendario, filtrosRelatorioEventosModal, confirmDeleteModal, filterMultipleSelect
-from sistema.views.siteMembroExecucaoViews import membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
+from sistema.views.siteMembroExecucaoViews import getMembrosExecucao, membrosExecucaoTable, membrosExecucaoDpEventoTable, membroExecucaoForm, membroExecucaoModal, saveMembroExecucao, editarMembroExecucao,eliminarMembroExecucao, membrosExecucaoSelect, membroExecucaoDemandasModal
 from sistema.views.siteTicketViews import ticketModal, saveTicket, ticket_form, ticket_form_collapsable, eliminarTicket, ticketModalEdit,updateTicket, editarTicket
 from sistema.views.siteDepartamentoViews import gerencia_departamentos, departamentosTable, visualizarDepartamento, departamentosSelect, departamentosModalCadastrar, eliminarDepartamento, saveDepartamento, editarDepartamento
 from sistema.views.siteItinerarioViews import saveItinerario, editarItinerario, eliminarItinerario
@@ -120,6 +120,14 @@ from sistema.views.siteComentarioViews import (
     # removeComentario
 )
 
+from sistema.views.siteRecursoViews import (
+    recursoForm,
+    recursoSave,
+    recursoEdit,
+    recursoTabela,
+    recursoDelete,
+)
+
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -134,6 +142,7 @@ from sistema.views.anexoApiViews import AnexoApiView, AnexoDetailApiView
 from sistema.views.comentarioApiViews import ComentarioApiView, ComentarioDetailApiView
 from sistema.views.emailApiViews import EmailApiView
 from sistema.views.membroExecucaoRoleApiViews import MembroExecucaoRoleApiView, MembroExecucaoRoleDetailApiView
+from sistema.views.recursoApiView import RecursoApiView, RecursoDetailApiView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -272,12 +281,13 @@ urlpatterns = [
     
     # ROTAS PARA ALOCAÇÔES
     path("alocacoesTable",alocacoesTable),
+    path("formAlocacaoMembroEquipe",formAlocacaoMembroEquipe, name="form-alocacao-membro-equipe"),
     path("horasTrabalhadas",horasTrabalhadas),
     path("modalAlocar",modalAlocar),
     path("alocacaoModalCadastrar",alocacaoModalCadastrar),
-    path("saveAlocacao",saveAlocacao),
-    path("editarAlocacao/<codigo>",editarAlocacao),
-    path("eliminarAlocacao/<codigo>",eliminarAlocacao),
+    path("saveAlocacao",saveAlocacao, name="save-alocacao"),
+    path("editarAlocacao/<codigo>",editarAlocacao, name="editar-alocacao"),
+    path("eliminarAlocacao/<codigo>",eliminarAlocacao, name= "eliminar-alocacao"),
     
     # ROTAS PARA ENSINO
     path("gerenciar-ensinos",gerencia_ensinos),
@@ -341,6 +351,7 @@ urlpatterns = [
     path("membroExecucaoModal",membroExecucaoModal),
     path("saveMembroExecucao",saveMembroExecucao),
     path("membrosExecucaoSelect",membrosExecucaoSelect),
+    path("getMembrosExecucao",getMembrosExecucao, name="membros-execucao-all"),
     path("editarMembroExecucao/<codigo>",editarMembroExecucao),
     path("eliminarMembroExecucao/<codigo>",eliminarMembroExecucao),
     path("membroExecucaoDemandasModal/<membro_execucao_id>",membroExecucaoDemandasModal),
@@ -436,6 +447,13 @@ urlpatterns = [
     path("updateAtividadeSection/<int:atividade_section_id>", updateAtividadeSection),
     path("atividadeSectionComponent//<int:atividade_section_id>", atividadeSectionComponent),
     
+    #ROTAS PARA RECURSOS
+    path("recurso-form", recursoForm, name="recurso-form"),
+    path("recurso-save", recursoSave, name="recurso-save"),
+    path("recurso-edit/<int:recurso_id>", recursoEdit, name="recurso-edit"),
+    path("recurso-tabela", recursoTabela, name="recurso-tabela"),
+    path("recurso-delete/<int:recurso_id>", recursoDelete, name="recurso-delete"),      
+    
     # ROTAS PARA IMAGENS
     path("saveImagem", saveImagem),
     path("deleteImagem/<imagem_id>", deleteImagem),
@@ -529,6 +547,8 @@ urlpatterns = [
     path('membro-execucao-roles', MembroExecucaoRoleApiView.as_view(), name="membro-execucao-roles"),
     path('membro-execucao-roles/<int:membro_execucao_role_id>', MembroExecucaoRoleDetailApiView.as_view(), name="membro-execucao-role-detail"),
 
+    path('recursos', RecursoApiView.as_view()),
+    path('recursos/<int:recurso_id>', RecursoDetailApiView.as_view()),
     # ROTAS DE AUTENTICAÇÂO
     path("auth-user/", include('django.contrib.auth.urls')),
     path("auth-user/", include('authentication.urls')),

@@ -1,0 +1,93 @@
+<table class="table table-borderless" width="100%" cellspacing="0" id="table-recurso">
+    <thead class="border">
+        <tr class="">
+            <th class="w-45-p text-left">Nome</th>
+            <th class="w-45-p text-left">Descrição</th>
+            <th class="w-10-p text-left">Unidade</th>
+            <th class="w-10-p text-left">Quantidade</th>
+            <th class="w-5 text-left">Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recurso in recursos %}
+        <tr>
+            <td class="w-45-p text-left">
+                {{recurso.nome}}
+            </td>
+            <td class="w-45-p text-left">
+                {{recurso.descricao}}
+            </td>
+            <td class="w-10-p text-left">
+                {{recurso.quantidade}}
+            </td>
+            <td class="w-10-p text-left">
+                {{recurso.unidade}}
+            </td>
+            <td class="w-5-p text-left" style="position: relative;">
+                <div class="d-flex justify-content-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn-remove-default btn-circle btn-outline-secondary"
+                        data-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <button data-recurso-item-id="{{recurso.id}}" 
+                            class="dropdown-item cursor-pointer"
+                            id="item-recurso-edit-btn-{{recurso.id}}">Editar</button>
+                            <button class="dropdown-item cursor-pointer"
+                            onclick="criarTicket('{{recurso.id}}')">Adicionar Demanda</button>
+                            <button class="dropdown-item cursor-pointer"
+                            onclick="openDeleteModal(() => deleteRecurso('{{recurso.id}}', '{{recurso.id}}'))">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function deleteRecurso(recursoId, recursoId) {
+        removeItemRecurso(recursoId, function (data) {
+            showFloatingMessage("Recurso removido com sucesso", "alert-success");
+            try {
+                carregarRecurso({model_id: recursoId})
+            } catch (error) {
+                console.log("nao foi possivel carregar a tabela de recursos, função nao existe")
+            }
+        }, function (error) {
+            showFloatingMessage(error.responseJSON.message, "alert-danger");
+        })
+    }
+
+    $(document).ready(function() {
+        (function(params) {
+            let table = $("#table-recurso");
+            const recursoModal = new CustomModalComponent({
+                modalTitle: "Adicionar Recurso",
+                modalBtnActionText: "Salvar",
+            });
+
+            table.on('click', '[id^="item-recurso-edit-btn-"]', ($event) => {
+                let recursoId = $($event.currentTarget).data('recurso-item-id');
+                recursoModal.options.initializeForm = (container) => initializeItemRecursoForm(recursoId, container)
+                recursoModal.options.loadContent = (parms) => getItemRecursoForm({model_id: recursoId})
+                recursoModal.options.modalActionFunction = (data) => updateItemRecurso(recursoId,
+                    {recurso_id: params.recursoId, ...data}, 
+                    (data) => {
+                        showFloatingMessage("Recurso adicionado com sucesso", "alert-success");
+                        try {
+                            carregarRecurso({model_id: params.recursoId})
+                        } catch (error) {
+                            console.log("nao foi possivel carregar a tabela de recursos, função nao existe")
+                        }
+                    }, 
+                    function (error) {
+                        showFloatingMessage(error.responseJSON.message, "alert-danger");
+                    })
+                recursoModal.open('xl');
+            });
+
+        })({recursoId: '{{recurso.id}}'})
+    })
+</script>

@@ -248,67 +248,65 @@
         </p>
     </div>
     <div>
-        <h4>Informações Adicionais:</h4>
-        <p class="ml-5">
-           {{ proposta_projeto.informacoes_adicionais|default_if_none:'Não Informado' }}
-        </p>
-    </div>
-    <div>
         <h4>Público Alvo:</h4>
         <p class="ml-5">
            {{ proposta_projeto.publico_alvo|default_if_none:'Não Informado' }}
         </p>
     </div>
-
-    <h3>Orçamento</h3>
-    <table class="table table-striped table-bordered table-hover">
-        <thead>
-            <tr>
-                <th class="text-center">Descricao</th>
-                <!-- <th class="text-center">Tipo</th> -->
-                <th class="text-center">Quantidade</th>
-                <th class="text-center">Unidade</th>
-                <th class="text-center">Valor</th>
-                <th class="text-center">Valor Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in proposta_projeto.orcamento.items.all %}
-            <tr>
-                <td>{{ item.descricao|default_if_none:'Não Informado' }}</td>
-                <!-- <td>{{ item.tipo }}</td> -->
-                <td>{{ item.quantidade|default_if_none:'Não Informado' }}</td>
-                <td>{{ item.unidade|default_if_none:'Não Informado' }}</td>
-                <td> {% if item.valor %} R$ {% endif %} {{ item.valor|default_if_none:'Não Informado' }}</td>
-                <td>{% if item.valor_total %} R$ {% endif %} {{ item.valor_total|default_if_none:'Não Informado' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+    <div>
+        <h4>Informações Adicionais:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.informacoes_adicionais|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    
     <h3>Equipe</h3>
     <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
+                <th class="text-center">Pessoa</th>
                 <th class="text-center">Função</th>
                 <th class="text-center">Instituicao</th>
-                <th class="text-center">Pessoa</th>
             </tr>
         </thead>
         <tbody>
             {% for membro in proposta_projeto.equipe.all %}
             <tr>
-                <td>
-                    {% for role in membro.roles.all %}
-                    {{ role.nome|default_if_none:'Não Informado' }}
-                    {% endfor %}
-                </td>
-                <td>{{ membro.instituicao|default_if_none:'Não Informado' }}</td>
                 {% if membro.pessoa %}
                 <td>{{ membro.pessoa.nome|default_if_none:'Não Informado' }}</td>
                 {% else %}
                 <td>Não Informado</td>
                 {% endif %}
+                <td>
+                    {% for role in membro.roles.all %}
+                    {{ role.nome|default_if_none:'Não Informado' }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ membro.instituicao|default_if_none:'Não Informado' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Insumos</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">Nome</th>
+                <th class="text-center">Descricao</th>
+                <!-- <th class="text-center">Tipo</th> -->
+                <th class="text-center">Unidade</th>
+                <th class="text-center">Quantidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in proposta_projeto.recursos.all %}
+            <tr>
+                <td>{{ item.nome|default_if_none:'Não Informado' }}</td>
+                <td>{{ item.descricao|default_if_none:'Não Informado' }}</td>
+                <!-- <td>{{ item.tipo }}</td> -->
+                <td>{{ item.unidade|default_if_none:'Não Informado' }}</td>
+                <td>{{ item.quantidade|default_if_none:'Não Informado' }}</td>
             </tr>
             {% endfor %}
         </tbody>

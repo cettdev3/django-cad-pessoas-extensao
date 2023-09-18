@@ -165,6 +165,7 @@ def visualizarDpEvento(request, codigo):
             .prefetch_related("ticket_set")
             .prefetch_related("itinerario__itinerarioitem_set"),
         ),
+        "recursos"
     )
     dpEvento = dpEvento.get(id=codigo)
 

@@ -283,7 +283,6 @@
         dayContainer.click(function () {
             let mode = getMode();
             let dayDate = getDateFromId($(this).attr("id")); 
-            console.log("mode", mode)
             if(mode == 'select-start') {
                 startRangeSelectedDate = dayDate
                 $(this).addClass("selected")
@@ -525,9 +524,6 @@
     }
 
     function finalizar() {
-        console.log("startRangeSelectedDate", startRangeSelectedDate)
-        console.log("endRangeSelectedDate", endRangeSelectedDate)
-        console.log("removedDates", removedDates)
         var base_url = window.location.origin;
         filter = getFiltros()
         if (startRangeSelectedDate && endRangeSelectedDate) {

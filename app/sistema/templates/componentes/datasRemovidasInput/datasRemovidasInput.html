@@ -47,7 +47,6 @@
 <script>
     $(document).ready(function() {
         (function(params) {
-            console.log("dentro da funcao: ",params.id, params.isEditing);
             function formatDate(dateStr) {
                 const date = moment(dateStr, "YYYY-MM-DD");
                 return date.format("DD/MM/YYYY");
@@ -73,7 +72,6 @@
                     data: JSON.stringify({date: date, alocacao_id: id}),
                     contentType: "application/json",
                     success: function (data) {
-                        console.log(data)
                         const chip = $("<div></div>").addClass("chip").text(formatDate(date));
                         const closeButton = $("<button></button>").addClass("close-button").text("x");
                         closeButton.attr("id", "btn-remover-date-" + data.id);
@@ -100,7 +98,6 @@
                 }
                 
                 if (params.isEditing == "true") {
-                    console.log("isEditing")
                     createDataRemovida(dateValue, params.id);
                     return
                 }

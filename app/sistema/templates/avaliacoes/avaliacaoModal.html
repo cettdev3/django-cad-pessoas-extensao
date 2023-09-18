@@ -759,7 +759,6 @@
 
     function carregarSelectMembroExecucao() {
         let data = getMembroExecucaoData()
-        console.log(data)
         $.ajax({
             url: "/membrosExecucaoSelect",
             data: data,
@@ -805,7 +804,6 @@
         });
 
         $("#avaliacao-user-acao-endereco").change(function () {
-            console.log("dsaf")
             if (this.checked) {
                 $("#logradouro, #bairro, #cep, #complemento").val(function () {
                     return $("#acao-" + this.id).text();

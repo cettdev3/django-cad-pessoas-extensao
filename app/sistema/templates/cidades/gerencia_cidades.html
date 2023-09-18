@@ -167,7 +167,6 @@ z-index: 4
         let filter = {}
         let filterInputs = document.querySelectorAll(`input[id^=${cidadeFiltersPrefix}]`)
         filterInputs.forEach((input) => {
-            console.log(`${input.name} : ${input.value} `)
             filter[input.name] = input.value
         })
         return filter

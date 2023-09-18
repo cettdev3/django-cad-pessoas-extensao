@@ -7,6 +7,7 @@ from sistema.models.pessoa import Pessoas
 from sistema.models.cidade import Cidade
 from sistema.models.acao import Acao
 from sistema.models.dpEvento import DpEvento
+from sistema.models.atividade import Atividade
 from django.contrib.auth.decorators import login_required
 import requests
 from rest_framework.authtoken.models import Token
@@ -144,3 +145,20 @@ def membrosExecucaoSelect(request):
     selectedId = int(selectedId) if selectedId else ""
     data["selected_membro_execucao_id"] = selectedId
     return render(request,'membrosExecucao/membroExecucaoSelect.html', data)
+
+
+login_required(login_url='/auth-user/login-user')
+def getMembrosExecucao(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    params = {}
+    if request.GET.get('evento_id'):
+        params['evento_id'] = request.GET.get('evento_id')
+    if request.GET.get('proposta_projeto_id'):
+        params['proposta_projeto_id'] = request.GET.get('proposta_projeto_id')
+    if request.GET.get('atividade_id'):
+        atividade = Atividade.objects.get(id=request.GET.get('atividade_id'))
+        params['proposta_projeto_id'] = atividade.proposta_projeto.id if atividade.proposta_projeto else None
+    response = requests.get('http://localhost:8000/membroExecucao', params=params, headers=headers)
+    pessoas = json.loads(response.content)
+    return JsonResponse(pessoas,safe=False)

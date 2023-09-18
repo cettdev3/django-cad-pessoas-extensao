@@ -295,7 +295,6 @@
     }
 
     function cadastrarAcao() {
-        console.log("formulario: ",getFormData())
         $.ajax({
             url: "/saveAcao",
             data: JSON.stringify({"data": getFormData()}),
@@ -396,7 +395,6 @@
 
     function addEquipeMembersToItinerario() {
         getFormData().membros_execucao.forEach(function (membroEquipe, index) {
-            console.log("membroEquipe: ", membroEquipe)
             addMembroEquipeOnItinerario(membroEquipe)
         })
     }
@@ -465,8 +463,6 @@
 
         activTabFn = getActiveTab()
         tabsQuantity = functionGetTabsQuantity()
-        console.log("activTabFn: ", activTabFn)
-        console.log("tabsQuantity: ", tabsQuantity)
         if (activTabFn == 1 && tabsQuantity > 1) {
             showHideTabs(tabsControl.first)
         } else if (tabsQuantity == 1) {

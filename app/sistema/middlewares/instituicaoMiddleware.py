@@ -28,6 +28,9 @@ class InstituicaoMiddleware:
             reverse('create-item-orcamento'),
             reverse('cotec-projeto-success'),
             reverse('membro-execucao-roles'),
+            reverse('membros-execucao-all'),
+            reverse('form-alocacao-membro-equipe'),
+            reverse('save-alocacao'),
         ]
 
         dynamic_urls = [
@@ -40,6 +43,8 @@ class InstituicaoMiddleware:
             'remove-item-orcamento',
             'update-proposta-projeto',
             'remove-proposta-projeto',
+            'eliminar-alocacao',
+            'editar-alocacao'
         ]
         
         isPkRoute = False

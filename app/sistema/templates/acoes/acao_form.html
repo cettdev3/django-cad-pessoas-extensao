@@ -139,7 +139,6 @@
             success: function (data) {
                 $("#select_cidade").html(data)
                 $("#select_cidade").children("select").on("change", function () {
-                    console.log("cidade modificada: ",$(this).val())
                     $("collapse_endereco_")
                 });
             }

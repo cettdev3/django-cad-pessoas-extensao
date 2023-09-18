@@ -65,5 +65,11 @@ class MembroExecucao(models.Model):
         else: 
             return "sem_tickets"
         return "criado"
+    
+    @property
+    def nome(self):
+        if self.pessoa:
+            return self.pessoa.nome
+        return ""
 
 

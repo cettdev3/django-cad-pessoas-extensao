@@ -73,6 +73,7 @@ class Pessoas(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank= True, related_name="pessoa")
     instituicao = models.CharField(max_length=50, choices=INSTITUICAO_CHOICES, null=True, blank=True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True)
+    numero_matricula = models.CharField(null = True, max_length=100)
 
     class Meta:
         db_table = 'processo_gps_professor'

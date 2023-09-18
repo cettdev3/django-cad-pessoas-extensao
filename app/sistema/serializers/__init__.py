@@ -3,3 +3,4 @@ from .galeriaSerializer import GaleriaSerializer
 from .anexoSerializer import AnexoSerializer
 from .comentarioSerializer import ComentarioSerializer
 from .membroExecucaoRoleSerializer import MembroExecucaoRoleSerializer
+from .recursoSerializer import RecursoSerializer

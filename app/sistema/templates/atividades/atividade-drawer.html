@@ -451,7 +451,6 @@
     }
 
     function updateAtividadeDrawer(atividadeId, data, field = null, oldValue = null) {
-        console.log("chamando update atividade drawer")
         data.template = 'atividade-drawer.html';
         if (field && oldValue == data[field]) return
         updateAtividade(

@@ -8,8 +8,10 @@ from ..models.alocacao import Alocacao
 from ..models.pessoa import Pessoas
 from ..models.cidade import Cidade
 from ..models.ensino import Ensino
-from ..models.curso import Curso
 from ..models.dataRemovida import DataRemovida
+from ..models.atividade import Atividade
+from ..models.membroExecucao import MembroExecucao
+from ..models.curso import Curso
 from ..serializers.alocacaoSerializer import AlocacaoSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -58,6 +60,8 @@ class AlocacaoApiView(APIView):
         acaoEnsino = None
         professor = None
         curso = None
+        atividade = None
+        membroExecucao = None
         
         if isinstance(request.data, list):
             alocacoesCriadas = []
@@ -198,6 +202,22 @@ class AlocacaoApiView(APIView):
                             status=st.HTTP_400_BAD_REQUEST
                         )
                 
+                if request.data.get("atividade_id"):
+                    atividade = self.get_object(Atividade, request.data.get("atividade_id"))
+                    if not atividade:
+                        return Response(
+                            {"res": "Não existe atividade com o id informado"}, 
+                            status=st.HTTP_400_BAD_REQUEST
+                        )
+                    
+                if request.data.get("membro_execucao_id"):
+                    membroExecucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+                    if not membroExecucao:
+                        return Response(
+                            {"res": "Não existe membro de execução com o id informado"}, 
+                            status=st.HTTP_400_BAD_REQUEST
+                        )
+                
                 data_inicio = None
                 data_fim = None
                 data_saida = None
@@ -208,6 +228,7 @@ class AlocacaoApiView(APIView):
                 cidade = None
                 cep = None
                 aulas_sabado = False
+                tipo = None
 
                 if request.data.get("data_inicio"):
                     data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
@@ -239,6 +260,7 @@ class AlocacaoApiView(APIView):
 
                 if request.data.get("aulas_sabado"):
                     aulas_sabado = request.data.get("aulas_sabado")
+                    
                 if request.data.get("tipo"):
                     tipo = request.data.get("tipo")
 
@@ -258,14 +280,16 @@ class AlocacaoApiView(APIView):
                     cidade = cidade,
                     cep = cep,
                     aulas_sabado = aulas_sabado,
-                    tipo = tipo
+                    tipo = tipo,
+                    atividade = atividade,
+                    membroExecucao = membroExecucao
                 )
                 
                 if request.data.get("turnos"):
                     turnos = request.data.get("turnos")
                     alocacao.turnos.add(*turnos)
                 
-                datasRemovidas = alocacaoData["datas_removidas"]
+                datasRemovidas = request.data.get("datas_removidas")
                 if datasRemovidas:
                     for dataRemovida in datasRemovidas:
                         DataRemovida.objects.create(

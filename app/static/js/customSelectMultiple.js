@@ -87,6 +87,7 @@ class CustomSelectMultiple {
     }
 
     bindModalEvents() {
+        if (!this.modal) return;
         this.modal.element.on('action-success', (event) => this.handleNewItem(event.detail));
         this.modal.element.on('action-fail', (event) => showFloatingMessage("Erro ao cadastrar item", "alert-danger"));
     }
@@ -100,7 +101,11 @@ class CustomSelectMultiple {
         this.element.on('click', '.dropdown-item', this.handleOptionClick.bind(this));
         this.element.on('click', 'button.close', this.handleBadgeRemove.bind(this));
         this.element.on('keyup', '#filterInput', this.handleFilter.bind(this));
-        this.element.find('#btn-open-modal').on('click', () => this.modal.open());
+        if (this.modal) {
+            this.element.find('#btn-open-modal').on('click', () => this.modal.open());
+        } else {
+            this.element.find('#btn-open-modal').hide();
+        }
         this.element.find('#filterInput').on('focus', () => this.openDropdown());
         $("body").on('click', (event) => {
             if (!this.element.is(event.target) && this.element.has(event.target).length === 0) {
@@ -158,7 +163,6 @@ class CustomSelectMultiple {
         const optionsToRender = filteredOptions || this.state.options;
         const optionsContainer = this.element.find('#options-container');
         optionsContainer.empty();
-
         optionsToRender.forEach(option => {
             let isChecked = this.state.selectedOptions.includes(option.id) ? 'checked' : '';
             const optionElement = $(`
@@ -241,7 +245,6 @@ class CustomSelectMultiple {
     renderBadges() {
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
-        console.log("dentro de render badges: ", this.state.selectedOptions)
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => {
                 return o.id === id

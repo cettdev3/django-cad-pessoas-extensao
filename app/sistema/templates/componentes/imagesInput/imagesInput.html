@@ -54,10 +54,7 @@ class="d-flex justify-content-between"
     }
 
     function toggleLoadingThumbnail(thumbnailContainer, from = "teste") {
-        console.log("from: ", from)
-        console.log("container da thumb: ", thumbnailContainer)
         var $imageContainer = thumbnailContainer.find('.image-container');
-        console.log("image container: ", $imageContainer)
         if ($imageContainer.hasClass('loading')) {
             $imageContainer.removeClass('loading');
             $imageContainer.find('.spinner').hide();
@@ -70,7 +67,6 @@ class="d-flex justify-content-between"
     function bindEvents(thumbnail) {
         let inputDescricao = thumbnail.find("textarea");
         inputDescricao.on("keyup", debounce(function () {
-            console.log("input descricao mudou dentro de input images");
             saveImage(thumbnail);
         }, 1000));
     }
@@ -82,13 +78,6 @@ class="d-flex justify-content-between"
         let imagemNome = thumbnail.find("#imagem_name").val()
         let inputImagemId = thumbnail.find("#imagem_id");
         if (!inputGaleriaId.val()) return;
-        console.log("salvando imagem pelo input images: ", {
-            imagem_id: inputImagemId.val(),
-            descricao: thumbnail.find(".image-descricao-input").val(),
-            dataUrl: imageDataUrl,
-            galeria_id: inputGaleriaId.val(),
-            imagem_nome: imagemNome
-        })
 
         toggleLoadingThumbnail(thumbnail, "saveImage");
         $.ajax({

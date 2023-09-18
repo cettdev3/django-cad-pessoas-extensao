@@ -64,3 +64,18 @@ async function removeMembroEquipe(membro_equipe_id, onSuccess=null, onError=null
         }
     });
 }
+
+async function getMembrosExecucao(data, onSuccess, onError) {
+    return await $.ajax({
+        url: '/getMembrosExecucao',
+        contentType: 'application/json',
+        method: "GET",
+        data: data,
+        success: function(response) {
+            if (onSuccess) onSuccess(response);
+        },
+        error: function(response) {
+            if (onError) onError(response);
+        }
+    });
+}

@@ -1,0 +1,132 @@
+<form id="form-alocacao-membro-equipe-container-{{alocacao.id}}">
+    <div id="form-container-{{alocacao.id}}">
+        <div class="form-group row">
+            <div class="col-12">
+                <label for="nome"><b>Membro da equipe</b></label>
+                <div id="select-alocacao-membro-equipe-{{alocacao.id}}" 
+                data-cidade-id="{{alocacao.membroExecucao.id}}">
+                </div>
+            </div>
+        </div>
+        <div class="row align-items-end">
+            <div class="col-3">
+                <label for="nome"><b>Função</b></label>
+                <input type="text" class="form-control" {% if read_only == True %} disabled {% endif %}
+                data-id="{{alocacao.id}}" data-current-value="{{alocacao.funcao|default_if_none:''}}"
+                value="{{alocacao.funcao|default_if_none:''}}" id="funcao" name="funcao">
+            </div>
+            <div class="col-3">
+                <label for="nome"><b>Carga horária</b></label>
+                <input type="number" step="0.01" class="form-control" {% if read_only == True %} disabled {% endif %}
+                data-id="{{alocacao.id}}" data-current-value="{{alocacao.cargaHoraria|default_if_none:''}}"
+                value="{{alocacao.cargaHoraria|default_if_none:''}}" id="cargaHoraria" name="cargaHoraria">
+            </div>
+            <div class="col-3">
+                <label for="nome"><b>Tipo Contratação</b></label>
+                <select class="form-control" {% if read_only == True %} disabled {% endif %}
+                data-id="{{alocacao.id}}" data-current-value="{{alocacao.tipoContratacao|default_if_none:''}}"
+                value="{{alocacao.tipoContratacao|default_if_none:''}}" id="tipoContratacao" name="tipoContratacao">
+                    <option value="voluntario" {% if alocacao.tipoContratacao == 'voluntario' %} selected {% endif %}>Voluntário</option>
+                    <option value="terceirizado" {% if alocacao.tipoContratacao == 'terceirizado' %} selected {% endif %}>Terceirizado</option>
+                    <option value="outro" {% if alocacao.tipoContratacao == 'efetivo' %} selected {% endif %}>Efetivo</option>
+                    <option value="outro" {% if alocacao.tipoContratacao == 'outro' %} selected {% endif %}>Outro</option>
+                </select>
+            </div>
+            <div class="col-3">
+                <label for="nome"><b>Valor</b></label>
+                <input type="number" step="0.01" class="form-control" {% if read_only == True %} disabled {% endif %}
+                data-id="{{alocacao.id}}" data-current-value="{{alocacao.valor|default_if_none:''}}"
+                value="{{alocacao.valor|default_if_none:''}}" id="valor" name="valor">
+            </div>
+            <div class="col-6 offset-3 mt-0">
+                <small id="timeDifferenceError" class="form-text text-danger"></small>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        (function (params) {
+            let formContainer = $("#form-container-" + params.alocacaoId);
+            let membro_equipe_ready = false;
+
+            function setupFormReady(field) {
+                if (field == 'membro_equipe') {
+                    $('#select-alocacao-membro-equipe-' + params.alocacaoId).append(customSelectMembroEquipe.element);
+                    membro_equipe_ready = true;
+                }
+
+                if (membro_equipe_ready) {
+                    formContainer[0].getValue = function () {
+                        var membroEquipe = {}
+    
+                        formContainer.find("input").each(function () {
+                            var name = $(this).attr('name');
+                            membroEquipe[name] = $(this).val();
+                        });
+    
+                        return membroEquipe;
+                    }
+    
+                    formContainer.find("input").each(function () {
+                        let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio','horario_fim', 'publico_esperado', 'local'];
+                        if (!includedField.includes($(this).attr('name'))) return;
+                        $(this).on('change', function () {
+                            var name = $(this).attr('name');
+                            var value = $(this).val();
+                            let data = {}
+                            let current_value = $(this).data('current-value');
+                            data[name] = value;
+    
+                            if (current_value == value || !params.atividadeId) return;
+                            updateAlocacao(params.atividadeId, 
+                            data, 
+                            function (response) {
+                                showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
+                            }, function (error) {
+                                showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
+                                $(this).val(current_value);
+                            });
+                        });
+                    });
+                }
+            }
+
+            const customSelectMembroEquipe = new CustomSelectMultiple(null, {
+                label: "Responsável",
+                multiple: false,
+                selectedOptions: params.responsavelId ? [parseInt(params.responsavelId)] : [],
+                loadOptions: function () {
+                    return selectDataService.fetchData(
+                        'membros_equipe', 
+                        () => getMembrosExecucao({atividade_id: params.atividadeId})
+                    );
+                }
+            }, function () {
+                setupFormReady('membro_equipe');
+                customSelectMembroEquipe.element.on('change', function (event) {
+                    const selectedOptions = event.detail;
+                    if (selectedOptions.length == 0) return
+                    if (!params.alocacaoId) return;
+
+                    let data = {
+                        membro_execucao_id: selectedOptions[0]
+                    }
+
+                    updateAlocacao(params.alocacaoId,
+                        data,
+                        function (response) {
+                            showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
+                        }, function (error) {
+                            showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
+                            $(this).val(current_value);
+                        });
+                });
+            });
+
+        })({
+            atividadeId: '{{atividade_id}}',
+            alocacaoId: '{{alocacao.id}}'
+        })
+    });
+</script>

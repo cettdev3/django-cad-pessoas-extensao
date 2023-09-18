@@ -47,14 +47,11 @@ style="height: calc(100vh - 75px);">
                 <li class=" cs-tab-link active">
                     <a id="atividades-tab" data-toggle="tab" href="#atividades">Atividades</a>
                 </li>
-                {% if dpEvento.proposta_projeto.orcamento %}
+                {% if dpEvento.recursos %}
                 <li class=" cs-tab-link active">
-                    <a id="orcamento-tab" data-toggle="tab" href="#orcamento">Orcamento</a>
+                    <a id="recurso-tab" data-toggle="tab" href="#recurso">Recursos</a>
                 </li>
                 {% endif %}
-                <li class=" cs-tab-link active">
-                    <a id="galerias-tab" data-toggle="tab" href="#galerias">Galerias de Imagens</a>
-                </li>
             </ul>
             <div class="d-flex justify-content-between px-2">
                 <div id="add-membro-execucao-btn">
@@ -78,11 +75,11 @@ style="height: calc(100vh - 75px);">
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
-                {% if dpEvento.proposta_projeto.orcamento %}
-                <div id="add-item-orcamento-btn">
+                {% if dpEvento.recursos %}
+                <div id="add-item-recurso-btn">
                     <div data-toggle="tooltip" data-placement="top" title="Adicionar Atividade" 
                     class="d-flex align-items-center ">            
-                        <button onclick="addItemOrcamento('{{dpEvento.proposta_projeto.orcamento.id}}')" 
+                        <button onclick="addRecurso('{{dpEvento.proposta_projeto.recurso.id}}')" 
                         class="btn btn-success">Adicionar</button>
                     </div>
                 </div>
@@ -197,9 +194,9 @@ style="height: calc(100vh - 75px);">
                     </div>
                 </div>
             </div>
-            {% if dpEvento.proposta_projeto.orcamento %}
-            <div id="orcamento" class="tab-pane">
-                <div id="orcamentoTableContainer"></div>
+            {% if dpEvento.recursos %}
+            <div id="recurso" class="tab-pane">
+                <div id="recursoTableContainer"></div>
                 <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
                     <div class="loading-container"
                     style="display: none; position: relative">
@@ -262,21 +259,21 @@ style="height: calc(100vh - 75px);">
         });
     }
 
-    function addItemOrcamento(orcamentoId) {
-        const orcamentoModal = new CustomModalComponent({
-            modalTitle: "Adicionar Item de Orçamento",
+    function addRecurso(recursoId) {
+        const recursoModal = new CustomModalComponent({
+            modalTitle: "Adicionar Recurso",
             modalBtnActionText: "Salvar",
-            initializeForm: (container) => initializeItemOrcamentoForm(null, container),
-            loadContent: (parms) => getItemOrcamentoForm({}),
-            modalActionFunction: (data) =>  createItemOrcamento({orcamento_id: orcamentoId, ...data}, function (data) {
-                showFloatingMessage("Item adicionado ao orçamento com sucesso", "alert-success");
-                carregarOrcamento({model_id: orcamentoId})
+            initializeForm: (container) => initializeRecursoForm(null, container),
+            loadContent: (parms) => getRecursoForm({}),
+            modalActionFunction: (data) =>  createRecurso({recurso_id: recursoId, ...data}, function (data) {
+                showFloatingMessage("Recurso adicionado com sucesso", "alert-success");
+                carregarRecurso({model_id: recursoId})
             }, function (error) {
                 showFloatingMessage(error.responseJSON.message, "alert-danger");
             })
         });
 
-        orcamentoModal.open('xl');
+        recursoModal.open('xl');
     }
 
     function clearModalFormTicket(tableToReload = null) {
@@ -366,14 +363,14 @@ style="height: calc(100vh - 75px);">
 
     }
     
-    function carregarOrcamento(data = null) {
+    function carregarRecurso(data = null) {
         toggleLoading("show");
-        $("#orcamentoTableContainer").html("");
-        getOrcamentoTable(data, function (data) {
+        $("#recursoTableContainer").html("");
+        getRecursoTable(data, function (data) {
             toggleLoading("hide");
-            $("#orcamentoTableContainer").html(data);
+            $("#recursoTableContainer").html(data);
         }, function (error) {
-            showFloatingMessage("Erro ao carregar orçamento", "alert-danger");
+            showFloatingMessage("Erro ao carregar recurso", "alert-danger");
             toggleLoading("hide");
         });
     }
@@ -455,7 +452,7 @@ style="height: calc(100vh - 75px);">
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#atividades-table-header").hide()
         } else if (id == "itinerarios-tab") {
             $("#add-membro-execucao-btn").hide()
@@ -463,7 +460,7 @@ style="height: calc(100vh - 75px);">
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#atividades-table-header").hide()
         } else if (id == "atividades-tab") {
             $("#add-membro-execucao-btn").hide()
@@ -471,36 +468,36 @@ style="height: calc(100vh - 75px);">
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").hide()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#atividades-table-header").show()
         } else if (id == "avaliacao-local-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").show()
             $("#add-galeria-btn").hide()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#add-servico-contratado-btn").hide()
             $("#atividades-table-header").hide()
         } else if (id == "galerias-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#add-galeria-btn").show()
             $("#add-servico-contratado-btn").hide()
             $("#atividades-table-header").hide()
-        } else if (id == "orcamento-tab") {
+        } else if (id == "recurso-tab") {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
             $("#add-galeria-btn").hide()
-            $("#add-item-orcamento-btn").show()
+            $("#add-item-recurso-btn").show()
             $("#atividades-table-header").hide()
         } else {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
             $("#add-avaliacao-btn").hide()
-            $("#add-item-orcamento-btn").hide()
+            $("#add-item-recurso-btn").hide()
             $("#add-galeria-btn").hide()
             $("#add-servico-contratado-btn").show()
             $("#atividades-table-header").hide()
@@ -530,7 +527,7 @@ style="height: calc(100vh - 75px);">
     }
     
     $(document).ready(function() {
-        let orcamentoId = '{{dpEvento.proposta_projeto.orcamento.id}}'
+        let dpEventoId = '{{dpEvento.id}}'
         membroExecucaoModificadaEventProxy = new Proxy(membroExecucaoModificadaEvent, {
             set: function (target, key, value) {
                 target[key] = value;
@@ -552,7 +549,7 @@ style="height: calc(100vh - 75px);">
         carregarAvaliacaoLocal()
         carregarServicosContratados()
         carregarGalerias()
-        if (orcamentoId) carregarOrcamento({model_id: orcamentoId})
+        carregarRecurso({evento_id: dpEventoId})
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

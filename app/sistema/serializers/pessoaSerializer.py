@@ -53,6 +53,7 @@ class PessoaSerializer(serializers.ModelSerializer):
             "is_admin",
             "instituicao",
             'instituicao_formatada',
-            'escola'
+            'escola',
+            'numero_matricula'
         ]
         depth = 2

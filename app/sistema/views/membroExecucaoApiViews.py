@@ -31,6 +31,10 @@ class MembroExecucaoApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         membrosExecucao = MembroExecucao.objects.prefetch_related("ticket_set").all()
+        if request.GET.get("evento_id"):
+            membrosExecucao = membrosExecucao.filter(evento_id=request.GET.get("evento_id"))
+        if request.GET.get("proposta_projeto_id"):
+            membrosExecucao = membrosExecucao.filter(proposta_projeto_id=request.GET.get("proposta_projeto_id"))
         serializer = MembroExecucaoSerializer(membrosExecucao, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -216,7 +220,6 @@ class MembroExecucaoDetailApiView(APIView):
                 )
             membroExecucao.cidade = cidade
 
-        print("pessoa dentro de update de memebro equipe: ", request.data.get("pessoa_id"), " - ", request.data.get("pessoa_id") is not None)
         if request.data.get("pessoa_id"):
             pessoa = self.get_object(Pessoas, request.data.get("pessoa_id"))
             if not pessoa:

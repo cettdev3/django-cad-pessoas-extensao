@@ -2,7 +2,7 @@
     <div id="form-container-{{atividade.id}}">
         <div class="form-group row">
             <div class="col-12">
-                <label for="nome"><b>Nome</b></label>
+                        <label for="nome"><b>Nome</b></label>
                 <input type="text" class="form-control" 
                 {% if read_only == True %} disabled {% endif %}
                 data-id="{{atividade.id}}"
@@ -69,9 +69,9 @@
                 data-cidade-id="{{atividade.cidade.id}}">
                 </div>
             </div>
-
+            
             <div class="col-6">
-                <label for="nome"><b>Local</b></label>
+                <label for="local"><b>Local</b></label>
                 <input type="text" class="form-control" 
                 {% if read_only == True %} disabled {% endif %}
                 data-id="{{atividade.id}}"
@@ -83,10 +83,24 @@
         </div>
     </div>
 </form>
+<div class="row">
+    <div class="col-12">
+        <label for="nome"><b>Alocar equipe</b></label>
+        <div id="multiple-form-component-membro-equipe-alocacao-{{atividade.id}}">
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function () {
         (function (params) {
             let formContainer = $("#form-container-" + params.atividadeId);
+            let cidade_id_ready = false;
+            let alocacoes = {{ alocacoes_json|safe }};
+            let alocacoesId = alocacoes.map(item => {
+                                    return {
+                                        id: item.pk
+                                    }
+                                });
 
             const cidadeModal = new CustomModalComponent({
                 loadContent: cidadeForm,
@@ -95,8 +109,50 @@
                 modalActionFunction: cidadeCreate
             });
 
+            function setupFormReady(field) {
+                if (field == 'cidade') {
+                    $('#select-atividade-cidade-' + params.atividadeId).append(customSelectCidade.element);
+                    cidade_id_ready = true;
+                }
+
+                if (cidade_id_ready) {
+                    formContainer[0].getValue = function () {
+                        var membroEquipe = {}
+    
+                        formContainer.find("input").each(function () {
+                            var name = $(this).attr('name');
+                            membroEquipe[name] = $(this).val();
+                        });
+    
+                        return membroEquipe;
+                    }
+    
+                    formContainer.find("input").each(function () {
+                        let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio','horario_fim', 'publico_esperado', 'local'];
+                        if (!includedField.includes($(this).attr('name'))) return;
+                        $(this).on('change', function () {
+                            var name = $(this).attr('name');
+                            var value = $(this).val();
+                            let data = {}
+                            let current_value = $(this).data('current-value');
+                            data[name] = value;
+    
+                            if (current_value == value || !params.atividadeId) return;
+                            cotecUpdateAtividade(params.atividadeId, 
+                            data, 
+                            function (response) {
+                                showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
+                            }, function (error) {
+                                showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
+                                $(this).val(current_value);
+                            });
+                        });
+                    });
+                }
+            }
+
             let cidade_id = $(`#select-atividade-cidade-${params.atividadeId}`).data('cidade-id');
-            const customSelect = new CustomSelectMultiple(cidadeModal, {
+            const customSelectCidade = new CustomSelectMultiple(cidadeModal, {
                 label: "Selecione Cidade",
                 multiple: false,
                 selectedOptions: cidade_id ? [cidade_id] : [],
@@ -104,41 +160,8 @@
                     return selectDataService.fetchData('cidades', getCidades);
                 }
             }, function () {
-                $('#select-atividade-cidade-' + params.atividadeId).append(customSelect.element);
-                formContainer[0].getValue = function () {
-                    var membroEquipe = {}
-
-                    formContainer.find("input").each(function () {
-                        var name = $(this).attr('name');
-                        membroEquipe[name] = $(this).val();
-                    });
-
-                    return membroEquipe;
-                }
-
-                formContainer.find("input").each(function () {
-                    let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio','horario_fim', 'publico_esperado', 'local'];
-                    if (!includedField.includes($(this).attr('name'))) return;
-                    $(this).on('change', function () {
-                        var name = $(this).attr('name');
-                        var value = $(this).val();
-                        let data = {}
-                        let current_value = $(this).data('current-value');
-                        data[name] = value;
-
-                        if (current_value == value || !params.atividadeId) return;
-                        cotecUpdateAtividade(params.atividadeId, 
-                        data, 
-                        function (response) {
-                            showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
-                        }, function (error) {
-                            showFloatingMessage("Erro ao atualizar atividade!", "alert-danger")
-                            $(this).val(current_value);
-                        });
-                    });
-                });
-
-                customSelect.element.on('change', function (event) {
+                setupFormReady('cidade');
+                customSelectCidade.element.on('change', function (event) {
                     const selectedOptions = event.detail;
                     if (selectedOptions.length == 0) return
                     if (!params.atividadeId) return;
@@ -147,7 +170,7 @@
                         cidade_id: selectedOptions[0]
                     }
 
-                    updateAtividade(params.atividadeId,
+                    cotecUpdateAtividade(params.atividadeId,
                         data,
                         function (response) {
                             showFloatingMessage("Atividade atualizada com sucesso!", "alert-success")
@@ -156,9 +179,9 @@
                             $(this).val(current_value);
                         });
                 });
-
             });
-
+            
+           
             let startTimeInput = $('#horario_inicio');
             let endTimeInput = $('#horario_fim');
         
@@ -187,12 +210,58 @@
                     return true;
                 }
             }
+
+            let handleCreateAlocacaoMembroEquipe = () => createAlocacao({atividade_id: params.atividadeId}, function (data) {
+                showFloatingMessage("Membro da equipe alocado com sucesso", "alert-success");
+            }, function (error) {
+                console.log(error)
+                showFloatingMessage(error.responseJSON.message, "alert-danger");
+            });
+        
+            let handleDeleteAlocacao = (alocacaoId) => removeAlocacao(alocacaoId, function (data) {
+                    showFloatingMessage("Alocação removida com sucesso", "alert-success");
+                }, function (error) {
+                    showFloatingMessage(error.responseJSON.message, "alert-danger");
+                });
+
+            const multipleFormOptionsAlocacaoMembroEquipe = {
+                fetchFormTemplateFunction: (customFormParams) => { 
+                    return getFormAlocacaoMembroEquipe({
+                        ...customFormParams,
+                        atividade_id: params.atividadeId
+                    })
+                },
+                initializeForm:  initializeAlocacaoMembroEquipeForm,
+                fetchComponentTemplateFunction: getMultipleFormComponent,
+                createFunction: params.atividadeId ? handleCreateAlocacaoMembroEquipe : undefined,
+                // showAddButton: false,
+                // showDeleteButton: false,
+                showSaveButton: false,
+                updateFunction: async function(modelId, data) {
+                    console.log(modelId, data)
+                },
+                deleteFunction: async function(modelId) {
+                    handleDeleteAlocacao(modelId)
+                },
+                onReady: function() {
+                    $("#multiple-form-component-membro-equipe-alocacao-"+params.atividadeId).html(multipleFormAlocacaoMembroEquipe.element);
+                    const formData = alocacoesId.length > 0 ? alocacoesId : 1;
+                    multipleFormAlocacaoMembroEquipe.setValue(formData);
+                }
+            };
+
+            multipleFormAlocacaoMembroEquipe = new MultipleFormComponent(multipleFormOptionsAlocacaoMembroEquipe);
+            $("#get-form-values").on('click', () => {
+                console.log("alocações: ", multipleFormAlocacaoMembroEquipe.getValues())
+            })
                                 
             startTimeInput.on('change', validateTimeDifference);
             endTimeInput.on('change', validateTimeDifference);
 
         })({
-            atividadeId: '{{atividade.id}}'
+            atividadeId: '{{atividade.id}}',
+            propostaProjetoId: '{{atividade.proposta_projeto.id}}',
+            responsavelId: '{{atividade.responsavel.id}}',
         })
     });
 </script>

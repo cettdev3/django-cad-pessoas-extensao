@@ -28,7 +28,8 @@ class MembroExecucaoSerializer(serializers.ModelSerializer):
             "ticket_status",
             "roles",
             "instituicao",
-            "proposta_projeto"
+            "proposta_projeto",
+            "nome"
         ]
     
     def __init__(self, *args, **kwargs):

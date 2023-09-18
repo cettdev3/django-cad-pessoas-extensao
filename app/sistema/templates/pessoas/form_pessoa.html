@@ -58,87 +58,27 @@
                     required>
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between mb-0">
+                        <label for="recurso"><b>Número de matricula</b></label>
+                        <div class="mb-2">
+                            <input type="checkbox" id="is_professor" name="is_professor" 
+                            onchange="isProfessorChange(this)"
+                            {% if pessoa.cargo == 'professor' %} checked {% endif %}>
+                            <label for="is_professor_{{pessoa.id}}" class="mb-0">Professor</label>
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" {% if read_only == True %} disabled {% endif %}
+                    data-id="{{pessoa.id}}" data-current-value="{{pessoa.numero_matricula|default_if_none:''}}"
+                    value="{{pessoa.numero_matricula|default_if_none:''}}" 
+                    {% if pessoa.cargo != 'professor' %}
+                    disabled
+                    {% endif %}
+                    id="numero_matricula" 
+                    name="numero_matricula">
+                </div>
+            </div>
         </div>
     </form>
 </div>
-{{ cursos|json_script:"cursos" }}
-<script>
-    $(document).ready(function () {
-        (function (params) {
-            function updateSelectedCursos(cursos) {
-                setTimeout(() => {  
-                    $("input[name='cursos']").each(function (i, elem) {
-                        for (let index = 0; index < cursos.length; index++) {
-                            const selectedId = cursos[index]["id"];
-                            if ($(elem).val() == selectedId) $(elem).trigger("click");
-                        }
-                    })
-                }, 200);
-            }
-        
-           
-            function buscarCursos(selectedCursos = null) {
-                $.ajax({
-                    url: "cursosSelect",
-                    data: {},
-                    success: function (data) {
-                        $("#selectCursosCadastrarPessoa").html(data);
-                        if (selectedCursos) updateSelectedCursos(selectedCursos)
-                    }
-                });
-            }
-        
-            function getFormData() {
-                if ($("#sexo_select").length) {
-                    if ($("#sexo_input").val()) {
-                        $("#sexo_select").remove()
-                    } else $("#sexo_input").remove()
-                }
-        
-                let form = $('#cadastrarPessoaForm')
-                var unindexed_array = form.serializeArray();
-                var values = {};
-        
-                $.map(unindexed_array, function (n, i) {
-                    values[n['name']] = n['value'];
-                });
-        
-                return values
-            }
-
-            let cursos = JSON.parse(document.getElementById('cursos').textContent)
-            tabsQuantity = 4
-            item = 1
-            $(".nav-tabs a").click(function () {
-                $(this).tab('show');
-            });
-            
-            $("#cadastrarPessoaModal").on('hide.bs.modal', function(){
-                let pessoaId = $("#modelId").text()
-                if (pessoaId) {
-                    clearModalForm()
-                }
-            });
-
-            $("#sexo_select").on('change', function(evt){
-                if ($(this).val() == "outro") {
-                    $("#sexo_select").remove()
-                    $("#sexo_input").toggle()
-                    $("#sexo_input").focus()
-                    $("#sexo_input").attr("placeholder", "Digite um valor para o sexo...")
-                } 
-            });
-    
-            pessoaFormSelectEscola = $("#pessoaFormSelectEscola")
-            $("#instituicao").on('change', function(evt){
-                let instituicaoValue = $(this).val()
-                if (instituicaoValue == 'escola') pessoaFormSelectEscola.show()
-                else pessoaFormSelectEscola.hide()
-            });
-            console.log("params.id: ", params.id)
-            $("#pessoas-form-container-"+params.id)[0].getFormData = getFormData
-            buscarCursos(cursos)
-            maskValues()
-        })({id: '{{id}}'})
-    });
-</script>

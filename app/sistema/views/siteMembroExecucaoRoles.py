@@ -14,7 +14,6 @@ def getMembroExecucaoRoles(request):
     }
 
     response = requests.get('http://localhost:8000/membro-execucao-roles', params=params, headers=headers)
-    print(response.content)
     return JsonResponse(json.loads(response.content.decode()),status=response.status_code, safe=False)
 
 @login_required(login_url="/auth-user/login-user")

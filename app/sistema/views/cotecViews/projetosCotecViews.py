@@ -12,7 +12,8 @@ from sistema.models import (
     Galeria,
     AtividadeSection,
     AtividadeCategoria,
-    MembroExecucaoRoles
+    MembroExecucaoRoles,
+    Recursos
 )
 from sistema.serializers import (
     MembroExecucaoSerializer,
@@ -81,7 +82,7 @@ def projetoCotecForm(request):
     
     equipe_json = serializers.serialize('json', proposta_projeto.equipe.all().prefetch_related('roles'))
 
-    orcamento_itens_json = serializers.serialize('json', proposta_projeto.orcamento.items.all())
+    recursos_json = serializers.serialize('json', proposta_projeto.recursos.all())
     return render(
         request,
         "projetosCotec/projetoCotecCreate.html",
@@ -95,7 +96,7 @@ def projetoCotecForm(request):
             "responsaveis_json": responsaveis_json,
             "atividades_json": atividades_json,
             "equipe_json": equipe_json,
-            "orcamento_itens_json": orcamento_itens_json,
+            "recursos_json": recursos_json,
         },
     )
 
@@ -121,6 +122,8 @@ def pessoaCreate(request):
     pessoa.email = data.get("email")
     pessoa.telefone = data.get("telefone")
     pessoa.cpf = data.get("cpf")
+    pessoa.numero_matricula = data.get("numero_matricula")
+    pessoa.cargo = 'professor' if data.get("is_professor") else ''
     pessoa.save()
     pessoa_dict = model_to_dict(pessoa)
     return JsonResponse(pessoa_dict) 
@@ -160,7 +163,6 @@ def membroEquipeForm(request):
         try:
             membroEquipe = MembroExecucao.objects.prefetch_related('roles').get(pk=model_id)
             context["membroEquipe"] = MembroExecucaoSerializer(instance=membroEquipe, depth=0).data
-            print("dado do serializer: ", context)
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Membro da equipe não encontrado"}, status=400)
     return render(
@@ -220,43 +222,18 @@ def handlePropostaProjetoCreate(data, pessoa):
                 if membro_equipe.get("pessoa_id"):
                     db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
                 db_membro_equipe.save()
-            
-        if data.get("proponente"):
-            for membro_equipe in data.get("proponente"):
-                db_membro_equipe = MembroExecucao()
-                if membro_equipe.get("pessoa_id"):
-                    db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
-                db_membro_equipe.proposta_projeto = proposta_projeto
-                db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_PROPONENTE)
-                db_membro_equipe.instituicao = membro_equipe.get("instituicao")
-                db_membro_equipe.save()
-        else:
-            db_membro_equipe = MembroExecucao()
-            db_membro_equipe.proposta_projeto = proposta_projeto
-            db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_PROPONENTE)
-            db_membro_equipe.save()
 
-        if data.get("responsavel"):
-            for membro_equipe in data.get("responsavel"):
-                db_membro_equipe = MembroExecucao()
-                if membro_equipe.get("pessoa_id"):
-                    db_membro_equipe.pessoa = Pessoas.objects.get(pk=membro_equipe.get("pessoa_id"))
-                db_membro_equipe.proposta_projeto = proposta_projeto
-                db_membro_equipe.role = MembroExecucaoRoles.objects.get(slug=MembroExecucaoRoles.SLUG_RESPONSAVEL)
-                db_membro_equipe.instituicao = membro_equipe.get("instituicao")
-                db_membro_equipe.save()
-
-        if data.get("orcamento"):
-            for orcamento_item in data.get("orcamento"):
-                db_orcamento_item = OrcamentoItem()
-                db_orcamento_item.orcamento = orcamento
-                db_orcamento_item.descricao = orcamento_item.get('descricao')
-                db_orcamento_item.tipo = orcamento_item.get('tipo')
-                db_orcamento_item.quantidade = orcamento_item.get('quantidade')
-                db_orcamento_item.unidade = orcamento_item.get('unidade')
-                db_orcamento_item.valor = orcamento_item.get('valor')
-                db_orcamento_item.valor_total = orcamento_item.get('valor_total')
-                db_orcamento_item.save()    
+        if data.get("recursos"):
+            for recurso in data.get("recursos"):
+                db_recurso = Recursos()
+                db_recurso.proposta_projeto = proposta_projeto
+                db_recurso.descricao = recurso.get('descricao')
+                db_recurso.tipo = recurso.get('tipo')
+                db_recurso.quantidade = recurso.get('quantidade')
+                db_recurso.unidade = recurso.get('unidade')
+                db_recurso.valor = recurso.get('valor')
+                db_recurso.valor_total = recurso.get('valor_total')
+                db_recurso.save()    
         return proposta_projeto
 
 @login_required(login_url="/auth-user/login-user")
@@ -309,7 +286,6 @@ def updatePropostaProjeto(request, pk):
     if data.get("publico_alvo"):
         proposta_projeto.publico_alvo = data.get("publico_alvo")
     if data.get("status"):
-        print("dentro de set status: ", data.get("status"))
         proposta_projeto.status = data.get("status")
     if data.get("justificativa"):
         proposta_projeto.justificativas = data.get("justificativa")
@@ -380,7 +356,6 @@ def propostasTable(request):
 
 @login_required(login_url="/auth-user/login-user")
 def updateAtividade(request, pk):
-    print("data dentro de update atividade: ", request.body.decode())
     data = json.loads(request.body.decode())
     atividade = Atividade.objects.get(pk=pk)
     if data.get("data_realizacao_inicio"):
@@ -397,6 +372,8 @@ def updateAtividade(request, pk):
         atividade.publico_esperado = data.get("publico_esperado")
     if data.get("cidade_id"):
         atividade.cidade = Cidade.objects.get(pk=data.get("cidade_id"))
+    if data.get('membro_execucao_id'):
+        atividade.responsavel = MembroExecucao.objects.get(pk=data.get('membro_execucao_id'))
     atividade.save()
     atividade = model_to_dict(atividade)
     return JsonResponse(atividade)
@@ -431,7 +408,6 @@ def removeAtividade(request, pk):
 @login_required(login_url="/auth-user/login-user")
 def updateMembroEquipe(request, pk):
     payload = json.loads(request.body)
-    print("payload do update de memebro de equipe: ", payload)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/membroExecucao/'+str(pk)
@@ -463,7 +439,6 @@ def removeMembroEquipe(request, pk):
 
 @login_required(login_url="/auth-user/login-user")
 def updateItemOrcamento(request, pk):
-    print("data dentro de update item orcamento: ", request.body.decode())
     data = json.loads(request.body.decode())
     itemOrcamento = OrcamentoItem.objects.get(pk=pk)
     if data.get('descricao'):
@@ -607,6 +582,12 @@ def createProjetoFromProposta(request, pk):
                 membro.evento = evento
                 membro.save()
             galeria = Galeria.objects.create(nome="galeria geral do evento ", evento=evento) 
+
+            recursos = Recursos.objects.filter(proposta_projeto=proposta_projeto)
+            for recurso in recursos:
+                recurso.evento = evento
+                recurso.save()
+                
         proposta_projeto.status = "aprovada"
         proposta_projeto.save()
     return JsonResponse({"message": "Projeto criado com sucesso!"})

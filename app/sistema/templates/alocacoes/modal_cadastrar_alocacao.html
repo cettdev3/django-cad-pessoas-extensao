@@ -339,7 +339,6 @@
     
     function editarAlocacao(alocacaoId) {
         let formdata = getFormData()
-        console.log(formdata)
         $.ajax({
             url: "/editarAlocacao/"+alocacaoId,
             data: JSON.stringify({"data":formdata}),
@@ -374,7 +373,6 @@
 
     $(document).ready(function () {
         $("#cadastrarAlocacaoModal").on('hide.bs.modal', function(){
-            console.log()
             let pessoaId = $("#"+alocacaoModelId).text()
             if (pessoaId) {
                 clearModalForm()

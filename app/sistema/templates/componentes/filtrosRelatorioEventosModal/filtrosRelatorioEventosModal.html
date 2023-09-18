@@ -165,7 +165,6 @@
         xhr.addEventListener('progress', event => {
             if (event.lengthComputable) {
                 const percentComplete = (event.loaded / event.total) * 100;
-                console.log('Download progress:', percentComplete + '%');
             }
         });
 
@@ -206,7 +205,6 @@
         xhr.addEventListener('progress', event => {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
-            console.log('Download progress:', percentComplete + '%');
         }
         });
 
