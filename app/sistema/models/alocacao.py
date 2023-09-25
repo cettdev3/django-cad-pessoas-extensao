@@ -1,5 +1,4 @@
 from django.db import models
-import datetime
 from ..models.ensino import Ensino
 from ..models.cidade import Cidade
 from ..models.pessoa import Pessoas
@@ -42,6 +41,7 @@ class Alocacao(models.Model):
     cargaHoraria = models.FloatField(null = True)
     tipoContratacao = models.CharField(null = True, max_length=100)
     membroExecucao = models.ForeignKey('MembroExecucao', on_delete=models.SET_NULL, null=True, blank=True, related_name='alocacoes')
+    numero_matricula = models.CharField(null = True, max_length=100)
     class Meta:
         db_table = 'alocacoes'
 

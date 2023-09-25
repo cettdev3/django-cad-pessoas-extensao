@@ -9,9 +9,11 @@ class MultipleFormComponent {
         this.deleteFunction = options.deleteFunction || null;
         this.initialFormCount = options.initialFormCount || 0;
         this.showDeleteButton = options.showDeleteButton !== undefined ? options.showDeleteButton : true;
+        this.deleteButtonText = options.deleteButtonText || 'Remover';
         this.showSaveButton = options.showSaveButton !== undefined ? options.showSaveButton : true;
         this.showAddButton = options.showAddButton !== undefined ? options.showAddButton : true;
-
+        this.addButtonText = options.addButtonText || 'Adicionar';
+        this.parentVariables = options.parentVariables || null;
         this.init();
     }
 
@@ -20,11 +22,9 @@ class MultipleFormComponent {
             const template = await this.fetchComponentTemplateFunction();
             this.element = $(template);
             this.bindUIEvents();
-            
             for(let i = 0; i < this.initialFormCount; i++) {
                 await this.addForm();
             }
-            
             // Callback execution after initialization
             if (this.onReady) {
                 this.onReady();
@@ -64,9 +64,13 @@ class MultipleFormComponent {
                 ${formContent}
                 <div class="form-actions d-flex justify-content-end">
                     ${saveButton}
-                    ${this.showDeleteButton ? '<button class="btn btn-danger remove-form-btn" style="margin-top: 10px;">Remover</button>' : ''}
+                    ${this.showDeleteButton ? `<button class="btn btn-danger remove-form-btn" style="margin-top: 10px;">${this.deleteButtonText}</button>` : ''}
                 </div>
             </div>`;
+            let addButton = this.element.find("#multiple-form-component-adicionar")
+            if (this.addButtonText) {
+                addButton.text(this.addButtonText);
+            }
             this.element.find('.form-container').append(wrappedFormContent);
             // get the last form and initialize it
             const newForm = this.element.find('.individual-form').last();

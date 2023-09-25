@@ -69,7 +69,6 @@ async function removeAlocacao(alocacao_id, onSuccess=null, onError=null) {
     return await $.ajax({
         url: "/eliminarAlocacao/"+alocacao_id,
         headers: { "X-CSRFToken": XCSRFToken },
-        dataType: "json",
         method: "POST",
         success: function (data) {
             if (onSuccess) onSuccess(data);

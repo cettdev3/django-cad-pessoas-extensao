@@ -83,13 +83,74 @@
         </div>
     </div>
 </form>
-<div class="row">
+<div class="row mt-2" id="membro-equipe-alocacao-container-{{atividade.id}}">
     <div class="col-12">
-        <label for="nome"><b>Alocar equipe</b></label>
+        <div class="d-flex justify-content-between">
+            <label for="nome"><b><h3>Alocar equipe</h3></b></label>
+            <button id="nova-alocacao-btn" class="btn btn-primary" type="button">
+                + Adicionar Alocação
+            </button>
+        </div>
         <div id="multiple-form-component-membro-equipe-alocacao-{{atividade.id}}">
+            {% for alocacao in atividade.alocacoes.all %}
+                {% include 'alocacoes/membro_execucao_alocacao_form.html' with alocacao=alocacao %}
+                <hr>
+            {% endfor %}
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        (function(params) {
+            let formContainer = $("#membro-equipe-alocacao-container-" + params.atividadeID);
+            let novaAlocacaoBtn = formContainer.find("#nova-alocacao-btn")
+
+            function deleteAlocacao() {
+                console.log("deletando alocação form")
+            }
+            
+            async function createAlocacaoObject() {
+                return await createAlocacao({
+                    atividade_id: params.atividadeID
+                })
+            }
+
+            async function getFormAlocacaoTemplate(alocacaoId) {
+                return await getFormAlocacaoMembroEquipe(
+                    {
+                        model_id: alocacaoId,
+                        atividade_id: params.atividadeID
+                    }
+                )
+            }
+
+            function updateAlocacao() {
+                console.log("atualizando alocação form")
+            }
+
+            function deleteAlocacaoForm() {
+                console.log("deletando alocação form")
+            }
+            
+            async function createAlocacaoForm() {
+                let alocacao = await createAlocacaoObject()
+                let formAlocacaoContainer = $(`#multiple-form-component-membro-equipe-alocacao-${params.atividadeID}`)
+                let formAlocacaoTemplate = await getFormAlocacaoTemplate(alocacao.id)
+                formAlocacaoContainer.append(formAlocacaoTemplate)
+                formAlocacaoContainer.append("<hr>")
+            }
+
+            function updateAlocacaoForm() {
+                console.log("atualizando alocação form")
+            }
+            
+            novaAlocacaoBtn.on("click", function() {
+                createAlocacaoForm()
+            })
+
+        })({atividadeID: '{{atividade.id}}'})
+    })
+</script>
 <script>
     $(document).ready(function () {
         (function (params) {
@@ -126,7 +187,6 @@
     
                         return membroEquipe;
                     }
-    
                     formContainer.find("input").each(function () {
                         let includedField = ['nome', 'data_realizacao_inicio', 'horario_inicio','horario_fim', 'publico_esperado', 'local'];
                         if (!includedField.includes($(this).attr('name'))) return;
@@ -136,7 +196,7 @@
                             let data = {}
                             let current_value = $(this).data('current-value');
                             data[name] = value;
-    
+                            
                             if (current_value == value || !params.atividadeId) return;
                             cotecUpdateAtividade(params.atividadeId, 
                             data, 
@@ -180,7 +240,6 @@
                         });
                 });
             });
-            
            
             let startTimeInput = $('#horario_inicio');
             let endTimeInput = $('#horario_fim');
@@ -210,54 +269,9 @@
                     return true;
                 }
             }
-
-            let handleCreateAlocacaoMembroEquipe = () => createAlocacao({atividade_id: params.atividadeId}, function (data) {
-                showFloatingMessage("Membro da equipe alocado com sucesso", "alert-success");
-            }, function (error) {
-                console.log(error)
-                showFloatingMessage(error.responseJSON.message, "alert-danger");
-            });
-        
-            let handleDeleteAlocacao = (alocacaoId) => removeAlocacao(alocacaoId, function (data) {
-                    showFloatingMessage("Alocação removida com sucesso", "alert-success");
-                }, function (error) {
-                    showFloatingMessage(error.responseJSON.message, "alert-danger");
-                });
-
-            const multipleFormOptionsAlocacaoMembroEquipe = {
-                fetchFormTemplateFunction: (customFormParams) => { 
-                    return getFormAlocacaoMembroEquipe({
-                        ...customFormParams,
-                        atividade_id: params.atividadeId
-                    })
-                },
-                initializeForm:  initializeAlocacaoMembroEquipeForm,
-                fetchComponentTemplateFunction: getMultipleFormComponent,
-                createFunction: params.atividadeId ? handleCreateAlocacaoMembroEquipe : undefined,
-                // showAddButton: false,
-                // showDeleteButton: false,
-                showSaveButton: false,
-                updateFunction: async function(modelId, data) {
-                    console.log(modelId, data)
-                },
-                deleteFunction: async function(modelId) {
-                    handleDeleteAlocacao(modelId)
-                },
-                onReady: function() {
-                    $("#multiple-form-component-membro-equipe-alocacao-"+params.atividadeId).html(multipleFormAlocacaoMembroEquipe.element);
-                    const formData = alocacoesId.length > 0 ? alocacoesId : 1;
-                    multipleFormAlocacaoMembroEquipe.setValue(formData);
-                }
-            };
-
-            multipleFormAlocacaoMembroEquipe = new MultipleFormComponent(multipleFormOptionsAlocacaoMembroEquipe);
-            $("#get-form-values").on('click', () => {
-                console.log("alocações: ", multipleFormAlocacaoMembroEquipe.getValues())
-            })
                                 
             startTimeInput.on('change', validateTimeDifference);
             endTimeInput.on('change', validateTimeDifference);
-
         })({
             atividadeId: '{{atividade.id}}',
             propostaProjetoId: '{{atividade.proposta_projeto.id}}',

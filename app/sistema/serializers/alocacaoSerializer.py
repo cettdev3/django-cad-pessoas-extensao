@@ -41,6 +41,12 @@ class AlocacaoSerializer(serializers.ModelSerializer):
             "codigo_siga",
             "tipo",
             "atividade_id",
+            "atividade",
             "membroExecucao_id",
+            "membroExecucao",
+            "numero_matricula",
+            "funcao",
+            "cargaHoraria",
+            "tipoContratacao",
         ]
-        depth = 2
+        depth = 3

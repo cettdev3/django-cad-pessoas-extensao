@@ -81,6 +81,7 @@ class CustomSelectMultiple {
     }
 
     init() {
+        this.state.options = [];
         this.loadOptions();
         this.bindUIEvents();
         this.updateLabel();
@@ -92,12 +93,14 @@ class CustomSelectMultiple {
         this.modal.element.on('action-fail', (event) => showFloatingMessage("Erro ao cadastrar item", "alert-danger"));
     }
 
-    emitChangeEvent() {
+    emitChangeEvent(from) {
         const event = new CustomEvent('change', { detail: this.state.selectedOptions });
+        if (!this.element) return;
         this.element[0].dispatchEvent(event);
     }
 
     bindUIEvents() {
+        if (!this.element) return;
         this.element.on('click', '.dropdown-item', this.handleOptionClick.bind(this));
         this.element.on('click', 'button.close', this.handleBadgeRemove.bind(this));
         this.element.on('keyup', '#filterInput', this.handleFilter.bind(this));
@@ -115,15 +118,18 @@ class CustomSelectMultiple {
     }
 
     openDropdown() {
+        if (!this.element) return;
         this.element.find('#dropdownMenu').addClass('show');
     }
     
     closeDropdown() {
+        if (!this.element) return;
         this.element.find('#dropdownMenu').removeClass('show');
         this.resetFilter();
     }
 
     resetFilter() {
+        if (!this.element) return;
         this.element.find('#filterInput').val('');
         this.renderOptions();
     }
@@ -152,14 +158,17 @@ class CustomSelectMultiple {
     }
     
     showSpinner() {
+        if(!this.element) return;
         this.element.find("#loading-spinner").show();
     }
     
     hideSpinner() {
+        if(!this.element) return;
         this.element.find("#loading-spinner").hide();
     }
 
     renderOptions(filteredOptions = null) {
+        if (!this.element) return;
         const optionsToRender = filteredOptions || this.state.options;
         const optionsContainer = this.element.find('#options-container');
         optionsContainer.empty();
@@ -175,6 +184,7 @@ class CustomSelectMultiple {
     }
 
     updateLabel() {
+        if (!this.element) return;
         this.element.find('#dropdownMenuButton').text(this.config.label);
     }
 
@@ -186,10 +196,11 @@ class CustomSelectMultiple {
         this.state.selectedOptions.push(item.id);
         this.renderOptions();
         this.renderBadges();
-        this.emitChangeEvent();
+        this.emitChangeEvent("handel new item");
     }
 
     handleOptionClick(event) {
+        if (!this.element) return;
         event.preventDefault();
         event.stopPropagation(); 
         const checkbox = $(event.target).is('input[type="checkbox"]') ? $(event.target) : $(event.target).find('input[type="checkbox"]');
@@ -215,10 +226,11 @@ class CustomSelectMultiple {
         checkbox.prop('checked', !checkbox.prop('checked')); 
         this.renderBadges();
         this.openDropdown();
-        this.emitChangeEvent();
+        this.emitChangeEvent("handle option click");
     }
 
     handleBadgeRemove(event) {
+        if (!this.element) return;
         const badge = $(event.target).closest('.item-badge');
         const optionId = badge.data('id');
         const index = this.state.selectedOptions.indexOf(optionId);
@@ -228,7 +240,7 @@ class CustomSelectMultiple {
 
         this.renderOptions();
         badge.remove();
-        this.emitChangeEvent();
+        this.emitChangeEvent("handle badge remove");
     }
 
     handleFilter(event) {
@@ -243,6 +255,7 @@ class CustomSelectMultiple {
     }    
 
     renderBadges() {
+        if (!this.element) return;
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
         this.state.selectedOptions.forEach(id => {
@@ -251,18 +264,17 @@ class CustomSelectMultiple {
             });
             if (!option) return;
             const badge = $(`
-            <div class="badge-outline-secondary d-flex align-items-center mx-2 item-badge" data-id="${option.id}">
-                <span>${option.nome}</span>
-                <button type="button" 
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Remover"
-                class="close ml-2">
-                    <i class="fa fa-close"></i>
-                </button>
-            </div>
-        `);
-
+                <div class="badge-outline-secondary d-flex align-items-center mx-2 item-badge" data-id="${option.id}">
+                    <span>${option.nome}</span>
+                    <button type="button" 
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Remover"
+                    class="close ml-2">
+                        <i class="fa fa-close"></i>
+                    </button>
+                </div>
+            `);
             badgesContainer.append(badge);
         });
     }
@@ -271,10 +283,10 @@ class CustomSelectMultiple {
         return this.config.multiple ? this.state.selectedOptions : this.state.selectedOptions[0];
     }
 
-    setValue(values) {
+    setValue(values, emmitChangeEvent = true) {
         this.state.selectedOptions = this.config.multiple ? values : [values];
         this.renderOptions();
         this.renderBadges();
-        this.emitChangeEvent();
+        if (emmitChangeEvent) this.emitChangeEvent("set value");
     }
 }

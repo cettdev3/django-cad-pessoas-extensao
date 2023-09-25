@@ -198,6 +198,16 @@ def getAtividadeDrawer(request, atividade_id):
     )
 
 @login_required(login_url="/auth-user/login-user")
+def getAtividade(request, pk):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {"Authorization": "Token " + token.key}
+    response = requests.get(
+        "http://localhost:8000/atividades/" + str(pk), headers=headers
+    )
+    response = json.loads(response.content)
+    return JsonResponse(json.loads(response.content),safe=False) 
+
+@login_required(login_url="/auth-user/login-user")
 def atividadeForm(request):
     model_id = request.GET.get("model_id")
     context = {}

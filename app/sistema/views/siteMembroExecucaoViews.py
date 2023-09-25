@@ -162,3 +162,10 @@ def getMembrosExecucao(request):
     response = requests.get('http://localhost:8000/membroExecucao', params=params, headers=headers)
     pessoas = json.loads(response.content)
     return JsonResponse(pessoas,safe=False)
+
+@login_required(login_url='/auth-user/login-user')
+def getMembroExecucao(request, pk):
+    token, created = Token.objects.get_or_create(user=request.user)
+    headers = {'Authorization': 'Token ' + token.key}
+    response = requests.get('http://localhost:8000/membroExecucao/'+str(pk), headers=headers)
+    return JsonResponse(json.loads(response.content),safe=False)

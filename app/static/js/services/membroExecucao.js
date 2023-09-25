@@ -79,3 +79,18 @@ async function getMembrosExecucao(data, onSuccess, onError) {
         }
     });
 }
+
+async function getMembroExecucao(membroExecucaoId, data, onSuccess, onError) {
+    return await $.ajax({
+        url: '/get-membro-execucao/'+membroExecucaoId,
+        contentType: 'application/json',
+        method: "GET",
+        data: data,
+        success: function(response) {
+            if (onSuccess) onSuccess(response);
+        },
+        error: function(response) {
+            if (onError) onError(response);
+        }
+    });
+}

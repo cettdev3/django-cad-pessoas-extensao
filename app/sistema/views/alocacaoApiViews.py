@@ -229,6 +229,7 @@ class AlocacaoApiView(APIView):
                 cep = None
                 aulas_sabado = False
                 tipo = None
+                numero_matricula = None
 
                 if request.data.get("data_inicio"):
                     data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
@@ -264,6 +265,9 @@ class AlocacaoApiView(APIView):
                 if request.data.get("tipo"):
                     tipo = request.data.get("tipo")
 
+                if request.data.get("numero_matricula"):
+                    numero_matricula = request.data.get("numero_matricula")
+
                 alocacao = Alocacao.objects.create(
                     data_inicio = data_inicio,
                     data_fim = data_fim,
@@ -282,7 +286,8 @@ class AlocacaoApiView(APIView):
                     aulas_sabado = aulas_sabado,
                     tipo = tipo,
                     atividade = atividade,
-                    membroExecucao = membroExecucao
+                    membroExecucao = membroExecucao,
+                    numero_matricula = numero_matricula
                 )
                 
                 if request.data.get("turnos"):
@@ -349,11 +354,6 @@ class AlocacaoDetailApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST
                 )
             alocacao.acaoEnsino = acaoEnsino
-        else:
-            return Response(
-                {"res": "É necessário informar a ação de ensino"}, 
-                status=st.HTTP_400_BAD_REQUEST
-            )
 
         if request.data.get("professor_id"):
             professor = self.get_object(Pessoas, request.data.get("professor_id"))
@@ -363,62 +363,54 @@ class AlocacaoDetailApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST
                 )
             alocacao.professor = professor
-        else:
-            alocacao.professor = None
+
+        if request.data.get("membro_execucao_id"):
+            membroExecucao = self.get_object(MembroExecucao, request.data.get("membro_execucao_id"))
+            if not membroExecucao:
+                return Response(
+                    {"res": "Não existe membro de equipe com o id informado"}, 
+                    status=st.HTTP_400_BAD_REQUEST
+                )
+            alocacao.membroExecucao = membroExecucao
 
         if request.data.get("data_inicio"):
             data_inicio = datetime.strptime(request.data.get("data_inicio"), "%Y-%m-%d").date()
             alocacao.data_inicio = data_inicio
-        else:
-            alocacao.data_inicio = None
+
             
         if request.data.get("data_fim"):
             data_fim = datetime.strptime(request.data.get("data_fim"), "%Y-%m-%d").date()
             alocacao.data_fim = data_fim
-        else:
-            alocacao.data_fim = None
+
         
         if request.data.get("data_saida"):
             data_saida = datetime.strptime(request.data.get("data_saida"), "%Y-%m-%d").date()
             alocacao.data_saida = data_saida
-        else:
-            alocacao.data_saida = None
+
 
         if request.data.get("data_retorno"):
             data_retorno = datetime.strptime(request.data.get("data_retorno"), "%Y-%m-%d").date()
             alocacao.data_retorno = data_retorno
-        else:
-            alocacao.data_retorno = None
         
         if request.data.get("status"):
             status = request.data.get("status") 
             alocacao.status = status
-        else:
-            alocacao.status = None
         
         if request.data.get("observacao"):
             observacao = request.data.get("observacao")
             alocacao.observacao = observacao
-        else:
-            alocacao.observacao = None
         
         if request.data.get("logradouro"):
             logradouro = request.data.get("logradouro")
             alocacao.logradouro = logradouro
-        else:
-            alocacao.logradouro = None
 
         if request.data.get("complemento"):
             complemento = request.data.get("complemento")
             alocacao.complemento = complemento
-        else:
-            alocacao.complemento = None
 
         if request.data.get("bairro"):
             bairro = request.data.get("bairro")
             alocacao.bairro = bairro
-        else:
-            alocacao.bairro = None
 
         if request.data.get("cidade_id"):
             cidade = self.get_object(Cidade, request.data.get("cidade_id"))
@@ -428,14 +420,10 @@ class AlocacaoDetailApiView(APIView):
                     status=st.HTTP_400_BAD_REQUEST
                 )
             alocacao.cidade = cidade
-        else:
-            alocacao.cidade = None
         
         if request.data.get("cep"):
             cep = request.data.get("cep")
             alocacao.cep = cep
-        else:
-            alocacao.cep = None
         
         if request.data.get("tipo"):
             tipo = request.data.get("tipo")
@@ -456,10 +444,18 @@ class AlocacaoDetailApiView(APIView):
         if request.data.get("turnos"):
             turnos = request.data.get("turnos")
             alocacao.turnos.set(turnos)
-
+        if request.data.get('funcao'):
+            alocacao.funcao = request.data.get('funcao')
+        if request.data.get('cargaHoraria'):
+            alocacao.cargaHoraria = request.data.get('cargaHoraria')
+        if request.data.get('tipoContratacao'):
+            alocacao.tipoContratacao = request.data.get('tipoContratacao')
+        if request.data.get('numero_matricula'):
+            alocacao.numero_matricula = request.data.get('numero_matricula')
+        
         alocacao.save()
         serializer = AlocacaoSerializer(alocacao)
-        
+    
         return Response(serializer.data, status=st.HTTP_200_OK)
 
     def delete(self, request, alocacao_id, *args, **kwargs):

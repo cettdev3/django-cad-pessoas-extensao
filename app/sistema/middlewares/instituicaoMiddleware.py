@@ -44,7 +44,9 @@ class InstituicaoMiddleware:
             'update-proposta-projeto',
             'remove-proposta-projeto',
             'eliminar-alocacao',
-            'editar-alocacao'
+            'editar-alocacao',
+            'get-membro-execucao',
+            'get-atividade'
         ]
         
         isPkRoute = False

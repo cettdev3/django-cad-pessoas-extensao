@@ -75,8 +75,9 @@ def saveAlocacao(request):
 def editarAlocacao(request, codigo):
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
-    body = json.loads(request.body)['data']
+    body = json.loads(request.body)['data'] if json.loads(request.body).get('data') else json.loads(request.body)
     response = requests.put('http://localhost:8000/alocacoes/'+str(codigo), json=body, headers=headers)
+    responseJson = json.loads(response.content)
     return JsonResponse(json.loads(response.content),status=response.status_code)
 
 @login_required(login_url='/auth-user/login-user')
@@ -91,11 +92,10 @@ def eliminarAlocacao(request,codigo):
 def formAlocacaoMembroEquipe(request):
     id = request.GET.get('model_id')
     atividade_id = request.GET.get('atividade_id')
-
     alocacao = None
     data = {}
     if id:
-        alocacao = Alocacao.objects.prefetch_related("dataremovida_set").get(id=id)
+        alocacao = Alocacao.objects.get(id=id)
         alocacao = AlocacaoSerializer(alocacao).data
         data['alocacao'] = alocacao
     data['atividade_id'] = atividade_id

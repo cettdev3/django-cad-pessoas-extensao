@@ -410,6 +410,14 @@
                 hideAllSteps();
                 currentStep++;
                 showStep(currentStep);
+                if (currentStep == 3) {
+                    let forceReload = true
+                    selectDataService.fetchData(
+                        'membros_equipe', 
+                        () => getMembrosExecucao({proposta_projeto_id: propostaId}),
+                        forceReload
+                    );
+                }
             }
         });
 
@@ -564,6 +572,8 @@
         const multipleFormOptionsCronograma = {
             fetchFormTemplateFunction: getAtividadeForm,
             fetchComponentTemplateFunction: getMultipleFormComponent,
+            deleteButtonText: 'Remover Atividade',
+            addButtonText: 'Adicionar Atividade',
             createFunction: propostaId ? handleCreateCronograma : undefined,
             // showAddButton: false,
             // showDeleteButton: false,
