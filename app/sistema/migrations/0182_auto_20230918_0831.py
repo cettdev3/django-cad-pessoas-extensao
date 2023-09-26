@@ -30,6 +30,11 @@ def migrate_orcamentoitem_to_recursos(apps, schema_editor):
             print("does not have evento")
         Recursos.objects.create(**recursos_data)
 
+def reverse_migrate_orcamentoitem_to_recursos(apps, schema_editor):
+    # Define how you want to reverse the migration here.
+    # If you don't have a logical way to reverse, you can leave this empty or just use migrations.RunPython.noop.
+    pass
+
 
 class Migration(migrations.Migration):
 
@@ -38,5 +43,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_orcamentoitem_to_recursos),
+        migrations.RunPython(migrate_orcamentoitem_to_recursos, reverse_migrate_orcamentoitem_to_recursos),
     ]

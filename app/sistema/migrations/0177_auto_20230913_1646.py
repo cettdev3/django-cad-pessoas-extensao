@@ -8,6 +8,8 @@ def forward(apps, schema_editor):
         if membro.role:
             membro.roles.add(membro.role)
 
+def reverse(apps, schema_editor):
+    pass
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,5 +17,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forward)
+        migrations.RunPython(forward, reverse)
     ]
