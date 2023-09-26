@@ -1,4 +1,4 @@
-<div id="atividade-row-container-{{atividade.id}}"  class="w-100 d-flex align-items-start" >
+<div id="atividade-row-container-{{atividade.id}}"  class="w-100 d-flex align-items-start border" >
     <div class="d-flex w-35" id="atividade-row-nome-{{atividade.id}}" >
         <div>
             <div id="atividade-row-status-{{atividade.id}}" class="w-5 d-flex align-items-center" style="box-sizing: border-box;">
@@ -16,15 +16,16 @@
             value="{{atividade.nome|default_if_none:''}}">
         </div>
     </div>
-    <div class="w-20 d-flex align-items-center" style="box-sizing: border-box;">
-        <div id="select-membro-execucao-atividade-{{atividade.id}}">
-            {% include 'atividades/atividade-select-membro-execucao.html' with membrosExecucao=membrosExecucao atividade=atividade %}
+    <div class="w-25-p d-flex align-items-center justify-content-start" 
+    style="box-sizing: border-box;">
+        <div class="d-flex align-items-center justify-content-start py-1 w-100" style=" gap: 4px; flex-wrap: wrap;">
+            {% for alocacao in atividade.alocacoes %}
+            <span class="badge badge-primary">{{alocacao.membroExecucao.pessoa.nome}}</span>
+            {% endfor %}
         </div>
     </div>
-    <div class="w-15  d-flex align-items-center" style="box-sizing: border-box;">
-        <div id="select-departamento-atividade-{{atividade.id}}">
-            {% include 'atividades/atividade-select-departamento.html' with departamentos=departamentos atividade=atividade %}
-        </div>
+    <div class="w-10 d-flex align-items-center justify-content-center" style="box-sizing: border-box;">
+        <span>{{atividade.carga_horaria_formatada}}</span>
     </div>
     <div class="w-20  d-flex align-items-center" style="box-sizing: border-box;">
         <div id="input-data-realizacao-atividade-{{atividade.id}}">

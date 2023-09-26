@@ -13,6 +13,7 @@ from ..serializers.servicoSerializer import ServicoSerializer
 from ..serializers.atividadeCategoriaSerializer import AtividadeCategoriaSerializer
 from ..serializers.galeriaSerializer import GaleriaSerializer
 from ..serializers.ticketSerializers.ticketSerializer import TicketSerializer
+from ..serializers.alocacaoSerializer import AlocacaoSerializer
 
 class AtividadeSerializer(serializers.ModelSerializer):
     acao = AcaoSerializer(many=False, read_only=True)   
@@ -27,7 +28,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
     anexos = AnexoSerializer(many=True, read_only=True)
     atividadeCategorias = AtividadeCategoriaSerializer(many=True, read_only=True)
     atividadeCategorias_ids = serializers.SerializerMethodField()
-
+    alocacoes = AlocacaoSerializer(many=True, read_only=True)
     class Meta:
         model = Atividade
         fields = [
@@ -68,6 +69,7 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "carga_horaria_formatada",
             "horario_inicio",
             "horario_fim",
+            "alocacoes"
         ]
         
         depth = 4

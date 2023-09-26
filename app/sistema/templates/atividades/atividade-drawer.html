@@ -367,6 +367,35 @@
             </div>
         </div>
     </div>
+    <div class="w-100">
+        <div class="card">
+            <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseAnexos" aria-expanded="true" aria-controls="collapseAnexos">
+                <h5 class="mb-0">
+                    <span>
+                        Alocações
+                    </span>
+                </h5>
+            </div>
+            <div id="collapseAlocacoes" class="collapse show" aria-labelledby="headingOne">
+                <div class="card-body">
+                    <div id="alocacoes-container-{{atividade.id}}" class="alocacoes-container">
+                        {% for alocacao in atividade.alocacoes %}
+                            {% include 'alocacoes/membro_execucao_alocacao_form.html' with alocacao=alocacao %}
+                            <hr>
+                        {% endfor %}
+                    </div>
+                    <div class="row d-flex justify-content-end align-items-end px-3">
+                        <div class="col-sm-3">
+                            <button
+                            id="nova-alocacao-btn-{{atividade.id}}"
+                            type="button"
+                            class="disable-on-loading btn btn-outline-success ml-3 my-2">Adicionar Alocação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- <div>
         <div class="row">
             <div class="col-sm-12">
@@ -471,6 +500,7 @@
             $('#anexo-card-'+anexoId).remove();
         })
     }
+    
 
     function updateAtividadeDrawer(atividadeId, data, field = null, oldValue = null) {
         data.template = 'atividade-drawer.html';
@@ -484,8 +514,41 @@
         );
     }
 
+    async function getFormAlocacaoTemplate(alocacaoId, params) {
+        return await getFormAlocacaoMembroEquipe(
+            {
+                model_id: alocacaoId,
+                atividade_id: params.atividadeId
+            }
+        )
+    }
+    
+    async function createAlocacaoForm(params) {
+        console.log("dentro de createAlocacaoForm: ", params)
+        let alocacao = await createAlocacaoObject(params)
+        // console.log("alocacao: ", alocacao)
+        let formAlocacaoContainer = $(`#alocacoes-container-${params.atividadeId}`)
+        console.log("formAlocacaoContainer: ", formAlocacaoContainer, `#alocacoes-container-${params.atividadeId}`)
+        let formAlocacaoTemplate = await getFormAlocacaoTemplate(alocacao.id, params)
+        // console.log("formAlocacaoTemplate: ", formAlocacaoTemplate)
+        formAlocacaoContainer.append(formAlocacaoTemplate)
+        formAlocacaoContainer.append("<hr>")
+    }
+
+    async function createAlocacaoObject(params) {
+        return await createAlocacao({
+            atividade_id: params.atividadeId
+        })
+    }
+
     $(document).ready(function() {
         (function(params) {
+            let novaAlocacaoBtn = $(`#nova-alocacao-btn-${params.atividadeId}`)
+
+            novaAlocacaoBtn.on("click", function() {
+                createAlocacaoForm(params)
+            })
+
             function loadSelectMembroExecucao() {
                 getMembroExecucaoSelect({
                     evento_id: $('#evento_id').val(),

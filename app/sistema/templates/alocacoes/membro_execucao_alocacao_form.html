@@ -86,9 +86,10 @@
                             let current_value = $(this).data('current-value');
                             data[name] = value;
                             if (name == 'tipoContratacao' && value == 'efetivo') {
-                                $("#numero-matricula-container-" + params.alocacaoId).show();
-                            } else {
-                                $("#numero-matricula-container-" + params.alocacaoId).hide();
+                                $("#numero-matricula-container-" + params.alocacaoId).find("input").attr("disabled", false);
+                            } else if (name == 'tipoContratacao' && value != 'efetivo') {
+                                $("#numero-matricula-container-" + params.alocacaoId).find("input").attr("disabled", true);
+                                $("#numero-matricula-container-" + params.alocacaoId).find("input").val('');
                             }
 
                             if (current_value == value || !params.alocacaoId) return;
@@ -138,6 +139,7 @@
 
                 if (numero_matricula) {
                     formContainer.find("#numero_matricula").val(numero_matricula)
+                    formContainer.find("#numero_matricula").attr("disabled", false);
                     formContainer.find("#tipoContratacao").val('efetivo')
                 }
 
