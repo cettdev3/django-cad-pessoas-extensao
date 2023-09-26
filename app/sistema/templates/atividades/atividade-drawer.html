@@ -36,11 +36,6 @@
             class="btn btn-light btn-sm">
                 <i class="fa-solid fa-paperclip"></i>
             </button>
-            <!-- <button id="add-subtarefa-button-{{atividade.id}}"
-            data-toggle="tooltip" data-placement="top" title="Adicionar subtarefa"
-            class="btn btn-light btn-sm">
-                <i class="fa-solid fa-code-branch fa-rotate-90"></i>
-            </button> -->
             <button id="close-drawer-button"
             data-toggle="tooltip" data-placement="top" title="Fechar"
             class="btn btn-light btn-sm">
@@ -99,18 +94,19 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
+                                    <label><b>Descrição:</b></label>
                                     <textarea name="descricao" id="descricao" cols="30" rows="4" class="form-control" 
                                     onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'descricao': this.value}, 'descricao', '{{atividade.descricao|default_if_none:""|escapejs }}')">{% if atividade.id and atividade.descricao and atividade.descricao != 'None' %}{{atividade.descricao}}{% endif %}</textarea>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <div id="tipoAtividadeSelectContainer" class="col-sm-4">
+                                <!-- <div id="tipoAtividadeSelectContainer" class="col-sm-4">
                                 </div>
                                 <div id="departamentoSelectContainer" class="col-sm-3">
-                                </div>
+                                </div> -->
                                 <div class="col-sm-3">
                                     <label><b>Carga Horária:</b></label>
-                                    <input type="number"
+                                    <input type="text"
                                     required
                                     class="form-control"
                                     {% if atividade.id %}
@@ -120,7 +116,34 @@
                                     id="cargaHoraria"
                                     name="cargaHoraria">
                                 </div>
-                                <div class="col-sm-2">
+                                
+                                <div class="col-3">
+                                    <label for="nome"><b>Hora Início</b></label>
+                                    <input 
+                                    type="time" 
+                                    class="form-control" 
+                                    {% if atividade.id %}
+                                    value="{{atividade.horario_inicio|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'horario_inicio': this.value}, 'horario_inicio', '{{atividade.horario_inicio|default_if_none:""}}')"
+                                    id="horario_inicio"
+                                    name="horario_inicio">
+                                </div>
+                                
+                                <div class="col-3">
+                                    <label for="nome"><b>Hora de Término</b></label>
+                                    <input type="time" 
+                                    class="form-control" 
+                                    {% if atividade.id %}
+                                    value="{{atividade.horario_fim|default_if_none:""}}"
+                                    {% endif %}
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'horario_fim': this.value}, 'horario_fim', '{{atividade.horario_fim|default_if_none:""}}')"
+                                    id="horario_fim"
+                                    name="horario_fim">
+                                </div>
+                                <div id="cidadesSelectContainer" class="col-sm-3">
+                                </div>
+                                <!-- <div class="col-sm-2">
                                     <label class=""><b>Valor:</b></label>
                                     <input type="float"
                                     step="0.01"
@@ -132,7 +155,7 @@
                                     onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'valor': this.value}, 'valor', '{{atividade.valor|default_if_none:""}}')"
                                     id="valor"
                                     name="valor">
-                                </div>
+                                </div> -->
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-3">
@@ -219,9 +242,8 @@
                                 </div>
                             </div>
                             {% endif %}
-                            <div class="form-group row">
-                                <div id="cidadesSelectContainer" class="col-sm-3">
-                                </div>
+                            <!-- <div class="form-group row">
+                                
                                 <div class="col-sm-3">
                                     <label><b>Logradouro:</b></label>
                                     <input type="text"
@@ -258,19 +280,19 @@
                                     id="cep"
                                     name="cep">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <label><b>Complemento:</b></label>
+                                    <label><b>Local:</b></label>
                                     <input type="text"
                                     required
                                     class="form-control"
                                     {% if atividade.id %}
-                                    value="{{atividade.complemento|default_if_none:""}}"
+                                    value="{{atividade.local|default_if_none:""}}"
                                     {% endif %}
-                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'complemento': this.value}, 'complemento', '{{atividade.complemento|default_if_none:""}}')"
-                                    id="complemento"
-                                    name="complemento">
+                                    onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'local': this.value}, 'local', '{{atividade.local|default_if_none:""}}')"
+                                    id="local"
+                                    name="local">
                                 </div>
                             </div>
                             
@@ -345,7 +367,7 @@
             </div>
         </div>
     </div>
-    <div>
+    <!-- <div>
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -364,7 +386,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <div>
         <div class="row">
             <div class="col-sm-12">
@@ -568,8 +590,8 @@
             });
 
             loadSelectMembroExecucao()
-            loadSelectDepartamento()
-            loadSelectTipoAtividade()
+            // loadSelectDepartamento()
+            // loadSelectTipoAtividade()
             loadSelectCidade()
             loadSelectDemandas()
 

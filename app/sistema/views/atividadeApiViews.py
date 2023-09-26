@@ -104,6 +104,8 @@ class AtividadeApiView(APIView):
                     {"res": "Não existe departamento com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        else:
+            departamento = Departamento.objects.filter(nome__icontains="extens").first()
             
         if data.get("atividade_section_id"):
             section = self.get_object(AtividadeSection, data["atividade_section_id"])
@@ -127,13 +129,23 @@ class AtividadeApiView(APIView):
                 atividade_meta = False
 
         galeria = Galeria.objects.create(nome="Galeria sem titulo ", evento=evento)
+        cargaHoraria = data.get("cargaHoraria")
+        if data.get("horario_inicio") and data.get("horario_fim"):
+            dt_inicio = datetime.combine(datetime.today(), data.get("horario_inicio"))
+            dt_fim = datetime.combine(datetime.today(), data.get("horario_fim"))
+
+            delta = dt_fim - dt_inicio
+
+            hours, remainder = divmod(delta.seconds, 3600)
+            cargaHoraria = hours
+
         atividadeData = {
             "descricao": data.get("descricao"),
             "quantidadeCertificacoes": data.get("quantidadeCertificacoes"),
             "quantidadeMatriculas": data.get("quantidadeMatriculas"),
             "quantidadeAtendimentos": data.get("quantidadeAtendimentos"),
             "quantidadeInscricoes": data.get("quantidadeInscricoes"),
-            "cargaHoraria": data.get("cargaHoraria"),
+            "cargaHoraria": cargaHoraria,
             "status": data.get("status", "pendente"),
             "linkDocumentos": data.get("linkDocumentos"),
             "acao": acao,
@@ -143,6 +155,8 @@ class AtividadeApiView(APIView):
             "departamento": departamento,
             "data_realizacao_inicio": datetime.strptime(data["data_realizacao_inicio"], "%Y-%m-%d").date() if data.get("data_realizacao_inicio") else None,
             "data_realizacao_fim": datetime.strptime(data["data_realizacao_fim"], "%Y-%m-%d").date() if data.get("data_realizacao_fim") else None,
+            "horario_inicio": data.get("horario_inicio"),
+            "horario_fim": data.get("horario_fim"),
             "cidade": cidade,
             "galeria": galeria,
             "logradouro": data.get("logradouro"),
@@ -317,7 +331,9 @@ class AtividadeDetailApiView(APIView):
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio", atividade.data_realizacao_inicio)
         atividade.data_realizacao_fim = data.get("data_realizacao_fim", atividade.data_realizacao_fim)
         atividade.save()
-
+        if atividade.carga_horaria_formatada:
+            atividade.cargaHoraria = atividade.carga_horaria_formatada_number 
+            atividade.save()
         anexos = Anexo.objects.filter(model='Atividade', id_model=atividade.id)
         anexos = list(anexos.values())
 

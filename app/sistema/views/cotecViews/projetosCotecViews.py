@@ -13,7 +13,8 @@ from sistema.models import (
     AtividadeSection,
     AtividadeCategoria,
     MembroExecucaoRoles,
-    Recursos
+    Recursos,
+    Departamento
 )
 from sistema.serializers import (
     MembroExecucaoSerializer,
@@ -375,6 +376,9 @@ def updateAtividade(request, pk):
     if data.get('membro_execucao_id'):
         atividade.responsavel = MembroExecucao.objects.get(pk=data.get('membro_execucao_id'))
     atividade.save()
+    if atividade.carga_horaria_formatada:
+        atividade.cargaHoraria = atividade.carga_horaria_formatada_number 
+        atividade.save()
     atividade = model_to_dict(atividade)
     return JsonResponse(atividade)
 
@@ -395,6 +399,7 @@ def createAtividade(request):
     atividade.proposta_projeto = PropostaProjeto.objects.get(pk=data.get("proposta_projeto_id"))
     if data.get("cidade_id"):
         atividade.cidade = Cidade.objects.get(pk=data.get("cidade_id"))
+    atividade.departamento = Departamento.objects.filter(nome__icontains="extens").first()
     atividade.save()
     atividade = model_to_dict(atividade)
     return JsonResponse(atividade)

@@ -65,7 +65,9 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "categoria_badge",
             "atividadeCategorias",
             "atividadeCategorias_ids",
-            "carga_horaria_formatada"
+            "carga_horaria_formatada",
+            "horario_inicio",
+            "horario_fim",
         ]
         
         depth = 4
