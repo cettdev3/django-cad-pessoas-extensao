@@ -560,6 +560,8 @@ def createProjetoFromProposta(request, pk):
             evento = DpEvento.objects.create(
                 escola=escola,
                 proposta_projeto=proposta_projeto,
+                data_inicio=proposta_projeto.data_inicio,
+                data_fim=proposta_projeto.data_fim,
                 tipo=tipo,
                 descricao=descricao,
             )
