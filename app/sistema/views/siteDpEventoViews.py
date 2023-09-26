@@ -414,7 +414,7 @@ def getAtividadeLabel(doc, atividade, counter):
 def getAtividadeImage(doc: Document, atividade, imageCounter):
     galeria = atividade.galeria 
     if not galeria:
-        return doc
+        return doc, imageCounter
     
     imagens = galeria.imagem_set.filter(show_on_report=True)
     if len(imagens) == 0:
