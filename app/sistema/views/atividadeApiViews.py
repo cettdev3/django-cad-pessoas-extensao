@@ -303,6 +303,11 @@ class AtividadeDetailApiView(APIView):
         else:
             atividade.valor = data.get("valor", atividade.valor)
 
+        if data.get("horario_inicio"):
+            atividade.horario_inicio = data.get("horario_inicio")
+        if data.get("horario_fim"):
+            atividade.horario_fim = data.get("horario_fim")
+            
         if data.get("nome"):
             galeriaId = atividade.galeria.id
             galeria = self.get_object(Galeria, galeriaId)

@@ -156,35 +156,65 @@ class Atividade(models.Model):
                     return choice[2]
         return "badge-categoria-atividade"
 
-    property
+    @property
     def carga_horaria_formatada(self):
+        # If either field is None or empty, return an empty string
         if not self.horario_inicio or not self.horario_fim:
-            return None
+            return ""
 
-        dt_inicio = datetime.combine(datetime.today(), self.horario_inicio)
-        dt_fim = datetime.combine(datetime.today(), self.horario_fim)
+        # Convert string to time object if necessary
+        if isinstance(self.horario_inicio, str):
+            horario_inicio = datetime.strptime(self.horario_inicio, '%H:%M').time()
+        else:
+            horario_inicio = self.horario_inicio
 
+        if isinstance(self.horario_fim, str):
+            horario_fim = datetime.strptime(self.horario_fim, '%H:%M').time()
+        else:
+            horario_fim = self.horario_fim
+
+        # Convert TimeFields to datetime objects for subtraction
+        dt_inicio = datetime.combine(datetime.today(), horario_inicio)
+        dt_fim = datetime.combine(datetime.today(), horario_fim)
+
+        # Calculate the difference
         delta = dt_fim - dt_inicio
 
+        # Extract hours and minutes from the timedelta
         hours, remainder = divmod(delta.seconds, 3600)
         minutes, _ = divmod(remainder, 60)
-        strCargaHoraria = ""
-        if hours > 0:
-            strCargaHoraria += f"{hours}h "
-        if minutes > 0:
-            strCargaHoraria += f"{minutes}m"
-        return strCargaHoraria
+
+        # Return the formatted duration
+        return f"{hours}h {minutes}m"
+
 
     @property
     def carga_horaria_formatada_number(self):
+         # If either field is None or empty, return an empty string
         if not self.horario_inicio or not self.horario_fim:
-            return None
+            return ""
 
-        dt_inicio = datetime.combine(datetime.today(), self.horario_inicio)
-        dt_fim = datetime.combine(datetime.today(), self.horario_fim)
+        # Convert string to time object if necessary
+        if isinstance(self.horario_inicio, str):
+            horario_inicio = datetime.strptime(self.horario_inicio, '%H:%M').time()
+        else:
+            horario_inicio = self.horario_inicio
 
+        if isinstance(self.horario_fim, str):
+            horario_fim = datetime.strptime(self.horario_fim, '%H:%M').time()
+        else:
+            horario_fim = self.horario_fim
+
+        # Convert TimeFields to datetime objects for subtraction
+        dt_inicio = datetime.combine(datetime.today(), horario_inicio)
+        dt_fim = datetime.combine(datetime.today(), horario_fim)
+
+        # Calculate the difference
         delta = dt_fim - dt_inicio
 
+        # Extract hours and minutes from the timedelta
         hours, remainder = divmod(delta.seconds, 3600)
         minutes, _ = divmod(remainder, 60)
+
+        # Return the formatted duration
         return hours

@@ -110,7 +110,7 @@
                                     required
                                     class="form-control"
                                     {% if atividade.id %}
-                                    value="{{atividade.cargaHoraria}}"
+                                    value="{{atividade.cargaHoraria|default_if_none:""}}"
                                     {% endif %}
                                     onfocusout="updateAtividadeDrawer('{{atividade.id}}', {'cargaHoraria': this.value}, 'cargaHoraria', '{{atividade.cargaHoraria|default_if_none:""}}')"
                                     id="cargaHoraria"
