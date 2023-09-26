@@ -23,6 +23,7 @@
         <i class="fa fa-comment"></i>
         </button>
         {% if pessoa.instituicao == 'cett' or pessoa.cargo == 'diretoria_escola' %}
+        {% if proposta_projeto.status != 'aprovada' %}
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Opções
@@ -98,6 +99,7 @@
             {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
         {% endif %}
     </div>
     {% if pessoa.instituicao == 'cett' or pessoa.cargo == 'diretoria_escola' %}
