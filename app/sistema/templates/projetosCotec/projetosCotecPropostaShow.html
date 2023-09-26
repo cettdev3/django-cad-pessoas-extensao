@@ -293,8 +293,6 @@
         <thead>
             <tr>
                 <th class="text-center">Nome</th>
-                <th class="text-center">Descricao</th>
-                <!-- <th class="text-center">Tipo</th> -->
                 <th class="text-center">Unidade</th>
                 <th class="text-center">Quantidade</th>
             </tr>
@@ -303,8 +301,6 @@
             {% for item in proposta_projeto.recursos.all %}
             <tr>
                 <td>{{ item.nome|default_if_none:'Não Informado' }}</td>
-                <td>{{ item.descricao|default_if_none:'Não Informado' }}</td>
-                <!-- <td>{{ item.tipo }}</td> -->
                 <td>{{ item.unidade|default_if_none:'Não Informado' }}</td>
                 <td>{{ item.quantidade|default_if_none:'Não Informado' }}</td>
             </tr>
@@ -319,6 +315,8 @@
                 <th class="text-center">Nome</th>
                 <th class="text-center">Data Realizacao</th>
                 <th class="text-center">Horario Inicio</th>
+                <th class="text-center">Horario Término</th>
+                <th class="text-center">Carga Horária</th>
                 <th class="text-center">Local</th>
                 <th class="text-center">Publico Esperado</th>
             </tr>
@@ -334,6 +332,16 @@
                 {% endif %}
                 {% if atividade.horario_inicio %}
                 <td>{{ atividade.horario_inicio|time:"H:i" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.horario_fim %}
+                <td>{{ atividade.horario_fim|time:"H:i" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.carga_horaria_formatada %}
+                <td>{{ atividade.carga_horaria_formatada }}</td>
                 {% else %}
                 <td>Não Informado</td>
                 {% endif %}

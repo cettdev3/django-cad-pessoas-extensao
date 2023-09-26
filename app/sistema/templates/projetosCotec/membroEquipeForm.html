@@ -78,6 +78,17 @@
 
             let pessoa_id = $(`#select-pessoa-membro-${params.membroEquipeId}`).data('pessoa-id');
             let role_ids = params.roles;
+            
+            function handleMembroEquipeUpdate(data, input, current_value) {
+                updateMembroEquipe(params.membroEquipeId, 
+                    data, 
+                    function (response) {
+                        showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
+                    }, function (error) {
+                        showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
+                        if (input) input.val(current_value);
+                    });
+            }
 
             function setupFormReady(field) {
                 if (field == 'role') {
@@ -114,14 +125,8 @@
                             data[name] = value;
                             data = formContainer[0].getValue()
                             if (current_value == value || !params.membroEquipeId) return;
-                            updateMembroEquipe(params.membroEquipeId, 
-                            data, 
-                            function (response) {
-                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
-                            }, function (error) {
-                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
-                                $(this).val(current_value);
-                            });
+                            let input = $(this);
+                            handleMembroEquipeUpdate(data, input, current_value);
                         });
                     });
                 }
@@ -139,19 +144,22 @@
                 }, 
                 function () {
                     setupFormReady('pessoa');
-                    customSelectPessoa.element.on('change', function (event) {
+                    customSelectPessoa.element.on('change', async function (event) {
                         const selectedOptions = event.detail;
                         if (selectedOptions.length == 0) return
                         if (!params.membroEquipeId) return;
                         data = formContainer[0].getValue()
-                        updateMembroEquipe(params.membroEquipeId,
-                            data,
-                            function (response) {
-                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
-                            }, function (error) {
-                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
-                                $(this).val(current_value);
-                            });
+                        let input = $(this);
+                        let current_value = $(this).data('current-value');
+                        let selectedPessoa = customSelectPessoa.getValue()
+                        console.log("selectedPessoa: ", selectedPessoa)
+                        let membrosExecucao = await getMembrosExecucao({proposta_projeto_id: params.propostaId})
+                        if (membrosExecucao.filter(membro => membro.pessoa.id == selectedPessoa).length > 0) {
+                            showFloatingMessage("Pessoa já adicionada como membro da equipe!", "alert-danger")
+                            customSelectPessoa.setValue(0, false)
+                            return
+                        }
+                        handleMembroEquipeUpdate(data, input, current_value);
                     });
                 }
             );
@@ -173,14 +181,9 @@
                         if (selectedOptions.length == 0) return
                         if (!params.membroEquipeId) return;
                         data = formContainer[0].getValue()
-                        updateMembroEquipe(params.membroEquipeId,
-                            data,
-                            function (response) {
-                                showFloatingMessage("Membro da equipe atualizado com sucesso!", "alert-success")
-                            }, function (error) {
-                                showFloatingMessage("Erro ao atualizar membro da equipe!", "alert-danger")
-                                $(this).val(current_value);
-                            });
+                        let input = null
+                        let current_value = null
+                        handleMembroEquipeUpdate(data, input, current_value);
                     });
                 }
             );
@@ -188,6 +191,7 @@
         })({
             membroEquipeId: '{{membroEquipe.id}}',
             roles: {{membroEquipe.roles}},
+            propostaId: '{{membroEquipe.proposta_projeto}}'
         })
     });
 </script>

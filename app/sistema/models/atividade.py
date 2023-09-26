@@ -9,6 +9,8 @@ from .atividadeSection import AtividadeSection
 from .atividadeCategoria import AtividadeCategoria
 from .galeria import Galeria
 from .propostaProjeto import PropostaProjeto
+from datetime import datetime
+
 class Atividade(models.Model):
     STATUS_PENDENTE = 'pendente'
     STATUS_CONCLUIDO = 'concluido'
@@ -153,3 +155,22 @@ class Atividade(models.Model):
                 if choice[0] == self.categoria:
                     return choice[2]
         return "badge-categoria-atividade"
+
+    property
+    def carga_horaria_formatada(self):
+        if not self.horario_inicio or not self.horario_fim:
+            return ""
+
+        dt_inicio = datetime.combine(datetime.today(), self.horario_inicio)
+        dt_fim = datetime.combine(datetime.today(), self.horario_fim)
+
+        delta = dt_fim - dt_inicio
+
+        hours, remainder = divmod(delta.seconds, 3600)
+        minutes, _ = divmod(remainder, 60)
+        strCargaHoraria = ""
+        if hours > 0:
+            strCargaHoraria += f"{hours}h "
+        if minutes > 0:
+            strCargaHoraria += f"{minutes}m"
+        return strCargaHoraria
