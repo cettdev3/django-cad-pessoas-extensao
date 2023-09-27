@@ -77,8 +77,10 @@ class CustomModalComponent {
     }
 
     bindModalEvents() {
-        this.element.on('shown.bs.modal', () => this.state.isOpen = true);
-        this.element.on('hidden.bs.modal', () => this.state.isOpen = false);
+        setTimeout(() => {
+            this.element.on('shown.bs.modal', () => this.state.isOpen = true);
+            this.element.on('hidden.bs.modal', () => this.state.isOpen = false);
+        }, 1000)
     }
 
     handleActionClick() {
