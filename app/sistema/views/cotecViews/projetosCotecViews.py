@@ -368,6 +368,7 @@ def updateAtividade(request, pk):
     atividade = Atividade.objects.get(pk=pk)
     if data.get("data_realizacao_inicio"):
         atividade.data_realizacao_inicio = data.get("data_realizacao_inicio")
+        atividade.data_realizacao_fim = data.get("data_realizacao_inicio") 
     if data.get("horario_inicio"):
         atividade.horario_inicio = data.get("horario_inicio")
     if data.get("horario_fim"):

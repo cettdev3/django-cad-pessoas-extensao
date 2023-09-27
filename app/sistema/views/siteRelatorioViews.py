@@ -1,6 +1,4 @@
-from sistema.models.dpEvento import DpEvento
-from sistema.models.atividade import Atividade
-from sistema.models.alocacao import Alocacao
+from sistema.models import Alocacao, PropostaProjeto
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import xlsxwriter
@@ -14,9 +12,10 @@ def relatorioHorasTrabalhadasProfessores(request):
     # Query for the relevant Alocacao records
     alocacoes = Alocacao.objects.filter(
         membroExecucao__isnull=False,
-        funcao='professor',
+        funcao__icontains="profe",
         atividade__data_realizacao_inicio__gte=data_inicio,
-        atividade__data_realizacao_fim__lte=data_fim
+        atividade__data_realizacao_fim__lte=data_fim,
+        atividade__proposta_projeto__status=PropostaProjeto.STATUS_APROVADA,
     )
 
     # Aggregate total cargaHoraria for each unique Pessoa
