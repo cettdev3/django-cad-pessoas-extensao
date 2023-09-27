@@ -153,7 +153,10 @@
                         let current_value = $(this).data('current-value');
                         let selectedPessoa = customSelectPessoa.getValue()
                         let membrosExecucao = await getMembrosExecucao({proposta_projeto_id: params.propostaId})
-                        if (membrosExecucao.filter(membro => membro.pessoa.id == selectedPessoa).length > 0) {
+                        if (membrosExecucao.filter(membro => {
+                            if (!membro.pessoa) return false
+                            membro.pessoa.id == selectedPessoa
+                        }).length > 0) {
                             showFloatingMessage("Pessoa já adicionada como membro da equipe!", "alert-danger")
                             customSelectPessoa.setValue(0, false)
                             return
