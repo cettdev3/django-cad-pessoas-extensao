@@ -28,7 +28,7 @@
                 value="{{alocacao.tipoContratacao|default_if_none:''}}" id="tipoContratacao" name="tipoContratacao">
                     <option value="" {% if alocacao.tipoContratacao == '' %} selected {% endif %}>Selecione uma opção</option>
                     <option value="voluntario" {% if alocacao.tipoContratacao == 'voluntario' %} selected {% endif %}>Voluntário</option>
-                    <option value="terceirizado" {% if alocacao.tipoContratacao == 'terceirizado' %} selected {% endif %}>Terceirizado</option>
+                    <option value="rpa" {% if alocacao.tipoContratacao == 'rpa' %} selected {% endif %}>RPA</option>
                     <option value="efetivo" {% if alocacao.tipoContratacao == 'efetivo' %} selected {% endif %}>Efetivo</option>
                     <option value="outro" {% if alocacao.tipoContratacao == 'outro' %} selected {% endif %}>Outro</option>
                 </select>
