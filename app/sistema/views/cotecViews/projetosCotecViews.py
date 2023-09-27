@@ -118,6 +118,13 @@ def pessoaModal(request):
 @login_required(login_url="/auth-user/login-user")
 def pessoaCreate(request):
     data = json.loads(request.body.decode())
+    if (not data.get("cpf")):
+        return JsonResponse({"message": "CPF é obrigatório"}, status=400)
+    
+    pessoaFromCpf = Pessoas.objects.filter(cpf=data.get("cpf")).first()
+    if pessoaFromCpf:
+        return JsonResponse({"message": "Já existe uma pessoa cadastrada com esse CPF"}, status=400)
+    
     pessoa = Pessoas()
     pessoa.nome = data.get("nome")
     pessoa.email = data.get("email")

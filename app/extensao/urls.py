@@ -128,6 +128,10 @@ from sistema.views.siteRecursoViews import (
     recursoDelete,
 )
 
+from sistema.views.siteRelatorioViews import (
+    relatorioHorasTrabalhadasProfessores
+)
+
 from sistema.views.ticketApiViews import TicketApiView, TicketDetailApiView
 from sistema.views.itinerarioApiViews import ItinerarioApiView, ItinerarioDetailApiView
 from sistema.views.itinerarioItemApiViews import ItinerarioItemApiView, ItinerarioItemDetailApiView
@@ -209,6 +213,9 @@ urlpatterns = [
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),
     path("create-comentario", createComentario, name="create-comentario"),
     # path("remove-comentario/<pk>", removeComentario, name="remove-comentario"),
+
+    # RELATORIOS
+    path("relatorioHorasTrabalhadasProfessores", relatorioHorasTrabalhadasProfessores, name="relatorio-horas-trabalhadas"),
 
     # ROTAS PARA PESSOAS
     path("",gerencia_dp_eventos),

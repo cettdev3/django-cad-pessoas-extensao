@@ -90,7 +90,13 @@ class CustomSelectMultiple {
     bindModalEvents() {
         if (!this.modal) return;
         this.modal.element.on('action-success', (event) => this.handleNewItem(event.detail));
-        this.modal.element.on('action-fail', (event) => showFloatingMessage("Erro ao cadastrar item", "alert-danger"));
+        this.modal.element.on('action-fail', (event) => {
+            if (event.originalEvent && event.originalEvent.detail && event.originalEvent.detail.responseJSON && event.originalEvent.detail.responseJSON.message) {
+                showFloatingMessage("Erro ao cadastrar item: "+ event.originalEvent.detail.responseJSON.message, "alert-danger")
+            } else {
+                showFloatingMessage("Erro ao cadastrar item", "alert-danger")
+            }
+        });
     }
 
     emitChangeEvent(from) {

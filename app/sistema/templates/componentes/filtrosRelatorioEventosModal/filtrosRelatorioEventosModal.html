@@ -27,6 +27,10 @@
                                 value="exel_sintetico">
                                     EXCEL (ANALÍTICO)
                                 </option>
+                                <option
+                                value="exel_horas_trabalhadas">
+                                    EXCEL (Horas Trabalhadas)
+                                </option>
                                 <option 
                                 value="cirscunstanciado_word">
                                     WORD (CIRSCUNSTANCIADO)
@@ -232,6 +236,46 @@
 
         xhr.send();
     };
+   
+    function gerarRelatorioHorasTrabalhadasProfessores() {
+        $("#modalRelatorioEventos").modal("toggle");
+        filtros = getFiltroRelatorioEvento(); // Ajuste isto se os filtros do novo relatório forem diferentes
+        const xhr = new XMLHttpRequest();
+        let uri = '/relatorioHorasTrabalhadasProfessores' // Altere isto para o endpoint do novo relatório
+        let params = Object.keys(filtros).map(function (key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(filtros[key]);
+        }).join('&');
+        xhr.open('GET', uri+"?"+params, true);
+        xhr.addEventListener('progress', event => {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+        }
+        });
+
+        xhr.responseType = 'blob';
+        
+        xhr.onload = event => {
+            if (xhr.status === 200) {
+                const blob = xhr.response;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'relatorio_horas_trabalhadas_professores.xlsx'; // Altere isto para o nome do novo relatório
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                $("#modalRelatorioEventos").modal("toggle"); // Ajuste isto se o id do modal for diferente
+                $("#modalRelatorioEventos").modal("toggle");
+            } else {
+                console.error('Download failed:', xhr.statusText);
+                $("#modalRelatorioEventos").modal("toggle");
+            }
+        };
+
+        xhr.send();
+    };
 
     function gerarRelatorioFiltrado() {
         filtroTipoRelatorio = $("#tipo_relatorio").val();  
@@ -239,6 +283,8 @@
             gerarRelatorioCircunstanciado();
         } else if (filtroTipoRelatorio == "exel_sintetico") {
             gerarRelatorioSintetico();
+        } else if (filtroTipoRelatorio == "exel_horas_trabalhadas") {
+            gerarRelatorioHorasTrabalhadasProfessores()
         }
     }
 
