@@ -144,7 +144,7 @@ class CustomSelectMultiple {
     loadOptions() {
         if (this.state.options.length > 0) {
             this.renderOptions();
-            this.renderBadges();
+            this.renderBadges("load options initial if");
             return;
         }
 
@@ -154,7 +154,7 @@ class CustomSelectMultiple {
         this.config.loadOptions({}).then(options => {            
             this.state.options = options;
             this.renderOptions();
-            this.renderBadges();
+            this.renderBadges("load options");
             this.state.isLoading = false;
             this.hideSpinner();
         }).catch(error => {
@@ -202,7 +202,7 @@ class CustomSelectMultiple {
         }
         this.state.selectedOptions.push(item.id);
         this.renderOptions();
-        this.renderBadges();
+        this.renderBadges("handel new item");
         this.emitChangeEvent("handel new item");
     }
 
@@ -231,7 +231,7 @@ class CustomSelectMultiple {
         }
 
         checkbox.prop('checked', !checkbox.prop('checked')); 
-        this.renderBadges();
+        this.renderBadges("handle option click");
         this.openDropdown();
         this.emitChangeEvent("handle option click");
     }
@@ -261,10 +261,11 @@ class CustomSelectMultiple {
         this.renderOptions(filteredOptions);
     }    
 
-    renderBadges() {
+    renderBadges(from=null) {
         if (!this.element) return;
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
+        console.log(from)
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => {
                 return o.id === id
@@ -293,7 +294,7 @@ class CustomSelectMultiple {
     setValue(values, emmitChangeEvent = true) {
         this.state.selectedOptions = this.config.multiple ? values : [values];
         this.renderOptions();
-        this.renderBadges();
+        this.renderBadges("set value");
         if (emmitChangeEvent) this.emitChangeEvent("set value");
     }
 }

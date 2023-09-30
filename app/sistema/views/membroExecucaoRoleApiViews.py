@@ -32,7 +32,12 @@ class MembroExecucaoRoleApiView(APIView):
             return None
 
     def get(self, request, *args, **kwargs):
-        membrosExecucaoroles = MembroExecucaoRoles.objects.all()
+        slugs = [
+            MembroExecucaoRoles.SLUG_PROPONENTE,
+            MembroExecucaoRoles.SLUG_RESPONSAVEL,
+            MembroExecucaoRoles.SLUG_PRFESSOR
+        ]
+        membrosExecucaoroles = MembroExecucaoRoles.objects.filter(slug__in=slugs)
         serializer = MembroExecucaoRoleSerializer(membrosExecucaoroles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

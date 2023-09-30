@@ -167,9 +167,10 @@
                     });
                 }
             );
-
+            console.log("role_ids", role_ids)
             const customSelectRole = new CustomSelectMultiple(
-                roleModal, 
+                // roleModal, 
+                null, 
                 {
                     label: "Selecione a Função",
                     multiple: true,
@@ -194,7 +195,7 @@
 
         })({
             membroEquipeId: '{{membroEquipe.id}}',
-            roles: {{membroEquipe.roles}},
+            roles: {% if membroEquipe.roles %}{{membroEquipe.roles}}{% else %}[]{% endif %},
             propostaId: '{{membroEquipe.proposta_projeto}}'
         })
     });

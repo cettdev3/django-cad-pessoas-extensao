@@ -437,6 +437,7 @@ def removeAtividade(request, pk):
 @login_required(login_url="/auth-user/login-user")
 def updateMembroEquipe(request, pk):
     payload = json.loads(request.body)
+    print("payload: ", payload)
     token, created = Token.objects.get_or_create(user=request.user)
     headers = {'Authorization': 'Token ' + token.key}
     url = 'http://localhost:8000/membroExecucao/'+str(pk)
