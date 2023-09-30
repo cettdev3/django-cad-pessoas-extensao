@@ -35,9 +35,11 @@ class RecursoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         proposta_projeto = None
-        
+        evento = None
         if request.data.get("proposta_projeto_id"):
             proposta_projeto = self.get_object(PropostaProjeto, request.data.get("proposta_projeto_id"))
+            if proposta_projeto.evento:
+                evento = proposta_projeto.evento
             if not PropostaProjeto:
                 return Response(
                     {"res": "Não existe proposta de projeto com o id informado"}, 
@@ -52,7 +54,8 @@ class RecursoApiView(APIView):
             valor = request.data.get("valor", None),
             valor_total = request.data.get("valor_total", None),
             em_estoque = request.data.get("em_estoque", False),
-            proposta_projeto = proposta_projeto
+            proposta_projeto = proposta_projeto,
+            evento = evento
         )
 
         recursoSerializer = RecursoSerializer(recurso)

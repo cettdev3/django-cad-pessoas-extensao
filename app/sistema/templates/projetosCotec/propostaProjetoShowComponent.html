@@ -269,7 +269,7 @@
                 <td>Não Informado</td>
                 {% endif %}
                 <td>{{ atividade.local|default_if_none:'Não Informado' }}</td>
-                <td>{{ atividade.publico_esperado|default_if_none:'Não Informado' }}</td>
+                <td>{{ atividade.publico_esperado|default_if_none:'Não Informado' }} {{atividade.evento.id}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -349,8 +349,6 @@
     }
     
     $(document).ready(function () {
-        console.log("aprovada: ", window.location);
-
         loadStatusMenu({
             proposta_projeto_id: '{{ proposta_projeto.id }}'
         });

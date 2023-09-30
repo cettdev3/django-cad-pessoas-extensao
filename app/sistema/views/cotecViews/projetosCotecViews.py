@@ -7,10 +7,10 @@ from django.http import JsonResponse
 from sistema.models import (
     PropostaProjeto,
     DpEvento,
+    AtividadeSection,
     DpEventoEscola,
     Escola,
     Galeria,
-    AtividadeSection,
     AtividadeCategoria,
     MembroExecucaoRoles,
     Recursos,
@@ -19,6 +19,8 @@ from sistema.models import (
 from sistema.serializers import (
     MembroExecucaoSerializer,
 )
+
+from sistema.serializers.atividadeSerializer import AtividadeSerializer
 from django.db import transaction
 import requests
 from rest_framework.authtoken.models import Token
@@ -387,7 +389,8 @@ def updateAtividade(request, pk):
     if atividade.carga_horaria_formatada:
         atividade.cargaHoraria = atividade.carga_horaria_formatada_number 
         atividade.save()
-    atividade = model_to_dict(atividade)
+    atividade = Atividade.objects.get(pk=atividade.id)
+    atividade = AtividadeSerializer(atividade).data
     return JsonResponse(atividade)
 
 @login_required(login_url="/auth-user/login-user")
@@ -404,12 +407,25 @@ def createAtividade(request):
         atividade.nome = data.get("nome")
     if data.get("publico_esperado"):
         atividade.publico_esperado = data.get("publico_esperado")
-    atividade.proposta_projeto = PropostaProjeto.objects.get(pk=data.get("proposta_projeto_id"))
+    proposta_projeto = PropostaProjeto.objects.get(pk=data.get("proposta_projeto_id"))
+    atividade.proposta_projeto = proposta_projeto
     if data.get("cidade_id"):
         atividade.cidade = Cidade.objects.get(pk=data.get("cidade_id"))
     atividade.departamento = Departamento.objects.filter(nome__icontains="extens").first()
-    atividade.save()
-    atividade = model_to_dict(atividade)
+    with transaction.atomic():
+        atividade.save()
+        if proposta_projeto.evento:
+            atividade_categoria_slug = "tarefa"
+            atividadeSection = AtividadeSection.objects.filter(evento=proposta_projeto.evento).first()
+            atividade_categoria = AtividadeCategoria.objects.get(slug=atividade_categoria_slug)
+            
+            atividade.atividadeSection = atividadeSection
+            atividade.evento = atividade.proposta_projeto.evento
+            atividade.status = "pendente"
+            atividade_categoria.atividades.add(atividade)
+            atividade.save()
+    atividade = Atividade.objects.get(pk=atividade.id)
+    atividade = AtividadeSerializer(atividade).data
     return JsonResponse(atividade)
 
 @login_required(login_url="/auth-user/login-user")

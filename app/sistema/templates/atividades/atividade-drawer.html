@@ -380,17 +380,19 @@
                 <div class="card-body">
                     <div id="alocacoes-container-{{atividade.id}}" class="alocacoes-container">
                         {% for alocacao in atividade.alocacoes %}
-                            {% include 'alocacoes/membro_execucao_alocacao_form.html' with alocacao=alocacao %}
+                            {% include 'alocacoes/membro_execucao_alocacao_form.html' with alocacao=alocacao read_only=True %}
                             <hr>
                         {% endfor %}
                     </div>
                     <div class="row d-flex justify-content-end align-items-end px-3">
+                        {% if False %}
                         <div class="col-sm-3">
                             <button
                             id="nova-alocacao-btn-{{atividade.id}}"
                             type="button"
                             class="disable-on-loading btn btn-outline-success ml-3 my-2">Adicionar Alocação</button>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

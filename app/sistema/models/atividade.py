@@ -63,7 +63,7 @@ class Atividade(models.Model):
     galeria = models.ForeignKey(Galeria, on_delete=models.SET_NULL, null=True, blank=True)
     atividade_meta = models.BooleanField(default=False, null = True, blank= True)
     categoria = models.CharField(null = True, blank=True, max_length=100)
-    atividadeCategorias = models.ManyToManyField(AtividadeCategoria, blank=True)
+    atividadeCategorias = models.ManyToManyField(AtividadeCategoria, blank=True, related_name='atividades')
     atividadeSection = models.ForeignKey(AtividadeSection, on_delete=models.SET_NULL, null=True, blank=True)
     publico_esperado = models.IntegerField(null = True, blank=True)
     local = models.CharField(null = True, blank=True, max_length=500)

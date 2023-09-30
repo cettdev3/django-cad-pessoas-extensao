@@ -2,10 +2,14 @@
     <div id="form-container-{{alocacao.id}}">
         <div class="form-group row">
             <div class="col-12">
+                {% if read_only == True %}
+                <span><strong>{{alocacao.membroExecucao.pessoa.nome}}</strong></span>
+                {% else %}
                 <label for="nome"><b>Membro da Equipe</b></label>
                 <div id="select-alocacao-membro-equipe-{{alocacao.id}}" 
                 data-membro-equipe-id="{{alocacao.membroExecucao_id}}">
                 </div>
+                {% endif %}
             </div>
         </div>
         <div class="row align-items-center ">
@@ -40,12 +44,14 @@
                 value="{{alocacao.numero_matricula|default_if_none:''}}" id="numero_matricula" name="numero_matricula">
             </div>
             <div class="col-1">
+                {% if not read_only %}
                 <button type="button" 
                 data-toggle="tooltip" data-placement="top" title="remover alocação"
                 class="btn btn-danger btn-sm mt-2" 
                 id="btn-remove-alocacao-membro-equipe-{{alocacao.id}}">
                     <i class="fas fa-trash"></i>
                 </button>
+                {% endif %}
             </div>
         </div>
         <input hidden type="text" id="parent-data" name="parent-data">
@@ -161,6 +167,7 @@
             const customSelectMembroEquipe = new CustomSelectMultiple(null, {
                 label: "Responsável",
                 multiple: false,
+                readOnly: params.readOnly,
                 selectedOptions: params.membroExecucaoId ? [parseInt(params.membroExecucaoId)] : [],
                 loadOptions: function () {
                     return selectDataService.fetchData(
@@ -212,6 +219,7 @@
             atividadeId: '{{alocacao.atividade_id}}',
             alocacaoId: '{{alocacao.id}}',
             membroExecucaoId: '{{alocacao.membroExecucao_id}}',
+            readOnly: '{{read_only}}'
         })
     });
 </script>

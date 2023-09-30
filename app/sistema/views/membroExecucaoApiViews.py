@@ -49,6 +49,7 @@ class MembroExecucaoApiView(APIView):
                 )
             
         proposta_projeto = None
+        evento = None
         if request.data.get("proposta_projeto_id"):
             proposta_projeto = self.get_object(PropostaProjeto, request.data.get("proposta_projeto_id"))
             if not proposta_projeto:
@@ -56,6 +57,8 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe proposta de projeto com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            if proposta_projeto.evento:
+                evento = proposta_projeto.evento
         
         pessoa = None
         if request.data.get("pessoa_id"):
@@ -74,7 +77,7 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe acao com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        evento = None
+                
         if request.data.get("evento_id"):
             evento = self.get_object(DpEvento, request.data.get("evento_id"))
             if not evento:

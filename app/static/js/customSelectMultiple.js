@@ -59,6 +59,7 @@ class CustomSelectMultiple {
         this.state = {
             options: options.options || [],
             selectedOptions: options.selectedOptions || [],
+            readOnly: options.readOnly || false,
             isLoading: false
         };
         this.config = {
