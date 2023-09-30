@@ -132,7 +132,7 @@
             <div id="step-dados-gerais">
                 <h2>Dados Gerais</h2>
                 <div class="form-group">
-                    <label for="titulo-do-projeto">Título do projeto</label>
+                    <label for="titulo-do-projeto"><b>Título do projeto</b></label>
                     <input type="text" 
                     class="form-control proposta-field" 
                     id="titulo_projeto" 
@@ -146,7 +146,7 @@
                     <label for="periodo-de-realizacao"><b>Período de realização</b></label>
                     <div class="form-group row">
                         <div class="col-6">
-                            <label for="data_inicio">Data de início</label>
+                            <label for="data_inicio"><b>Data de início</b></label>
                             <input type="date" 
                             {% if proposta_projeto.read_only %}
                             disabled
@@ -156,7 +156,7 @@
                             name="data_inicio">
                         </div>
                         <div class="col-6">
-                            <label for="data_fim">Data de Término</label>
+                            <label for="data_fim"><b>Data de Término</b></label>
                             <input type="date" 
                             {% if proposta_projeto.read_only %}
                             disabled
@@ -168,7 +168,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="resumo-da-proposta">Resumo da proposta</label>
+                    <label for="resumo-da-proposta"><b>Resumo da proposta</b></label>
                     <textarea class="form-control proposta-field" rows="5" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -177,7 +177,7 @@
                     name="resumo_proposta">{{proposta_projeto.resumo_proposta|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="objetivos-gerais">Objetivos gerais</label>
+                    <label for="objetivos-gerais"><b>Objetivos gerais</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -186,7 +186,7 @@
                     name="objetivos_gerais">{{proposta_projeto.objetivos_gerais|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="objetivos-especificos">Objetivos específicos</label>
+                    <label for="objetivos-especificos"><b>Objetivos específicos</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -196,7 +196,7 @@
                     rows="5">{{proposta_projeto.objetivos_especificos|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="metodologia">Metodologia</label>
+                    <label for="metodologia"><b>Metodologia</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -205,7 +205,7 @@
                     name="metodologia" rows="5">{{proposta_projeto.metodologia|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="formato-e-conteudo">Formato e conteúdo do produto a ser entregue</label>
+                    <label for="formato-e-conteudo"><b>Formato e conteúdo do produto a ser entregue</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -215,7 +215,7 @@
                     rows="5">{{proposta_projeto.formato_conteudo|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="justificativas">Justificativas</label>
+                    <label for="justificativas"><b>Justificativas</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -224,7 +224,7 @@
                     name="justificativas" rows="5">{{proposta_projeto.justificativas|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="resultados-esperados">Resultados esperados</label>
+                    <label for="resultados-esperados"><b>Resultados esperados</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -234,7 +234,7 @@
                     rows="5">{{proposta_projeto.resultados_esperados|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="fontes-de-apoio">Fontes de apoio e patrocínio utilizadas para realização da ação</label>
+                    <label for="fontes-de-apoio"><b>Fontes de apoio e patrocínio utilizadas para realização da ação</b></label>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -243,7 +243,7 @@
                     name="fontes_apoio" rows="5">{{proposta_projeto.fontes_apoio|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="publico_alvo">Público alvo</label>
+                    <label for="publico_alvo"><b>Público alvo</b></label>
                     <textarea class="form-control proposta-field" id="publico_alvo" 
                     {% if proposta_projeto.read_only %}
                     disabled
@@ -252,7 +252,9 @@
                     rows="5">{{proposta_projeto.publico_alvo|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="informacoes-adicionais">Informações adicionais</label>
+                    <label for="informacoes-adicionais"><b>Informações adicionais (campo opcional)</b></label>
+                    <br>
+                    <span class="mb-1"><i class="fa-solid fa-info"></i> <small class="text-muted">Este campo se deve ser preenchido quando <strong><u>necessário</u></strong>, caso exista informações pertinentes que nao puderam ser cobertas nos campos anteriores</small></span>
                     <textarea class="form-control proposta-field" 
                     {% if proposta_projeto.read_only %}
                     disabled
