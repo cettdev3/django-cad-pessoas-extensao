@@ -29,7 +29,7 @@ def relatorioHorasTrabalhadasProfessores(request):
     worksheet = workbook.add_worksheet()
 
     # Define the headers
-    headers = ['nome', 'cpf', 'numero matricula', 'carga horaria total']
+    headers = ['nome', 'cpf','tipo de contratação', 'numero matricula', 'carga horaria total']
 
     # Write the headers to the worksheet
     for col_num, header in enumerate(headers):
@@ -37,10 +37,12 @@ def relatorioHorasTrabalhadasProfessores(request):
 
     # Populate the worksheet with aggregated data
     for row_num, (pessoa, total_carga_horaria) in enumerate(carga_horaria_totals.items(), start=1):
+        tipo_contratacao = 'Efetivo' if pessoa.numero_matricula else 'RPA'
         worksheet.write(row_num, 0, pessoa.nome)
         worksheet.write(row_num, 1, pessoa.cpf)
-        worksheet.write(row_num, 2, pessoa.numero_matricula)
-        worksheet.write(row_num, 3, total_carga_horaria)
+        worksheet.write(row_num, 2, tipo_contratacao)
+        worksheet.write(row_num, 3, pessoa.numero_matricula)
+        worksheet.write(row_num, 4, total_carga_horaria)
 
     workbook.close()
 
