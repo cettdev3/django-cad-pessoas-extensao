@@ -28,6 +28,35 @@ async function getMultipleFormComponent(data, onSuccess=null, onError=null) {
     });
 }
 
+async function getStatusPropostaProjetoMenu(data, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/status-proposta-menu",
+        data: data,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}
+
+async function getPropostaProjetoComponent(id, onSuccess=null, onError=null) {
+    return await $.ajax({
+        url: "/proposta-projeto-view/"+id,
+        headers: { "X-CSRFToken":  XCSRFToken },
+        contentType: 'application/json',
+        success: function (data) {
+            if (onSuccess) onSuccess(data);
+        },
+        error: function (data) {
+            if (onError) onError(data);
+        }
+    });
+}
+
 async function getMembroEquipeForm(data = {}, onSuccess=null, onError=null) {
     return await $.ajax({
         url: "/membro-equipe-form",

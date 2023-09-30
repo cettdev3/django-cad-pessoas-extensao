@@ -11,6 +11,8 @@ class PropostaProjeto(models.Model):
     STATUS_APROVADA = "aprovada"
     STATUS_REPROVADA = "reprovada"
     STATUS_CANCELADA = "cancelada"
+    STATUS_SOLICITAR_MUDANCA = "solicitar_mudanca"
+    STATUS_DEVOLVIDA_APOS_APROVACAO = "devolvida_apos_aprovacao"
 
     STATUS_CHOICES = [
         (STATUS_RASCUNHO, 'Rascunho'),
@@ -21,6 +23,21 @@ class PropostaProjeto(models.Model):
         (STATUS_APROVADA, 'Aprovada'),
         (STATUS_REPROVADA, 'Reprovada'),
         (STATUS_CANCELADA, 'Cancelada'),
+        (STATUS_SOLICITAR_MUDANCA, 'Mudança solicitada'),
+        (STATUS_DEVOLVIDA_APOS_APROVACAO, 'Devolvida após aprovação'),
+    ]
+    
+    STATUS_MENU_LABEL = [
+        (STATUS_RASCUNHO, 'Em elaboração'),
+        (STATUS_EM_ANALISE, 'Submeter para análise'),
+        (STATUS_EM_ANALISE_DIRECAO, 'Submeter para análise da direção'),
+        (STATUS_EM_ANALISE_CETT, 'Submeter para análise do CETT'),
+        (STATUS_DEVOLVIDA, 'Devolver para o autor'),
+        (STATUS_APROVADA, 'Aprovar'),
+        (STATUS_REPROVADA, 'Reprovar'),
+        (STATUS_CANCELADA, 'Cancelar'),
+        (STATUS_SOLICITAR_MUDANCA, 'Solicitar mudança'),
+        (STATUS_DEVOLVIDA_APOS_APROVACAO, 'Devolver ao autor após aprovação'),
     ]
 
     titulo_projeto = models.CharField(max_length=255, null=True, blank=True)
@@ -56,16 +73,21 @@ class PropostaProjeto(models.Model):
     @property
     def status_formatado(self):
         return dict(self.STATUS_CHOICES)[self.status]
+   
+    @property
+    def status_menu_label(self):
+        return dict(self.STATUS_MENU_LABEL)[self.status]
     
     @property
     def read_only(self):
         readOnly =  self.status != self.STATUS_RASCUNHO
         readOnly = readOnly and self.status != self.STATUS_DEVOLVIDA 
+        readOnly = readOnly and self.status != self.STATUS_DEVOLVIDA_APOS_APROVACAO
         return readOnly
     
     @property
     def is_editable(self):
-        return self.status == self.STATUS_RASCUNHO or self.status == self.STATUS_DEVOLVIDA
+        return self.status == self.STATUS_RASCUNHO or self.status == self.STATUS_DEVOLVIDA or self.status == self.STATUS_DEVOLVIDA_APOS_APROVACAO
     
     @property
     def is_deleteable(self):

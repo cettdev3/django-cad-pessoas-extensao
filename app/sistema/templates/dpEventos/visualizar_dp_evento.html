@@ -52,6 +52,11 @@ style="height: calc(100vh - 75px);">
                     <a id="recurso-tab" data-toggle="tab" href="#recurso">Recursos</a>
                 </li>
                 {% endif %}
+                {% if dpEvento.proposta_projeto %}
+                <li class=" cs-tab-link active">
+                    <a id="proposta-projeto-tab" data-toggle="tab" href="#proposta-projeto">Proposta de Projeto</a>
+                </li>
+                {% endif %}
             </ul>
             <div class="d-flex justify-content-between px-2">
                 <div id="add-membro-execucao-btn">
@@ -197,6 +202,22 @@ style="height: calc(100vh - 75px);">
             {% if dpEvento.recursos %}
             <div id="recurso" class="tab-pane">
                 <div id="recursoTableContainer"></div>
+                <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
+                    <div class="loading-container"
+                    style="display: none; position: relative">
+                        <div class="d-flex flex-column justify-content-center align-items-center">
+                            <div class="spinner-border text-primary " role="status">
+                            </div>
+                            <h3>Carregando...</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if dpEvento.proposta_projeto %}
+            <div id="proposta-projeto" class="tab-pane">
+                <div id="propostaProjetoContainer">
+                </div>
                 <div  class="w-100 d-flex flex-column justify-content-center align-items-center" style="height: 70vh">
                     <div class="loading-container"
                     style="display: none; position: relative">
@@ -374,6 +395,19 @@ style="height: calc(100vh - 75px);">
             toggleLoading("hide");
         });
     }
+
+    function carregarPropostaProjeto(propostaProjetoId) {
+        if (!propostaProjetoId) return
+        toggleLoading("show");
+        $("#propostaProjetoContainer").html("");
+        getPropostaProjetoComponent(propostaProjetoId, function (data) {
+            toggleLoading("hide");
+            $("#propostaProjetoContainer").html(data);
+        }, function (error) {
+            showFloatingMessage("Erro ao carregar proposta de projeto", "alert-danger");
+            toggleLoading("hide");
+        });
+    }
     
     function carregarServicosContratados() {
         $.ajax({
@@ -493,6 +527,14 @@ style="height: calc(100vh - 75px);">
             $("#add-galeria-btn").hide()
             $("#add-item-recurso-btn").show()
             $("#atividades-table-header").hide()
+        } else if (id == "proposta-projeto-tab") {
+            $("#add-membro-execucao-btn").hide()
+            $("#add-atividade-btn").hide()
+            $("#add-avaliacao-btn").hide()
+            $("#add-galeria-btn").hide()
+            $("#add-item-recurso-btn").hide()
+            $("#add-servico-contratado-btn").hide()
+            $("#atividades-table-header").hide()
         } else {
             $("#add-membro-execucao-btn").hide()
             $("#add-atividade-btn").hide()
@@ -550,6 +592,7 @@ style="height: calc(100vh - 75px);">
         carregarServicosContratados()
         carregarGalerias()
         carregarRecurso({evento_id: dpEventoId})
+        carregarPropostaProjeto('{{dpEvento.proposta_projeto.id}}')
         $("body").css("overflow", "hidden")
         $("#dpEvento-visualizar-tabs a").each(function() {
             let link = $(this)

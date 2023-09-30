@@ -50,12 +50,12 @@
                                 {{ proposta.status_formatado }}
                             </span>
                             {% endif %}
-                            {% if proposta.status == 'em_analise' or proposta.status == 'em_analise_direcao' or proposta.status == 'em_analise_cett'%}
+                            {% if proposta.status == 'em_analise' or proposta.status == 'em_analise_direcao' or proposta.status == 'em_analise_cett' or proposta.status == 'solicitar_mudanca' or proposta.status == 'solicitar_mudanca' %}
                             <span class="badge badge-warning">
                                 {{ proposta.status_formatado }}
                             </span>
                             {% endif %}
-                            {% if proposta.status == 'devolvida' %}
+                            {% if proposta.status == 'devolvida' or proposta.status == 'devolvida_apos_aprovacao' %}
                             <span class="badge badge-danger">
                                 {{ proposta.status_formatado }}
                             </span>

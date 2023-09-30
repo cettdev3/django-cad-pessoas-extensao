@@ -8,11 +8,21 @@ class Pessoas(models.Model):
     INSTITUICAO_CETT = 'cett'
     INSTITUICAO_ESCOLA = 'escola'
     INSTITUICAO_OUTROS = 'outros'
+
+    TIPO_CONTRATACAO_EFETIVO = 'efetivo'
+    TIPO_CONTRATACAO_RPA = 'rpa'
+    TIPO_CONTRATACAO_OUTRO = 'outro'
     
     INSTITUICAO_CHOICES = (
         ('escola', 'Escola'),
         ('cett', 'CETT'),
         ('outros', 'Outros'),
+    )
+
+    TIPO_CONTRATACAO_CHOICES = (
+        (TIPO_CONTRATACAO_EFETIVO, 'Efetivo'),
+        (TIPO_CONTRATACAO_RPA, 'RPA'),
+        (TIPO_CONTRATACAO_OUTRO, 'Outro'),
     )
 
     CARGO_ESTOQUISTA = 'estoquista'
@@ -74,7 +84,8 @@ class Pessoas(models.Model):
     instituicao = models.CharField(max_length=50, choices=INSTITUICAO_CHOICES, null=True, blank=True)
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True)
     numero_matricula = models.CharField(null = True, max_length=100)
-
+    tipo_contratacao = models.CharField(max_length=50, choices=TIPO_CONTRATACAO_CHOICES, null=True, blank=True)
+    
     class Meta:
         db_table = 'processo_gps_professor'
   

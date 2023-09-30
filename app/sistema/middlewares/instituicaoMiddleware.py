@@ -31,6 +31,7 @@ class InstituicaoMiddleware:
             reverse('membros-execucao-all'),
             reverse('form-alocacao-membro-equipe'),
             reverse('save-alocacao'),
+            reverse('status-proposta-menu'),
         ]
 
         dynamic_urls = [
@@ -46,7 +47,8 @@ class InstituicaoMiddleware:
             'eliminar-alocacao',
             'editar-alocacao',
             'get-membro-execucao',
-            'get-atividade'
+            'get-atividade',
+            'proposta-projeto-view'
         ]
         
         isPkRoute = False

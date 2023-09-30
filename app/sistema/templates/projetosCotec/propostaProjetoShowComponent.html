@@ -1,0 +1,359 @@
+<div class="container my-3" style="width: 80%; margin: 0 auto;">
+    <div class="dropdown position-fixed d-flex justify-content-center align-items-center" style="right: 10px;">
+        <div class="ml-5 mr-2 d-flex h-100">
+            <span class="badge 
+            {% if proposta_projeto.status == 'rascunho' %}
+            bg-secondary
+            {% elif proposta_projeto.status == 'devolvida' %}
+            bg-danger
+            {% elif proposta_projeto.status == 'em_analise' or proposta_projeto.status == 'em_analise_direcao' or  proposta_projeto.status == 'em_analise_cett' or proposta_projeto.status == 'solicitar_mudanca' %}
+            bg-warning
+            {% elif proposta_projeto.status == 'aprovada' %}
+            bg-success
+            {% endif %}
+            custom-badge">
+                {{proposta_projeto.status_formatado}}
+            </span>
+        </div>
+        <button class="btn btn-primary mx-2" type="button" id="commentsButton" data-bs-toggle="offcanvas"
+        data-bs-target="#commentsOffcanvas" aria-controls="commentsOffcanvas">
+        <i class="fa fa-comment"></i>
+        </button>
+        <div id="menu-status-proposta">
+            
+        </div>
+    </div>
+    {% if pessoa.instituicao == 'cett' or pessoa.cargo == 'diretoria_escola' %}
+    <div class="modal fade" id="devolverModal" tabindex="-1" aria-labelledby="devolverModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="devolverModalLabel">Justificativa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="justificativaForm">
+                        <div class="form-group">
+                            <label for="justificativa">Justificativa</label>
+                            <textarea class="form-control" id="justificativa" name="justificativa" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" id="submitJustificativa" class="btn btn-primary">Devolver ao autor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="commentsOffcanvas" aria-labelledby="commentsOffcanvasLabel"
+        style="width: 30%;">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="commentsOffcanvasLabel">Comentários</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" style="height: 90%; overflow-y: auto;">
+            {% for comment in proposta_projeto.comentarios.all %}
+        <div class="card mb-3">
+                <div class="card-header">
+                    {{ comment.autor.nome }} <small class="text-muted float-right">{{ comment.created_at|date:"d/m/Y, H:i"}}</small>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ comment.conteudo }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>Nenhum comentário ainda</p>
+            {% endfor %}
+        </div>
+
+        <!-- <div class="p-3">
+            <div class="input-group">
+                <textarea class="form-control" id="newComment" rows="3" placeholder="Adicione um comentário..."></textarea>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>            
+        </div> -->
+    </div>
+    <h2 class="mb-5">#{{ proposta_projeto.id }} - {{ proposta_projeto.titulo_projeto }}</h2>
+    {% for proponente in proposta_projeto.proponentes %}
+    <div>
+        <h4>Proponente:</h4>
+        <p class="ml-5">
+           {{ proponente.pessoa.nome|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    {% endfor %}
+    
+    {% if proposta_projeto.data_inicio %}
+    <div>
+        <h4>Data de Início:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.data_inicio|date:"d/m/Y" }}
+        </p>
+    </div>
+    {% else %}
+    <div>
+        <h4>Data de Início:</h4>
+        <p class="ml-5">
+           Não informada</
+        </p>
+    </div>
+    {% endif %}
+    {% if proposta_projeto.data_fim %}
+    <div>
+        <h4>Data de Término:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.data_fim|date:"d/m/Y" }}
+        </p>
+    </div>
+    {% else %}
+    <div>
+        <h4>Data de Término:</h4>
+        <p class="ml-5">
+           Não informada</
+        </p>
+    </div>
+    {% endif %}
+    <div>
+        <h4>Resumo Proposta:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.resumo_proposta|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Objetivos Gerais:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.objetivos_gerais|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Objetivos Específicos:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.objetivos_especificos|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Metodologia:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.metodologia|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Formato Conteúdo:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.formato_conteudo|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Justificativas:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.justificativas|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Resultados Esperados:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.resultados_esperados|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Fontes Apoio:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.fontes_apoio|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Público Alvo:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.publico_alvo|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    <div>
+        <h4>Informações Adicionais:</h4>
+        <p class="ml-5">
+           {{ proposta_projeto.informacoes_adicionais|default_if_none:'Não Informado' }}
+        </p>
+    </div>
+    
+    <h3>Equipe</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">Pessoa</th>
+                <th class="text-center">Função</th>
+                <th class="text-center">Instituicao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for membro in proposta_projeto.equipe.all %}
+            <tr>
+                {% if membro.pessoa %}
+                <td>{{ membro.pessoa.nome|default_if_none:'Não Informado' }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                <td>
+                    {% for role in membro.roles.all %}
+                    {{ role.nome|default_if_none:'Não Informado' }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ membro.instituicao|default_if_none:'Não Informado' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Insumos</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">Nome</th>
+                <th class="text-center">Unidade</th>
+                <th class="text-center">Quantidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in proposta_projeto.recursos.all %}
+            <tr>
+                <td>{{ item.nome|default_if_none:'Não Informado' }}</td>
+                <td>{{ item.unidade|default_if_none:'Não Informado' }}</td>
+                <td>{{ item.quantidade|default_if_none:'Não Informado' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Atividades</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">Nome</th>
+                <th class="text-center">Data Realizacao</th>
+                <th class="text-center">Horario Inicio</th>
+                <th class="text-center">Horario Término</th>
+                <th class="text-center">Carga Horária</th>
+                <th class="text-center">Local</th>
+                <th class="text-center">Publico Esperado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atividade in proposta_projeto.atividades.all %}
+            <tr>
+                <td>{{ atividade.nome|default_if_none:'Não Informado' }}</td>
+                {% if atividade.data_realizacao_inicio %}
+                <td>{{ atividade.data_realizacao_inicio|date:"d/m/Y" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.horario_inicio %}
+                <td>{{ atividade.horario_inicio|time:"H:i" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.horario_fim %}
+                <td>{{ atividade.horario_fim|time:"H:i" }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                {% if atividade.carga_horaria_formatada %}
+                <td>{{ atividade.carga_horaria_formatada }}</td>
+                {% else %}
+                <td>Não Informado</td>
+                {% endif %}
+                <td>{{ atividade.local|default_if_none:'Não Informado' }}</td>
+                <td>{{ atividade.publico_esperado|default_if_none:'Não Informado' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    $("#submitJustificativa").click(function (e) {
+        e.preventDefault();
+        var conteudo = $("#justificativa").val();
+        var data = { 
+            status: 'devolvida',
+            justificativa: conteudo
+        };
+
+        updatePropostaProjeto('{{ proposta_projeto.id }}', 
+        data, 
+        function (response) {
+            $('#devolverModal').modal('hide');
+                createComentario({
+                    conteudo: conteudo,
+                    proposta_projeto_id: '{{ proposta_projeto.id }}'
+                }, function (response) {
+                    console.log(response);
+                    $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                }, function (error) {
+                    console.error(error);
+                });
+            }, function (error) {
+                console.error(error);
+            }
+        );
+    });
+
+    function handleStatusPropostaChange() {
+        $(".dropdown-item").on("click", function (e) {
+            var status = $(this).data("status");
+            console.log("click no botao: " + status);
+            if (status == 'aprovada') {
+                createProjetoFromProposta(
+                    '{{ proposta_projeto.id }}',
+                    {},
+                    function (response) {
+                        console.log("click no botao: " + status);
+                        if (status == 'reprovada' || status == 'cancelada' || status == 'em_analise_cett' || status == 'aprovada' ) {
+                            updatePropostaProjeto('{{ proposta_projeto.id }}', {
+                                status: status
+                            }, function (response) {
+                                $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                            }, function (error) {
+                                console.error(error);
+                            });
+                        }
+                    }, function (error) {
+                        console.error(error);
+                    }
+                );
+            } else {
+                updatePropostaProjeto('{{ proposta_projeto.id }}', {
+                    status: status
+                }, function (response) {
+                    console.log("click no botao: " + status);
+                    $(location).attr('href', "{% url 'cotec-projeto-index' %}");
+                }, function (error) {
+                    console.error(error);
+                });
+            }
+        });
+    }
+
+    function loadStatusMenu(data) {
+        getStatusPropostaProjetoMenu(data, function (response) {
+            $("#menu-status-proposta").html(response);
+            handleStatusPropostaChange();
+        }, function (error) {
+            console.error(error);
+        })
+    }
+    
+    $(document).ready(function () {
+        console.log("aprovada: ", window.location);
+
+        loadStatusMenu({
+            proposta_projeto_id: '{{ proposta_projeto.id }}'
+        });
+
+    });
+</script>

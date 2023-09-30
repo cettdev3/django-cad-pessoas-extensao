@@ -137,6 +137,22 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-3">
+                                    <label><b>Tipo de Contratação:</b></label>
+                                    <select required class="form-control" 
+                                    id="tipo_contratacao" name="tipo_contratacao">
+                                        <option value="">Selecione uma Opção</option>
+                                        {% for tipo_contratacao in tipos_contratacao %}
+                                        <option 
+                                        {% if pessoa %}
+                                            {% if pessoa.tipo_contratacao == tipo_contratacao.0 %}
+                                                selected
+                                            {% endif %}
+                                        {% endif %}
+                                        value="{{tipo_contratacao.0}}">{{tipo_contratacao.1}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
                                     <label><b>Instituição:</b></label>
                                     <select required class="form-control" id="instituicao" name="instituicao">
                                         <option value="">Selecione uma Opção</option>
@@ -151,18 +167,25 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-sm-3" id="pessoaFormSelectEscola" 
-                                {% if pessoa.instituicao == 'escola' %}
-                                    style="display: block;"
-                                {% else %}
-                                    style="display: none;"
-                                {% endif %}>
-                                    {% include 'escolas/escolas_select.html' with escolas=escolas escola_id=pessoa.escola.id %}
-                                </div>
                                 <div class="col-sm-3">
                                     {% include 'users/users_select.html' with users=users selected=pessoa.user.id current_user=pessoa.user.username %}
                                 </div>
-                                <div id="selectCursosCadastrarPessoa" class="col-sm-3">
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3" id="selectEscolaContainer">
+                                    {% include 'escolas/escolas_select.html' with escolas=escolas escola_id=pessoa.escola.id %}
+                                </div>
+                                <div class="col-sm-3" id="numeroMatriculaContainer">
+                                    <div class="d-flex justify-content-between mb-0">
+                                        <label for="recurso"><b>Número de matricula</b></label>
+                                    </div>
+                                    <input type="text" class="form-control"
+                                    value="{{pessoa.numero_matricula|default_if_none:''}}" 
+                                    id="numero_matricula" 
+                                    name="numero_matricula">
+                                </div>
+                                <div id="selectCursosCadastrarPessoa" 
+                                class="col-sm-6">
                                 </div>
                             </div>
                         </div>
@@ -274,6 +297,15 @@
         values['cursos'] = cursosId;
         return values
     }
+    
+    function setupInstituicaoFields() {
+        if ($("#instituicao").val() != 'escola') $("#fromEscolaFields").hide()
+        $("#instituicao").on('change', function(evt){
+            let instituicaoValue = $(this).val()
+            if (instituicaoValue == 'escola') $("#fromEscolaFields").show()
+            else fromEscolaFields.hide()
+        });
+    }
 
     $(document).ready(function () {
         let cursos = JSON.parse(document.getElementById('cursos').textContent)
@@ -298,11 +330,55 @@
             } 
         });
 
-        pessoaFormSelectEscola = $("#pessoaFormSelectEscola")
+        
+        numeroMatriculaContainer = $("#numeroMatriculaContainer")
+        pessoaFormSelectEscola = $("#selectEscolaContainer")
+        pessoaFormSelectCursos = $("#selectCursosCadastrarPessoa")
+        if ($("#instituicao").val() != 'escola') pessoaFormSelectEscola.hide()
+        if ($("#cargo").val() != 'professor') {
+            pessoaFormSelectCursos.hide()
+            numeroMatriculaContainer.hide()
+        }
+
+        if ($("#tipo_contratacao").val() != 'efetivo') numeroMatriculaContainer.hide()
+    
         $("#instituicao").on('change', function(evt){
             let instituicaoValue = $(this).val()
-            if (instituicaoValue == 'escola') pessoaFormSelectEscola.show()
+            if (instituicaoValue == 'escola') {
+                if ($("#cargo").val() == 'professor') {
+                    if ($('#tipo_contratacao').val() == 'efetivo') {
+                        numeroMatriculaContainer.show()
+                    } else numeroMatriculaContainer.hide()
+
+                    pessoaFormSelectCursos.show()
+                }
+                pessoaFormSelectEscola.show()
+            }
             else pessoaFormSelectEscola.hide()
+        });
+
+        $("#cargo").on('change', function(evt){
+            let cargoValue = $(this).val()
+            if (cargoValue == 'professor') {
+                if ($('#tipo_contratacao').val() == 'efetivo') {
+                    numeroMatriculaContainer.show()
+                } else numeroMatriculaContainer.hide()
+                pessoaFormSelectCursos.show()
+                pessoaFormSelectEscola.show()
+            }
+            else {
+                pessoaFormSelectCursos.hide()
+                numeroMatriculaContainer.hide()
+            }
+        });
+
+        $("#tipo_contratacao").on('change', function(evt){
+            let tipoContratacaoValue = $(this).val()
+            if (tipoContratacaoValue == 'efetivo') {
+                if ($("#cargo").val() == 'professor') {
+                    numeroMatriculaContainer.show()
+                }
+            } else numeroMatriculaContainer.hide()
         });
 
         buscarCursos(cursos)

@@ -1,0 +1,21 @@
+{% if status_to_show %}
+<button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+    aria-haspopup="true" aria-expanded="false">
+    Opções
+</button>
+<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for status, display_status in proposta_projeto.STATUS_MENU_LABEL %}
+    {% if status != proposta_projeto.status and status in status_to_show %}
+        <button type="button" 
+        class="dropdown-item" 
+        data-status="{{ status }}"
+        {% if status == 'devolvida' %}
+        data-toggle="modal"
+        data-target="#devolverModal" 
+        {% endif %}>
+            <span>{{display_status}}</span>
+        </button>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}

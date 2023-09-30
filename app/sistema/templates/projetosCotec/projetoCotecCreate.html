@@ -79,7 +79,7 @@
                 <span class="badge 
                 {% if proposta_projeto.status == 'rascunho' %}
                 bg-secondary
-                {% elif proposta_projeto.status == 'devolvida' %}
+                {% elif proposta_projeto.status == 'devolvida' or proposta_projeto.status == 'devolvida_apos_aprovacao'  %}
                 bg-danger
                 {% elif proposta_projeto.status == 'em_analise' %}
                 bg-warning
@@ -487,6 +487,17 @@
         $('#editBtn').on('click', function () {
             if (propostaStatus == 'devolvida' || propostaStatus == 'rascunho') {
                 let status = "em_analise_direcao"
+                let values = {
+                    status : status
+                }
+                updatePropostaProjeto(propostaId, values, 
+                function (data) {
+                    $(location).attr('href', "{% url 'cotec-projeto-success' %}");
+                }, function (error) {
+                    console.log(error)
+                })
+            } else if (propostaStatus == 'devolvida_apos_aprovacao') {
+                let status = "aprovada"
                 let values = {
                     status : status
                 }

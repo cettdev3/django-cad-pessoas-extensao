@@ -606,3 +606,171 @@ def createProjetoFromProposta(request, pk):
         proposta_projeto.status = "aprovada"
         proposta_projeto.save()
     return JsonResponse({"message": "Projeto criado com sucesso!"})
+
+@login_required(login_url="/auth-user/login-user")
+def proposta_projeto_view(request, pk):
+    proposta_projeto = PropostaProjeto.objects.get(pk=pk)
+    pessoa = Pessoas.objects.get(user=request.user)
+    return render(
+        request, 
+        'projetosCotec/propostaProjetoShowComponent.html', 
+        {
+            'proposta_projeto': proposta_projeto,
+            'pessoa': pessoa
+        })
+
+@login_required(login_url="/auth-user/login-user")
+def menuStatusProposta(request):
+    proposta_id = request.GET.get("proposta_projeto_id")
+    proposta = PropostaProjeto.objects.get(pk=proposta_id)
+    pessoa = Pessoas.objects.get(user=request.user)
+    PropostaProjeto.STATUS_EM_ANALISE_CETT = "em_analise_cett"
+    PropostaProjeto.STATUS_DEVOLVIDA = "devolvida"
+    PropostaProjeto.STATUS_APROVADA = "aprovada"
+    PropostaProjeto.STATUS_REPROVADA = "reprovada"
+    PropostaProjeto.STATUS_CANCELADA = "cancelada"
+    PropostaProjeto.STATUS_SOLICITAR_MUDANCA = "solicitar_mudanca"
+    PropostaProjeto.STATUS_DEVOLVIDA_APOS_APROVACAO = "devolvida_apos_aprovacao"
+
+    decision_tree = {
+        PropostaProjeto.STATUS_RASCUNHO: {
+            Pessoas.INSTITUICAO_CETT: None,
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [PropostaProjeto.STATUS_EM_ANALISE_CETT],
+                "outro": [PropostaProjeto.STATUS_EM_ANALISE_DIRECAO]
+            }
+        },
+        PropostaProjeto.STATUS_EM_ANALISE: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_APROVADA, 
+                PropostaProjeto.STATUS_DEVOLVIDA,
+                PropostaProjeto.STATUS_REPROVADA,
+                PropostaProjeto.STATUS_CANCELADA
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [
+                    PropostaProjeto.STATUS_EM_ANALISE_CETT,
+                    PropostaProjeto.STATUS_DEVOLVIDA,
+                    PropostaProjeto.STATUS_REPROVADA,
+                    PropostaProjeto.STATUS_CANCELADA
+                ],
+                "outro": None
+            },
+        },   
+        PropostaProjeto.STATUS_EM_ANALISE_DIRECAO: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_APROVADA, 
+                PropostaProjeto.STATUS_DEVOLVIDA,
+                PropostaProjeto.STATUS_REPROVADA,
+                PropostaProjeto.STATUS_CANCELADA
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [
+                    PropostaProjeto.STATUS_EM_ANALISE_CETT,
+                    PropostaProjeto.STATUS_DEVOLVIDA,
+                    PropostaProjeto.STATUS_REPROVADA,
+                    PropostaProjeto.STATUS_CANCELADA
+                ],
+                "outro": None
+            },
+        },
+        PropostaProjeto.STATUS_EM_ANALISE_CETT: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_APROVADA, 
+                PropostaProjeto.STATUS_DEVOLVIDA,
+                PropostaProjeto.STATUS_REPROVADA,
+                PropostaProjeto.STATUS_CANCELADA
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: None,
+                "outro": None
+            },
+        },
+        PropostaProjeto.STATUS_APROVADA: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_CANCELADA
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [
+                    PropostaProjeto.STATUS_SOLICITAR_MUDANCA,
+                ],
+                "outro": [
+                    PropostaProjeto.STATUS_SOLICITAR_MUDANCA,
+                ]
+            },
+        },
+        PropostaProjeto.STATUS_SOLICITAR_MUDANCA: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_APROVADA,
+                PropostaProjeto.STATUS_DEVOLVIDA_APOS_APROVACAO,
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: None,
+                "outro": None
+            },
+        },
+        PropostaProjeto.STATUS_DEVOLVIDA_APOS_APROVACAO: {
+            Pessoas.INSTITUICAO_CETT: [
+                PropostaProjeto.STATUS_APROVADA,
+            ],
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [
+                    PropostaProjeto.STATUS_APROVADA,
+                ],
+                "outro": [
+                    PropostaProjeto.STATUS_APROVADA,
+                ]
+            },
+        },
+        PropostaProjeto.STATUS_DEVOLVIDA: {
+            Pessoas.INSTITUICAO_CETT: None,
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: [
+                    PropostaProjeto.STATUS_EM_ANALISE_CETT,
+                ],
+                "outro": [
+                    PropostaProjeto.STATUS_EM_ANALISE_CETT,
+                ]
+            },
+        },
+        PropostaProjeto.STATUS_REPROVADA: {
+            Pessoas.INSTITUICAO_CETT: None,
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: None,
+                "outro": None
+            },
+        },
+        PropostaProjeto.STATUS_CANCELADA: {
+            Pessoas.INSTITUICAO_CETT: None,
+            Pessoas.INSTITUICAO_OUTROS: None,
+            Pessoas.INSTITUICAO_ESCOLA: {
+                Pessoas.CARGO_DIRETORIA_ESCOLA: None,
+                "outro": None
+            },
+        },
+    }
+    cargo = pessoa.cargo
+    if cargo != Pessoas.CARGO_DIRETORIA_ESCOLA:
+        cargo = "outro"
+    status_to_show = []
+    if pessoa.instituicao == Pessoas.INSTITUICAO_CETT:
+        status_to_show = decision_tree[proposta.status][pessoa.instituicao]
+    else:
+        status_to_show = decision_tree[proposta.status][pessoa.instituicao][cargo]
+    return render(
+        request, 
+        'projetosCotec/dropMenuPropostaStatus.html', 
+         {
+            'proposta_projeto': proposta,
+            'pessoa': pessoa,
+            'status_to_show': status_to_show
+        })

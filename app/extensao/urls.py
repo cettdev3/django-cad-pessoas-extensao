@@ -64,6 +64,8 @@ from sistema.views.cotecViews.projetosCotecViews import (
     projetoCotecForm, 
     projetoCotecIndex, 
     orcamentoTable,
+    proposta_projeto_view,
+    menuStatusProposta,
     pessoaModal, 
     pessoaCreate, 
     selectMultipleComponent, 
@@ -208,6 +210,8 @@ urlpatterns = [
     path("remove-item-orcamento/<pk>", removeItemOrcamento, name="remove-item-orcamento"),
     path("item-orcamento-form", itemOrcamentoForm, name="item-orcamento-form"),
     path("orcamento-table", orcamentoTable, name="orcamento-table"),
+    path("proposta-projeto-view/<pk>", proposta_projeto_view, name="proposta-projeto-view"),
+    path("status-proposta-menu", menuStatusProposta, name="status-proposta-menu"),
 
     # ROTAS PARA COMENTARIOS
     # path("update-comentario/<pk>", updateComentario, name="update-comentario"),

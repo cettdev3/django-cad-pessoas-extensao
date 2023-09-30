@@ -82,6 +82,7 @@ def pessoasModalCadastrar(request):
     cursos = None
     users = User.objects.exclude(pessoa__isnull=False)
     instituicoes = Pessoas.INSTITUICAO_CHOICES
+    tipos_contratacao = Pessoas.TIPO_CONTRATACAO_CHOICES
     if id:
         token, created = Token.objects.get_or_create(user=request.user)
     
@@ -97,7 +98,8 @@ def pessoasModalCadastrar(request):
         'cursos':cursos, 
         'users':users, 
         'instituicoes':instituicoes, 
-        'escolas': escolas
+        'escolas': escolas,
+        'tipos_contratacao': tipos_contratacao
     })
 
 @login_required(login_url='/auth-user/login-user')

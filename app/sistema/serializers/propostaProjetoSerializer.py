@@ -10,5 +10,6 @@ class PropostaProjetoSerializer(serializers.ModelSerializer):
         model = PropostaProjeto
         fields = [
             "id",
-            "orcamento"
+            "orcamento",
+            "status_menu_label"
         ]

@@ -100,6 +100,8 @@ class PessoaApiView(APIView):
         qtd_contratacoes = request.data.get("qtd_contratacoes")
         user_camunda = request.data.get("user_camunda")
         instituicao = request.data.get("instituicao")
+        numero_matricula = request.data.get("numero_matricula")
+        tipo_contratacao = request.data.get("tipo_contratacao")
         user = None
         if request.data.get("user_id"):
             user_to_validate = User.objects.get(id=request.data.get("user_id"))
@@ -147,7 +149,9 @@ class PessoaApiView(APIView):
             user_camunda = user_camunda,
             user = user,
             instituicao = instituicao,
-            escola = escola
+            escola = escola,
+            numero_matricula = numero_matricula,
+            tipo_contratacao = tipo_contratacao,
         )
         pessoa.cursos.add(*cursos)
         serializer = PessoaSerializer(pessoa)
@@ -282,7 +286,12 @@ class PessoaDetailApiView(APIView):
             pessoa.escola = escola
         if request.data.get("instituicao"):
             pessoa.instituicao = request.data.get("instituicao") 
-        
+        if request.data.get("numero_matricula"):
+            pessoa.numero_matricula = request.data.get("numero_matricula")
+        if request.data.get('tipo_contratacao'):
+            if request.data.get('tipo_contratacao') != Pessoas.TIPO_CONTRATACAO_EFETIVO:
+                pessoa.numero_matricula = None
+            pessoa.tipo_contratacao = request.data.get('tipo_contratacao')
         pessoa.save()
         serializer = PessoaSerializer(pessoa)
         
