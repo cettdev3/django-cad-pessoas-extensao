@@ -181,9 +181,10 @@ class CustomSelectMultiple {
         optionsContainer.empty();
         optionsToRender.forEach(option => {
             let isChecked = this.state.selectedOptions.includes(option.id) ? 'checked' : '';
+            let nome = this.capitalizeFirstLetter(option.nome);
             const optionElement = $(`
                 <a class="dropdown-item" href="#">
-                    <input type="checkbox" data-id="${option.id}" ${isChecked}> ${option.nome}
+                    <input type="checkbox" data-id="${option.id}" ${isChecked}> ${nome}
                 </a>
             `);
             optionsContainer.append(optionElement);
@@ -261,19 +262,30 @@ class CustomSelectMultiple {
         this.renderOptions(filteredOptions);
     }    
 
+    capitalizeFirstLetter(string) {
+        if (!string) return "Não Informado";
+        let words = string.split(" ");
+        let newWords = [];
+        words.forEach(word => {
+            newWords.push(word.charAt(0).toUpperCase() + word.slice(1));
+        });
+        return newWords.join(" ");
+    }
+
     renderBadges(from=null) {
         if (!this.element) return;
         const badgesContainer = this.element.find('#badges-container');
         badgesContainer.empty();
-        console.log(from)
         this.state.selectedOptions.forEach(id => {
             const option = this.state.options.find(o => {
                 return o.id === id
             });
             if (!option) return;
+            let nome = this.capitalizeFirstLetter(option.nome);
+
             const badge = $(`
                 <div class="badge-outline-secondary d-flex align-items-center mx-2 item-badge" data-id="${option.id}">
-                    <span>${option.nome}</span>
+                    <span>${nome}</span>
                     <button type="button" 
                     data-toggle="tooltip"
                     data-placement="top"
