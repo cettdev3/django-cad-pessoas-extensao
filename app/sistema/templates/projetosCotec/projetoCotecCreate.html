@@ -464,13 +464,21 @@
             })
         });
 
+        const variableChangeInstance = new VariableChangeService();
         if (propostaId) {
             $(".proposta-field").each(function () {
                 $(this).on('focusout', function () {
                     let name = $(this).attr('name')
                     let value = $(this).val()
                     let data = {}
-    
+                   
+                    if (name == 'titulo_projeto') {
+                        variableChangeInstance.notify({
+                            variable: 'titulo_projeto',
+                            value: value
+                        });
+                    }
+                   
                     data[name] = value
                     updatePropostaProjeto(
                         propostaId,
@@ -671,6 +679,11 @@
         }).on('input', function () {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        variableChangeInstance.notify({
+            variable: 'titulo_projeto',
+            value: $('#titulo_projeto').val()
         });
     });
 </script>

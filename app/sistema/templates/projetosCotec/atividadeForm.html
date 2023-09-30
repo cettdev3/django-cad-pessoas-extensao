@@ -2,7 +2,18 @@
     <div id="form-container-{{atividade.id}}">
         <div class="form-group row">
             <div class="col-12">
-                        <label for="nome"><b>Nome</b></label>
+                <div class="d-flex justify-content-between mb-0">
+                    <label for="nome"><b>Nome</b></label>
+                    <div class="mb-2">
+                        <input type="checkbox" 
+                        id="use_projeto_nome" 
+                        name="use_projeto_nome" 
+                        {% if pessoa.cargo == 'professor' %} checked {% endif %}>
+                        <label for="is_professor_{{pessoa.id}}" class="mb-0">
+                            Usar nome do projeto
+                        </label>
+                    </div>
+                </div>
                 <input type="text" class="form-control" 
                 {% if read_only == True %} disabled {% endif %}
                 data-id="{{atividade.id}}"
@@ -104,7 +115,7 @@
         (function(params) {
             let formContainer = $("#membro-equipe-alocacao-container-" + params.atividadeID);
             let novaAlocacaoBtn = formContainer.find("#nova-alocacao-btn")
-
+            
             function deleteAlocacao() {
                 console.log("deletando alocação form")
             }
@@ -162,6 +173,39 @@
                                         id: item.pk
                                     }
                                 });
+            let tituloProjeto = ''
+            let isInitialized = false;
+            const variableChangeInstance = new VariableChangeService();
+
+            variableChangeInstance.subscribe((data) => {
+                if (data.variable === 'titulo_projeto') {
+                    let nomeInput = formContainer.find("#nome")
+                    tituloProjeto = data.value;
+                    console.log("tituloProjeto: ", tituloProjeto)
+                    console.log("nomeInput: ", nomeInput.val())
+                    if (nomeInput.val() == tituloProjeto && !isInitialized) {
+                        formContainer.find("#use_projeto_nome").prop('checked', true)
+                        nomeInput.attr("disabled", true)
+                        isInitialized = true;
+                    }
+                }
+            });
+
+            formContainer.find("#use_projeto_nome").on('change', ($event) => {
+                let isChecked = $($event.target).is(':checked')
+                console.log("use_projeto_nome: ", isChecked)
+                let nomeInput = formContainer.find("#nome")
+                if (isChecked) {
+                    console.log("tituloProjeto: ", tituloProjeto)
+                    nomeInput.val(tituloProjeto)
+                    nomeInput.trigger('change')
+                    nomeInput.attr("disabled", true)
+                } else {
+                    nomeInput.val("")
+                    nomeInput.trigger('change')
+                    nomeInput.attr("disabled", false)
+                }
+            })
 
             const cidadeModal = new CustomModalComponent({
                 loadContent: cidadeForm,

@@ -377,7 +377,7 @@ def updateAtividade(request, pk):
         atividade.horario_fim = data.get("horario_fim")
     if data.get("local"):
         atividade.local = data.get("local")
-    if data.get("nome"):
+    if data.get("nome") is not None:
         atividade.nome = data.get("nome")
     if data.get("publico_esperado"):
         atividade.publico_esperado = data.get("publico_esperado")
@@ -414,7 +414,8 @@ def createAtividade(request):
     atividade.departamento = Departamento.objects.filter(nome__icontains="extens").first()
     with transaction.atomic():
         atividade.save()
-        if proposta_projeto.evento:
+        eventos = DpEvento.objects.filter(proposta_projeto=proposta_projeto)
+        if len(eventos) > 0:
             atividade_categoria_slug = "tarefa"
             atividadeSection = AtividadeSection.objects.filter(evento=proposta_projeto.evento).first()
             atividade_categoria = AtividadeCategoria.objects.get(slug=atividade_categoria_slug)
@@ -455,6 +456,7 @@ def createMembroEquipe(request):
     url = 'http://localhost:8000/membroExecucao'
     body = payload
     response = requests.post(url, json=body, headers=headers)
+    print("response: ", response)
     membro_equipe_response = json.loads(response.content)
     
     if response.status_code != 200 and response.status_code != 201:

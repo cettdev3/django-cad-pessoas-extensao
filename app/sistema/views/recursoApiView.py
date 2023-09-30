@@ -7,7 +7,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from sistema.models import (
     Recursos,
-    PropostaProjeto
+    PropostaProjeto,
+    DpEvento
 )
 
 from sistema.serializers import (
@@ -38,7 +39,8 @@ class RecursoApiView(APIView):
         evento = None
         if request.data.get("proposta_projeto_id"):
             proposta_projeto = self.get_object(PropostaProjeto, request.data.get("proposta_projeto_id"))
-            if proposta_projeto.evento:
+            eventos = DpEvento.objects.filter(proposta_projeto=proposta_projeto)
+            if len(eventos) > 0:
                 evento = proposta_projeto.evento
             if not PropostaProjeto:
                 return Response(

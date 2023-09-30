@@ -57,7 +57,8 @@ class MembroExecucaoApiView(APIView):
                     {"res": "Não existe proposta de projeto com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            if proposta_projeto.evento:
+            eventos = DpEvento.objects.filter(proposta_projeto=proposta_projeto)
+            if len(eventos) > 0:
                 evento = proposta_projeto.evento
         
         pessoa = None
