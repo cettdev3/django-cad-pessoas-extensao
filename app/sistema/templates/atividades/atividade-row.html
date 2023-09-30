@@ -16,7 +16,12 @@
             value="{{atividade.nome|default_if_none:''}}">
         </div>
     </div>
-    <div class="w-25-p d-flex align-items-center justify-content-start" 
+    <div class="w-15 d-flex align-items-center" style="box-sizing: border-box;">
+        <div id="select-membro-execucao-atividade-{{atividade.id}}">
+            {% include 'atividades/atividade-select-membro-execucao.html' with membrosExecucao=membrosExecucao atividade=atividade %}
+        </div>
+    </div>
+    <div class="w-10-p d-flex align-items-center justify-content-start" 
     style="box-sizing: border-box;">
         <div class="d-flex align-items-center justify-content-start py-1 w-100" style=" gap: 4px; flex-wrap: wrap;">
             {% for alocacao in atividade.alocacoes %}
