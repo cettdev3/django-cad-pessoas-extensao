@@ -42,6 +42,7 @@ class Alocacao(models.Model):
     tipoContratacao = models.CharField(null = True, max_length=100)
     membroExecucao = models.ForeignKey('MembroExecucao', on_delete=models.SET_NULL, null=True, blank=True, related_name='alocacoes')
     numero_matricula = models.CharField(null = True, max_length=100)
+    
     class Meta:
         db_table = 'alocacoes'
 

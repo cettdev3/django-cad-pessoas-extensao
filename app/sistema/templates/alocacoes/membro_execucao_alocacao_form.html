@@ -3,7 +3,7 @@
         <div class="form-group row">
             <div class="col-12">
                 {% if read_only == True %}
-                <span><strong>{{alocacao.membroExecucao.pessoa.nome}}</strong></span>
+                <span><strong>Nome: </strong></span><span>{{alocacao.membroExecucao.pessoa.nome}}</span>
                 {% else %}
                 <label for="nome"><b>Membro da Equipe</b></label>
                 <div id="select-alocacao-membro-equipe-{{alocacao.id}}" 

@@ -206,7 +206,6 @@ class AtividadeDetailApiView(APIView):
         anexos = list(anexos.values())
 
         atividade.anexos = anexos
-
         serializer = AtividadeSerializer(atividade)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -31,7 +31,8 @@
             </div>
         </div>
         <div>
-            <button id="add-anexo-button-{{atividade.id}}"
+            <button id="open-modal-anexo-button-{{atividade.id}}"
+            data-bs-toggle="modal" data-bs-target="#anexoModal"
             data-toggle="tooltip" data-placement="top" title="Adicionar anexo"
             class="btn btn-light btn-sm">
                 <i class="fa-solid fa-paperclip"></i>
@@ -478,9 +479,49 @@
             </div>
         </div>
     </div>
-    <input type="file" id="anexoFileInput" style="display: none;" />
 </div>
-
+<div class="modal fade" id="anexoModal" tabindex="-1" style="z-index: 50000">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Anexar Arquivo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <label><b>Tipo:</b></label>
+                    <select class="form-control" 
+                    id="tipo_anexo"
+                    name="tipo_anexo">
+                        <option value="relatorio_professor">Relatório do Professor</option>
+                        <option value="lista_presenca">Lista de Presença</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div class="col-sm-12 mt-2">
+                    <label><b>Arquivo:</b></label>
+                    <input type="file" 
+                    id="anexoFileInput" 
+                    class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" 
+          class="btn btn-secondary" 
+          data-bs-dismiss="modal">Fechar</button>
+          <button type="button" 
+          id="btn-salvar-anexo-modal-{{atividade.id}}" 
+          class="btn btn-primary">
+              <span id="btn-texto-salvar-anexo">Salvar Anexo</span>
+              <span id="btn-texto-salvar-carregando" style="display: none;">carregando, aguarde</span>
+              <span id="save-anexo-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
     var galleryImagesFiles = [];
     async function addAtividadeDemanda(atividade_id, demanda_id = null) {
@@ -628,14 +669,14 @@
                 carregarAtividades()
             });
 
-            $('#add-anexo-button-'+params.atividadeId).click(function() {
-                $('#anexoFileInput').click();
+            $('#open-modal-anexo-button-'+params.atividadeId).click(function() {
+                $('#anexoModal').appendTo("body").modal('show');
             });
 
-            $('#anexoFileInput').change(function() {
-                var file = this.files[0];
+            $('#btn-salvar-anexo-modal-'+params.atividadeId).on('click', function() {
+                var fileInput = $('#anexoFileInput')[0];
+                var file = fileInput.files[0]; // get the selected file
                 var reader = new FileReader();
-                
                 reader.onloadend = function() {
                     var atividade_id = params.atividadeId
                     var dataURL = reader.result;
@@ -645,9 +686,22 @@
                         'model': 'Atividade',
                         'dataUrl': dataURL,
                         "nome": file.name,
+                        "tipo": $("#tipo_anexo").val()
                     };
+                    $("#save-anexo-spinner").show();
+                    $('#btn-texto-salvar-anexo').hide();
+                    $('#btn-texto-salvar-carregando').show();
+                    $("#btn-salvar-anexo-modal-"+atividade_id).attr("disabled", true)
                     createAnexo(data, function(html) {
+                        console.log("html: ", html)
                         $("#anexos-container-"+atividade_id).append(html);
+                        $("#save-anexo-spinner").hide();
+                        $('#btn-texto-salvar-anexo').show();
+                        $('#btn-texto-salvar-carregando').hide();
+                        $("#btn-salvar-anexo-modal-"+atividade_id).attr("disabled", false)
+                        $("#tipo_anexo").val("outro")
+                        $("#anexoFileInput").val("")
+                        $('#anexoModal').modal('hide');
                     });
                 }
 

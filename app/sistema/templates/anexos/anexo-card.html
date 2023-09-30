@@ -12,6 +12,7 @@
 </style>
 <div id="anexo-card-{{anexo.id}}" 
 class="anexo-card position-relative">
+    <span><b> {{anexo.tipo_anexo_formatado|default_if_none:'Outro'}} </b></span>
     <a href="{{ anexo.shared_link }}" 
     data-toggle="tooltip" data-placement="top" title="clique para baixar: {{ anexo.nome }}"
     {% if anexo.extension == "img" %}

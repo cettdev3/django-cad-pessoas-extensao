@@ -29,6 +29,7 @@ class AnexoApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
+        print("data dentro de anexo: ", data)
         anexoService = AnexoService()
         anexo = anexoService.create_anexo(data)
         serializer = AnexoSerializer(anexo)
@@ -70,6 +71,8 @@ class AnexoDetailApiView(APIView):
             data["descricao"] = request.data.get("descricao")
         if request.data.get("fonte"):
             data["fonte"] = request.data.get("fonte")
+        if request.data.get("tipo"):
+            data["tipo"] = request.data.get("tipo")
         
 
         serializer = AnexoSerializer(instance=anexo, data=data, partial=True)

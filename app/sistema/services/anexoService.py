@@ -30,7 +30,7 @@ class AnexoService:
         node_id = entry['id']
         alfresco_base_url = "https://docs.cett.org.br/alfresco/api/-default-/public/alfresco/versions/1"
         shared_link_url = f"{alfresco_base_url}/shared-links/{node_id}/content"
-
+        print("tipo do anexo: ", data.get("tipo"))
         anexo = Anexo(
             nome=data.get("nome"),
             fonte=data.get("fonte"),
@@ -39,7 +39,8 @@ class AnexoService:
             model=data.get("model"),
             id_model=data.get("id_model"),
             id_alfresco=alfrescoNode.entry_id,
-            shared_link=shared_link_url
+            shared_link=shared_link_url,
+            tipo=data.get("tipo")
         )
         
         anexo.save()
