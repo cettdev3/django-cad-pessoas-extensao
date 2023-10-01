@@ -672,9 +672,19 @@ def getAtividadeHorasRow(
 def getAtividadeDescricaoRow(
     worksheet: Worksheet, atividade: Atividade, startRow: int, endRow: int, column: int, style: Format
 ) -> Worksheet:
+    proposta_objetivos_gerais = ""
+    if atividade.proposta_projeto:
+        if atividade.proposta_projeto.objetivos_gerais:
+            proposta_objetivos_gerais = atividade.proposta_projeto.objetivos_gerais
+    atividade_descricao = ""
     if atividade.descricao:
+        atividade_descricao = atividade.descricao
+
+    if proposta_objetivos_gerais or atividade_descricao:
+        descricao = "\nObjetivos gerais: "+proposta_objetivos_gerais if proposta_objetivos_gerais else ""
+        descricao += "\nDescrição: "+atividade_descricao if atividade_descricao else ""
         if startRow == endRow:
-            worksheet.write(startRow, column, str(atividade.descricao), style)
+            worksheet.write(startRow, column, str(descricao), style)
             return worksheet
         worksheet.merge_range(startRow, column, endRow, column, str(atividade.descricao), style)
     else:
