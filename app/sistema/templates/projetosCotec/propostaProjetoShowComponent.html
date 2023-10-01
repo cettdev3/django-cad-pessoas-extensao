@@ -1,6 +1,6 @@
 <div class="container my-3" style="width: 80%; margin: 0 auto;">
     <div class="dropdown position-fixed d-flex justify-content-center align-items-center" style="right: 10px;">
-        <div class="ml-5 mr-2 d-flex h-100">
+        <div class="ml-4 mr-2 d-flex h-100">
             <span class="badge 
             {% if proposta_projeto.status == 'rascunho' %}
             bg-secondary
@@ -86,7 +86,7 @@
     {% for proponente in proposta_projeto.proponentes %}
     <div>
         <h4>Proponente:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proponente.pessoa.nome|default_if_none:'Não Informado' }}
         </p>
     </div>
@@ -95,84 +95,87 @@
     {% if proposta_projeto.data_inicio %}
     <div>
         <h4>Data de Início:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.data_inicio|date:"d/m/Y" }}
         </p>
     </div>
     {% else %}
     <div>
         <h4>Data de Início:</h4>
-        <p class="ml-5">
-           Não informada</
+        <p class="ml-4">
+           Não informada
         </p>
     </div>
     {% endif %}
     {% if proposta_projeto.data_fim %}
     <div>
         <h4>Data de Término:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.data_fim|date:"d/m/Y" }}
         </p>
     </div>
     {% else %}
     <div>
         <h4>Data de Término:</h4>
-        <p class="ml-5">
-           Não informada</
+        <p class="ml-4">
+           Não informada
         </p>
     </div>
     {% endif %}
     <div>
         <h4>Resumo Proposta:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.resumo_proposta|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Objetivos Gerais:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.objetivos_gerais|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Objetivos Específicos:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.objetivos_especificos|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Metodologia:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.metodologia|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Formato Conteúdo:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
+            {{ proposta_projeto.formato_conteudo_tipo_formatado|default_if_none:'Não Informado' }}
+        </p>
+        <p class="ml-4">
            {{ proposta_projeto.formato_conteudo|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Justificativas:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.justificativas|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Resultados Esperados:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.resultados_esperados|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Fontes Apoio:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.fontes_apoio|default_if_none:'Não Informado' }}
         </p>
     </div>
     <div>
         <h4>Público Alvo:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.publico_alvo|default_if_none:'Não Informado' }}
         </p>
     </div>
@@ -270,7 +273,7 @@
     </table>
     <div>
         <h4>Informações Adicionais:</h4>
-        <p class="ml-5">
+        <p class="ml-4">
            {{ proposta_projeto.informacoes_adicionais|default_if_none:'Nenhuma informação adicional' }}
         </p>
     </div>

@@ -11,5 +11,7 @@ class PropostaProjetoSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "orcamento",
-            "status_menu_label"
+            "status_menu_label",
+            "formato_conteudo_tipo",
+            "formato_conteudo_tipo_formatado",
         ]

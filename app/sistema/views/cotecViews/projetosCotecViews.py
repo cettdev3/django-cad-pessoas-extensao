@@ -86,6 +86,7 @@ def projetoCotecForm(request):
     equipe_json = serializers.serialize('json', proposta_projeto.equipe.all().prefetch_related('roles'))
 
     recursos_json = serializers.serialize('json', proposta_projeto.recursos.all())
+    formato_conteudo_tipos = proposta_projeto.FORMATO_CONTEUDO_TIPO_CHOICES
     return render(
         request,
         "projetosCotec/projetoCotecCreate.html",
@@ -100,6 +101,7 @@ def projetoCotecForm(request):
             "atividades_json": atividades_json,
             "equipe_json": equipe_json,
             "recursos_json": recursos_json,
+            "formato_conteudo_tipos": formato_conteudo_tipos,
         },
     )
 
@@ -285,6 +287,8 @@ def updatePropostaProjeto(request, pk):
         proposta_projeto.metodologia = data.get("metodologia")
     if data.get("formato_conteudo"):
         proposta_projeto.formato_conteudo = data.get("formato_conteudo")
+    if data.get("formato_conteudo_tipo"):
+        proposta_projeto.formato_conteudo_tipo = data.get("formato_conteudo_tipo")
     if data.get("justificativas"):
         proposta_projeto.justificativas = data.get("justificativas")
     if data.get("resultados_esperados"):

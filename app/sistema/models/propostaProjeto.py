@@ -14,6 +14,18 @@ class PropostaProjeto(models.Model):
     STATUS_SOLICITAR_MUDANCA = "solicitar_mudanca"
     STATUS_DEVOLVIDA_APOS_APROVACAO = "devolvida_apos_aprovacao"
 
+    FORMATO_CONTEUDO_TIPO_OFICINA = 'oficina'
+    FORMATO_CONTEUDO_TIPO_WORKSHOP = 'workshop'
+    FORMATO_CONTEUDO_TIPO_PRESTACAO_SERVICO = 'prestacao_servico'
+    FORMATO_CONTEUDO_TIPO_OUTRO = 'outro'
+
+    FORMATO_CONTEUDO_TIPO_CHOICES = [
+        (FORMATO_CONTEUDO_TIPO_OFICINA, "Oficina"),
+        (FORMATO_CONTEUDO_TIPO_WORKSHOP, "Workshop"),
+        (FORMATO_CONTEUDO_TIPO_PRESTACAO_SERVICO, "Prestação de serviço"),
+        (FORMATO_CONTEUDO_TIPO_OUTRO, "Outro"),
+    ]
+
     STATUS_CHOICES = [
         (STATUS_RASCUNHO, 'Rascunho'),
         (STATUS_EM_ANALISE, 'Em análise'),
@@ -58,7 +70,7 @@ class PropostaProjeto(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='em_analise')
     escola = models.ForeignKey("Escola", on_delete=models.SET_NULL, null=True, blank=True)
-  
+    formato_conteudo_tipo = models.CharField(max_length=255, null=True, blank=True)
     class Meta:
         db_table = 'propostas_projeto'
 
@@ -92,3 +104,7 @@ class PropostaProjeto(models.Model):
     @property
     def is_deleteable(self):
         return self.status == self.STATUS_RASCUNHO
+
+    @property
+    def formato_conteudo_tipo_formatado(self):
+        return dict(self.FORMATO_CONTEUDO_TIPO_CHOICES)[self.formato_conteudo_tipo]

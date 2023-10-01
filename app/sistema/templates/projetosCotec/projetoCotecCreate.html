@@ -205,14 +205,34 @@
                     name="metodologia" rows="5">{{proposta_projeto.metodologia|default_if_none:''}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="formato-e-conteudo"><b>Formato e conteúdo do produto a ser entregue</b></label>
-                    <textarea class="form-control proposta-field" 
+                    <label for="formato_conteudo_tipo"><b>Formato e conteúdo do produto a ser entregue</b></label>
+                    <!-- formato_conteudo_tipos -->
+                    <select name="formato_conteudo_tipo" 
                     {% if proposta_projeto.read_only %}
                     disabled
                     {% endif %}
-                    id="formato_conteudo"
-                    name="formato_conteudo"
-                    rows="5">{{proposta_projeto.formato_conteudo|default_if_none:''}}</textarea>
+                    class="form-control proposta-field" 
+                    id="formato_conteudo_tipo">
+                        <option value="">Selectione uma Opção</option>
+                        {% for tipo in formato_conteudo_tipos %}
+                        <option value="{{tipo.0}}" 
+                        {% if proposta_projeto.formato_conteudo_tipo == tipo.0 %} selected {% endif %}>
+                            {{tipo.1}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="formato-conteudo-container">
+                        <label for="formato_conteudo" class="mt-2">
+                            <b>Descrição do formato do conteudo</b>
+                        </label>
+                        <textarea class="form-control proposta-field" 
+                        {% if proposta_projeto.read_only %}
+                        disabled
+                        {% endif %}
+                        id="formato_conteudo"
+                        name="formato_conteudo"
+                        rows="5">{{proposta_projeto.formato_conteudo|default_if_none:''}}</textarea>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="justificativas"><b>Justificativas</b></label>
@@ -464,6 +484,20 @@
             })
         });
 
+        function handleFormatoConteudoField() {
+            let formatoConteudoTipo = $('#formato_conteudo_tipo').val()
+            console.log(formatoConteudoTipo == "outro")
+            if (formatoConteudoTipo == 'outro') {
+                $('#formato-conteudo-container').show()
+            } else {
+                $('#formato-conteudo-container').hide()
+            }
+        }
+        
+        $("#formato_conteudo_tipo").on('change', function () {
+            handleFormatoConteudoField()
+        })
+
         const variableChangeInstance = new VariableChangeService();
         if (propostaId) {
             $(".proposta-field").each(function () {
@@ -685,6 +719,7 @@
             variable: 'titulo_projeto',
             value: $('#titulo_projeto').val()
         });
+        handleFormatoConteudoField()
     });
 </script>
 {% endblock content %}
