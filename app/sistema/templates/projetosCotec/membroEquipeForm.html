@@ -139,6 +139,7 @@
                 {
                     label: "Selecione Pessoa",
                     multiple: false,
+                    fieldsOfInterst: ['nome','cpf'],
                     selectedOptions: pessoa_id ? [pessoa_id] : [],
                     loadOptions: function () {
                         return selectDataService.fetchData('pessoas', getPessoas);
@@ -148,6 +149,7 @@
                     setupFormReady('pessoa');
                     customSelectPessoa.element.on('change', async function (event) {
                         const selectedOptions = event.detail;
+                        if (!selectedOptions) return
                         if (selectedOptions.length == 0) return
                         if (!params.membroEquipeId) return;
                         data = formContainer[0].getValue()

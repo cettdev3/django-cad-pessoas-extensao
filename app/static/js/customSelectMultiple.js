@@ -60,6 +60,7 @@ class CustomSelectMultiple {
             options: options.options || [],
             selectedOptions: options.selectedOptions || [],
             readOnly: options.readOnly || false,
+            fieldsOfInterst: options.fieldsOfInterst || [],
             isLoading: false
         };
         this.config = {
@@ -182,11 +183,21 @@ class CustomSelectMultiple {
         optionsToRender.forEach(option => {
             let isChecked = this.state.selectedOptions.includes(option.id) ? 'checked' : '';
             let nome = this.capitalizeFirstLetter(option.nome);
-            const optionElement = $(`
-                <a class="dropdown-item" href="#">
-                    <input type="checkbox" data-id="${option.id}" ${isChecked}> ${nome}
-                </a>
-            `);
+            const optionElementLink =  $("<a class='dropdown-item' href='#'></a>");
+            const optionElementCheckbox = $(`<input type='checkbox' data-id='${option.id}' ${isChecked}>`);
+            optionElementLink.append(optionElementCheckbox)
+            let optionElement = null; 
+            if (this.state.fieldsOfInterst.length > 0) {
+                for (let i = 0; i < this.state.fieldsOfInterst.length; i++) {
+                    const field = this.state.fieldsOfInterst[i]; 
+                    if (option && option[field]) {
+                        optionElementLink.append(` ${option[field]} `);
+                    }
+                }
+            } else {
+                optionElementLink.append(` ${nome}`);
+            }
+            optionElement = optionElementLink;
             optionsContainer.append(optionElement);
         });
     }
@@ -254,6 +265,17 @@ class CustomSelectMultiple {
     handleFilter(event) {
         const query = $(event.target).val().toLowerCase();
         const filteredOptions = this.state.options.filter(option => {
+            if (this.state.fieldsOfInterst.length > 0) {
+                for (let i = 0; i < this.state.fieldsOfInterst.length; i++) {
+                    const field = this.state.fieldsOfInterst[i];
+                    if (option && option[field]) {
+                        if (option[field].toLowerCase().includes(query)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             if (option && option.nome) {
                 return option.nome.toLowerCase().includes(query);
             }
