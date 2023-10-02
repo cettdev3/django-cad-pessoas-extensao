@@ -107,4 +107,6 @@ class PropostaProjeto(models.Model):
 
     @property
     def formato_conteudo_tipo_formatado(self):
+        if not self.formato_conteudo_tipo:
+            return None
         return dict(self.FORMATO_CONTEUDO_TIPO_CHOICES)[self.formato_conteudo_tipo]
