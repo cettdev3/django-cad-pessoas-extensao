@@ -84,7 +84,7 @@
                 value="anexo"> -->
             
                 <div class="form-group row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <label><b>Tipo da demanda:</b></label>
                         <select required
                         onchange="updateDemandaForm('{{ticket.id}}', 'tipo', this.value, '{{ticket.tipo}}')"
@@ -167,7 +167,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         <label><b>Id da demanda:</b></label>
                         <input 
                         type="text" 
@@ -176,67 +176,7 @@
                         value="{{ ticket.id_protocolo|default_if_none:''}}" 
                         {% endif %}
                         class="form-control" 
-                        name="id_protocolo">
-                    </div>
-                    <div class="col-sm-3">
-                        <label><b>Status:</b></label>
-                        <select required 
-                        id="status"
-                        class="form-control" 
-                        name="status">
-                            <option
-                            value="">
-                                Selecione uma opção
-                            </option>
-                        <!-- CRIACAO_PENDENTE -->
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'CRIACAO_PENDENTE' %}
-                            selected
-                            {% endif %}
-                            value="CRIACAO_PENDENTE">
-                                CRIAÇÂO PENDENTE
-                            </option>
-                            <!-- CRIADO -->
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'CRIADO' %}
-                            selected
-                            {% endif %}
-                            value="CRIADO">
-                                CRIADO
-                            </option>
-            
-                            <!-- ATRASADO_PARA_CRIACAO -->
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'ATRASADO_PARA_CRIACAO' %}
-                            selected
-                            {% endif %}
-                            value="ATRASADO_PARA_CRIACAO">
-                                ATRASADO PARA CRIACAO
-                            </option>
-                        <!-- PENDING_PRESTACAO_CONTAS -->
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'PENDING_PRESTACAO_CONTAS' %}
-                            selected
-                            {% endif %}
-                            value="PENDING_PRESTACAO_CONTAS">
-                                PRESTAÇÂO DE CONTAS PENDENTE
-                            </option>
-                        <!-- PRESTACAO_CONTAS_CREATED -->
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'PRESTACAO_CONTAS_CREATED' %}
-                            selected
-                            {% endif %}
-                            value="PRESTACAO_CONTAS_CREATED">
-                                CONTAS PRESTADAS
-                            </option>
-                            <option 
-                            {% if ticket and ticket.status_calculado == 'CANCELADO' %}
-                            selected
-                            {% endif %}
-                            value="CANCELADO">
-                                CANCELADO
-                            </option>
-                        </select>
+                        name="id_protocolo">                    
                     </div>
                     <div class="col-sm-4">
                         <label><b>Valor Executado:</b></label>
@@ -252,7 +192,7 @@
                         {% endif %}>
                     </div>
                 </div>
-                    <!-- <div class="col-sm-4">
+                <!-- <div class="col-sm-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <label><b>Data Início: {{ticket.nao_se_aplica_data_inicio}}</b></label>
                             <div class="form-group d-flex justify-content-start align-items-start" 
