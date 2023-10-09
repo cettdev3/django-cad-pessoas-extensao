@@ -310,6 +310,7 @@
         $(".dropdown-item").on("click", function (e) {
             var status = $(this).data("status");
             console.log("click no botao: " + status);
+            if (status == 'devolvida') return 
             if (status == 'aprovada') {
                 createProjetoFromProposta(
                     '{{ proposta_projeto.id }}',
