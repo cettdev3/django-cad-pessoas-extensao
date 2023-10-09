@@ -22,10 +22,11 @@ class="d-flex justify-content-between"
                     <input type="file" class="form-control d-none" id="galeria_images" name="galeria_images[]" multiple
                         required>
                 </div>
-                <i id="dropzone-icon" {% if imagens %} class="fas fa-cloud-upload-alt drop-icon d-none" {% else %}
-                    class="fas fa-cloud-upload-alt drop-icon" {% endif %}></i>
-                <p id="dropzone-text" {% if imagens %} class="d-none" {% endif %}>Você pode arrastar suas imagens para
-                    esta área</p>
+                <!-- <i id="dropzone-icon" {% if imagens %} class="fas fa-cloud-upload-alt drop-icon d-none" {% else %}
+                    class="fas fa-cloud-upload-alt drop-icon" {% endif %}></i> -->
+                <p id="dropzone-text" {% if imagens %} class="d-none" {% endif %}>
+                    Clique no botão para adicionar imagens
+                </p>
                 <div class="row mt-3" id="thumbnails-container">
                     {% for imagem in imagens %}
                     {% include "componentes/imagesInput/thumbnail.html" with imagem=imagem galeria_id=galeria_id thumbnailStyle=thumbnailStyle %}
