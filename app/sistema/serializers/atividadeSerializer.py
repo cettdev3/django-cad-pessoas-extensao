@@ -69,7 +69,8 @@ class AtividadeSerializer(serializers.ModelSerializer):
             "carga_horaria_formatada",
             "horario_inicio",
             "horario_fim",
-            "alocacoes"
+            "alocacoes",
+            "local"
         ]
         
         depth = 4
