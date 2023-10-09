@@ -7,11 +7,16 @@ def create_galerias_for_atividades(apps, schema_editor):
     Galeria = apps.get_model('sistema', 'Galeria')
     
     for atividade in Atividade.objects.all():
+        print("dentro da migration: ", atividade.id, atividade.galeria, atividade.evento)
         if atividade.galeria is None and atividade.evento is not None:
-            Galeria.objects.create(
+            print("criando galeria para: ", atividade.id)
+            
+            galeria = Galeria.objects.create(
                 nome=f'galeria atividade {atividade.id}',
                 evento=atividade.evento,
             )
+            atividade.galeria = galeria
+            atividade.save()
 
 def rollback(apps, schema_editor):
     pass
