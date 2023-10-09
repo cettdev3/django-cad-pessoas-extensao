@@ -190,7 +190,7 @@ class CustomSelectMultiple {
             if (this.state.fieldsOfInterst.length > 0) {
                 for (let i = 0; i < this.state.fieldsOfInterst.length; i++) {
                     const field = this.state.fieldsOfInterst[i]; 
-                    if (option && option[field]) {
+                    if (option && option[field] && field != 'cpf') {
                         optionElementLink.append(` ${option[field]} `);
                     }
                 }

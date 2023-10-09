@@ -609,10 +609,12 @@ def createProjetoFromProposta(request, pk):
             atividade_categoria = AtividadeCategoria.objects.get(slug=atividade_categoria_slug)
             atividades = Atividade.objects.filter(proposta_projeto=proposta_projeto)
             for atividade in atividades:
+                atividadeGaleria = Galeria.objects.create(nome="galeria atividade "+ str(atividade.id), evento=evento)  
                 atividade.evento = evento
                 atividade.atividadeSection = atividadeSection
                 atividade.status = "pendente"
                 atividade.atividadeCategorias.set([atividade_categoria.id])
+                atividade.galeria = atividadeGaleria
                 atividade.save()
             
             equipe = MembroExecucao.objects.filter(proposta_projeto=proposta_projeto)
