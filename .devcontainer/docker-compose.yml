@@ -30,9 +30,9 @@ services:
       - .:/home/vscode/app:cached
       - ./.devcontainer/.zshrc:/home/vscode/.zshrc:rw
       - ./.devcontainer/.p10k.zsh:/home/vscode/.p10k.zsh:rw
-      - ./${DJ_BACKUP}:/home/vscode/app/src/backup
-      - ./${DJ_UPLOAD}:/home/vscode/app/src/upload
-      - ./${DJ_MEDIA}:/home/vscode/app/src/media
+      - ./${DJ_BACKUP}:/home/vscode/app/app/backup
+      - ./${DJ_UPLOAD}:/home/vscode/app/app/upload
+      - ./${DJ_MEDIA}:/home/vscode/app/app/media
 
       # Uncomment the next line to use Docker from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker-compose for details.
       - /var/run/docker.sock:/var/run/docker.sock 
