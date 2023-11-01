@@ -80,7 +80,7 @@ class PropostaProjeto(models.Model):
     
     @property
     def proponentes(self):
-        return self.equipe.filter(role__slug='proponente')
+        return self.equipe.filter(roles__slug='proponente')
 
     @property
     def status_formatado(self):

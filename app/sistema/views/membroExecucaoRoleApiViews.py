@@ -57,7 +57,7 @@ class MembroExecucaoRoleApiView(APIView):
 
 class MembroExecucaoRoleDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     
     def get_object(self, fn, object_id):
         try:

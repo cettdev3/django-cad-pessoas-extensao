@@ -109,7 +109,14 @@
                                     </a>
                                     {% endif %}
                                     {% endif %}
-                                    {% if proposta.is_deleteable  %}
+                                    {% if proposta.is_deleteable %}
+                                    <button class="dropdown-item cursor-pointer btn-excluir-proposta" 
+                                    type="button"
+                                    data-proposta-projeto-id="{{ proposta.id }}">
+                                        Excluir
+                                    </button>
+                                    {% endif %}
+                                    {% if pessoa.instituicao == 'cett' and not proposta.is_deleteable %}
                                     <button class="dropdown-item cursor-pointer btn-excluir-proposta" 
                                     type="button"
                                     data-proposta-projeto-id="{{ proposta.id }}">
@@ -150,17 +157,18 @@
             $('.btn-excluir-proposta').on('click', function () {
                 var proposta_projeto_id = $(this).data('proposta-projeto-id')
                 console.log(proposta_projeto_id)
-                removePropostaProjeto(
-                    proposta_projeto_id,
-                    function (response) {
-                        showFloatingMessage("Proposta de projeto removida com sucesso", "alert-success");
-                        loadPropostasTable()
-                    },
-                    function (error) {
-                        console.log("erro")
-                        console.log(error)
-                    }
-                )
+                openDeleteModal( () => 
+                    removePropostaProjeto(
+                        proposta_projeto_id,
+                        function (response) {
+                            showFloatingMessage("Proposta de projeto removida com sucesso", "alert-success");
+                            loadPropostasTable()
+                        },
+                        function (error) {
+                            console.log("erro")
+                            console.log(error)
+                        }
+                ))
             })
 
             $(document).on('click', '[data-toggle="modal"]', function(event) {
