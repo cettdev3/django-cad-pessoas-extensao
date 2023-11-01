@@ -8,4 +8,4 @@
 	email = gpcortes@gmail.com
 	name = Gustavo Côrtes
 [credential]
-	helper = "!f() { /home/appuser/.vscode-server/bin/704ed70d4fd1c6bd6342c436f1ede30d1cff4710/node /tmp/vscode-remote-containers-bc456948-54af-48cb-a39f-8c881b03bb3c.js git-credential-helper $*; }; f"
+	helper = "!f() { /home/vscode/.vscode-server/bin/f1b07bd25dfad64b0167beb15359ae573aecd2cc/node /tmp/vscode-remote-containers-7ddbffca-8678-4ec1-8171-abb3eb08cd90.js git-credential-helper $*; }; f"

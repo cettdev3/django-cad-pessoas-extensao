@@ -21,9 +21,12 @@ services:
       context: .
       dockerfile: ./Dockerfile
       args:
-        - APP_USER_NAME=${APP_USER_NAME}
-        - APP_GID=${APP_UID}
-        - APP_UID=${APP_GID}
+        IMAGE_NAME: ${DJ_IMAGE_NAME}
+        IMAGE_TAG: ${DJ_IMAGE_TAG}
+        APP_USER_NAME: ${APP_USER_NAME}
+        APP_NAME: ${APP_NAME}
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
     labels:
       - "traefik.enable=true"
       - "traefik.constraint-label-stack=cad-pessoas-extensao"
@@ -47,18 +50,18 @@ services:
       - ENG_REST_USERNAME=${CAMUNDA_USERNAME}
       - ENG_REST_PASSWORD=${CAMUNDA_PASSWORD}
       - MAX_TASK_DURATION=30000
-      - DEV_SSH_HOST_NAME=${DEV_SSH_HOST_NAME}
-      - DEV_SSH_HOST_USER=${DEV_SSH_HOST_USER}
-      - DEV_SSH_HOST_PASS=${DEV_SSH_HOST_PASS}
-      - SITES_SSH_HOST_NAME=${SITES_SSH_HOST_NAME}
-      - SITES_SSH_HOST_USER=${SITES_SSH_HOST_USER}
-      - SITES_SSH_HOST_PASS=${SITES_SSH_HOST_PASS}
+      # - DEV_SSH_HOST_NAME=${DEV_SSH_HOST_NAME}
+      # - DEV_SSH_HOST_USER=${DEV_SSH_HOST_USER}
+      # - DEV_SSH_HOST_PASS=${DEV_SSH_HOST_PASS}
+      # - SITES_SSH_HOST_NAME=${SITES_SSH_HOST_NAME}
+      # - SITES_SSH_HOST_USER=${SITES_SSH_HOST_USER}
+      # - SITES_SSH_HOST_PASS=${SITES_SSH_HOST_PASS}
       - SIGA-SER_SSH_HOST_NAME=${SIGA-SER_SSH_HOST_NAME}
       - SIGA-SER_SSH_HOST_USER=${SIGA-SER_SSH_HOST_USER}
       - SIGA-SER_SSH_HOST_PASS=${SIGA-SER_SSH_HOST_PASS}
-      - PROTO_API_KEY=${PROTO_API_KEY}
-      - PROTO_API_SECRET=${PROTO_API_SECRET}
-      - PROTO_API_URL=${PROTO_API_URL}
+      # - PROTO_API_KEY=${PROTO_API_KEY}
+      # - PROTO_API_SECRET=${PROTO_API_SECRET}
+      # - PROTO_API_URL=${PROTO_API_URL}
       - MYSQL_ROOT_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${EXT_MYSQL_USER}
       - MYSQL_PASSWORD=${EXT_MYSQL_ROOT_PASSWORD}
@@ -97,10 +100,12 @@ services:
       context: .
       dockerfile: ./Dockerfile
       args:
-        - APP_NAME=${APP_NAME}
-        - APP_USER_NAME=${APP_USER_NAME}
-        - APP_GID=${APP_UID}
-        - APP_UID=${APP_GID}
+        IMAGE_NAME: ${DJ_IMAGE_NAME}
+        IMAGE_TAG: ${DJ_IMAGE_TAG}
+        APP_USER_NAME: ${APP_USER_NAME}
+        APP_NAME: ${APP_NAME}
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
     container_name: celery
     command: celery -A extensao worker --loglevel=INFO
     volumes:

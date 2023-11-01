@@ -1,5 +1,7 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.8-slim
+ARG IMAGE_NAME
+ARG IMAGE_TAG
+
+FROM $IMAGE_NAME:$IMAGE_TAG
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
