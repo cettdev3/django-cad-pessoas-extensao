@@ -93,6 +93,9 @@ services:
     #  - 8081:8000
     volumes:
       - ./app:/home/${APP_USER_NAME}
+    networks:
+      - default
+      - backend
   
   celery:
     restart: always
@@ -122,5 +125,8 @@ services:
 
 networks:
   default:
+    external: false
+    name: maestro-extensao
+  backend:
     external: true
     name: backend
