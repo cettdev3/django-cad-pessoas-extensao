@@ -1,85 +1,57 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <label><b>Nome:</b></label>
-                <select required 
+                <input type="text" 
                 id="tipo"
+                {% if dpEvento %}
+                value="{{dpEvento.tipo|default_if_none:""}}"
+                {% endif %}
                 class="form-control" 
                 name="tipo">
-                    <option
-                    value="">
-                        Selecione uma opção
-                    </option>
-                    <option
-                    {% if dpEvento and dpEvento.tipo == "emprestimo" %} selected {% endif %}
-                    value="emprestimo">
-                        EMPRÉSTIMO
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "curso_gps" %} selected {% endif %} 
-                    value="curso_gps">
-                        CURSO GPS
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "feirao" %} selected {% endif %} 
-                    value="feirao">
-                        FEIRÃO DO EMPREGO
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "goias_feito_a_mao" %} selected {% endif %} 
-                    value="goias_feito_a_mao">
-                        GOIÁS FEITO À MÃO
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "mutirao" %} selected {% endif %} 
-                    value="mutirao">
-                        MUTIRÃO
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "recicla_goias" %} selected {% endif %} 
-                    value="recicla_goias">
-                        RECICLA GOIÁS
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "feira_agro_centro_oeste" %} selected {% endif %} 
-                    value="feira_agro_centro_oeste">
-                        FEIRA AGRO CENTRO OESTE
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "pauta_positiva" %} selected {% endif %} 
-                    value="pauta_positiva">
-                        PAUTA POSITIVA
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "dia_mulheres" %} selected {% endif %} 
-                    value="dia_mulheres">
-                        DIA DAS MULHERES
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "open_day" %} selected {% endif %} 
-                    value="open_day">
-                        OPEN DAY
-                    </option>
-                    <option 
-                    {% if dpEvento and dpEvento.tipo == "outro" %} selected {% endif %}
-                    value="outro">
-                        OUTRO
-                    </option>
-                </select>
             </div>
             <div class="col-sm-2">
-                <label><b>Edição:</b></label>
+                <label><b>Data Início:</b></label>
                 <input 
-                type="number"
-                step="1"     
-                name="edicao" 
-                id="edicao" 
+                type="date" 
+                name="data_inicio" 
                 class="form-control" 
                 {% if dpEvento %}
-                value="{{dpEvento.edicao|default_if_none:""}}"
+                value="{{dpEvento.data_inicio}}"
                 {% endif %}>
             </div>
+            <div class="col-sm-2">
+                <label><b>Data Fim:</b></label>
+                <input 
+                type="date" 
+                name="data_fim" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.data_fim}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-2">
+                <label><b>Horario Início:</b></label>
+                <input 
+                type="time" 
+                name="horarioInicio" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.horarioInicio}}"
+                {% endif %}>
+            </div>
+            <div class="col-sm-2">
+                <label><b>Horario Fim:</b></label>
+                <input 
+                type="time" 
+                name="horarioFim" 
+                class="form-control" 
+                {% if dpEvento %}
+                value="{{dpEvento.horarioFim}}"
+                {% endif %}>
+            </div>
+            {% if selected_ensino %}
             <div id="acao-ensino-select-container" class="col-sm-5">
                 {% if dpEvento %}
                 {% include 'ensinos/ensino_select.html' with selected=selected_ensino ensinos=ensinos %}
@@ -87,6 +59,7 @@
                 {% include 'ensinos/ensino_select.html' %}
                 {% endif %}
             </div>
+            {% endif %}
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
@@ -105,48 +78,6 @@
                 rows="3"
                 name="descricao" 
                 class="form-control">{% if dpEvento %}{{dpEvento.descricao|default_if_none:""}}{% endif %}</textarea>
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-3">
-                <label><b>Data Início:</b></label>
-                <input 
-                type="date" 
-                name="data_inicio" 
-                class="form-control" 
-                {% if dpEvento %}
-                value="{{dpEvento.data_inicio}}"
-                {% endif %}>
-            </div>
-            <div class="col-sm-3">
-                <label><b>Data Fim:</b></label>
-                <input 
-                type="date" 
-                name="data_fim" 
-                class="form-control" 
-                {% if dpEvento %}
-                value="{{dpEvento.data_fim}}"
-                {% endif %}>
-            </div>
-            <div class="col-sm-3">
-                <label><b>Horario Início:</b></label>
-                <input 
-                type="time" 
-                name="horarioInicio" 
-                class="form-control" 
-                {% if dpEvento %}
-                value="{{dpEvento.horarioInicio}}"
-                {% endif %}>
-            </div>
-            <div class="col-sm-3">
-                <label><b>Horario Fim:</b></label>
-                <input 
-                type="time" 
-                name="horarioFim" 
-                class="form-control" 
-                {% if dpEvento %}
-                value="{{dpEvento.horarioFim}}"
-                {% endif %}>
             </div>
         </div>
         <div class="form-group row">

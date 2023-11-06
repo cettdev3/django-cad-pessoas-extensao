@@ -85,16 +85,16 @@ class DpEventoApiView(APIView):
         acaoEnsino = None
         postDpEventoData = request.data.get("dpEvento")
 
-        if postDpEventoData["cidade_id"]:
-            cidade = self.get_object(Cidade, postDpEventoData["cidade_id"])
+        if postDpEventoData.get("cidade_id"):
+            cidade = self.get_object(Cidade, postDpEventoData.get("cidade_id"))
             if not cidade:
                 return Response(
                     {"res": "Não existe cidade com o id informado"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         
-        if postDpEventoData["acao_ensino_id"]:
-            acaoEnsino = self.get_object(Ensino, postDpEventoData["acao_ensino_id"])
+        if postDpEventoData.get("acao_ensino_id"):
+            acaoEnsino = self.get_object(Ensino, postDpEventoData.get("acao_ensino_id"))
             if not acaoEnsino:
                 return Response(
                     {"res": "Não existe ação de ensino com o id informado"},
@@ -103,28 +103,28 @@ class DpEventoApiView(APIView):
             
         date_formats = ['%Y-%m-%d', '%Y-%m-%dT%H:%M']
         dataInicio = None
-        if postDpEventoData["data_inicio"]:
-            dataInicio = parse_date(postDpEventoData["data_inicio"], date_formats)
+        if postDpEventoData.get("data_inicio"):
+            dataInicio = parse_date(postDpEventoData.get("data_inicio"), date_formats)
 
         dataFim = None
-        if postDpEventoData["data_fim"]:
-            dataFim = parse_date(postDpEventoData["data_fim"], date_formats)
+        if postDpEventoData.get("data_fim"):
+            dataFim = parse_date(postDpEventoData.get("data_fim"), date_formats)
         
         horarioInicio = None
-        if postDpEventoData["horarioInicio"]:
-            horarioInicio = datetime.strptime(postDpEventoData["horarioInicio"], '%H:%M').time()
+        if postDpEventoData.get("horarioInicio"):
+            horarioInicio = datetime.strptime(postDpEventoData.get("horarioInicio"), '%H:%M').time()
 
         horarioFim = None
-        if postDpEventoData["horarioFim"]: 
-            horarioFim = datetime.strptime(postDpEventoData["horarioFim"], '%H:%M').time()
+        if postDpEventoData.get("horarioFim"): 
+            horarioFim = datetime.strptime(postDpEventoData.get("horarioFim"), '%H:%M').time()
         
         edicao = None
-        if postDpEventoData["edicao"]:
-            edicao = postDpEventoData["edicao"]
+        if postDpEventoData.get("edicao"):
+            edicao = postDpEventoData.get("edicao")
         
         proposta_projeto = None
-        if postDpEventoData["proposta_projeto_id"]:
-            proposta_projeto = self.get_object(PropostaProjeto, postDpEventoData["proposta_projeto_id"])
+        if postDpEventoData.get("proposta_projeto_id"):
+            proposta_projeto = self.get_object(PropostaProjeto, postDpEventoData.get("proposta_projeto_id"))
             if not proposta_projeto:
                 return Response(
                     {"res": "Não existe proposta de projeto com o id informado"},
@@ -132,14 +132,14 @@ class DpEventoApiView(APIView):
                 )
             
         dp_eventoData = {
-            "tipo": postDpEventoData["tipo"] if postDpEventoData["tipo"] else None,
-            "descricao": postDpEventoData["descricao"] if postDpEventoData["descricao"] else None,
+            "tipo": postDpEventoData.get("tipo") if postDpEventoData.get("tipo") else None,
+            "descricao": postDpEventoData.get("descricao") if postDpEventoData.get("descricao") else None,
             "data_inicio": dataInicio,
             "data_fim": dataFim,
-            "bairro": postDpEventoData["bairro"] if postDpEventoData["bairro"] else None,
-            "logradouro": postDpEventoData["logradouro"] if postDpEventoData["logradouro"] else None,
-            "cep": postDpEventoData["cep"] if postDpEventoData["cep"] else None,
-            "complemento": postDpEventoData["complemento"] if postDpEventoData["complemento"] else None,
+            "bairro": postDpEventoData.get("bairro") if postDpEventoData.get("bairro") else None,
+            "logradouro": postDpEventoData.get("logradouro") if postDpEventoData.get("logradouro") else None,
+            "cep": postDpEventoData.get("cep") if postDpEventoData.get("cep") else None,
+            "complemento": postDpEventoData.get("complemento") if postDpEventoData.get("complemento") else None,
             "cidade": cidade,
             "acaoEnsino": acaoEnsino,
             "horarioInicio": horarioInicio,
@@ -151,8 +151,8 @@ class DpEventoApiView(APIView):
         with transaction.atomic():
             evento = DpEvento.objects.create(**dp_eventoData)
             dp_eventoSerializer = DpEventoSerializer(evento)
-            if postDpEventoData["escolas"]:
-                for escola_id in postDpEventoData["escolas"]:
+            if postDpEventoData.get("escolas"):
+                for escola_id in postDpEventoData.get("escolas"):
                     escola = self.get_object(Escola, escola_id)
                     if not escola:
                         return Response(
