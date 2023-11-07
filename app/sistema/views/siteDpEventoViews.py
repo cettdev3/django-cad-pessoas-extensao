@@ -650,9 +650,10 @@ def getTipoAtividadeRow(
         worksheet.merge_range(startRow, column, endRow, column, str(atividade.tipoAtividade.nome), style)
         return worksheet
     else:
+        nomeAtividade = atividade.nome if atividade.nome else "N/I"
         if startRow == endRow:
-            worksheet.write(startRow, column, "N/I", style)
-        worksheet.merge_range(startRow, column, endRow, column, "N/I", style)
+            worksheet.write(startRow, column, nomeAtividade, style)
+        worksheet.merge_range(startRow, column, endRow, column, nomeAtividade, style)
     return worksheet
 
 def getAtividadeHorasRow(
@@ -873,7 +874,7 @@ def relatorioSintetico(request):
     centered.set_text_wrap(True)
 
     headers = [
-        'Evento',
+        # 'Evento', # remover
         "Quantidade de Ações",
         "Ação de Extensão",
         "Horas Executadas",
@@ -887,8 +888,8 @@ def relatorioSintetico(request):
         "Curso",
         "COD. SIGA",
         "Turno",
-        "Ofício",
-        "ALUNOS"
+        # "Ofício", # remover
+        # "ALUNOS", # remover
     ]
 
         
@@ -930,7 +931,7 @@ def relatorioSintetico(request):
         # coluna do evento
         startEventoRow = row
         endEventoRow = (alocacoesCount * atividadeCount) + (previousRowCount)
-        worksheet = getEventoRow(worksheet, evento, startEventoRow, endEventoRow, headers.index("Evento"), centered)
+        # worksheet = getEventoRow(worksheet, evento, startEventoRow, endEventoRow, headers.index("Evento"), centered)
 
         # coluna da atividade
         atividadeStartRow = startRow
@@ -955,16 +956,16 @@ def relatorioSintetico(request):
                 worksheet.write(row, headers.index("Curso"), "N/A", centered)
                 worksheet.write(row, headers.index("COD. SIGA"), "N/A", centered)
                 worksheet.write(row, headers.index("Turno"), "N/A", centered)
-                worksheet.write(row, headers.index("Ofício"), "N/A", centered)
-                worksheet.write(row, headers.index("ALUNOS"), "N/A", centered)
+                # worksheet.write(row, headers.index("Ofício"), "N/A", centered)
+                # worksheet.write(row, headers.index("ALUNOS"), "N/A", centered)
                 row += 1
 
             for alocacao in alocacoes:
                 worksheet = getAtividadeCurso(worksheet, alocacao, row, headers.index("Curso"), centered)
                 worksheet = getAtividadeCursoSiga(worksheet, alocacao, row, headers.index("COD. SIGA"), centered)
                 worksheet = getAtividadeCursoTurno(worksheet, alocacao, row, headers.index("Turno"), centered)
-                worksheet = getAtividadeCursoOficio(worksheet, alocacao, row, headers.index("Ofício"), centered)
-                worksheet = getAtividadeCursoAtendimentos(worksheet, alocacao, row, headers.index("ALUNOS"), centered)
+                # worksheet = getAtividadeCursoOficio(worksheet, alocacao, row, headers.index("Ofício"), centered)
+                # worksheet = getAtividadeCursoAtendimentos(worksheet, alocacao, row, headers.index("ALUNOS"), centered)
                 row += 1
 
         startRow = row

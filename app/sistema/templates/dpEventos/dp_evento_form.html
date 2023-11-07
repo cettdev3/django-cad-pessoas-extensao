@@ -1,7 +1,7 @@
 <div class="w-100">
     <form id="cadastrardpEventoForm" action="/" method="POST">
         <div class="form-group row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label><b>Nome:</b></label>
                 <input type="text" 
                 id="tipo"
@@ -11,7 +11,7 @@
                 class="form-control" 
                 name="tipo">
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <label><b>Data Início:</b></label>
                 <input 
                 type="date" 
@@ -21,7 +21,7 @@
                 value="{{dpEvento.data_inicio}}"
                 {% endif %}>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <label><b>Data Fim:</b></label>
                 <input 
                 type="date" 
@@ -31,7 +31,7 @@
                 value="{{dpEvento.data_fim}}"
                 {% endif %}>
             </div>
-            <div class="col-sm-2">
+            <!-- <div class="col-sm-2">
                 <label><b>Horario Início:</b></label>
                 <input 
                 type="time" 
@@ -50,7 +50,7 @@
                 {% if dpEvento %}
                 value="{{dpEvento.horarioFim}}"
                 {% endif %}>
-            </div>
+            </div> -->
             {% if selected_ensino %}
             <div id="acao-ensino-select-container" class="col-sm-5">
                 {% if dpEvento %}
